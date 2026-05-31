@@ -27,13 +27,15 @@
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        /* --- V27 ANTI-FLICKER CORE ENGINE --- */
+        /* --- MOBILE TOUCH & BASE ENGINE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; padding-top: 90px; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         input, textarea, select, .admin-note-input { -webkit-touch-callout: default !important; -webkit-user-select: auto !important; user-select: auto !important; }
 
         /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
-        .admin-only-block, .admin-only-flex, .admin-only-inline { display: none !important; }
+        .admin-only-block { display: none !important; }
+        .admin-only-flex { display: none !important; }
+        .admin-only-inline { display: none !important; }
         body.is-admin .admin-only-block { display: block !important; }
         body.is-admin .admin-only-flex { display: flex !important; }
         body.is-admin .admin-only-inline { display: inline-flex !important; }
@@ -50,10 +52,10 @@
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
 
-        /* --- V27 SMOOTH INTRO PRELOADER (No Pixelation) --- */
+        /* --- INTRO PRELOADER --- */
         #intro-preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; transition: opacity 0.5s ease; }
         .intro-track { width: 280px; height: 4px; background: rgba(255,255,255,0.03); position: relative; margin-top: 40px; border-radius: 2px; }
-        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; } /* Removed shadow for mobile performance */
+        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; }
         .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 20px rgba(255,255,255,0.05); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s; }
         .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(10px); transition: all 0.5s; }
@@ -77,7 +79,6 @@
         .logo-text .red-part { color: var(--primary-red); }
         .logo-text .white-part { color: #ffffff; }
         
-        /* V27 Gentle Logo Car Animation */
         .logo-car-svg { height: clamp(14px, 3.5vw, 22px); width: auto; flex-shrink: 0; fill: #ffffff; margin-left: 6px; animation: gentleIdle 3s infinite ease-in-out; transition: fill 0.3s; }
         .logo-container:hover .logo-car-svg { fill: var(--primary-red); }
         @keyframes gentleIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
@@ -119,7 +120,7 @@
         .fullscreen-menu a { color: white; font-size: 24px; font-weight: 800; text-transform: uppercase; text-decoration: none; margin: 12px 0; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
         .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
 
-        /* --- OVAL DIALOG ARCHITECTURE (UNIFIED MODALS) --- */
+        /* --- OVAL DIALOG ARCHITECTURE --- */
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
@@ -145,7 +146,7 @@
         #confirmModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15); }
         #deleteConfirmOverlay .custom-dialog-window { max-width: 400px; border-top-color: #ff3b30; box-shadow: 0 20px 50px rgba(255,59,48,0.15); }
         #logoutConfirmOverlay .custom-dialog-window { max-width: 400px; }
-        #tickerConfigOverlay .custom-dialog-window { max-width: 520px; border-top-color: #007aff; }
+        #tickerConfigOverlay .custom-dialog-window { max-width: 580px; border-top-color: #007aff; }
         #lightboxOverlay .custom-dialog-window { max-width: 600px; border-top-color: #b38728; padding: 25px; }
         #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } 
 
@@ -188,8 +189,8 @@
         .pinned-plate::before { content: 'D'; background: #003399; color: #fff; padding: 2px 4px; font-size: 12px; border-radius: 3px; }
         @keyframes slideInPlate { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* --- CHECKBOX FIX (UNICODE SAFE) --- */
-        .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
+        /* --- CHECKBOX FIX --- */
+        .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
         .noble-checkbox-label input:checked + .noble-checkbox-box { background: var(--primary-red); border-color: var(--primary-red); }
@@ -201,12 +202,15 @@
         .noble-file-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; display: block; transition: 0.3s; }
         .noble-file-upload input:change + .noble-file-trigger, .noble-file-trigger:hover { border-color: var(--primary-red); color: white; background: rgba(230,0,0,0.04); }
 
+        /* --- TICKER SYMBOL MATRIX --- */
+        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
+
         /* --- SPA VIEW SECTIONS --- */
         .view-section { display: none; animation: viewFadeIn 0.4s ease forwards; padding-top: 30px; min-height: 100vh; }
         .view-section.active { display: block; }
         @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- COMPACT BOOKING FORM DESKTOP --- */
+        /* --- COMPACT BOOKING FORM --- */
         .booking-wrapper { max-width: 750px; margin: 0 auto; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
         .form-row { display: flex; gap: 15px; }
         @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
@@ -226,24 +230,26 @@
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- V27 FLATPICKR CENTERING & THEMING --- */
-        .flatpickr-calendar { background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; font-family: 'Montserrat', sans-serif !important; width: 300px !important; position: fixed !important; top: 50vh !important; left: 50vw !important; transform: translate(-50%, -50%) !important; z-index: 999999 !important; display: none; right: auto !important; bottom: auto !important; margin: 0 !important; }
-        .flatpickr-calendar.open { display: block !important; }
-        .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
+        /* --- FLATPICKR RE-FIX (ÄMTER STYLE) --- */
+        .flatpickr-calendar { 
+            background: #0c0c0f !important; border: 1px solid var(--primary-red) !important; 
+            border-radius: 15px !important; box-shadow: 0 15px 50px rgba(0,0,0,0.9) !important; 
+            font-family: 'Montserrat', sans-serif !important; 
+        }
+        .flatpickr-day.selected { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
-        .flatpickr-day.flatpickr-disabled { color: #2a2a30 !important; }
         
         .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
-        .time-slot.active { background: var(--primary-red); border-color: var(--primary-red); }
+        .time-slot.active { background: var(--primary-red); border-color: var(--primary-red); color: white; }
         .time-slot.booked { opacity: 0.2; text-decoration: line-through; cursor: not-allowed; }
 
         /* --- GLOBAL BUTTONS --- */
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- V27 MOBILE SCALING & ANTI-FLICKER --- */
+        /* --- MOBILE SCALING (V28 ANTI-FLICKER & RESPONSIVE FIXES) --- */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 80px; }
             nav { padding: 10px 3%; }
@@ -259,6 +265,7 @@
             .hero { margin-top: 15px; }
             .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
             
+            /* Anti Flicker Mobile Adjustments */
             .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
             
             .card { padding: 25px 15px !important; height: 160px !important; }
@@ -277,22 +284,24 @@
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
-        /* V27 SMOOTH SOFORTKENNZEICHEN (NO FLICKER) */
+        /* V28 ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
         .sofort-badge { 
-            background: linear-gradient(45deg, #ff0000, #b30000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
+            background: linear-gradient(45deg, #ff0000, #cc0000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
             padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; 
-            border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
-            animation: smooth-pulse-badge 2s infinite alternate ease-in-out; text-transform: uppercase; letter-spacing: 1px; 
+            border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            text-transform: uppercase; letter-spacing: 1px; 
         }
-        @keyframes smooth-pulse-badge { 
-            0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.4); border-color: rgba(255,255,255,0.3); } 
-            100% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.9); border-color: #ffcc00; } 
+        /* Only pulse the inner icon to prevent layout thrashing on mobile */
+        .sofort-badge i { animation: pulse-icon 1.5s infinite alternate ease-in-out; }
+        @keyframes pulse-icon { 
+            0% { color: #ffcc00; transform: scale(1); text-shadow: 0 0 5px #ffcc00; } 
+            100% { color: #ffffff; transform: scale(1.3); text-shadow: 0 0 15px #ffffff; } 
         }
         
         .section-header { text-align: center; margin-bottom: 35px; }
         .section-header h2 { font-size: clamp(22px, 3.5vw, 34px); font-weight: 900; text-transform: uppercase; }
         
-        /* --- SERVICE CARDS (ON-CARD REVEAL) --- */
+        /* --- SERVICE CARDS --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .card { background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .card:hover { border-color: rgba(230,0,0,0.5); }
@@ -304,7 +313,7 @@
 
         /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE) --- */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
-        .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
+        .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
         .download-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 600; }
         .download-item.selected { background: rgba(230,0,0,0.12); border-color: var(--primary-red); box-shadow: 0 0 15px rgba(230,0,0,0.25); }
@@ -320,22 +329,23 @@
         .admin-del { color: #ff3b30; margin-left: 5px; }
         .admin-del:hover { color: #fff; transform: scale(1.1); }
 
-        /* --- AUTO ANKAUF REAL PICTURE GALLERY (COMPACT) --- */
+        /* --- AUTO ANKAUF REAL PICTURE GALLERY --- */
         .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
         
         .gallery-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); height: 130px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
         .gallery-card img, .gallery-card video { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.6; z-index: 1; transition: 0.3s; }
-        .gallery-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)); z-index: 2; }
+        .gallery-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)); z-index: 2; pointer-events: none; }
         .gallery-card:hover { transform: scale(1.03); border-color: #b38728; }
         .gallery-card:hover img, .gallery-card:hover video { opacity: 0.9; }
         .gallery-card span { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
-        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; }
-        .admin-del-img-btn:hover { background: #ff3b30; color: #fff; }
+        /* V28 Delete Button Z-Index Fix */
+        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
+        .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* --- BERLIN KENNZEICHEN WARNING ACCENT COMPONENT --- */
+        /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
@@ -359,8 +369,6 @@
         #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
         #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
 
-        /* TICKER CONFIG SYMBOL MATRIX STYLING */
-        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -385,7 +393,7 @@
     <div id="header-wrapper">
         <nav>
             <div class="logo-container" id="logoHubTrigger">
-                <!-- V27 NEW HEADER LOGO: Text + Vector Sports Car -->
+                <!-- V28 NEW HEADER LOGO: Text + Vector Sports Car -->
                 <div class="logo-text">
                     <span class="red-part">RED</span> 
                     <span class="white-part">ZULASSUNGSDIENST</span>
@@ -520,7 +528,7 @@
         </div>
     </div>
 
-    <!-- V27 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <!-- V28 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
@@ -551,11 +559,11 @@
                 </div>
             </div>
             
-            <!-- V27 UPDATE: ENHANCED MULTIPLE SYMBOL SELECTOR MATRIX -->
+            <!-- V28 UPDATE: ENHANCED MULTIPLE SYMBOL SELECTOR MATRIX -->
             <div class="form-group" style="margin-top:10px;">
                 <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
                 <div class="symbol-grid">
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 Auto</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="noble-checkbox-box"></span> 🚛 LKW</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
@@ -564,6 +572,12 @@
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Stern</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symKey"><span class="noble-checkbox-box"></span> 🔑 Schlüssel</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symClock"><span class="noble-checkbox-box"></span> ⏱️ Uhr</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFire"><span class="noble-checkbox-box"></span> 🔥 Feuer</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symInfo"><span class="noble-checkbox-box"></span> ℹ️ Info</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCalendar"><span class="noble-checkbox-box"></span> 📅 Kalender</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symPin"><span class="noble-checkbox-box"></span> 📍 Pin</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symHand"><span class="noble-checkbox-box"></span> 🤝 Deal</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMedal"><span class="noble-checkbox-box"></span> 🥇 Nr. 1</label>
                 </div>
             </div>
             
@@ -639,8 +653,12 @@
     <div id="view-home" class="view-section active">
         <div class="hero">
             <div class="hero-content">
-                <!-- V27 Anti Flicker smooth pulse badge -->
-                <div class="sofort-badge"><i class="fa-solid fa-bolt" style="margin-right:8px;"></i> Sofortkennzeichen zum Mitnehmen! <i class="fa-solid fa-bolt" style="margin-left:8px;"></i></div>
+                <!-- V28 Anti Flicker smooth pulse badge -->
+                <div class="sofort-badge">
+                    <i class="fa-solid fa-bolt" style="margin-right:8px;"></i> 
+                    Sofortkennzeichen zum Mitnehmen! 
+                    <i class="fa-solid fa-bolt" style="margin-left:8px;"></i>
+                </div>
                 <h1 style="font-size: clamp(22px, 4.5vw, 42px); line-height: 1.1; margin-bottom: 15px;">Schnell. Zuverlässig.<br><span style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
                 <p style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 30px;">Zulassungstermine innerhalb von 1-2 Werktagen in Berlin Neukölln.</p>
                 <a href="#termin" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
@@ -680,7 +698,7 @@
             </div>
         </section>
 
-        <!-- NOBLE COMPACT TRANSACT WRAPPER -->
+        <!-- BOOKING ENGINE -->
         <section id="termin" style="background: rgba(0,0,0,0.4); border-top:1px solid var(--glass-border); padding: 60px 5%;">
             <div class="section-header">
                 <h2>Termin Buchen</h2>
@@ -757,9 +775,9 @@
             <p style="color:var(--text-muted); font-size:12px;">Klicken zum Markieren / Auswählen</p>
         </div>
         
-        <!-- DYNAMIC FORM GRID (Populated by JS/Firebase) -->
+        <!-- DYNAMIC FORM GRID (Populated by Firebase/Defaults) -->
         <div class="download-grid" id="formItemsGrid">
-            <!-- Rendered dynamically -->
+            <!-- Rendered by JS -->
         </div>
     </div>
 
@@ -795,7 +813,7 @@
 
         <div style="text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 14px; font-weight: 800; color: #b38728;">Wertermittlung & Oldtimer Galerie</div>
         
-        <!-- DYNAMIC CAR GALLERY -->
+        <!-- DYNAMIC CAR GALLERY (Populated by Firebase/Defaults) -->
         <div class="vintage-gallery" id="carsGalleryGrid">
             <!-- Rendered by JS -->
         </div>
@@ -866,7 +884,7 @@
         </div>
     </footer>
 
-    <!-- FIREBASE V27 MODULE INTEGRATION -->
+    <!-- FIREBASE V28 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -920,7 +938,6 @@
             window.isAuthorized = true;
             document.getElementById('authBox').style.display = 'none';
             document.getElementById('dashboardBox').style.display = 'block';
-            document.getElementById('adminKeyIcon').style.color = '#25D366';
         }
 
         window.tryLogin = function() {
@@ -936,7 +953,6 @@
                 
                 document.getElementById('authBox').style.display = 'none';
                 document.getElementById('dashboardBox').style.display = 'block';
-                document.getElementById('adminKeyIcon').style.color = '#25D366';
                 window.showToast('Erfolgreich als Admin angemeldet.', 'success');
             } else {
                 window.showToast('Zugriff verweigert! Falscher Name oder Passwort.', 'error');
@@ -954,7 +970,6 @@
             document.getElementById('adminPass').value = '';
             document.getElementById('dashboardBox').style.display = 'none';
             document.getElementById('authBox').style.display = 'block';
-            document.getElementById('adminKeyIcon').style.color = '#fff';
             
             window.cancelLogout();
             window.showToast('Erfolgreich abgemeldet.', 'success');
@@ -998,7 +1013,7 @@
             }
         });
 
-        // --- FIREBASE: LIVE TICKER CONFIGURATION (V27 WITH COLORED ICONS) ---
+        // --- FIREBASE: LIVE TICKER CONFIGURATION ---
         window.openTickerConfig = function() {
             if(!window.isAuthorized) return;
             document.getElementById('tickerConfigOverlay').classList.add('open');
@@ -1028,15 +1043,21 @@
             
             // Map symbols to their colored counterparts
             const symbolMap = {
-                'symCar': {icon: 'fa-car-side', col: '#e60000'},
-                'symMotorcycle': {icon: 'fa-motorcycle', col: '#007aff'},
-                'symTruck': {icon: 'fa-truck', col: '#ff9500'},
-                'symCard': {icon: 'fa-id-card', col: '#00ffff'},
+                'symCar': {icon: 'fa-car-side', col: '#ffffff'},
+                'symMotorcycle': {icon: 'fa-motorcycle', col: '#ffffff'},
+                'symTruck': {icon: 'fa-truck', col: '#ffffff'},
+                'symCard': {icon: 'fa-id-card', col: '#ffffff'},
                 'symBolt': {icon: 'fa-bolt', col: '#ffcc00'},
                 'symFlag': {icon: 'fa-flag-checkered', col: '#ffffff'},
                 'symStar': {icon: 'fa-star', col: '#ffcc00'},
-                'symKey': {icon: 'fa-key', col: '#cccccc'},
-                'symClock': {icon: 'fa-clock', col: '#ff9500'}
+                'symKey': {icon: 'fa-key', col: '#ffffff'},
+                'symClock': {icon: 'fa-clock', col: '#ffffff'},
+                'symFire': {icon: 'fa-fire', col: '#ff9500'},
+                'symInfo': {icon: 'fa-circle-info', col: '#007aff'},
+                'symCalendar': {icon: 'fa-calendar', col: '#ffffff'},
+                'symPin': {icon: 'fa-thumbtack', col: '#e60000'},
+                'symHand': {icon: 'fa-handshake', col: '#25D366'},
+                'symMedal': {icon: 'fa-medal', col: '#ffcc00'}
             };
             
             const symbols = [];
@@ -1112,6 +1133,12 @@
                     document.getElementById('symStar').checked = symbolsJson.includes('fa-star');
                     document.getElementById('symKey').checked = symbolsJson.includes('fa-key');
                     document.getElementById('symClock').checked = symbolsJson.includes('fa-clock');
+                    document.getElementById('symFire').checked = symbolsJson.includes('fa-fire');
+                    document.getElementById('symInfo').checked = symbolsJson.includes('fa-circle-info');
+                    document.getElementById('symCalendar').checked = symbolsJson.includes('fa-calendar');
+                    document.getElementById('symPin').checked = symbolsJson.includes('fa-thumbtack');
+                    document.getElementById('symHand').checked = symbolsJson.includes('fa-handshake');
+                    document.getElementById('symMedal').checked = symbolsJson.includes('fa-medal');
                 }
             }
         });
@@ -1124,7 +1151,7 @@
              }
         });
 
-        // --- FIREBASE: LIVE APPOINTMENTS (V27 SYNC BACKUP FIX) ---
+        // --- FIREBASE: LIVE APPOINTMENTS (V28 SYNC BACKUP FIX) ---
         window.activeBadgeNum = 0;
         let localAppointments = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
         
@@ -1419,8 +1446,10 @@
             });
         }
         
+        // Initial static render
         renderForms(staticForms);
 
+        // Listen for Firebase Forms (Override if exist)
         onSnapshot(collection(db, "forms"), (snapshot) => {
             if(!snapshot.empty) {
                 const formsData = [];
@@ -1455,7 +1484,9 @@
             fileInput.onchange = async e => {
                 if(e.target.files.length > 0) {
                     const file = e.target.files[0];
+                    // Create object URL for local display (In production: upload to Firebase Storage)
                     const url = URL.createObjectURL(file); 
+                    
                     try {
                         await updateDoc(doc(db, "forms", formId), { url: url });
                         window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
@@ -1520,6 +1551,7 @@
                    mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
                 }
                 
+                // Add the absolute z-index fix here for the delete button!
                 card.innerHTML = `
                     <div class="admin-del-img-btn admin-up admin-only-flex" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
                     ${mediaHtml}
