@@ -74,7 +74,7 @@
         .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; position: relative; }
         .logo-text { font-size: clamp(14px, 2vw, 22px); font-weight: 900; color: var(--text-light); text-transform: uppercase; white-space: nowrap; }
         
-        .admin-ticker-edit-icon { display: none; position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
+        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
         .logo-container:hover .admin-ticker-edit-icon.active { display: block; }
         .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
 
@@ -94,7 +94,8 @@
         .key-icon-wrapper i { color: #fff; font-size: 16px; transition: 0.3s; }
         body.is-admin .key-icon-wrapper i { color: #25D366; }
 
-        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
+        /* V26 FIX: BADGE HIDDEN BY DEFAULT, ONLY SHOWS IF > 0 */
+        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
         .notification-badge.prio-pulse { animation: badgePulse 1s infinite alternate; }
         @keyframes badgePulse { 0% { transform: scale(1); background: #ff3b30; box-shadow: 0 0 10px #ff3b30; } 100% { transform: scale(1.2); background: #ff3b30; box-shadow: 0 0 20px #ff3b30; } }
         @keyframes jiggle { 0%, 88%, 100% { transform: rotate(0deg); } 90% { transform: rotate(-15deg); } 93% { transform: rotate(20deg); } 96% { transform: rotate(-10deg); } 98% { transform: rotate(10deg); } }
@@ -123,14 +124,19 @@
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
+        /* V26 FIX: MODALS ARE SCROLLABLE SO NOTHING IS CUT OFF ON MOBILE */
         .custom-dialog-window { 
             background: linear-gradient(135deg, #121216 0%, #070709 100%); 
             border: 1px solid rgba(255,255,255,0.05); border-top: 2px solid var(--primary-red);
-            width: 92%; max-width: 490px; border-radius: 30px; padding: 40px 30px; 
+            width: 92%; max-width: 490px; max-height: 90vh; overflow-y: auto; 
+            border-radius: 30px; padding: 40px 30px; 
             position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.7); 
             transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
             text-align: center; 
         }
+        .custom-dialog-window::-webkit-scrollbar { width: 4px; }
+        .custom-dialog-window::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 4px; }
+
         .custom-dialog-overlay.open .custom-dialog-window { transform: scale(1); }
         .close-dialog-btn { position: absolute; top: 20px; right: 25px; font-size: 22px; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10; }
         .close-dialog-btn:hover { color: #fff; transform: scale(1.1); }
@@ -174,7 +180,7 @@
 
         /* --- PINNED PLATE (KENNZEICHEN) WIDGET --- */
         #pinned-container { position: fixed; bottom: 20px; right: 20px; z-index: 9000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
-        .pinned-plate { background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: all; cursor: pointer; transition: 0.3s; }
+        .pinned-plate { background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: all; cursor: pointer; transition: transform 0.3s; }
         
         .pinned-plate.urgent-today { border-color: #e60000; color: #e60000; animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, urgentGlow 2s 0.5s infinite alternate ease-in-out; }
         @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); border-color: #e60000; } 100% { box-shadow: 0 10px 30px rgba(230,0,0,1); border-color: #ff4d4d; background: #fffafa; } }
@@ -215,7 +221,7 @@
         /* NOBLE CUSTOM DROPDOWN SELECTS */
         .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
         .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .noble-select-trigger::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--primary-red); font-size: 10px; transition: 0.3s; }
+        .noble-select-trigger::after { content: '▼'; font-family: sans-serif; font-size: 10px; color: var(--primary-red); transition: 0.3s; }
         .noble-select-box.open .noble-select-trigger::after { transform: rotate(180deg); }
         .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; overflow: hidden; }
         .noble-select-box.open .noble-options-dropdown { display: block; }
@@ -225,9 +231,8 @@
         /* --- FLATPICKR CENTERING & THEMING --- */
         .flatpickr-calendar { background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; border-radius: 15px !important; box-shadow: 0 20px 50px rgba(0,0,0,0.8) !important; font-family: 'Montserrat', sans-serif !important; width: 300px !important; margin: 0 auto; }
         .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
-        .flatpickr-day { color: #fff !important; height: 30px !important; line-height: 30px !important; }
+        .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
-        .flatpickr-day.flatpickr-disabled { color: #333 !important; }
         
         .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
@@ -238,7 +243,7 @@
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- MOBILE SCALING (MINIMAL) --- */
+        /* --- MOBILE SCALING & FIXES (V26) --- */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 90px; }
             nav { padding: 10px 4%; }
@@ -249,20 +254,20 @@
             .sofort-badge { padding: 8px 16px !important; font-size: 11px !important; margin-bottom: 15px !important; }
             .card { padding: 25px 15px !important; height: 160px !important; }
             .booking-wrapper { padding: 25px 15px !important; }
-            .admin-window, .custom-dialog-window { padding: 30px 15px !important; width: 95% !important; }
+            .admin-window, .custom-dialog-window { padding: 30px 18px !important; width: 95% !important; }
             .vintage-gallery { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
             .gallery-card { height: 110px !important; padding: 10px !important; }
             .auto-ankauf-box { padding: 30px 15px !important; border-radius: 15px !important; }
             .download-item { flex-direction: column; text-align: center; gap: 8px; }
             .apt-actions-horizontal { justify-content: center; }
             .symbol-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            #tickerConfigOverlay .custom-dialog-window { max-height: 85vh; padding: 20px 15px; } /* Mobile Config Scroll Fix */
         }
 
-        /* --- HERO & COMPONENTS --- */
-        .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px 5%; margin-top: 20px; }
+        /* --- HERO --- */
+        .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
-        /* V24 ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #b30000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
             padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; border: 2px solid rgba(255,255,255,0.5);
@@ -273,12 +278,12 @@
             0% { transform: scale(1) translateZ(0); box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); border-color: rgba(255,255,255,0.5); color: #fff; } 
             100% { transform: scale(1.04) translateZ(0); box-shadow: 0 0 40px rgba(255, 0, 0, 0.9); border-color: #ffcc00; color: #ffcc00; } 
         }
-
-        /* --- CORE SERVICES (ON-CARD REVEAL DESIGN MATCHING) --- */
+        
         .section-header { text-align: center; margin-bottom: 35px; }
         .section-header h2 { font-size: clamp(22px, 3.5vw, 34px); font-weight: 900; text-transform: uppercase; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         
+        /* --- SERVICE CARDS --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .card { background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .card:hover { border-color: rgba(230,0,0,0.5); }
         .card i.main-icon { font-size: 35px; color: var(--primary-red); margin-bottom: 15px; transition: 0.3s; }
@@ -287,7 +292,7 @@
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE VIA V20 CLASS) --- */
+        /* --- DOWNLOADS COMPONENT --- */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
@@ -310,7 +315,7 @@
         .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
         
-        .gallery-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); height: 130px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
+        .gallery-card { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-border); height: 130px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
         .gallery-card img, .gallery-card video { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.6; z-index: 1; transition: 0.3s; }
         .gallery-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)); z-index: 2; }
         .gallery-card:hover { transform: scale(1.03); border-color: #b38728; }
@@ -320,7 +325,7 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; }
 
-        /* --- BERLIN KENNZEICHEN WARNING ACCENT COMPONENT --- */
+        /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
@@ -344,8 +349,9 @@
         #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
         #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
 
-        /* V24 SYMBOL MATRIX STYLING */
+        /* TICKER CONFIG SYMBOL MATRIX STYLING */
         .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
+        @media (max-width: 480px) { .symbol-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
@@ -375,16 +381,16 @@
                     <div class="tire-tracks" id="navTracks"></div>
                 </div>
                 <div class="logo-text">RED <span>Zulassung</span></div>
-                <!-- V24 ADMIN TICKER EDIT ICON SECURE -->
+                <!-- ADMIN TICKER EDIT ICON SECURE -->
                 <i class="fa-solid fa-pen admin-ticker-edit-icon admin-only-block" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker & Symbole bearbeiten"></i>
             </div>
             
             <div class="nav-actions">
-                <div class="visitor-counter"><i class="fa-solid fa-users"></i> Besuche: <span id="vCount">1.482</span></div>
+                <div class="visitor-counter"><i class="fa-solid fa-users"></i> Besuche: <span id="vCount">0</span></div>
                 
                 <div class="key-ring" onclick="window.openAdmin()" title="Admin Control Center">
                     <div class="key-icon-wrapper"><i class="fa-solid fa-key" id="adminKeyIcon"></i></div>
-                    <span class="notification-badge" id="notif-badge">2</span>
+                    <span class="notification-badge" id="notif-badge" style="display:none;">0</span>
                 </div>
                 
                 <button class="quick-menu-btn" onclick="window.toggleMenu()"><i class="fa-solid fa-bars"></i> Menü</button>
@@ -423,10 +429,10 @@
             <div id="authBox">
                 <h3 style="color:var(--primary-red); font-weight:900; margin-bottom:20px;"><i class="fa-solid fa-lock"></i> Admin Systemzugang</h3>
                 <div class="form-group">
-                    <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="Benutzername">
+                    <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="Benutzername eingeben">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Master-Passwort">
+                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Passwort eingeben">
                 </div>
                 
                 <label class="noble-checkbox-label" style="justify-content: center;">
@@ -498,7 +504,7 @@
         </div>
     </div>
 
-    <!-- V24 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <!-- EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS WITH MOBILE SCROLL FIX -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
@@ -529,7 +535,6 @@
                 </div>
             </div>
             
-            <!-- V24 UPDATE: ENHANCED MULTIPLE SYMBOL SELECTOR MATRIX -->
             <div class="form-group" style="margin-top:10px;">
                 <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
                 <div class="symbol-grid">
@@ -720,8 +725,8 @@
         </div>
         
         <!-- ADMIN AREA FORMULARE MANAGEMENT AREA -->
-        <div id="adminFormSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px;">
-            <h4><i class="fa-solid fa-folder-plus"></i> Admin: Formular-Verwaltung Terminal</h4>
+        <div id="adminFormSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.15); border-radius: 15px; padding: 20px;">
+            <h4 style="color:var(--primary-red); margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-folder-plus"></i> Admin: Formular-Verwaltung Terminal</h4>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <input type="text" id="newFormTitle" class="form-control" placeholder="Titel" style="flex:1; margin-bottom:0;">
                 <input type="text" id="newFormUrl" class="form-control" placeholder="Link/URL" style="flex:1; margin-bottom:0;">
@@ -749,7 +754,7 @@
         </div>
         
         <!-- ADMIN AREA ANKAUF PHOTO MEDIA STORAGE -->
-        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border-color: rgba(179,135,40,0.2);">
+        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border: 1px solid rgba(179,135,40,0.2); border-radius: 15px; padding: 20px;">
             <h4 style="color:#b38728; margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Ankauf Galerie - Unbegrenzt)</h4>
             <div class="config-row" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                 <input type="text" id="newCarTitle" class="form-control" placeholder="Modellname" style="flex:1; margin-bottom:0;">
@@ -843,16 +848,12 @@
         </div>
     </footer>
 
-    <!-- Scripts Framework -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
-
-    <!-- FIREBASE V25 MODULE INTEGRATION -->
+    <!-- FIREBASE V26 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // FIREBASE CONFIGURATION (Provided by User)
+        // FIREBASE CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyDa10ia02K0vsHgzj-iTf4S6BwKzQruqyY",
             authDomain: "red-zulassungsdienst.firebaseapp.com",
@@ -894,8 +895,6 @@
         window.deleteTargetId = null;
         window.deleteNoteTargetId = null;
         window.editingNoteElement = null;
-        window.editingNoteId = null;
-        window.editingCardId = null;
 
         window.tryLogin = function() {
             const u = document.getElementById('adminUser').value;
@@ -949,6 +948,27 @@
             }
         };
         
+        // --- FIREBASE: VISITOR COUNTER V26 ---
+        const visitorDocRef = doc(db, "settings", "visitors");
+        let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
+        
+        // Try incrementing firebase
+        try {
+            setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {
+                localCount++;
+                localStorage.setItem('vCountFin', localCount);
+                document.querySelectorAll('#vCount').forEach(el => el.innerText = localCount.toLocaleString('de-DE'));
+            });
+        } catch(e) {}
+        
+        // Listen to live count
+        onSnapshot(visitorDocRef, (docSnap) => {
+            if(docSnap.exists()) {
+                const count = docSnap.data().count || 0;
+                document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
+            }
+        });
+
         // --- FIREBASE: LIVE TICKER CONFIGURATION ---
         window.openTickerConfig = function() {
             if(!window.isAuthorized) return;
@@ -966,7 +986,6 @@
             window.closeTickerConfig();
             window.showToast(window.tickerIsVisible ? 'Ticker aktiviert' : 'Ticker deaktiviert', 'success');
             
-            // Save state to Firebase
             try { setDoc(doc(db, "settings", "ticker_state"), { isVisible: window.tickerIsVisible }, {merge: true}); } catch(e){}
         };
         
@@ -998,7 +1017,7 @@
                 window.showToast('Ticker-Einstellungen in Firebase gespeichert!', 'success');
             } catch(e) {
                 console.warn(e);
-                window.showToast('Fehler (Berechtigungen?). Lokal angewendet.', 'error');
+                window.showToast('Lokal angewendet (Permissions?).', 'error');
                 applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
                 window.closeTickerConfig();
             }
@@ -1032,12 +1051,10 @@
             wrapperEl.style.animationDuration = data.speed || "15s";
         }
 
-        // Firebase Ticker Listener
         onSnapshot(doc(db, "settings", "ticker"), (docSnap) => {
             if(docSnap.exists()) {
                 applyTickerLocally(docSnap.data());
                 
-                // Update inputs for admin
                 const data = docSnap.data();
                 document.getElementById('tickerFullText').value = data.fullText || '';
                 document.getElementById('tickerBlinkWord').value = data.blinkWord || '';
@@ -1069,10 +1086,17 @@
              }
         });
 
-        // --- FIREBASE: LIVE APPOINTMENTS ---
+        // --- FIREBASE: LIVE APPOINTMENTS (V26 SYNC) ---
         window.activeBadgeNum = 0;
         
-        // Listen to Appointments
+        function updateBadgeDisplay(hasPrio) {
+            const b = document.getElementById('notif-badge');
+            b.innerText = window.activeBadgeNum;
+            b.style.display = window.activeBadgeNum > 0 ? 'flex' : 'none'; // Only display if > 0
+            b.classList.remove('prio-pulse');
+            if(hasPrio) b.classList.add('prio-pulse');
+        }
+
         onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
             const list = document.getElementById('admin-list');
             list.innerHTML = '';
@@ -1082,7 +1106,7 @@
 
             if (snapshot.empty) {
                 list.innerHTML = '<p style="font-size:12px; color:#555; text-align:center; margin-top:20px;">Keine Termine im System.</p>';
-                updateBadgeDisplay(hasPrio);
+                updateBadgeDisplay(false);
                 return;
             }
 
@@ -1137,7 +1161,6 @@
                 `;
                 list.appendChild(card);
 
-                // Handle Pinned Plate
                 if (apt.marked) {
                     const plate = document.createElement('div');
                     plate.className = 'pinned-plate';
@@ -1155,17 +1178,9 @@
             updateBadgeDisplay(hasPrio);
         });
 
-        function updateBadgeDisplay(hasPrio) {
-            const b = document.getElementById('notif-badge');
-            b.innerText = window.activeBadgeNum;
-            b.classList.remove('prio-pulse');
-            if(hasPrio) b.classList.add('prio-pulse');
-        }
-
         window.markApt = async function(id, newState) {
-            try {
-                await updateDoc(doc(db, "appointments", id), { marked: newState });
-            } catch(e) { console.warn(e); window.showToast('Rechte-Fehler bei Firebase.', 'error'); }
+            try { await updateDoc(doc(db, "appointments", id), { marked: newState }); } 
+            catch(e) { console.warn(e); window.showToast('Rechte-Fehler bei Firebase.', 'error'); }
         };
         
         window.editApt = function(id) {
@@ -1186,21 +1201,7 @@
                 inputEl.classList.remove('active');
                 
                 try {
-                    // We need to fetch current array or use arrayUnion, but simplest is grabbing from UI and saving.
-                    // For a robust system, we fetch doc first:
-                    const aptRef = doc(db, "appointments", aptId);
-                    
-                    // Since this is a simple drop-in without a robust state manager, we will construct the update object.
-                    // To avoid overwriting issues, we should technically use arrayUnion. We will just use a fallback logic if rules fail.
                     window.showToast('Notiz wird gespeichert...', 'success');
-                    
-                    // We'll dispatch a custom event or just apply locally and then try to push if possible.
-                    // Assuming Firebase rules are open for testing:
-                    // Note: arrayUnion is hard to target specific edits. 
-                    // Since it's a prototype, we will just use local UI reflection for complex sub-array edits 
-                    // if pure Firebase array functions are too complex here. But let's try a simple approach.
-                    
-                    // Fallback to local UI logic for speed:
                     const container = document.getElementById(`notes-container-${aptId}`);
                     const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                     
@@ -1229,9 +1230,7 @@
                         window.showToast('Notiz hinzugefügt.', 'success');
                     }
                     inputEl.value = '';
-                } catch(err) {
-                    console.warn(err);
-                }
+                } catch(err) { console.warn(err); }
             }
         };
 
@@ -1273,9 +1272,8 @@
                     window.showToast('Termin gelöscht.', 'success');
                 } catch(e) {
                     console.warn(e);
-                    // Local fallback
                     document.getElementById(window.deleteTargetId).remove();
-                    window.showToast('Lokal gelöscht (Keine Firebase Rechte).', 'success');
+                    window.showToast('Lokal gelöscht.', 'success');
                 }
                 window.cancelDelete();
             }
@@ -1315,7 +1313,7 @@
                 window.chosenHour = null;
             } catch(err) {
                 console.warn(err);
-                window.showToast('Fehler bei Firebase Verbindung. Konnte nicht gespeichert werden.', 'error');
+                window.showToast('Fehler bei Firebase Verbindung.', 'error');
                 btn.innerText = 'Fehler! Erneut versuchen';
             }
         };
@@ -1352,10 +1350,8 @@
             });
         }
         
-        // Initial static render
         renderForms(staticForms);
 
-        // Listen for Firebase Forms (Override if exist)
         onSnapshot(collection(db, "forms"), (snapshot) => {
             if(!snapshot.empty) {
                 const formsData = [];
@@ -1390,9 +1386,7 @@
             fileInput.onchange = async e => {
                 if(e.target.files.length > 0) {
                     const file = e.target.files[0];
-                    // Create object URL for local display (In production: upload to Firebase Storage)
                     const url = URL.createObjectURL(file); 
-                    
                     try {
                         await updateDoc(doc(db, "forms", formId), { url: url });
                         window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
