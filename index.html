@@ -22,15 +22,29 @@
             --bg-card: #0e0e11;
             --text-light: #ffffff;
             --text-muted: #7c7c85;
-            --glass-bg: rgba(12, 12, 15, 0.92);
             --glass-border: rgba(255, 255, 255, 0.08);
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        /* --- MOBILE TOUCH & BASE ENGINE --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; padding-top: 90px; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-        input, textarea, select, .admin-note-input { -webkit-touch-callout: default !important; -webkit-user-select: auto !important; user-select: auto !important; }
+        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE (V29 FIX) --- */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: manipulation;
+        }
+        
+        /* Removed backdrop-filter to stop mobile flickering / puzzle effect */
+        body { 
+            font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
+            line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
+            -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; 
+            -webkit-font-smoothing: antialiased;
+        }
+        input, textarea, select, .admin-note-input {
+            -webkit-touch-callout: default !important;
+            -webkit-user-select: auto !important;
+            user-select: auto !important;
+        }
 
         /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
         .admin-only-block { display: none !important; }
@@ -55,14 +69,14 @@
         /* --- INTRO PRELOADER --- */
         #intro-preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; transition: opacity 0.5s ease; }
         .intro-track { width: 280px; height: 4px; background: rgba(255,255,255,0.03); position: relative; margin-top: 40px; border-radius: 2px; }
-        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; }
-        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 20px rgba(255,255,255,0.05); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s; }
+        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); }
+        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(255,255,255,0.1); transform: scale(0); opacity: 0; display: flex; align-items: center; gap: 10px; }
         .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
-        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(10px); transition: all 0.5s; }
+        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); }
 
         /* --- TOAST NOTIFICATIONS --- */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-msg { background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
+        .toast-msg { background: rgba(10,10,12,0.95); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
         .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
         .toast-success i { color: #25D366; font-size: 16px; }
         .toast-error { border-color: #ff3b30; box-shadow: 0 10px 30px rgba(255,59,48,0.2); }
@@ -75,13 +89,18 @@
         nav { padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 7, 0.98); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
         .logo-container { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; position: relative; max-width: 70%; }
-        .logo-text { font-size: clamp(12px, 3vw, 20px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; }
+        .logo-text { font-size: clamp(10px, 2.8vw, 18px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; }
         .logo-text .red-part { color: var(--primary-red); }
         .logo-text .white-part { color: #ffffff; }
         
-        .logo-car-svg { height: clamp(14px, 3.5vw, 22px); width: auto; flex-shrink: 0; fill: #ffffff; margin-left: 6px; animation: gentleIdle 3s infinite ease-in-out; transition: fill 0.3s; }
-        .logo-container:hover .logo-car-svg { fill: var(--primary-red); }
-        @keyframes gentleIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+        /* V29: Speech Bubble */
+        .speech-bubble { position: absolute; top: 110%; left: 10%; background: var(--primary-red); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 10px rgba(230,0,0,0.4); animation: floatBubble 2.5s infinite ease-in-out; pointer-events: none; text-transform: uppercase; letter-spacing: 0.5px; }
+        .speech-bubble::before { content: ''; position: absolute; top: -4px; left: 15px; border-width: 0 5px 5px 5px; border-style: solid; border-color: transparent transparent var(--primary-red) transparent; }
+        @keyframes floatBubble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+        /* V29: Auto Logo SVG */
+        .logo-car-svg { height: clamp(16px, 3.5vw, 24px); width: auto; flex-shrink: 0; fill: #ffffff; transition: 0.3s; }
+        .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(3px); }
 
         .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
         .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
@@ -92,14 +111,13 @@
         
         .key-ring { position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.05); transition: 0.3s; }
         .key-ring:hover { background: rgba(230,0,0,0.2); }
-        .key-icon-wrapper { animation: jiggle 4s infinite ease-in-out; display: flex; align-items: center; justify-content: center; }
+        .key-icon-wrapper { display: flex; align-items: center; justify-content: center; }
         .key-icon-wrapper i { color: #fff; font-size: 16px; transition: 0.3s; }
         body.is-admin .key-icon-wrapper i { color: #25D366; }
 
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
         .notification-badge.prio-pulse { animation: badgePulse 1s infinite alternate; }
         @keyframes badgePulse { 0% { transform: scale(1); background: #ff3b30; box-shadow: 0 0 10px #ff3b30; } 100% { transform: scale(1.2); background: #ff3b30; box-shadow: 0 0 20px #ff3b30; } }
-        @keyframes jiggle { 0%, 88%, 100% { transform: rotate(0deg); } 90% { transform: rotate(-15deg); } 93% { transform: rotate(20deg); } 96% { transform: rotate(-10deg); } 98% { transform: rotate(10deg); } }
 
         .quick-menu-btn { background: none; border: 1px solid var(--glass-border); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; transition: 0.3s; }
         .quick-menu-btn:hover { background: rgba(255,255,255,0.1); }
@@ -111,9 +129,10 @@
         .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; }
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .ticker-car { font-size: 15px; color: var(--primary-red); }
 
         /* --- FULLSCREEN MENU --- */
-        .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); backdrop-filter: blur(25px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
+        .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
         .fullscreen-menu.active { opacity: 1; pointer-events: all; }
         .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: white; cursor: pointer; transition: 0.3s; }
         .close-menu:hover { color: var(--primary-red); transform: rotate(90deg); }
@@ -121,7 +140,7 @@
         .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
 
         /* --- OVAL DIALOG ARCHITECTURE --- */
-        .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
         .custom-dialog-window { 
@@ -146,7 +165,7 @@
         #confirmModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15); }
         #deleteConfirmOverlay .custom-dialog-window { max-width: 400px; border-top-color: #ff3b30; box-shadow: 0 20px 50px rgba(255,59,48,0.15); }
         #logoutConfirmOverlay .custom-dialog-window { max-width: 400px; }
-        #tickerConfigOverlay .custom-dialog-window { max-width: 580px; border-top-color: #007aff; }
+        #tickerConfigOverlay .custom-dialog-window { max-width: 520px; border-top-color: #007aff; }
         #lightboxOverlay .custom-dialog-window { max-width: 600px; border-top-color: #b38728; padding: 25px; }
         #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } 
 
@@ -179,7 +198,7 @@
 
         /* --- PINNED PLATE (KENNZEICHEN) WIDGET --- */
         #pinned-container { position: fixed; bottom: 20px; right: 20px; z-index: 9000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
-        .pinned-plate { background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: all; cursor: pointer; transition: transform 0.3s; }
+        .pinned-plate { background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); pointer-events: all; cursor: pointer; transition: transform 0.3s; animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         
         .pinned-plate.urgent-today { border-color: #e60000; color: #e60000; animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, urgentGlow 2s 0.5s infinite alternate ease-in-out; }
         @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); border-color: #e60000; } 100% { box-shadow: 0 10px 30px rgba(230,0,0,1); border-color: #ff4d4d; background: #fffafa; } }
@@ -190,11 +209,11 @@
         @keyframes slideInPlate { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* --- CHECKBOX FIX --- */
-        .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; margin-top: 10px; }
+        .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
         .noble-checkbox-label input:checked + .noble-checkbox-box { background: var(--primary-red); border-color: var(--primary-red); }
-        .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
         /* --- FILE UPLOAD COMPONENT --- */
         .noble-file-upload { position: relative; display: block; width: 100%; margin-top: 8px; }
@@ -230,15 +249,19 @@
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- FLATPICKR RE-FIX (ÄMTER STYLE) --- */
+        /* --- V29 FLATPICKR FIX --- */
         .flatpickr-calendar { 
             background: #0c0c0f !important; border: 1px solid var(--primary-red) !important; 
             border-radius: 15px !important; box-shadow: 0 15px 50px rgba(0,0,0,0.9) !important; 
             font-family: 'Montserrat', sans-serif !important; 
+            /* Let flatpickr handle display: none / block naturally to fix init bugs */
+            position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; 
+            z-index: 999999 !important; width: 320px !important; max-width: 90vw !important; margin: 0 !important;
         }
         .flatpickr-day.selected { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
+        .flatpickr-month { fill: var(--primary-red) !important; color: var(--primary-red) !important; }
         
         .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
@@ -249,7 +272,7 @@
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- MOBILE SCALING (V28 ANTI-FLICKER & RESPONSIVE FIXES) --- */
+        /* --- MOBILE SCALING & ANTI-FLICKER --- */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 80px; }
             nav { padding: 10px 3%; }
@@ -284,7 +307,7 @@
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
-        /* V28 ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
+        /* V29: ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #cc0000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
             padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; 
@@ -311,9 +334,9 @@
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE) --- */
+        /* --- DOWNLOADS COMPONENT --- */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
-        .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; }
+        .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
         .download-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 600; }
         .download-item.selected { background: rgba(230,0,0,0.12); border-color: var(--primary-red); box-shadow: 0 0 15px rgba(230,0,0,0.25); }
@@ -341,7 +364,6 @@
         .gallery-card:hover img, .gallery-card:hover video { opacity: 0.9; }
         .gallery-card span { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
-        /* V28 Delete Button Z-Index Fix */
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
@@ -392,8 +414,11 @@
     <!-- 3. MAIN NAVBAR HUB & TICKER -->
     <div id="header-wrapper">
         <nav>
-            <div class="logo-container" id="logoHubTrigger">
-                <!-- V28 NEW HEADER LOGO: Text + Vector Sports Car -->
+            <div class="logo-container" id="logoHubTrigger" onclick="window.switchView('view-home')">
+                <!-- V29 SPEECH BUBBLE -->
+                <div class="speech-bubble">Schnell Termin vereinbaren</div>
+                
+                <!-- NEW HEADER LOGO: Text + Vector Sports Car -->
                 <div class="logo-text">
                     <span class="red-part">RED</span> 
                     <span class="white-part">ZULASSUNGSDIENST</span>
@@ -653,7 +678,7 @@
     <div id="view-home" class="view-section active">
         <div class="hero">
             <div class="hero-content">
-                <!-- V28 Anti Flicker smooth pulse badge -->
+                <!-- V29: FLICKER-FREE SOFT ANIMATION -->
                 <div class="sofort-badge">
                     <i class="fa-solid fa-bolt" style="margin-right:8px;"></i> 
                     Sofortkennzeichen zum Mitnehmen! 
@@ -738,6 +763,7 @@
                     
                     <div class="form-group" style="margin-top: 10px;">
                         <label>Wunschdatum</label>
+                        <!-- V29 FIX: CALENDAR INITIALIZATION FIX -->
                         <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer;" required>
                     </div>
                     
@@ -884,7 +910,7 @@
         </div>
     </footer>
 
-    <!-- FIREBASE V28 MODULE INTEGRATION -->
+    <!-- FIREBASE V29 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -913,7 +939,7 @@
             setTimeout(() => { toast.remove(); }, 3800);
         };
 
-        // --- 1. OVERLAY CLICK TO CLOSE ENGINE ---
+        // --- 1. OVERLAY CLICK TO CLOSE ENGINE (V29 Fixed missing refs) ---
         document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
                 if(e.target === this) {
@@ -924,7 +950,7 @@
             });
         });
 
-        // --- 2. ADMIN LIVE AUTH SHELL (WITH AUTO-LOGIN FIX) ---
+        // --- 2. ADMIN LIVE AUTH SHELL ---
         window.currentAdminUser = "Tamer Yazici";
         window.currentAdminPass = "616161";
         window.isAuthorized = false;
@@ -994,7 +1020,7 @@
             }
         };
         
-        // --- FIREBASE: VISITOR COUNTER ---
+        // --- FIREBASE: VISITOR COUNTER V29 ---
         const visitorDocRef = doc(db, "settings", "visitors");
         let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
         
@@ -1027,9 +1053,10 @@
             window.tickerIsVisible = !window.tickerIsVisible;
             document.getElementById('ticker-container').style.display = window.tickerIsVisible ? 'flex' : 'none';
             document.body.style.paddingTop = window.tickerIsVisible ? '100px' : '70px'; 
-            window.showToast(window.tickerIsVisible ? 'Ticker aktiviert' : 'Ticker deaktiviert', 'success');
-            try { setDoc(doc(db, "settings", "ticker_state"), { isVisible: window.tickerIsVisible }, {merge: true}); } catch(e){}
             window.closeTickerConfig();
+            window.showToast(window.tickerIsVisible ? 'Ticker aktiviert' : 'Ticker deaktiviert', 'success');
+            
+            try { setDoc(doc(db, "settings", "ticker_state"), { isVisible: window.tickerIsVisible }, {merge: true}); } catch(e){}
         };
         
         window.saveTickerConfig = async function() {
@@ -1041,7 +1068,6 @@
             const font = document.getElementById('tickerFont').value;
             const size = document.getElementById('tickerSize').value;
             
-            // Map symbols to their colored counterparts
             const symbolMap = {
                 'symCar': {icon: 'fa-car-side', col: '#ffffff'},
                 'symMotorcycle': {icon: 'fa-motorcycle', col: '#ffffff'},
@@ -1076,7 +1102,7 @@
                 window.showToast('Lokal angewendet (Permissions?).', 'error');
                 applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
             }
-            window.closeTickerConfig();
+            window.closeTickerConfig(); // V29: Closes the window immediately after clicking save!
         };
 
         function applyTickerLocally(data) {
@@ -1151,7 +1177,7 @@
              }
         });
 
-        // --- FIREBASE: LIVE APPOINTMENTS (V28 SYNC BACKUP FIX) ---
+        // --- FIREBASE: LIVE APPOINTMENTS ---
         window.activeBadgeNum = 0;
         let localAppointments = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
         
@@ -1243,24 +1269,19 @@
             if (!snapshot.empty) {
                 const fbApts = [];
                 snapshot.forEach((docSnap) => fbApts.push({ id: docSnap.id, ...docSnap.data() }));
-                // Sync to local backup
                 localStorage.setItem('red_local_apts', JSON.stringify(fbApts));
                 renderAppointments(fbApts);
             } else {
-                // If Firebase is empty, render local backup if available (fallback offline protection)
                 renderAppointments(localAppointments);
             }
         }, (error) => {
-            console.warn("Firebase Read Error: Loading Local Backup", error);
             renderAppointments(localAppointments);
         });
 
-        // Mark Appointment
         window.markApt = async function(id, newState) {
             try { 
                 await updateDoc(doc(db, "appointments", id), { marked: newState }); 
             } catch(e) { 
-                // Local Fallback Sync
                 const index = localAppointments.findIndex(a => a.id === id);
                 if(index > -1) {
                     localAppointments[index].marked = newState;
@@ -1289,7 +1310,6 @@
                 inputEl.classList.remove('active');
                 const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 
-                // Pure Local Fallback Implementation for Notes (Robust without complex FB Array Unions)
                 const index = localAppointments.findIndex(a => a.id === aptId);
                 if(index > -1) {
                     if(!localAppointments[index].notes) localAppointments[index].notes = [];
@@ -1303,7 +1323,6 @@
                     }
                     localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
                     
-                    // Try to push to Firebase
                     try { await updateDoc(doc(db, "appointments", aptId), { notes: localAppointments[index].notes }); } catch(err){}
                     
                     renderAppointments(localAppointments);
@@ -1326,12 +1345,11 @@
 
         window.triggerDeleteNote = function(noteDOMId, aptId) {
             window.deleteNoteTargetId = noteDOMId;
-            // Get correct element ID
             const confirmEl = document.getElementById('deleteConfirmOverlay');
             confirmEl.querySelector('h3').innerText = "Notiz löschen?";
             confirmEl.querySelector('p').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
             confirmEl.classList.add('open');
-            window.deleteTargetId = aptId; // Need this to find parent appointment
+            window.deleteTargetId = aptId; 
         };
 
         window.deleteApt = function(id) {
@@ -1349,7 +1367,6 @@
         };
 
         window.confirmDelete = async function() {
-            // Note Deletion Mode
             if(window.deleteNoteTargetId) {
                 const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
                 if(index > -1) {
@@ -1360,7 +1377,6 @@
                 }
                 window.showToast('Notiz gelöscht.', 'success');
             }
-            // Appointment Deletion Mode
             else if(window.deleteTargetId) {
                 try {
                     await deleteDoc(doc(db, "appointments", window.deleteTargetId));
@@ -1386,20 +1402,18 @@
             btn.innerText = 'Übermittle...';
             
             const appointmentData = {
-                id: 'local-' + Date.now(), // Fallback ID
+                id: 'local-' + Date.now(),
                 name: n, phone: p, email: e, date: d, timeLabel: window.chosenHour || "Ganztägig",
                 service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
             };
 
             try {
-                // Remove local ID, let Firebase assign
                 const fbData = {...appointmentData}; delete fbData.id; fbData.timestamp = serverTimestamp();
                 await addDoc(collection(db, "appointments"), fbData);
             } catch(err) {
-                console.warn("Offline Fallback: Saving Local Appointment");
                 localAppointments.unshift(appointmentData);
                 localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                renderAppointments(localAppointments); // Manually trigger if offline
+                renderAppointments(localAppointments);
             }
             
             document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${window.chosenHour || "Ganztägig"} Uhr wurde erfolgreich gespeichert.`;
@@ -1446,10 +1460,8 @@
             });
         }
         
-        // Initial static render
         renderForms(staticForms);
 
-        // Listen for Firebase Forms (Override if exist)
         onSnapshot(collection(db, "forms"), (snapshot) => {
             if(!snapshot.empty) {
                 const formsData = [];
@@ -1484,9 +1496,7 @@
             fileInput.onchange = async e => {
                 if(e.target.files.length > 0) {
                     const file = e.target.files[0];
-                    // Create object URL for local display (In production: upload to Firebase Storage)
                     const url = URL.createObjectURL(file); 
-                    
                     try {
                         await updateDoc(doc(db, "forms", formId), { url: url });
                         window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
@@ -1551,7 +1561,6 @@
                    mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
                 }
                 
-                // Add the absolute z-index fix here for the delete button!
                 card.innerHTML = `
                     <div class="admin-del-img-btn admin-up admin-only-flex" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
                     ${mediaHtml}
@@ -1590,7 +1599,7 @@
             const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = async function(e) {
-                const mediaUrl = e.target.result; // Base64 string
+                const mediaUrl = e.target.result; 
                 try {
                     await addDoc(collection(db, "cars"), { title, mediaUrl, timestamp: serverTimestamp() });
                     window.showToast('Fahrzeug erfolgreich in Firebase veröffentlicht.', 'success');
@@ -1625,9 +1634,6 @@
             document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
             if(!isActive) card.classList.add('reveal-active');
         };
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
-        });
 
         // Custom Select handling
         const trigger = document.getElementById('serviceSelectBox');
@@ -1643,23 +1649,85 @@
         });
         document.addEventListener('click', () => trigger.classList.remove('open'));
 
+        function runPlates() {
+            const container = document.getElementById('plate-container');
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for(let i=0; i<8; i++) {
+                let p = document.createElement('div'); p.className = 'plate';
+                p.innerHTML = `B - ${chars[Math.floor(Math.random()*26)]}${chars[Math.floor(Math.random()*26)]} ${Math.floor(1000+Math.random()*9000)}`;
+                p.style.left = `${Math.random() * 90}vw`; p.style.animationDelay = `${Math.random() * 15}s`;
+                container.appendChild(p);
+            }
+        }
+        runPlates();
+
+        // --- V29 FIX: PRELOADER & LOGO ROUTING ---
         window.addEventListener('DOMContentLoaded', () => {
             const preloader = document.getElementById('intro-preloader');
-            // Very smooth optimized preloader phaseout
             setTimeout(() => { document.getElementById('introCar').style.transform = 'translate3d(370px, 0, 0)'; document.getElementById('introCar').style.transition = 'transform 1.4s ease-in-out'; }, 200);
             setTimeout(() => { const p = document.getElementById('introPlate'); p.style.transform = 'scale(1)'; p.style.opacity = '1'; }, 800);
             setTimeout(() => { const t = document.getElementById('introText'); t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 1200);
             setTimeout(() => { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.display = 'none'; }, 600); }, 3100);
         });
 
+        // V29 FIX: LOGO OPENS HOMEPAGE & SCROLLS TO TOP
         window.switchView = function(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-            window.scrollTo(0,0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
+        
         window.toggleMenu = function() { document.getElementById('quickMenu').classList.toggle('active'); };
         window.openAdmin = function() { document.getElementById('adminModal').classList.add('open'); };
         window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
+        window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
+        window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
+
+        window.openLightbox = function(title, mediaUrl) {
+            document.getElementById('lightboxTitle').innerText = title;
+            const container = document.getElementById('lightboxImageContainer');
+            if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
+                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop style="width:100%; height:100%; object-fit:cover; border-radius: 12px;"></video>`;
+            } else {
+                container.innerHTML = `<img src="${mediaUrl}" alt="${title}" style="width:100%; height:100%; object-fit:cover; border-radius: 12px;">`;
+            }
+            document.getElementById('lightboxOverlay').classList.add('open');
+        };
+        window.closeLightbox = function() { document.getElementById('lightboxOverlay').classList.remove('open'); };
+
+        window.openInfo = function(type) {
+            const title = document.getElementById('pTitle'); const text = document.getElementById('pText');
+            title.innerText = type;
+            if(type === 'Anmeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Fahrzeugbrief<br>• Fahrzeugschein<br>• Personalausweis oder Pass<br>• Gültiger TÜV-Bericht (HU)<br>• eVB-Nummer Ihrer Kfz-Versicherung';
+            else if(type === 'Ummeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Bisherige Kennzeichen (falls Schildertausch gewünscht)<br>• Zulassungsbescheinigung I & II<br>• Aktueller HU-Prüfbericht';
+            else text.innerHTML = 'Unser Express-Service sichert Ihnen die schnellstmögliche Bearbeitung direkt über unsere internen Schnittstellen. Vorgänge werden taggleich eingereicht und innerhalb von 24h finalisiert.';
+            document.getElementById('infoPopupOverlay').classList.add('open');
+        };
+
+        // --- V29 FIX: FLATPICKR VISIBILITY OVERRIDE REMOVED ---
+        window.chosenHour = null;
+        flatpickr("#datePicker", {
+            locale: "de", minDate: "today", disable: [ d => d.getDay() === 0 || d.getDay() === 6 ],
+            onChange: function() {
+                document.getElementById('timeWrapper').style.display = 'block';
+                const container = document.getElementById('timeSlots');
+                container.innerHTML = '';
+                for(let h = 9; h <= 19; h++) {
+                    const tStr = `${h.toString().padStart(2, '0')}:00`;
+                    const div = document.createElement('div');
+                    div.className = 'time-slot'; div.innerText = tStr;
+                    if(Math.random() > 0.75) div.classList.add('booked');
+                    else {
+                        div.addEventListener('click', () => {
+                            Array.from(container.children).forEach(c => c.classList.remove('active'));
+                            div.classList.add('active');
+                            window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
+                        });
+                    }
+                    container.appendChild(div);
+                }
+            }
+        });
 
         window.showLegal = function(type) {
             const b = document.getElementById('legalBox'); const c = document.getElementById('legalContent');
