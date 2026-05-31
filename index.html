@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="de" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#d30000">
+    <title>RED Zulassungsdienst Berlin | Master Premium V23 Ultra</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Flatpickr Custom Theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <style>
+        :root {
+            --primary-red: #e60000;
+            --dark-red: #8a0000;
+            --bg-dark: #050507;
+            --bg-card: #0e0e11;
+            --text-light: #ffffff;
+            --text-muted: #7c7c85;
+            --glass-bg: rgba(12, 12, 15, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; padding-top: 100px; }
+
+        /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
+        .admin-only-block { display: none !important; }
+        .admin-only-flex { display: none !important; }
+        .admin-only-inline { display: none !important; }
+        body.is-admin .admin-only-block { display: block !important; }
+        body.is-admin .admin-only-flex { display: flex !important; }
+        body.is-admin .admin-only-inline { display: inline-flex !important; }
+
+        /* --- STYLISH CUSTOM SCROLLBARS --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #050507; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff1a1a; }
+
+        /* --- BACKGROUND PLATES --- */
+        .plate-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: -1; overflow: hidden; }
+        .plate { position: absolute; background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 5px 15px; border-radius: 5px; border: 2px solid #000; opacity: 0.12; display: flex; align-items: center; gap: 10px; animation: float 22s linear infinite; }
+        .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
+        @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
+
+        /* --- INTRO PRELOADER --- */
+        #intro-preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; transition: opacity 0.6s ease; }
+        .intro-track { width: 280px; height: 4px; background: rgba(255,255,255,0.03); position: relative; margin-top: 40px; border-radius: 2px; }
+        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); }
+        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(255,255,255,0.1); transform: scale(0); opacity: 0; display: flex; align-items: center; gap: 10px; }
+        .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
+        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast-msg { background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
+        .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
+        .toast-success i { color: #25D366; font-size: 16px; }
+        .toast-error { border-color: #ff3b30; box-shadow: 0 10px 30px rgba(255,59,48,0.2); }
+        .toast-error i { color: #ff3b30; font-size: 16px; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.9); } }
+
+        /* --- NAVBAR & TICKER ARCHITECTURE --- */
+        #header-wrapper { position: fixed; top: 0; width: 100%; z-index: 1000; }
+        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 7, 0.98); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; position: relative; }
+        .logo-text { font-size: clamp(14px, 2vw, 22px); font-weight: 900; color: var(--text-light); text-transform: uppercase; white-space: nowrap; }
+        
+        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; }
+
+        .driving-scene { position: relative; width: 65px; height: 30px; display: flex; align-items: center; overflow: hidden; }
+        .car-icon { position: absolute; color: var(--primary-red); font-size: 22px; z-index: 2; left: -40px; animation: smoothDrive 5s infinite linear; }
+        .tire-tracks { position: absolute; left: 0; bottom: 5px; height: 2px; width: 100%; background: rgba(255,255,255,0.15); transform: scaleX(0); transform-origin: left; animation: smoothTrack 5s infinite linear; }
+        @keyframes smoothDrive { 0% { left: -40px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 70px; opacity: 0; } }
+        @keyframes smoothTrack { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .visitor-counter { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ccc; display: flex; align-items: center; gap: 5px; }
+        .visitor-counter span { color: var(--primary-red); }
+        
+        .key-ring { position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.05); transition: 0.3s; }
+        .key-ring:hover { background: rgba(230,0,0,0.2); }
+        .key-icon-wrapper { animation: jiggle 4s infinite ease-in-out; display: flex; align-items: center; justify-content: center; }
+        .key-icon-wrapper i { color: #fff; font-size: 16px; transition: 0.3s; }
+        body.is-admin .key-icon-wrapper i { color: #25D366; }
+
+        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
+        .notification-badge.prio-pulse { animation: badgePulse 1s infinite alternate; }
+        @keyframes badgePulse { 0% { transform: scale(1); background: #ff3b30; box-shadow: 0 0 10px #ff3b30; } 100% { transform: scale(1.2); background: #ff3b30; box-shadow: 0 0 20px #ff3b30; } }
+        @keyframes jiggle { 0%, 88%, 100% { transform: rotate(0deg); } 90% { transform: rotate(-15deg); } 93% { transform: rotate(20deg); } 96% { transform: rotate(-10deg); } 98% { transform: rotate(10deg); } }
+
+        .quick-menu-btn { background: none; border: 1px solid var(--glass-border); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; transition: 0.3s; }
+        .quick-menu-btn:hover { background: rgba(255,255,255,0.1); }
+
+        /* --- DYNAMIC INFO TICKER --- */
+        #ticker-container { background: linear-gradient(90deg, #1a0000, #000, #1a0000); border-bottom: 1px solid rgba(255,0,0,0.3); padding: 5px 0; overflow: hidden; white-space: nowrap; position: relative; display: flex; align-items: center; }
+        .ticker-text-wrapper { display: inline-block; padding-left: 100%; animation: tickerAnim linear infinite; }
+        @keyframes tickerAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; }
+        .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
+        @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .ticker-car { font-size: 15px; color: var(--primary-red); }
+
+        /* --- FULLSCREEN MENU --- */
+        .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); backdrop-filter: blur(25px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
+        .fullscreen-menu.active { opacity: 1; pointer-events: all; }
+        .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: white; cursor: pointer; }
+        .fullscreen-menu a { color: white; font-size: 24px; font-weight: 800; text-transform: uppercase; text-decoration: none; margin: 12px 0; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+        .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
+
+        /* --- OVAL DIALOG ARCHITECTURE (UNIFIED MODALS) --- */
+        .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
+        
+        .custom-dialog-window { 
+            background: linear-gradient(135deg, #121216 0%, #070709 100%); 
+            border: 1px solid rgba(255,255,255,0.05); border-top: 2px solid var(--primary-red);
+            width: 92%; max-width: 490px; border-radius: 30px; padding: 40px 30px; 
+            position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.7); 
+            transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+            text-align: center; 
+        }
+        .custom-dialog-overlay.open .custom-dialog-window { transform: scale(1); }
+        .close-dialog-btn { position: absolute; top: 20px; right: 25px; font-size: 22px; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10; }
+        .close-dialog-btn:hover { color: #fff; transform: scale(1.1); }
+
+        /* Specific Modal Colors */
+        #adminModal .custom-dialog-window { max-width: 550px; }
+        #passChangeOverlay .custom-dialog-window { max-width: 380px; border-top-color: #b38728; }
+        #confirmModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15); }
+        #deleteConfirmOverlay .custom-dialog-window { max-width: 400px; border-top-color: #ff3b30; box-shadow: 0 20px 50px rgba(255,59,48,0.15); }
+        #logoutConfirmOverlay .custom-dialog-window { max-width: 400px; }
+        #tickerConfigOverlay .custom-dialog-window { max-width: 520px; border-top-color: #007aff; }
+        #lightboxOverlay .custom-dialog-window { max-width: 600px; border-top-color: #b38728; padding: 25px; }
+        #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } /* Fixed info popup styling */
+
+        /* --- ADMIN ENGINE & CARDS --- */
+        .admin-list-wrapper { max-height: 350px; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
+        .admin-apt-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; margin-top: 12px; position: relative; border-left: 4px solid #555; text-align: left; transition: 0.3s; }
+        .admin-apt-card.marked { border: 1px solid #b38728; background: rgba(179,135,40,0.08); box-shadow: 0 0 15px rgba(179,135,40,0.2); border-left-width: 4px; }
+        .admin-apt-card.prio-high { border-left-color: #ff3b30; background: rgba(255,59,48,0.05); }
+        .admin-apt-card.prio-normal { border-left-color: #ffcc00; background: rgba(255,204,0,0.03); }
+        
+        .prio-badge { display: inline-block; font-size: 9px; font-weight: 900; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; margin-bottom: 8px; }
+        .prio-high .prio-badge { background: rgba(255,59,48,0.2); color: #ff3b30; animation: pulse-badge 1s infinite alternate; }
+        .prio-normal .prio-badge { background: rgba(255,204,0,0.2); color: #ffcc00; }
+
+        .apt-actions-horizontal { display: flex; gap: 6px; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .apt-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #aaa; cursor: pointer; font-size: 11px; transition: 0.3s; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .apt-btn.mark:hover { background: #b38728; color: #fff; border-color: #b38728; }
+        .apt-btn.edit:hover { background: #007aff; color: #fff; border-color: #007aff; }
+        .apt-btn.delete:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
+        
+        .admin-note-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-size: 12px; padding: 8px 10px; border-radius: 6px; margin-top: 10px; outline: none; display: none; }
+        .admin-note-input.active { display: block; animation: viewFadeIn 0.3s ease; }
+        .notes-list-box { margin-top: 8px; }
+        .saved-note-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; font-size: 10px; color: #b38728; background: rgba(179,135,40,0.08); padding: 6px 10px; border-radius: 6px; border-left: 2px solid #b38728; margin-bottom: 5px; }
+        .note-meta { font-size: 8px; color: var(--text-muted); display: block; margin-top: 2px; }
+        .note-row-actions { display: flex; gap: 6px; margin-top: 2px; }
+        .note-row-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; transition: 0.2s; }
+        .note-row-btn:hover { color: #fff; }
+        .note-row-btn.del:hover { color: var(--primary-red); }
+
+        /* --- PINNED PLATE (KENNZEICHEN) WIDGET --- */
+        #pinned-container { position: fixed; bottom: 20px; right: 20px; z-index: 9000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+        .pinned-plate { background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: all; cursor: pointer; transition: transform 0.3s; }
+        
+        .pinned-plate.urgent-today { border-color: #e60000; color: #e60000; animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, urgentGlow 2s 0.5s infinite alternate ease-in-out; }
+        @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); border-color: #e60000; } 100% { box-shadow: 0 10px 30px rgba(230,0,0,1); border-color: #ff4d4d; background: #fffafa; } }
+        
+        .pinned-plate.normal-day { border-color: #b38728; color: #333; }
+        .pinned-plate:hover { transform: translateY(-5px) scale(1.02); }
+        .pinned-plate::before { content: 'D'; background: #003399; color: #fff; padding: 2px 4px; font-size: 12px; border-radius: 3px; }
+        @keyframes slideInPlate { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* --- CHECKBOX FIX (UNICODE SAFE) --- */
+        .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
+        .noble-checkbox-label input { display: none; }
+        .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
+        .noble-checkbox-label input:checked + .noble-checkbox-box { background: var(--primary-red); border-color: var(--primary-red); }
+        .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        /* --- FILE UPLOAD COMPONENT --- */
+        .noble-file-upload { position: relative; display: block; width: 100%; margin-top: 8px; }
+        .noble-file-upload input { display: none; }
+        .noble-file-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; display: block; transition: 0.3s; }
+        .noble-file-upload input:change + .noble-file-trigger, .noble-file-trigger:hover { border-color: var(--primary-red); color: white; background: rgba(230,0,0,0.04); }
+
+        /* --- SPA VIEW SECTIONS --- */
+        .view-section { display: none; animation: viewFadeIn 0.4s ease forwards; padding-top: 30px; min-height: 100vh; }
+        .view-section.active { display: block; }
+        @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- COMPACT BOOKING FORM DESKTOP --- */
+        .booking-wrapper { max-width: 750px; margin: 0 auto; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+        .form-row { display: flex; gap: 15px; }
+        @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
+        
+        .form-group { position: relative; margin-bottom: 15px; text-align: left; flex: 1; }
+        .form-group label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .form-control { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; font-family: inherit; font-size: 13px; outline: none; transition: 0.3s; }
+        .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 12px rgba(230,0,0,0.3); }
+
+        /* NOBLE CUSTOM DROPDOWN SELECTS */
+        .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
+        .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .noble-select-trigger::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--primary-red); font-size: 10px; transition: 0.3s; }
+        .noble-select-box.open .noble-select-trigger::after { transform: rotate(180deg); }
+        .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; overflow: hidden; }
+        .noble-select-box.open .noble-options-dropdown { display: block; }
+        .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
+        .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
+
+        /* --- FLATPICKR CENTERING & THEMING --- */
+        .flatpickr-calendar { background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; font-family: 'Montserrat', sans-serif !important; width: 300px !important; position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 999999 !important; display: none; }
+        .flatpickr-calendar.open { display: block !important; }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
+        .flatpickr-day { color: #fff !important; }
+        .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
+        .flatpickr-day.flatpickr-disabled { color: #2a2a30 !important; }
+        
+        .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
+        .time-slot.active { background: var(--primary-red); border-color: var(--primary-red); }
+        .time-slot.booked { opacity: 0.2; text-decoration: line-through; cursor: not-allowed; }
+
+        /* --- GLOBAL BUTTONS --- */
+        .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
+        .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
+
+        /* --- MOBILE SCALING (MINIMAL) --- */
+        @media (max-width: 768px) {
+            body { font-size: 12px; padding-top: 90px; }
+            nav { padding: 10px 4%; }
+            .hero { margin-top: 20px; }
+            .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
+            .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
+            .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
+            .hero-content { padding: 30px 15px !important; border-radius: 20px !important; }
+            .sofort-badge { padding: 8px 16px !important; font-size: 11px !important; margin-bottom: 15px !important; }
+            .card { padding: 25px 15px !important; height: 160px !important; }
+            .booking-wrapper { padding: 25px 15px !important; }
+            .admin-window, .custom-dialog-window { padding: 30px 15px !important; width: 95% !important; }
+            .vintage-gallery { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+            .gallery-card { height: 110px !important; padding: 10px !important; }
+            .auto-ankauf-box { padding: 30px 15px !important; border-radius: 15px !important; }
+            .download-item { flex-direction: column; text-align: center; gap: 8px; }
+            .apt-actions-horizontal { justify-content: center; }
+        }
+
+        /* --- HERO & COMPONENTS --- */
+        .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px 5%; margin-top: 20px; }
+        .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
+        
+        /* MEGA EYE CATCHING SOFORTKENNZEICHEN */
+        .sofort-badge { background: linear-gradient(45deg, #ff0000, #b30000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; border: 2px solid #fff; box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); animation: mega-pulse-badge 1s infinite alternate; text-transform: uppercase; letter-spacing: 1px; }
+        @keyframes mega-pulse-badge { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); } 100% { transform: scale(1.08); box-shadow: 0 0 60px rgba(255, 0, 0, 1); border-color: #ffcc00; color: #ffcc00; } }
+
+        /* --- CORE SERVICES (ON-CARD REVEAL) --- */
+        .section-header { text-align: center; margin-bottom: 35px; }
+        .section-header h2 { font-size: clamp(22px, 3.5vw, 34px); font-weight: 900; text-transform: uppercase; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
+        
+        .card { background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .card:hover { border-color: rgba(230,0,0,0.5); }
+        .card i.main-icon { font-size: 35px; color: var(--primary-red); margin-bottom: 15px; transition: 0.3s; }
+        
+        .card-info-slide { position: absolute; top: 100%; left: 0; width: 100%; height: 100%; background: #0e0e12; border: 1px solid var(--primary-red); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; transition: top 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); z-index: 5; }
+        .card.reveal-active .card-info-slide { top: 0; }
+        .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
+
+        /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE) --- */
+        .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
+        .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
+        .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
+        .download-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 600; }
+        .download-item.selected { background: rgba(230,0,0,0.12); border-color: var(--primary-red); box-shadow: 0 0 15px rgba(230,0,0,0.25); }
+        .download-info i { font-size: 18px; color: var(--text-muted); flex-shrink: 0; }
+        .download-item.selected .download-info i { color: var(--primary-red); }
+        .download-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .download-actions i { font-size: 16px; transition: 0.3s; }
+        .user-dl { color: var(--text-muted); }
+        .user-dl:hover { color: var(--primary-red); transform: translateY(-2px); }
+        .admin-up { color: #b38728; margin-right: 5px; }
+        .admin-up:hover { color: #fff; transform: scale(1.1); }
+        .admin-del { color: #ff3b30; margin-left: 5px; }
+        .admin-del:hover { color: #fff; transform: scale(1.1); }
+
+        /* --- AUTO ANKAUF REAL PICTURE GALLERY (COMPACT) --- */
+        .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
+        .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
+        .gallery-card { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-border); height: 130px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
+        .gallery-card img, .gallery-card video { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.6; z-index: 1; transition: 0.3s; }
+        .gallery-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)); z-index: 2; }
+        .gallery-card:hover { transform: scale(1.03); border-color: #b38728; }
+        .gallery-card:hover img, .gallery-card:hover video { opacity: 0.9; }
+        .gallery-card span { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        
+        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; }
+        .admin-del-img-btn:hover { background: #ff3b30; color: #fff; }
+
+        /* --- BERLIN KENNZEICHEN WARNING ACCENT COMPONENT --- */
+        .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+        .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
+        .plate-text { color: black; font-family: 'Courier New', monospace; font-weight: bold; font-size: 20px; padding: 0 12px; }
+        .warning-text { display: flex; align-items: center; gap: 10px; font-size: 13px; color: white; text-align: left; }
+
+        /* --- FOOTER & CONTACT --- */
+        .contact-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 50px 5% 20px; }
+        .map-box { border-radius: 18px; overflow: hidden; border: 1px solid var(--glass-border); min-height: 250px; }
+        .map-box iframe { width: 100%; height: 100%; border: none; filter: grayscale(1) invert(0.9) contrast(1.2); }
+        
+        .cash-banner { background: rgba(230,0,0,0.05); border: 1px solid rgba(230,0,0,0.2); border-radius: 12px; padding: 20px; text-align: center; margin-top: 15px; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .social-icons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
+        .social-icons a { width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; text-decoration: none; transition: 0.3s; }
+        .social-icons a:hover { background: var(--primary-red); border-color: var(--primary-red); }
+
+        footer { background: #040406; padding: 30px 5%; border-top: 1px solid var(--glass-border); text-align: center; }
+        .footer-links { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 600; text-transform: uppercase; font-size: 11px; transition: 0.3s; cursor: pointer; }
+        .footer-links a:hover { color: var(--primary-red); }
+        #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
+        #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
+
+        /* V18/V22 FIX: ALIGN TEXT IN FORMS */
+        .v18-align-fix { margin-top: 0px !important; }
+    </style>
+</head>
+<body>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- PINNED PLATES CONTAINER -->
+    <div id="pinned-container"></div>
+
+    <!-- 1. INTRO PRELOADER SCENE -->
+    <div id="intro-preloader">
+        <div class="intro-plate" id="introPlate">B <span style="color:var(--primary-red);">-</span> RED 2026</div>
+        <div class="intro-track"><i class="fa-solid fa-car-side intro-car" id="introCar"></i></div>
+        <div class="intro-text" id="introText">Herzlich Willkommen zu Ihrem<br><span style="color:var(--primary-red);">Zulassungsdienst RED Berlin</span></div>
+    </div>
+
+    <!-- 2. BACKGROUND PLATES -->
+    <div class="plate-bg" id="plate-container"></div>
+
+    <!-- 3. MAIN NAVBAR HUB & TICKER -->
+    <div id="header-wrapper">
+        <nav>
+            <div class="logo-container" id="logoHubTrigger">
+                <div class="driving-scene">
+                    <i class="fa-solid fa-car-side car-icon" id="navCar"></i>
+                    <div class="tire-tracks" id="navTracks"></div>
+                </div>
+                <div class="logo-text">RED <span>Zulassung</span></div>
+                <!-- V22 ADMIN TICKER EDIT ICON SECURE -->
+                <i class="fa-solid fa-pen admin-ticker-edit-icon admin-only-block" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); openTickerConfig();" title="Ticker & Symbole bearbeiten"></i>
+            </div>
+            
+            <div class="nav-actions">
+                <div class="visitor-counter"><i class="fa-solid fa-users"></i> Besuche: <span id="vCount">1.482</span></div>
+                
+                <div class="key-ring" onclick="openAdmin()" title="Admin Control Center">
+                    <div class="key-icon-wrapper"><i class="fa-solid fa-key" id="adminKeyIcon"></i></div>
+                    <span class="notification-badge" id="notif-badge">2</span>
+                </div>
+                
+                <button class="quick-menu-btn" onclick="toggleMenu()">Menü</button>
+            </div>
+        </nav>
+        
+        <!-- DYNAMIC INFO TICKER -->
+        <div id="ticker-container" style="display:flex;">
+            <div class="ticker-text-wrapper" id="tickerWrapper" style="animation-duration: 15s;">
+                <div class="ticker-text" id="tickerTextContent" style="color: #ffffff; font-family: 'Montserrat', sans-serif; font-size: 13px;">
+                    <i class="fa-solid fa-car-side ticker-car"></i>
+                    <span>+++ WICHTIG: Die aktuellen Wartezeiten bei den Zulassungsstellen betragen 1-2 Werktage. Sichern Sie sich <span class="ticker-highlight" style="color: var(--primary-red);">jetzt</span> Ihren Termin bei RED Berlin! +++</span>
+                    <i class="fa-solid fa-car-side ticker-car" style="margin-left: 20px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. FULLSCREEN NAVIGATION OVERLAY -->
+    <div class="fullscreen-menu" id="quickMenu">
+        <i class="fa-solid fa-xmark close-menu" onclick="toggleMenu()"></i>
+        <a href="#" onclick="toggleMenu(); switchView('view-home');"><i class="fa-solid fa-house" style="color:var(--primary-red);"></i> Startseite</a>
+        <a href="#leistungen" onclick="toggleMenu(); switchView('view-home');"><i class="fa-solid fa-gears" style="color:var(--primary-red);"></i> Leistungen</a>
+        <a href="#" onclick="toggleMenu(); switchView('view-formulare');"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Formulare</a>
+        <a href="#" onclick="toggleMenu(); switchView('view-ankauf');"><i class="fa-solid fa-car" style="color:var(--primary-red);"></i> Auto Ankauf</a>
+        <a href="#termin" onclick="toggleMenu(); switchView('view-home');"><i class="fa-solid fa-calendar-check" style="color:var(--primary-red);"></i> Termin buchen</a>
+        <a href="https://wa.me/4915121006161" target="_blank" onclick="toggleMenu()"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> WhatsApp Support</a>
+    </div>
+
+    <!-- 5. OVAL CONTROL SYSTEM ARCHITECTURE (ADMIN CONTROL CENTER MODAL) -->
+    <div class="custom-dialog-overlay" id="adminModal">
+        <div class="custom-dialog-window" style="max-width: 550px;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="closeAdmin()"></i>
+            
+            <!-- SECURE PASSPHRASE AUTH LAYER -->
+            <div id="authBox">
+                <h3 style="color:var(--primary-red); font-weight:900; margin-bottom:20px;"><i class="fa-solid fa-lock"></i> Admin Systemzugang</h3>
+                <div class="form-group">
+                    <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="Benutzername">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Master-Passwort">
+                </div>
+                
+                <label class="noble-checkbox-label" style="justify-content: center;">
+                    <input type="checkbox" id="rememberMe">
+                    <span class="noble-checkbox-box"></span>
+                    Anmeldung für das nächste Mal merken
+                </label>
+                
+                <button class="btn-primary" style="width:100%; justify-content:center; margin-top:20px;" onclick="tryLogin()">Anmelden</button>
+            </div>
+
+            <!-- ADMINISTRATIVE LIVE LEAD REALTIME MONITORING DASHBOARD -->
+            <div id="dashboardBox" style="display:none;">
+                <h3 style="color:var(--primary-red); font-weight:900;"><i class="fa-solid fa-user-shield"></i> Live-Leads Terminal</h3>
+                <p style="font-size:12px; color:var(--text-muted);">Admin: <strong id="loggedInUser">Tamer Yazici</strong></p>
+                
+                <div style="margin-top:15px; display:flex; justify-content:center; gap:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
+                    <button class="btn-primary" style="background:transparent; border:1px solid #b38728; color:#b38728; padding:8px 15px;" onclick="changePassPrompt()"><i class="fa-solid fa-key"></i> Passwort</button>
+                    <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; padding:8px 15px;" onclick="triggerLogoutConfirm()"><i class="fa-solid fa-right-from-bracket"></i> Abmelden</button>
+                </div>
+
+                <div class="admin-list-wrapper" id="admin-list">
+                    <!-- Dynamic appointment entries inside admin workspace -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOBLE SYSTEM POPUPS: MULTI CONFIG MAPPED -->
+    <div class="custom-dialog-overlay" id="passChangeOverlay">
+        <div class="custom-dialog-window" style="border-top-color:#b38728; max-width:350px;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="closePassPrompt()"></i>
+            <h3 style="color:#b38728; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-key"></i> Master Passwort ändern</h3>
+            <input type="password" id="newPassInput" class="form-control" style="text-align:center;">
+            <button class="btn-primary" style="background:#b38728; width:100%; justify-content:center; margin-top:10px;" onclick="confirmPassChange()">Speichern</button>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="confirmModalOverlay">
+        <div class="custom-dialog-window" style="border-top-color:#25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15);">
+            <i class="fa-solid fa-circle-check" style="font-size:45px; color:#25D366; margin-bottom:15px;"></i>
+            <h3 style="color:#fff; font-weight:900;" id="confirmModalTitle">Termin Reserviert!</h3>
+            <p style="color:var(--text-muted); font-size:13px; margin:10px 0 20px;" id="confirmModalText"></p>
+            <button class="btn-primary" style="background:#25D366; width:100%; justify-content:center;" onclick="closeCustomConfirm()">Schließen</button>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="deleteConfirmOverlay">
+        <div class="custom-dialog-window" style="border-top-color:var(--primary-red); max-width:380px; box-shadow: 0 20px 50px rgba(255,59,48,0.15);">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:40px; color:var(--primary-red); margin-bottom:15px;"></i>
+            <h3 id="delTitleText">Eintrag löschen?</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin:10px 0 20px;" id="delDescText">Möchten Sie diesen Datensatz wirklich unwiderruflich aus dem System entfernen?</p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-primary" style="background:transparent; border:1px solid #333; color:#fff; flex:1; justify-content:center;" onclick="cancelDelete()">Abbrechen</button>
+                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="confirmDelete()">Löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="logoutConfirmOverlay">
+        <div class="custom-dialog-window" style="border-top-color:var(--primary-red); max-width:380px;">
+            <i class="fa-solid fa-right-from-bracket" style="font-size:40px; color:var(--primary-red); margin-bottom:15px;"></i>
+            <h3>Abmelden?</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin:10px 0 20px;">Sind Sie sicher, dass Sie sich aus dem Admin-Bereich abmelden möchten?</p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-primary" style="background:transparent; border:1px solid #333; color:#fff; flex:1; justify-content:center;" onclick="cancelLogout()">Nein</button>
+                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="executeLogout()">Ja, Abmelden</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- V22 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <div class="custom-dialog-overlay" id="tickerConfigOverlay">
+        <div class="custom-dialog-window" style="max-width: 520px; border-top-color: #007aff;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="closeTickerConfig()"></i>
+            <h3 style="color:#007aff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-text-width"></i> Ticker & Info-Leiste</h3>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:20px;">Passen Sie den Ticker-Satz, die Farbe des blinkenden Wortes sowie Icons an.</p>
+            
+            <div class="form-group">
+                <label>Gesamter Ticker-Text</label>
+                <input type="text" id="tickerFullText" class="form-control" value="+++ WICHTIG: Die aktuellen Wartezeiten bei den Zulassungsstellen betragen 1-2 Werktage. Sichern Sie sich jetzt Ihren Termin bei RED Berlin! +++">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Blinkendes Wort (Hervorhebung)</label>
+                    <input type="text" id="tickerBlinkWord" class="form-control" value="jetzt">
+                </div>
+                <div class="form-group">
+                    <label>Farbe des blinkenden Wortes</label>
+                    <select id="tickerBlinkColor" class="form-control" style="background:#111114;">
+                        <option value="#e60000" selected>Leuchtend Rot</option>
+                        <option value="#ffcc00">Premium Gold</option>
+                        <option value="#25D366">WhatsApp Grün</option>
+                        <option value="#007aff">Neon Blau</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- V22 UPDATE: MULTIPLE SYMBOL SELECTOR MATRIX -->
+            <div class="form-group" style="margin-top:10px;">
+                <label style="margin-bottom:8px;">Gleitende Ticker-Symbole wählen (Mehrfachauswahl)</label>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW Silhouette</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="noble-checkbox-box"></span> ⚡ Express Blitz</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="noble-checkbox-box"></span> 🏁 Rennflagge</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Nummernschild</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Premium Stern</label>
+                </div>
+            </div>
+            
+            <div class="form-row" style="margin-top:15px;">
+                <div class="form-group">
+                    <label>Lauf-Geschwindigkeit</label>
+                    <select id="tickerSpeed" class="form-control" style="background:#111114;">
+                        <option value="35s">Sehr Langsam</option>
+                        <option value="25s">Langsam</option>
+                        <option value="15s" selected>Normal</option>
+                        <option value="9s">Schnell</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Standard Textfarbe</label>
+                    <select id="tickerColor" class="form-control" style="background:#111114;">
+                        <option value="#ffffff" selected>Clean Weiß</option>
+                        <option value="#ccc">Muted Grau</option>
+                        <option value="#ffcc00">Gold</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Schriftart</label>
+                    <select id="tickerFont" class="form-control" style="background:#111114;">
+                        <option value="'Montserrat', sans-serif" selected>Montserrat (Modern)</option>
+                        <option value="'Courier New', monospace">Courier (Kennzeichen Style)</option>
+                        <option value="'Playfair Display', serif">Playfair Display (Nobel)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Schriftgröße</label>
+                    <select id="tickerSize" class="form-control" style="background:#111114;">
+                        <option value="11px">Minimal (11px)</option>
+                        <option value="13px" selected>Standard (13px)</option>
+                        <option value="16px">Groß (16px)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-primary" style="background:transparent; border:1px solid #555; color:#fff; flex:1; justify-content:center;" onclick="toggleTickerDisplay()">Ticker Ein/Aus</button>
+                <button class="btn-primary" style="background:#007aff; flex:1; justify-content:center;" onclick="saveTickerConfig()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CORE CARD INFO MODAL POPUPS -->
+    <div class="custom-dialog-overlay" id="infoPopupOverlay">
+        <div class="custom-dialog-window" style="border-top-color:var(--primary-red);">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="closeInfo()"></i>
+            <h3 id="pTitle" style="color:var(--primary-red); font-weight:900; margin-bottom:15px; text-transform:uppercase;"></h3>
+            <p id="pText" style="color:#ccc; font-size:13px; text-align:left; line-height:1.6;"></p>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX MODAL CONTAINER -->
+    <div class="custom-dialog-overlay" id="lightboxOverlay">
+        <div class="custom-dialog-window" style="border-top-color:#b38728; max-width:600px; padding:25px;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="closeLightbox()"></i>
+            <div style="width:100%; height:300px; background:#000; border-radius:12px; overflow:hidden; margin-bottom:15px;" id="lightboxImageContainer"></div>
+            <h3 id="lightboxTitle" style="color:#b38728; text-transform:uppercase; font-size:16px;"></h3>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW 1: HOMEPAGE MAIN CORE HUB             -->
+    <!-- ========================================== -->
+    <div id="view-home" class="view-section active">
+        <div class="hero">
+            <div class="hero-content">
+                <div class="sofort-badge"><i class="fa-solid fa-bolt" style="margin-right:8px;"></i> Sofortkennzeichen zum Mitnehmen! <i class="fa-solid fa-bolt" style="margin-left:8px;"></i></div>
+                <h1 style="font-size: clamp(22px, 4.5vw, 42px); line-height: 1.1; margin-bottom: 15px;">Schnell. Zuverlässig.<br><span style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
+                <p style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 30px;">Zulassungstermine innerhalb von 1-2 Werktagen in Berlin Neukölln.</p>
+                <a href="#termin" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
+            </div>
+        </div>
+
+        <section id="leistungen" style="padding-top: 10px;">
+            <div class="section-header">
+                <h2>Unsere Leistungen</h2>
+                <p style="color:var(--text-muted); font-size:12px;">Klicken Sie direkt auf eine Karte für detaillierte Infos</p>
+            </div>
+            <div class="grid-container">
+                <div class="card" onclick="toggleCardSlide(this)">
+                    <i class="fa-solid fa-file-signature main-icon"></i>
+                    <h3>Anmeldung</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Neuzulassung in 1-2 Tagen.</p>
+                    <div class="card-info-slide">
+                        <p><strong>Mitzubringen (Original):</strong><br>• Fahrzeugbrief & Schein<br>• Ausweis / Aufenthaltstitel<br>• TÜV-Bericht & eVB-Nr.<br>• Kontodaten (IBAN)</p>
+                    </div>
+                </div>
+                <div class="card" onclick="toggleCardSlide(this)">
+                    <i class="fa-solid fa-exchange-alt main-icon"></i>
+                    <h3>Ummeldung</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Halterwechsel ohne Stress.</p>
+                    <div class="card-info-slide">
+                        <p><strong>Mitzubringen (Original):</strong><br>• Fahrzeugpapiere I & II<br>• Gültige HU / AU Bescheinigung<br>• Bisherige Kennzeichen</p>
+                    </div>
+                </div>
+                <div class="card" onclick="toggleCardSlide(this)">
+                    <i class="fa-solid fa-bolt main-icon"></i>
+                    <h3>Express</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Priorisierte Abwicklung.</p>
+                    <div class="card-info-slide">
+                        <p><strong>Express Service:</strong><br>Direkte Vorgangseinreichung bei der Behördenstellenleitung. Fertigstellung meist innerhalb 24h.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NOBLE COMPACT TRANSACT WRAPPER -->
+        <section id="termin" style="background: rgba(0,0,0,0.4); border-top:1px solid var(--glass-border); padding: 60px 5%;">
+            <div class="section-header">
+                <h2>Termin Buchen</h2>
+                <p style="color:var(--text-muted); font-size:12px;">Ansprechpartner: <strong>Tamer Yazici</strong></p>
+            </div>
+            
+            <div class="booking-wrapper">
+                <form id="bookingForm" onsubmit="executeBooking(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Vor- und Nachname</label>
+                            <input type="text" id="formName" class="form-control" placeholder="Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefonnummer</label>
+                            <input type="tel" id="formPhone" class="form-control" placeholder="Nummer" required>
+                        </div>
+                    </div>
+                    <div class="form-row v18-align-fix">
+                        <div class="form-group">
+                            <label>E-Mail Adresse</label>
+                            <input type="email" id="formEmail" class="form-control" placeholder="Mail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Anliegen</label>
+                            <div class="noble-select-box" id="serviceSelectBox">
+                                <div class="noble-select-trigger" id="selectTriggerText">Zulassung (Neuanmeldung)</div>
+                                <div class="noble-options-dropdown">
+                                    <div class="noble-option" data-value="Anmeldung">Zulassung (Neuanmeldung)</div>
+                                    <div class="noble-option" data-value="Ummeldung">Ummeldung</div>
+                                    <div class="noble-option" data-value="Abmeldung">Abmeldung</div>
+                                    <div class="noble-option" data-value="Express">Express Zulassung</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label>Wunschdatum</label>
+                        <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer;" required>
+                    </div>
+                    
+                    <div id="timeWrapper" style="display:none; margin-top:20px;">
+                        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px; text-transform:uppercase; font-weight:700; text-align:center;">Verfügbare Uhrzeiten</p>
+                        <div class="time-slots" id="timeSlots"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 25px; justify-content: center;" id="submitBtn" disabled>Termin absenden</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: FORMULARE SYSTEM (V21 EXTENDED)   -->
+    <!-- ========================================== -->
+    <div id="view-formulare" class="view-section">
+        <div style="display:flex; justify-content:center; margin-bottom: 30px;">
+            <button class="btn-primary" onclick="switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
+        </div>
+        
+        <!-- ADMIN AREA FORMULARE MANAGEMENT AREA -->
+        <div id="adminFormSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px;">
+            <h4><i class="fa-solid fa-folder-plus"></i> Admin: Formular-Verwaltung Terminal</h4>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="newFormTitle" class="form-control" placeholder="Titel" style="flex:1; margin-bottom:0;">
+                <input type="text" id="newFormUrl" class="form-control" placeholder="Link/URL" style="flex:1; margin-bottom:0;">
+                <button class="btn-primary" onclick="addNewFormItem()">Hinzufügen</button>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>Formulare</h2>
+            <p style="color:var(--text-muted); font-size:12px;">Klicken zum Markieren / Auswählen</p>
+        </div>
+        <div class="download-grid" id="formItemsGrid">
+            <div class="download-item" id="form-item-1" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Allgemeine Vollmacht">Allgemeine Vollmacht</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-1')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-2" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Antrag auf Ausnahmegenehmigung">Antrag auf Ausnahmegenehmigung</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-2')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-3" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Antrag auf Kurzzeitkennzeichen">Antrag auf Kurzzeitkennzeichen</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-3')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-4" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Antrag auf Steuervergünstigung">Antrag auf Steuervergünstigung</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-4')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-5" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Empfangsbevollmächtigung">Empfangsbevollmächtigung</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-5')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-6" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Eidesstattliche Versicherung (EV I)">Eidesstattliche Versicherung (EV I)</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-6')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-7" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Eidesstattliche Versicherung (EV II)">Eidesstattliche Versicherung (EV II)</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-7')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-8" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="EV (Schilder)">EV (Schilder)</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-8')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-9" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Kennzeichenreservierung">Kennzeichenreservierung</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-9')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-10" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Mitteilung für Umsatzsteuerzwecke">Mitteilung für Umsatzsteuerzwecke</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-10')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-11" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="SEPA-Lastschriftmandat">SEPA-Lastschriftmandat</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-11')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+            <div class="download-item" id="form-item-12" onclick="selectForm(this)" data-url="#">
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="Zulassungsantrag">Zulassungsantrag</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('form-item-12')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW 3: AUTO ANKAUF PREVIEW COMPACT MATRIX -->
+    <!-- ========================================== -->
+    <div id="view-ankauf" class="view-section">
+        <div style="display:flex; justify-content:center; margin-bottom: 30px;">
+            <button class="btn-primary" onclick="switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
+        </div>
+        
+        <!-- ADMIN AREA ANKAUF PHOTO MEDIA STORAGE -->
+        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border-color: rgba(179,135,40,0.2);">
+            <h4 style="color:#b38728; margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Ankauf Galerie - Unbegrenzt)</h4>
+            <div class="config-row" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="newCarTitle" class="form-control" placeholder="Modellname" style="flex:1; margin-bottom:0;">
+                
+                <label class="noble-file-upload" style="flex:1; margin-top:0;">
+                    <input type="file" id="newCarFile" accept="image/*,video/*" onchange="updateFileLabel(this)">
+                    <span class="noble-file-trigger" id="fileLabelText"><i class="fa-solid fa-folder-open"></i> Datei auswählen</span>
+                </label>
+                
+                <button class="btn-primary" style="background:#b38728;" onclick="uploadNewCarMedia()">Veröffentlichen</button>
+            </div>
+        </div>
+
+        <div class="auto-ankauf-box">
+            <h2 style="font-family:'Playfair Display', serif; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(24px, 4vw, 36px); letter-spacing: 2px; margin: 0;">AUTO ANKAUF</h2>
+            <p style="font-size: clamp(16px, 2.5vw, 20px); font-weight: bold; color: white; margin: 0;">Jeglicher Art – Sofort Bargeld!</p>
+            <p style="color: #a0a0a0; font-size: 13px; max-width: 500px; margin: 10px 0 0;">Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort.</p>
+            <div style="font-family: 'Playfair Display', serif; font-size: 35px; color: #fcf6ba; opacity: 0.3; margin-top: 5px; line-height: 1;">Ty</div>
+        </div>
+
+        <div class="gallery-title">Wertermittlung & Oldtimer Galerie</div>
+        <div class="vintage-gallery" id="carsGalleryGrid">
+            <!-- SCHEMATIC HIGH RES ENGINE STACKS FROM PROMPTS -->
+            <div class="gallery-card" id="ankauf-card-1">
+                <div class="admin-del-img-btn admin-up admin-only-flex" onclick="event.stopPropagation(); deleteGalleryImage('ankauf-card-1')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/14573198169554396966" id="ankauf-img-1" onclick="openLightbox('Mercedes Adenauer', this.src)" alt="Mercedes">
+                <span onclick="openLightbox('Mercedes Adenauer', this.previousElementSibling.src)">Mercedes Benz</span>
+            </div>
+            <div class="gallery-card" id="ankauf-card-2">
+                <div class="admin-del-img-btn admin-up admin-only-flex" onclick="event.stopPropagation(); deleteGalleryImage('ankauf-card-2')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/12058880479335895744" id="ankauf-img-2" onclick="openLightbox('Ford Mustang 1965', this.src)" alt="Mustang">
+                <span onclick="openLightbox('Ford Mustang 1965', this.previousElementSibling.src)">Ford Mustang</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- LOWER INFRASTRUCTURE LAYOUT                -->
+    <!-- ========================================== -->
+    
+    <!-- BERLIN KENNZEICHEN WARNING NOBLE ACCENT -->
+    <div class="contact-layout" style="padding-bottom: 0;">
+        <div style="grid-column: 1 / -1; display:flex; justify-content:center;">
+            <div style="display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                <div style="display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2);">
+                    <div style="background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold;">D</div>
+                    <div style="color: black; font-family: 'Courier New', monospace; font-weight: bold; font-size: 20px; padding: 0 12px;">BERLIN</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: white; text-align: left;">
+                    <i class="fa-solid fa-circle-exclamation" style="color:var(--primary-red); font-size:24px;"></i>
+                    <span>Bei Kennzeichenwechsel bitte die <strong>Kennzeichen</strong> mitgeben.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-layout">
+        <div class="map-box">
+            <iframe src="https://maps.google.com/maps?q=Kienitzer%20Str.%206,%2012053%20Berlin&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="background:var(--glass-bg); padding:20px; border-radius:18px; border:1px solid var(--glass-border);">
+                <h3 style="font-size:14px;"><i class="fa-solid fa-location-dot" style="color:var(--primary-red);"></i> Anschrift</h3>
+                <p style="margin-top:8px; font-size:12px;">Kienitzer Str. 6, 12053 Berlin</p>
+                <p style="margin-top:5px; font-size:11px; color:var(--text-muted);"><i class="fa-solid fa-clock"></i> Mo - Fr: 09:00 - 20:00 Uhr</p>
+            </div>
+            <div style="background:var(--glass-bg); padding:20px; border-radius:18px; border:1px solid var(--glass-border);">
+                <h3 style="font-size:14px;"><i class="fa-solid fa-phone" style="color:var(--primary-red);"></i> Support-Hotlines</h3>
+                <p style="margin-top:5px; font-size:12px;">Zulassung: 0178 378 38 75</p>
+                <a href="https://wa.me/4915121006161" target="_blank" class="btn-primary" style="background:#25D366; margin-top:10px; width:100%; justify-content:center;"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> WhatsApp Chat</a>
+            </div>
+        </div>
+        
+        <div style="grid-column: 1 / -1;">
+            <div class="cash-banner">
+                <h3 style="font-size:11px; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px;">Zahlungsart</h3>
+                <div style="display:inline-flex; align-items:center; background:#fff; color:#000; padding:10px 20px; border-radius:10px; font-weight:900; font-size:14px;">
+                    <i class="fa-solid fa-euro-sign" style="color:var(--primary-red); margin-right:8px;"></i> NUR BARZAHLUNG
+                </div>
+            </div>
+            
+            <div class="social-icons">
+                <a href="https://instagram.com/red_zulassungsdienst" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <footer style="margin-top: 30px;">
+        <div class="footer-links">
+            <a href="#" onclick="switchView('view-home')">Startseite</a>
+            <a href="#" onclick="switchView('view-formulare')">Formulare</a>
+            <a href="#" onclick="switchView('view-ankauf')">Auto Ankauf</a>
+            <a href="javascript:void(0)" onclick="showLegal('impressum')">Impressum</a>
+            <a href="javascript:void(0)" onclick="showLegal('datenschutz')">Datenschutz & Cookies</a>
+        </div>
+        <p style="font-size:10px; color:var(--text-muted);">© 2026 RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici.</p>
+        <div id="legalBox" style="max-width:800px; margin:20px auto 0; display:none;">
+            <div id="legalContent" style="background:rgba(0,0,0,0.3); padding:15px; border-radius:10px; border:1px solid var(--glass-border); text-align:left; color:#aaa; font-size:11px;"></div>
+        </div>
+    </footer>
+
+    <!-- Scripts Framework -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+    
+    <script>
+        // --- TOAST ENGINE ---
+        function showToast(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>';
+            toast.className = `toast-msg toast-${type}`;
+            toast.innerHTML = `${icon} <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3800);
+        }
+
+        // --- 1. OVERLAY CLICK TO CLOSE ENGINE ---
+        document.querySelectorAll('.custom-dialog-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if(e.target === this) {
+                    this.classList.remove('open');
+                    // Special resets
+                    if(this.id === 'deleteConfirmOverlay') { deleteTargetId = null; deleteNoteTargetId = null; }
+                    if(this.id === 'passChangeOverlay') document.getElementById('newPassInput').value = '';
+                }
+            });
+        });
+
+        // --- 2. ADMIN LIVE AUTH SHELL ---
+        let currentAdminUser = "Tamer Yazici";
+        let currentAdminPass = "616161";
+        let isAuthorized = false;
+        let deleteTargetId = null;
+        let deleteNoteTargetId = null;
+        let editingNoteElement = null;
+
+        function tryLogin() {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+            if(u === currentAdminUser && p === currentAdminPass) {
+                isAuthorized = true;
+                
+                // V22 SECURE CLASS TRIGGER
+                document.body.classList.add('is-admin');
+                
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('dashboardBox').style.display = 'block';
+                
+                showToast('Erfolgreich als Admin angemeldet.', 'success');
+                
+                if(activeBadgeNum === 0) addDummyAppointments();
+            } else {
+                showToast('Zugriff verweigert! Falscher Name oder Passwort.', 'error');
+            }
+        }
+        
+        function triggerLogoutConfirm() { document.getElementById('logoutConfirmOverlay').classList.add('open'); }
+        function cancelLogout() { document.getElementById('logoutConfirmOverlay').classList.remove('open'); }
+        function executeLogout() {
+            isAuthorized = false;
+            document.body.classList.remove('is-admin');
+            
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPass').value = '';
+            document.getElementById('dashboardBox').style.display = 'none';
+            document.getElementById('authBox').style.display = 'block';
+            
+            cancelLogout();
+            showToast('Erfolgreich abgemeldet.', 'success');
+        }
+
+        function changePassPrompt() {
+            if(!isAuthorized) return;
+            document.getElementById('passChangeOverlay').classList.add('open');
+        }
+        function closePassPrompt() {
+            document.getElementById('passChangeOverlay').classList.remove('open');
+            document.getElementById('newPassInput').value = '';
+        }
+        function confirmPassChange() {
+            const newP = document.getElementById('newPassInput').value;
+            if(newP && newP.trim().length > 3) {
+                currentAdminPass = newP;
+                closePassPrompt();
+                showToast('Passwort erfolgreich geändert!', 'success');
+            } else {
+                showToast('Ungültiges Passwort!', 'error');
+            }
+        }
+        
+        // --- ADMIN CARD GENERATOR ---
+        let activeBadgeNum = 0;
+        function addDummyAppointments() {
+            const list = document.getElementById('admin-list');
+            list.innerHTML = `
+                <div class="admin-apt-card prio-high" id="apt-1">
+                    <div class="prio-badge">In Kürze</div>
+                    <h4 style="font-size:14px; margin-bottom:5px;">Anmeldung (Neuwagen)</h4>
+                    <p style="font-size:11px; color:#ccc;"><i class="fa-solid fa-user"></i> Max Mustermann | Heute, 14:00</p>
+                    <p style="font-size:10px; color:var(--text-muted); margin-bottom:5px;"><i class="fa-solid fa-envelope"></i> max@example.com | <i class="fa-solid fa-phone"></i> 0178 111222</p>
+                    
+                    <div class="notes-list-box" id="notes-container-apt-1"></div>
+                    <input type="text" class="admin-note-input" placeholder="Notiz eingeben und Enter drücken..." onkeypress="saveNote(event, this, 'apt-1')">
+                    
+                    <div class="apt-actions-horizontal">
+                        <button class="apt-btn mark" onclick="markApt('apt-1')" title="Markieren / Anheften"><i class="fa-solid fa-thumbtack"></i></button>
+                        <button class="apt-btn edit" onclick="editApt('apt-1')" title="Notiz hinzufügen/bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                        <button class="apt-btn delete" onclick="deleteApt('apt-1')" title="Termin Löschen"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+                <div class="admin-apt-card prio-normal" id="apt-2">
+                    <div class="prio-badge">Geplant</div>
+                    <h4 style="font-size:14px; margin-bottom:5px;">Express Ummeldung</h4>
+                    <p style="font-size:11px; color:#ccc;"><i class="fa-solid fa-user"></i> Sabine Schmidt | Morgen, 09:30</p>
+                    <p style="font-size:10px; color:var(--text-muted); margin-bottom:5px;"><i class="fa-solid fa-envelope"></i> sabine@example.com | <i class="fa-solid fa-phone"></i> 0151 444555</p>
+                    
+                    <div class="notes-list-box" id="notes-container-apt-2"></div>
+                    <input type="text" class="admin-note-input" placeholder="Notiz eingeben und Enter drücken..." onkeypress="saveNote(event, this, 'apt-2')">
+                    
+                    <div class="apt-actions-horizontal">
+                        <button class="apt-btn mark" onclick="markApt('apt-2')" title="Markieren / Anheften"><i class="fa-solid fa-thumbtack"></i></button>
+                        <button class="apt-btn edit" onclick="editApt('apt-2')" title="Notiz hinzufügen/bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                        <button class="apt-btn delete" onclick="deleteApt('apt-2')" title="Termin Löschen"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            `;
+            activeBadgeNum = 2;
+            updateBadge();
+        }
+
+        function updateBadge() {
+            const b = document.getElementById('notif-badge');
+            b.innerText = activeBadgeNum;
+            b.classList.remove('prio-pulse');
+            if(document.querySelector('.admin-apt-card.prio-high')) b.classList.add('prio-pulse');
+        }
+
+        function markApt(id) {
+            const card = document.getElementById(id);
+            card.classList.toggle('marked');
+            
+            // PINNED PLATE ON THE WEBSITE
+            if (card.classList.contains('marked')) {
+                const nameText = card.querySelector('p').innerText.split('|')[0].replace('', '').trim();
+                const timeText = card.querySelector('p').innerText.split('|')[1].trim();
+                const isToday = timeText.toLowerCase().includes('heute');
+                
+                const plate = document.createElement('div');
+                plate.className = 'pinned-plate';
+                if(isToday) { plate.classList.add('urgent-today'); } 
+                else { plate.classList.add('normal-day'); }
+                
+                plate.id = 'pinned-' + id;
+                plate.innerHTML = `<span style="font-size:14px;">${nameText}</span> <span style="font-size:16px;">-</span> <span style="font-size:12px;">${timeText}</span>`;
+                plate.onclick = () => openAdmin();
+                
+                document.getElementById('pinned-container').appendChild(plate);
+                showToast('Termin auf Webseite angeheftet.', 'success');
+            } else {
+                const plate = document.getElementById('pinned-' + id);
+                if(plate) plate.remove();
+            }
+        }
+        
+        function editApt(id) {
+            editingNoteElement = null; 
+            const input = document.querySelector(`#${id} .admin-note-input`);
+            input.value = '';
+            input.classList.toggle('active');
+            if(input.classList.contains('active')) input.focus();
+        }
+        
+        // --- REAL TIME SEPARATED NOTES MANAGEMENT ---
+        function saveNote(e, inputEl, cardId) {
+            if(e.key === 'Enter') {
+                e.preventDefault();
+                const noteText = inputEl.value.trim();
+                if(noteText === '') return;
+                
+                const container = document.getElementById(`notes-container-${cardId}`);
+                const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                if(editingNoteElement) {
+                    editingNoteElement.querySelector('.note-text-body').innerText = noteText;
+                    editingNoteElement.querySelector('.note-meta').innerText = `Geändert: ${timestamp}`;
+                    editingNoteElement = null;
+                    showToast('Notiz aktualisiert.', 'success');
+                } else {
+                    const noteId = 'note-' + Date.now();
+                    const noteRow = document.createElement('div');
+                    noteRow.className = 'saved-note-row';
+                    noteRow.id = noteId;
+                    noteRow.innerHTML = `
+                        <div style="flex:1;">
+                            <span class="note-text-body">${noteText}</span>
+                            <span class="note-meta">Erstellt: ${timestamp}</span>
+                        </div>
+                        <div class="note-row-actions">
+                            <button class="note-row-btn" onclick="triggerEditNote('${noteId}', '${cardId}')" title="Notiz bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                            <button class="note-row-btn del" onclick="triggerDeleteNote('${noteId}')" title="Notiz löschen"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                    container.appendChild(noteRow);
+                    showToast('Notiz hinzugefügt.', 'success');
+                }
+                
+                inputEl.value = '';
+                inputEl.classList.remove('active');
+            }
+        }
+
+        function triggerEditNote(noteId, cardId) {
+            const noteRow = document.getElementById(noteId);
+            const text = noteRow.querySelector('.note-text-body').innerText;
+            const input = document.querySelector(`#${cardId} .admin-note-input`);
+            
+            editingNoteElement = noteRow;
+            input.value = text;
+            input.classList.add('active');
+            input.focus();
+        }
+
+        function triggerDeleteNote(noteId) {
+            deleteNoteTargetId = noteId;
+            document.getElementById('delTitleText').innerText = "Notiz löschen?";
+            document.getElementById('delDescText').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
+            
+            // Fix dialog assignment for Custom Ovals
+            const customOverlay = document.getElementById('deleteConfirmOverlay');
+            customOverlay.querySelector('h3').innerText = "Notiz löschen?";
+            customOverlay.querySelector('p').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
+            customOverlay.classList.add('open');
+        }
+
+        function deleteApt(id) {
+            deleteTargetId = id;
+            const customOverlay = document.getElementById('deleteConfirmOverlay');
+            customOverlay.querySelector('h3').innerText = "Eintrag löschen?";
+            customOverlay.querySelector('p').innerText = "Möchten Sie diesen Datensatz wirklich unwiderruflich aus dem System entfernen?";
+            customOverlay.classList.add('open');
+        }
+
+        function cancelDelete() {
+            document.getElementById('deleteConfirmOverlay').classList.remove('open');
+            deleteTargetId = null;
+            deleteNoteTargetId = null;
+        }
+
+        function confirmDelete() {
+            // Handle Appointment Deletion
+            if(deleteTargetId && document.getElementById(deleteTargetId)) {
+                document.getElementById(deleteTargetId).remove();
+                if(activeBadgeNum > 0) activeBadgeNum--; 
+                updateBadge();
+                const plate = document.getElementById('pinned-' + deleteTargetId);
+                if(plate) plate.remove();
+                cancelDelete();
+                showToast('Termin dauerhaft gelöscht.', 'success');
+            }
+            // Handle Separate Note Deletion
+            else if(deleteNoteTargetId && document.getElementById(deleteNoteTargetId)) {
+                document.getElementById(deleteNoteTargetId).remove();
+                cancelDelete();
+                showToast('Notiz gelöscht.', 'success');
+            }
+        }
+
+        // --- V22 TICKER CONFIGURATION (ADMIN) ---
+        function openTickerConfig() {
+            if(!isAuthorized) return;
+            document.getElementById('tickerConfigOverlay').classList.add('open');
+        }
+        function closeTickerConfig() {
+            document.getElementById('tickerConfigOverlay').classList.remove('open');
+        }
+        
+        let tickerIsVisible = true;
+        function toggleTickerDisplay() {
+            tickerIsVisible = !tickerIsVisible;
+            document.getElementById('ticker-container').style.display = tickerIsVisible ? 'flex' : 'none';
+            document.body.style.paddingTop = tickerIsVisible ? '100px' : '70px'; 
+            closeTickerConfig();
+            showToast(tickerIsVisible ? 'Ticker aktiviert' : 'Ticker deaktiviert', 'success');
+        }
+        
+        function saveTickerConfig() {
+            const fullText = document.getElementById('tickerFullText').value;
+            const blinkWord = document.getElementById('tickerBlinkWord').value.trim();
+            const speed = document.getElementById('tickerSpeed').value;
+            const color = document.getElementById('tickerColor').value;
+            const blinkColor = document.getElementById('tickerBlinkColor').value;
+            const font = document.getElementById('tickerFont').value;
+            const size = document.getElementById('tickerSize').value;
+            
+            const symbols = [];
+            if(document.getElementById('symCar').checked) symbols.push('fa-car-side');
+            if(document.getElementById('symBolt').checked) symbols.push('fa-bolt');
+            if(document.getElementById('symFlag').checked) symbols.push('fa-flag-checkered');
+            if(document.getElementById('symCard').checked) symbols.push('fa-id-card');
+            if(document.getElementById('symStar').checked) symbols.push('fa-star');
+            
+            const contentEl = document.getElementById('tickerTextContent');
+            const wrapperEl = document.getElementById('tickerWrapper');
+            
+            let symLeft = '';
+            symbols.forEach(s => symLeft += `<i class="fa-solid ${s} ticker-car" style="margin-right:6px;"></i>`);
+            let symRight = '';
+            symbols.forEach(s => symRight += `<i class="fa-solid ${s} ticker-car" style="margin-left:6px;"></i>`);
+            
+            let textHtml = '';
+            if(blinkWord !== '' && fullText.includes(blinkWord)) {
+                const parts = fullText.split(blinkWord);
+                textHtml = `${parts[0]}<span class="ticker-highlight" style="color:${blinkColor};">${blinkWord}</span>${parts[1]}`;
+            } else {
+                textHtml = fullText;
+            }
+            
+            contentEl.innerHTML = `${symLeft} <span>${textHtml}</span> ${symRight}`;
+            contentEl.style.color = color;
+            contentEl.style.fontFamily = font;
+            contentEl.style.fontSize = size;
+            wrapperEl.style.animationDuration = speed;
+            
+            closeTickerConfig();
+            showToast('Ticker-Einstellungen gespeichert!', 'success');
+        }
+
+        // --- ADMIN LIVE CONTENT UPLOADS ---
+        function addNewFormItem() {
+            const title = document.getElementById('newFormTitle').value;
+            const url = document.getElementById('newFormUrl').value || '#';
+            if(!title) { showToast('Bitte Formular-Titel eingeben.', 'error'); return; }
+            
+            const grid = document.getElementById('formItemsGrid');
+            const formId = 'form-item-' + Date.now();
+            const element = document.createElement('div');
+            element.className = 'download-item';
+            element.id = formId;
+            element.setAttribute('data-url', url);
+            element.setAttribute('onclick', 'selectForm(this)');
+            
+            element.innerHTML = `
+                <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="${title}">${title}</span></div>
+                <div class="download-actions">
+                    <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); triggerAdminUpload(this)"></i>
+                    <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular leeren/löschen" onclick="event.stopPropagation(); adminDeleteForm('${formId}')"></i>
+                    <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); downloadForm(this)"></i>
+                </div>
+            `;
+            grid.prepend(element);
+            
+            document.getElementById('newFormTitle').value = '';
+            document.getElementById('newFormUrl').value = '';
+            showToast('Formular erfolgreich hinzugefügt.', 'success');
+        }
+
+        function triggerAdminUpload(iconEl) {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.pdf,.doc,.docx';
+            fileInput.onchange = e => {
+                if(e.target.files.length > 0) {
+                    iconEl.style.color = '#25D366';
+                    const file = e.target.files[0];
+                    const url = URL.createObjectURL(file);
+                    const parentItem = iconEl.closest('.download-item');
+                    parentItem.setAttribute('data-url', url);
+                    showToast('Datei erfolgreich verknüpft!', 'success');
+                }
+            };
+            fileInput.click();
+        }
+        
+        function adminDeleteForm(formId) {
+            if(confirm('Möchten Sie die hochgeladene Datei dieses Formulars entfernen/leeren?')) {
+                const item = document.getElementById(formId);
+                item.setAttribute('data-url', '#');
+                const uploadIcon = item.querySelector('.admin-up');
+                if(uploadIcon) uploadIcon.style.color = '#b38728';
+                showToast('Dokument entfernt. Link ist nun leer.', 'success');
+            }
+        }
+
+        function downloadForm(iconEl) { 
+            const parent = iconEl.closest('.download-item');
+            const url = parent.getAttribute('data-url');
+            if(url && url !== '#') {
+                showToast('Download wird gestartet...', 'success');
+                window.open(url, '_blank');
+            } else {
+                showToast('Dieses Formular enthält aktuell keine Datei.', 'error');
+            }
+        }
+
+        function updateFileLabel(input) {
+            const labelText = document.getElementById('fileLabelText');
+            if(input.files && input.files[0]) {
+                labelText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color:#25D366;"></i> ${input.files[0].name}`;
+            } else {
+                labelText.innerHTML = `<i class="fa-solid fa-folder-open"></i> Datei auswählen`;
+            }
+        }
+
+        function uploadNewCarMedia() {
+            const title = document.getElementById('newCarTitle').value;
+            const fileInput = document.getElementById('newCarFile');
+            if(!title || !fileInput.files[0]) { showToast('Bitte Modellnamen und Datei angeben.', 'error'); return; }
+            
+            const file = fileInput.files[0];
+            const mediaUrl = URL.createObjectURL(file);
+            const grid = document.getElementById('carsGalleryGrid');
+            const cardId = 'car-card-' + Date.now();
+            const card = document.createElement('div');
+            card.className = 'gallery-card';
+            card.id = cardId;
+            
+            let mediaHtml = '';
+            if (file.type.startsWith('video/')) {
+               mediaHtml = `<video src="${mediaUrl}" onclick="openLightbox('${title}', '${mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
+            } else {
+               mediaHtml = `<img src="${mediaUrl}" onclick="openLightbox('${title}', '${mediaUrl}')" alt="${title}">`;
+            }
+            
+            card.innerHTML = `
+                <div class="admin-del-img-btn admin-up admin-only-flex" onclick="event.stopPropagation(); deleteGalleryImage('${cardId}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
+                ${mediaHtml}
+                <span onclick="openLightbox('${title}', '${mediaUrl}')">${title}</span>
+            `;
+            
+            grid.prepend(card);
+            document.getElementById('newCarTitle').value = '';
+            fileInput.value = '';
+            document.getElementById('fileLabelText').innerHTML = `<i class="fa-solid fa-folder-open"></i> Datei auswählen`;
+            showToast('Medium in Galerie veröffentlicht.', 'success');
+        }
+        
+        function deleteGalleryImage(cardId) {
+            if(confirm('Möchten Sie dieses Fahrzeug dauerhaft entfernen?')) {
+                document.getElementById(cardId).remove();
+                showToast('Fahrzeug entfernt.', 'success');
+            }
+        }
+
+        function toggleCardSlide(card) {
+            const isActive = card.classList.contains('reveal-active');
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
+            if(!isActive) card.classList.add('reveal-active');
+        }
+
+        // --- CUSTOM SELECT MENU ---
+        const trigger = document.getElementById('serviceSelectBox');
+        let selectedServiceVal = "Anmeldung";
+        trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
+        document.querySelectorAll('.noble-option').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectedServiceVal = opt.getAttribute('data-value');
+                document.getElementById('selectTriggerText').innerText = opt.innerText;
+                trigger.classList.remove('open');
+            });
+        });
+        document.addEventListener('click', () => trigger.classList.remove('open'));
+
+        // --- PERSISTENT COUNTER ---
+        let count = localStorage.getItem('masterVCountFinal') || 1482;
+        count = parseInt(count) + 1;
+        localStorage.setItem('masterVCountFinal', count);
+        document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
+
+        function runPlates() {
+            const container = document.getElementById('plate-container');
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for(let i=0; i<8; i++) {
+                let p = document.createElement('div'); p.className = 'plate';
+                p.innerHTML = `B - ${chars[Math.floor(Math.random()*26)]}${chars[Math.floor(Math.random()*26)]} ${Math.floor(1000+Math.random()*9000)}`;
+                p.style.left = `${Math.random() * 90}vw`; p.style.animationDelay = `${Math.random() * 15}s`;
+                container.appendChild(p);
+            }
+        }
+        runPlates();
+
+        // --- PRELOADER INTRO SCENE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const preloader = document.getElementById('intro-preloader');
+            setTimeout(() => { document.getElementById('introCar').style.transition = 'left 1.4s linear'; document.getElementById('introCar').style.left = '320px'; }, 200);
+            setTimeout(() => { const p = document.getElementById('introPlate'); p.style.transform = 'scale(1)'; p.style.opacity = '1'; p.style.transition = '0.4s'; }, 800);
+            setTimeout(() => { const t = document.getElementById('introText'); t.style.transform = 'translateY(0)'; t.style.opacity = '1'; t.style.transition = '0.4s'; }, 1200);
+            setTimeout(() => { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.display = 'none'; }, 600); }, 3100);
+        });
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0,0);
+        }
+        function toggleMenu() { document.getElementById('quickMenu').classList.toggle('active'); }
+
+        function openAdmin() { document.getElementById('adminModal').classList.add('open'); }
+        function closeAdmin() { document.getElementById('adminModal').classList.remove('open'); }
+        function closeCustomConfirm() { document.getElementById('confirmModalOverlay').classList.remove('open'); }
+        function closeInfo() { document.getElementById('infoPopupOverlay').classList.remove('open'); }
+
+        function openLightbox(title, mediaUrl) {
+            document.getElementById('lightboxTitle').innerText = title;
+            const container = document.getElementById('lightboxImageContainer');
+            if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
+                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop style="width:100%; height:100%; object-fit:cover; border-radius: 12px;"></video>`;
+            } else {
+                container.innerHTML = `<img src="${mediaUrl}" alt="${title}" style="width:100%; height:100%; object-fit:cover; border-radius: 12px;">`;
+            }
+            document.getElementById('lightboxOverlay').classList.add('open');
+        }
+        function closeLightbox() { document.getElementById('lightboxOverlay').classList.remove('open'); }
+
+        function openInfo(type) {
+            const title = document.getElementById('pTitle'); const text = document.getElementById('pText');
+            title.innerText = type;
+            if(type === 'Anmeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Fahrzeugbrief<br>• Fahrzeugschein<br>• Personalausweis oder Pass<br>• Gültiger TÜV-Bericht (HU)<br>• eVB-Nummer Ihrer Kfz-Versicherung';
+            else if(type === 'Ummeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Bisherige Kennzeichen (falls Schildertausch gewünscht)<br>• Zulassungsbescheinigung I & II<br>• Aktueller HU-Prüfbericht';
+            else text.innerHTML = 'Unser Express-Service sichert Ihnen die schnellstmögliche Bearbeitung direkt über unsere internen Schnittstellen. Vorgänge werden taggleich eingereicht und innerhalb von 24h finalisiert.';
+            document.getElementById('infoPopupOverlay').classList.add('open');
+        }
+
+        function selectForm(element) {
+            document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        let chosenHour = null;
+        flatpickr("#datePicker", {
+            locale: "de", minDate: "today", disable: [ d => d.getDay() === 0 || d.getDay() === 6 ],
+            onChange: function() {
+                document.getElementById('timeWrapper').style.display = 'block';
+                const container = document.getElementById('timeSlots');
+                container.innerHTML = '';
+                for(let h = 9; h <= 19; h++) {
+                    const tStr = `${h.toString().padStart(2, '0')}:00`;
+                    const div = document.createElement('div');
+                    div.className = 'time-slot'; div.innerText = tStr;
+                    if(Math.random() > 0.75) div.classList.add('booked');
+                    else {
+                        div.addEventListener('click', () => {
+                            Array.from(container.children).forEach(c => c.classList.remove('active'));
+                            div.classList.add('active');
+                            chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
+                        });
+                    }
+                    container.appendChild(div);
+                }
+            }
+        });
+
+        function executeBooking(event) {
+            event.preventDefault();
+            const n = document.getElementById('formName').value;
+            const p = document.getElementById('formPhone').value;
+            const e = document.getElementById('formEmail').value;
+            const d = document.getElementById('datePicker').value;
+            const uid = 'apt-' + Date.now();
+
+            document.getElementById('submitBtn').innerText = 'Übermittle...';
+            
+            setTimeout(() => {
+                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${chosenHour} Uhr wurde erfolgreich bei Berater Tamer Yazici gespeichert.`;
+                document.getElementById('confirmModalOverlay').classList.add('open');
+
+                const list = document.getElementById('admin-list');
+                const card = document.createElement('div');
+                card.className = 'admin-apt-card prio-high';
+                card.id = uid;
+                
+                card.innerHTML = `
+                    <div class="prio-badge">NEU</div>
+                    <h4 style="font-size:14px; margin-bottom:5px;">${selectedServiceVal}</h4>
+                    <p style="font-size:11px; color:#ccc;"><i class="fa-solid fa-user"></i> ${n} | Datum: ${d} (${chosenHour})</p>
+                    <p style="font-size:10px; color:var(--text-muted); margin-bottom:15px;"><i class="fa-solid fa-envelope"></i> ${e} | <i class="fa-solid fa-phone"></i> ${p}</p>
+                    
+                    <div class="notes-list-box" id="notes-container-${uid}"></div>
+                    <input type="text" class="admin-note-input" placeholder="Notiz eingeben und Enter drücken..." onkeypress="saveNote(event, this, '${uid}')">
+                    
+                    <div class="apt-actions-horizontal">
+                        <button class="apt-btn mark" onclick="markApt('${uid}')" title="Markieren / Anheften"><i class="fa-solid fa-thumbtack"></i></button>
+                        <button class="apt-btn edit" onclick="editApt('${uid}')" title="Notiz hinzufügen/bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                        <button class="apt-btn delete" onclick="deleteApt('${uid}')" title="Löschen"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `;
+                list.prepend(card);
+                
+                activeBadgeNum++; updateBadge();
+                showToast('Ein neuer Termin ist eingegangen.', 'success');
+
+                document.getElementById('bookingForm').reset();
+                document.getElementById('timeWrapper').style.display = 'none';
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').innerText = 'Termin absenden';
+                document.getElementById('selectTriggerText').innerText = "Zulassung (Neuanmeldung)";
+                selectedServiceVal = "Anmeldung";
+                chosenHour = null;
+            }, 800);
+        }
+
+        function showLegal(type) {
+            const b = document.getElementById('legalBox'); const c = document.getElementById('legalContent');
+            b.style.display = 'block';
+            if(type === 'impressum') c.innerHTML = '<strong>Impressum gemäß § 5 TMG:</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6, 12053 Berlin<br>Tel: 0178 378 38 75';
+            else c.innerHTML = '<strong>Datenschutzerklärung:</strong><br><br>Sämtliche Eingabedaten werden verschlüsselt verarbeitet und direkt in der geschützten Datenbank synchronisiert. Es findet kein unbefugtes Tracking statt.';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
+</body>
+</html>
