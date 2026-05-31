@@ -27,28 +27,13 @@
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE --- */
-        * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            touch-action: manipulation;
-        }
-        body { 
-            font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
-            line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
-            -webkit-touch-callout: none; /* Prevent iOS Callout */
-            -webkit-user-select: none; user-select: none; /* Prevent unwanted selection */
-        }
-        input, textarea, select, .admin-note-input {
-            -webkit-touch-callout: default !important;
-            -webkit-user-select: auto !important;
-            user-select: auto !important;
-        }
+        /* --- V27 ANTI-FLICKER CORE ENGINE --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; padding-top: 90px; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        input, textarea, select, .admin-note-input { -webkit-touch-callout: default !important; -webkit-user-select: auto !important; user-select: auto !important; }
 
         /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
-        .admin-only-block { display: none !important; }
-        .admin-only-flex { display: none !important; }
-        .admin-only-inline { display: none !important; }
+        .admin-only-block, .admin-only-flex, .admin-only-inline { display: none !important; }
         body.is-admin .admin-only-block { display: block !important; }
         body.is-admin .admin-only-flex { display: flex !important; }
         body.is-admin .admin-only-inline { display: inline-flex !important; }
@@ -65,13 +50,13 @@
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
 
-        /* --- INTRO PRELOADER --- */
-        #intro-preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; transition: opacity 0.6s ease; }
+        /* --- V27 SMOOTH INTRO PRELOADER (No Pixelation) --- */
+        #intro-preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; transition: opacity 0.5s ease; }
         .intro-track { width: 280px; height: 4px; background: rgba(255,255,255,0.03); position: relative; margin-top: 40px; border-radius: 2px; }
-        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); }
-        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(255,255,255,0.1); transform: scale(0); opacity: 0; display: flex; align-items: center; gap: 10px; }
+        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; } /* Removed shadow for mobile performance */
+        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 20px rgba(255,255,255,0.05); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s; }
         .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
-        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); }
+        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(10px); transition: all 0.5s; }
 
         /* --- TOAST NOTIFICATIONS --- */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -88,13 +73,14 @@
         nav { padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 7, 0.98); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
         .logo-container { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; position: relative; max-width: 70%; }
-        .logo-text { font-size: clamp(10px, 2.8vw, 18px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; }
+        .logo-text { font-size: clamp(12px, 3vw, 20px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; }
         .logo-text .red-part { color: var(--primary-red); }
         .logo-text .white-part { color: #ffffff; }
         
-        /* New Sportscar Logo SVG */
-        .logo-car-svg { height: clamp(18px, 3.5vw, 26px); width: auto; flex-shrink: 0; fill: #ffffff; transition: 0.3s; }
-        .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(3px); }
+        /* V27 Gentle Logo Car Animation */
+        .logo-car-svg { height: clamp(14px, 3.5vw, 22px); width: auto; flex-shrink: 0; fill: #ffffff; margin-left: 6px; animation: gentleIdle 3s infinite ease-in-out; transition: fill 0.3s; }
+        .logo-container:hover .logo-car-svg { fill: var(--primary-red); }
+        @keyframes gentleIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
         .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
         .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
@@ -124,7 +110,6 @@
         .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; }
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-        .ticker-car { font-size: 15px; color: var(--primary-red); }
 
         /* --- FULLSCREEN MENU --- */
         .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); backdrop-filter: blur(25px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
@@ -234,15 +219,15 @@
         /* NOBLE CUSTOM DROPDOWN SELECTS */
         .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
         .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .noble-select-trigger::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--primary-red); font-size: 10px; transition: 0.3s; }
+        .noble-select-trigger::after { content: '▼'; font-family: sans-serif; font-size: 10px; color: var(--primary-red); transition: 0.3s; }
         .noble-select-box.open .noble-select-trigger::after { transform: rotate(180deg); }
         .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; overflow: hidden; }
         .noble-select-box.open .noble-options-dropdown { display: block; }
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- FLATPICKR CENTERING & THEMING --- */
-        .flatpickr-calendar { background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; font-family: 'Montserrat', sans-serif !important; width: 300px !important; position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 999999 !important; display: none; }
+        /* --- V27 FLATPICKR CENTERING & THEMING --- */
+        .flatpickr-calendar { background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; font-family: 'Montserrat', sans-serif !important; width: 300px !important; position: fixed !important; top: 50vh !important; left: 50vw !important; transform: translate(-50%, -50%) !important; z-index: 999999 !important; display: none; right: auto !important; bottom: auto !important; margin: 0 !important; }
         .flatpickr-calendar.open { display: block !important; }
         .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
         .flatpickr-day { color: #fff !important; }
@@ -258,23 +243,22 @@
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- MOBILE SCALING (V28 ANTI-FLICKER & RESPONSIVE FIXES) --- */
+        /* --- V27 MOBILE SCALING & ANTI-FLICKER --- */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 80px; }
             nav { padding: 10px 3%; }
-            .logo-container { max-width: 60%; gap: 6px; }
-            .logo-text { font-size: clamp(9px, 3.2vw, 14px); white-space: normal; line-height: 1.2; }
+            .logo-container { max-width: 65%; gap: 6px; }
+            .logo-text { font-size: clamp(10px, 3.2vw, 15px); white-space: normal; line-height: 1.2; }
             .logo-car-svg { height: clamp(14px, 4vw, 20px); margin-left: 2px; }
             
             .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
-            .visitor-counter { display: none; } /* Hidden to ensure header fits cleanly */
+            .visitor-counter { display: none; }
             
             .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
             .hero { margin-top: 15px; }
             .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
             
-            /* Anti Flicker Mobile Adjustments */
             .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
             
             .card { padding: 25px 15px !important; height: 160px !important; }
@@ -293,20 +277,16 @@
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
-        /* V28 ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
+        /* V27 SMOOTH SOFORTKENNZEICHEN (NO FLICKER) */
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #b30000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
-            padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; border: 2px solid rgba(255,255,255,0.5);
-            /* Strict Hardware Acceleration for iOS/Android */
-            -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0);
-            -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            -webkit-perspective: 1000px; perspective: 1000px;
-            will-change: transform, box-shadow; -webkit-font-smoothing: subpixel-antialiased;
-            animation: mega-pulse-badge 1.5s infinite alternate ease-in-out; text-transform: uppercase; letter-spacing: 1px; 
+            padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; 
+            border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            animation: smooth-pulse-badge 2s infinite alternate ease-in-out; text-transform: uppercase; letter-spacing: 1px; 
         }
-        @keyframes mega-pulse-badge { 
-            0% { transform: scale(1) translateZ(0); box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); border-color: rgba(255,255,255,0.5); color: #fff; } 
-            100% { transform: scale(1.04) translateZ(0); box-shadow: 0 0 40px rgba(255, 0, 0, 0.9); border-color: #ffcc00; color: #ffcc00; } 
+        @keyframes smooth-pulse-badge { 
+            0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.4); border-color: rgba(255,255,255,0.3); } 
+            100% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.9); border-color: #ffcc00; } 
         }
         
         .section-header { text-align: center; margin-bottom: 35px; }
@@ -322,7 +302,7 @@
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE VIA V20 CLASS) --- */
+        /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE) --- */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
@@ -379,8 +359,8 @@
         #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
         #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
 
-        /* V28 FIX: ALIGN TEXT IN FORMS */
-        .v18-align-fix { margin-top: 0px !important; }
+        /* TICKER CONFIG SYMBOL MATRIX STYLING */
+        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -405,7 +385,7 @@
     <div id="header-wrapper">
         <nav>
             <div class="logo-container" id="logoHubTrigger">
-                <!-- V28 NEW HEADER LOGO: Text + Vector Sports Car -->
+                <!-- V27 NEW HEADER LOGO: Text + Vector Sports Car -->
                 <div class="logo-text">
                     <span class="red-part">RED</span> 
                     <span class="white-part">ZULASSUNGSDIENST</span>
@@ -417,7 +397,7 @@
                     <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/>
                 </svg>
                 
-                <!-- V28 ADMIN TICKER EDIT ICON SECURE -->
+                <!-- ADMIN TICKER EDIT ICON SECURE -->
                 <i class="fa-solid fa-pen admin-ticker-edit-icon admin-only-block" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker & Symbole bearbeiten"></i>
             </div>
             
@@ -540,7 +520,7 @@
         </div>
     </div>
 
-    <!-- V28 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <!-- V27 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
@@ -571,18 +551,19 @@
                 </div>
             </div>
             
+            <!-- V27 UPDATE: ENHANCED MULTIPLE SYMBOL SELECTOR MATRIX -->
             <div class="form-group" style="margin-top:10px;">
                 <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
                 <div class="symbol-grid">
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 Auto</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="noble-checkbox-box"></span> 🚛 LKW</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="noble-checkbox-box"></span> ⚡ Blitz</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="noble-checkbox-box"></span> 🏁 Flagge</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Stern</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symKey"><span class="noble-checkbox-box"></span> 🔑 Schlüssel</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symClock"><span class="noble-checkbox-box"></span> ⏱️ Uhr</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFire"><span class="noble-checkbox-box"></span> 🔥 Feuer</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symInfo"><span class="noble-checkbox-box"></span> ℹ️ Info</label>
                 </div>
             </div>
             
@@ -636,7 +617,7 @@
 
     <!-- CORE CARD INFO MODAL POPUPS -->
     <div class="custom-dialog-overlay" id="infoPopupOverlay">
-        <div class="custom-dialog-window" style="border-top-color:var(--primary-red);">
+        <div class="custom-dialog-window" style="border-top-color:var(--primary-red); max-width: 450px;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeInfo()"></i>
             <h3 id="pTitle" style="color:var(--primary-red); font-weight:900; margin-bottom:15px; text-transform:uppercase;"></h3>
             <p id="pText" style="color:#ccc; font-size:13px; text-align:left; line-height:1.6;"></p>
@@ -658,6 +639,7 @@
     <div id="view-home" class="view-section active">
         <div class="hero">
             <div class="hero-content">
+                <!-- V27 Anti Flicker smooth pulse badge -->
                 <div class="sofort-badge"><i class="fa-solid fa-bolt" style="margin-right:8px;"></i> Sofortkennzeichen zum Mitnehmen! <i class="fa-solid fa-bolt" style="margin-left:8px;"></i></div>
                 <h1 style="font-size: clamp(22px, 4.5vw, 42px); line-height: 1.1; margin-bottom: 15px;">Schnell. Zuverlässig.<br><span style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
                 <p style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 30px;">Zulassungstermine innerhalb von 1-2 Werktagen in Berlin Neukölln.</p>
@@ -775,9 +757,9 @@
             <p style="color:var(--text-muted); font-size:12px;">Klicken zum Markieren / Auswählen</p>
         </div>
         
-        <!-- DYNAMIC FORM GRID (Populated by Firebase/Defaults) -->
+        <!-- DYNAMIC FORM GRID (Populated by JS/Firebase) -->
         <div class="download-grid" id="formItemsGrid">
-            <!-- Rendered by JS -->
+            <!-- Rendered dynamically -->
         </div>
     </div>
 
@@ -813,7 +795,7 @@
 
         <div style="text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 14px; font-weight: 800; color: #b38728;">Wertermittlung & Oldtimer Galerie</div>
         
-        <!-- DYNAMIC CAR GALLERY (Populated by Firebase/Defaults) -->
+        <!-- DYNAMIC CAR GALLERY -->
         <div class="vintage-gallery" id="carsGalleryGrid">
             <!-- Rendered by JS -->
         </div>
@@ -884,7 +866,7 @@
         </div>
     </footer>
 
-    <!-- FIREBASE V28 MODULE INTEGRATION -->
+    <!-- FIREBASE V27 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -924,7 +906,7 @@
             });
         });
 
-        // --- 2. ADMIN LIVE AUTH SHELL ---
+        // --- 2. ADMIN LIVE AUTH SHELL (WITH AUTO-LOGIN FIX) ---
         window.currentAdminUser = "Tamer Yazici";
         window.currentAdminPass = "616161";
         window.isAuthorized = false;
@@ -932,17 +914,29 @@
         window.deleteNoteTargetId = null;
         window.editingNoteElement = null;
 
+        // Auto-Login Check on load
+        if(localStorage.getItem('red_admin_saved') === 'true') {
+            document.body.classList.add('is-admin');
+            window.isAuthorized = true;
+            document.getElementById('authBox').style.display = 'none';
+            document.getElementById('dashboardBox').style.display = 'block';
+            document.getElementById('adminKeyIcon').style.color = '#25D366';
+        }
+
         window.tryLogin = function() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPass').value;
+            const remember = document.getElementById('rememberMe').checked;
+            
             if(u === window.currentAdminUser && p === window.currentAdminPass) {
                 window.isAuthorized = true;
                 document.body.classList.add('is-admin');
                 
+                if(remember) localStorage.setItem('red_admin_saved', 'true');
+                
                 document.getElementById('authBox').style.display = 'none';
                 document.getElementById('dashboardBox').style.display = 'block';
                 document.getElementById('adminKeyIcon').style.color = '#25D366';
-                
                 window.showToast('Erfolgreich als Admin angemeldet.', 'success');
             } else {
                 window.showToast('Zugriff verweigert! Falscher Name oder Passwort.', 'error');
@@ -954,6 +948,7 @@
         window.executeLogout = function() {
             window.isAuthorized = false;
             document.body.classList.remove('is-admin');
+            localStorage.removeItem('red_admin_saved');
             
             document.getElementById('adminUser').value = '';
             document.getElementById('adminPass').value = '';
@@ -984,11 +979,10 @@
             }
         };
         
-        // --- FIREBASE: VISITOR COUNTER V28 ---
+        // --- FIREBASE: VISITOR COUNTER ---
         const visitorDocRef = doc(db, "settings", "visitors");
         let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
         
-        // Try incrementing firebase
         try {
             setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {
                 localCount++;
@@ -997,7 +991,6 @@
             });
         } catch(e) {}
         
-        // Listen to live count
         onSnapshot(visitorDocRef, (docSnap) => {
             if(docSnap.exists()) {
                 const count = docSnap.data().count || 0;
@@ -1005,7 +998,7 @@
             }
         });
 
-        // --- FIREBASE: LIVE TICKER CONFIGURATION ---
+        // --- FIREBASE: LIVE TICKER CONFIGURATION (V27 WITH COLORED ICONS) ---
         window.openTickerConfig = function() {
             if(!window.isAuthorized) return;
             document.getElementById('tickerConfigOverlay').classList.add('open');
@@ -1019,11 +1012,9 @@
             window.tickerIsVisible = !window.tickerIsVisible;
             document.getElementById('ticker-container').style.display = window.tickerIsVisible ? 'flex' : 'none';
             document.body.style.paddingTop = window.tickerIsVisible ? '100px' : '70px'; 
-            window.closeTickerConfig();
             window.showToast(window.tickerIsVisible ? 'Ticker aktiviert' : 'Ticker deaktiviert', 'success');
-            
-            // Save state to Firebase
             try { setDoc(doc(db, "settings", "ticker_state"), { isVisible: window.tickerIsVisible }, {merge: true}); } catch(e){}
+            window.closeTickerConfig();
         };
         
         window.saveTickerConfig = async function() {
@@ -1035,29 +1026,36 @@
             const font = document.getElementById('tickerFont').value;
             const size = document.getElementById('tickerSize').value;
             
+            // Map symbols to their colored counterparts
+            const symbolMap = {
+                'symCar': {icon: 'fa-car-side', col: '#e60000'},
+                'symMotorcycle': {icon: 'fa-motorcycle', col: '#007aff'},
+                'symTruck': {icon: 'fa-truck', col: '#ff9500'},
+                'symCard': {icon: 'fa-id-card', col: '#00ffff'},
+                'symBolt': {icon: 'fa-bolt', col: '#ffcc00'},
+                'symFlag': {icon: 'fa-flag-checkered', col: '#ffffff'},
+                'symStar': {icon: 'fa-star', col: '#ffcc00'},
+                'symKey': {icon: 'fa-key', col: '#cccccc'},
+                'symClock': {icon: 'fa-clock', col: '#ff9500'}
+            };
+            
             const symbols = [];
-            if(document.getElementById('symCar').checked) symbols.push('fa-car-side');
-            if(document.getElementById('symBolt').checked) symbols.push('fa-bolt');
-            if(document.getElementById('symFlag').checked) symbols.push('fa-flag-checkered');
-            if(document.getElementById('symCard').checked) symbols.push('fa-id-card');
-            if(document.getElementById('symStar').checked) symbols.push('fa-star');
-            if(document.getElementById('symKey').checked) symbols.push('fa-key');
-            if(document.getElementById('symClock').checked) symbols.push('fa-clock');
-            if(document.getElementById('symFire').checked) symbols.push('fa-fire');
-            if(document.getElementById('symInfo').checked) symbols.push('fa-circle-info');
+            for (const [id, data] of Object.entries(symbolMap)) {
+                if(document.getElementById(id) && document.getElementById(id).checked) {
+                    symbols.push(data);
+                }
+            }
             
             try {
                 await setDoc(doc(db, "settings", "ticker"), {
                     fullText, blinkWord, speed, color, blinkColor, font, size, symbols, timestamp: serverTimestamp()
                 });
-                window.closeTickerConfig();
-                window.showToast('Ticker-Einstellungen in Firebase gespeichert!', 'success');
+                window.showToast('Ticker in Firebase gespeichert!', 'success');
             } catch(e) {
-                console.warn(e);
-                window.showToast('Fehler (Berechtigungen?). Lokal angewendet.', 'error');
+                window.showToast('Lokal angewendet (Permissions?).', 'error');
                 applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
-                window.closeTickerConfig();
             }
+            window.closeTickerConfig();
         };
 
         function applyTickerLocally(data) {
@@ -1065,12 +1063,14 @@
             const wrapperEl = document.getElementById('tickerWrapper');
             
             let symLeft = '';
-            if(data.symbols && data.symbols.length > 0) {
-                data.symbols.forEach(s => symLeft += `<i class="fa-solid ${s} ticker-car" style="margin-right:6px;"></i>`);
-            }
             let symRight = '';
             if(data.symbols && data.symbols.length > 0) {
-                data.symbols.forEach(s => symRight += `<i class="fa-solid ${s} ticker-car" style="margin-left:6px;"></i>`);
+                data.symbols.forEach(s => {
+                    const iclass = typeof s === 'string' ? s : s.icon;
+                    const icolor = typeof s === 'string' ? 'var(--primary-red)' : s.col;
+                    symLeft += `<i class="fa-solid ${iclass} ticker-car" style="margin-right:8px; color:${icolor};"></i>`;
+                    symRight += `<i class="fa-solid ${iclass} ticker-car" style="margin-left:8px; color:${icolor};"></i>`;
+                });
             }
             
             let textHtml = '';
@@ -1088,12 +1088,10 @@
             wrapperEl.style.animationDuration = data.speed || "15s";
         }
 
-        // Firebase Ticker Listener
         onSnapshot(doc(db, "settings", "ticker"), (docSnap) => {
             if(docSnap.exists()) {
                 applyTickerLocally(docSnap.data());
                 
-                // Update inputs for admin
                 const data = docSnap.data();
                 document.getElementById('tickerFullText').value = data.fullText || '';
                 document.getElementById('tickerBlinkWord').value = data.blinkWord || '';
@@ -1104,15 +1102,16 @@
                 document.getElementById('tickerSize').value = data.size || '13px';
                 
                 if(data.symbols) {
-                    document.getElementById('symCar').checked = data.symbols.includes('fa-car-side');
-                    document.getElementById('symBolt').checked = data.symbols.includes('fa-bolt');
-                    document.getElementById('symFlag').checked = data.symbols.includes('fa-flag-checkered');
-                    document.getElementById('symCard').checked = data.symbols.includes('fa-id-card');
-                    document.getElementById('symStar').checked = data.symbols.includes('fa-star');
-                    document.getElementById('symKey').checked = data.symbols.includes('fa-key');
-                    document.getElementById('symClock').checked = data.symbols.includes('fa-clock');
-                    document.getElementById('symFire').checked = data.symbols.includes('fa-fire');
-                    document.getElementById('symInfo').checked = data.symbols.includes('fa-circle-info');
+                    const symbolsJson = JSON.stringify(data.symbols);
+                    document.getElementById('symCar').checked = symbolsJson.includes('fa-car-side');
+                    document.getElementById('symMotorcycle').checked = symbolsJson.includes('fa-motorcycle');
+                    document.getElementById('symTruck').checked = symbolsJson.includes('fa-truck');
+                    document.getElementById('symCard').checked = symbolsJson.includes('fa-id-card');
+                    document.getElementById('symBolt').checked = symbolsJson.includes('fa-bolt');
+                    document.getElementById('symFlag').checked = symbolsJson.includes('fa-flag-checkered');
+                    document.getElementById('symStar').checked = symbolsJson.includes('fa-star');
+                    document.getElementById('symKey').checked = symbolsJson.includes('fa-key');
+                    document.getElementById('symClock').checked = symbolsJson.includes('fa-clock');
                 }
             }
         });
@@ -1125,36 +1124,32 @@
              }
         });
 
-        // --- FIREBASE: LIVE APPOINTMENTS ---
+        // --- FIREBASE: LIVE APPOINTMENTS (V27 SYNC BACKUP FIX) ---
         window.activeBadgeNum = 0;
+        let localAppointments = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
         
-        function updateBadgeDisplay(hasPrio) {
+        function updateBadgeDisplay(hasPrio, count) {
             const b = document.getElementById('notif-badge');
-            b.innerText = window.activeBadgeNum;
-            b.style.display = window.activeBadgeNum > 0 ? 'flex' : 'none';
+            b.innerText = count;
+            b.style.display = count > 0 ? 'flex' : 'none';
             b.classList.remove('prio-pulse');
             if(hasPrio) b.classList.add('prio-pulse');
         }
 
-        // Listen to Appointments
-        onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
+        function renderAppointments(apts) {
             const list = document.getElementById('admin-list');
             list.innerHTML = '';
             document.getElementById('pinned-container').innerHTML = '';
-            window.activeBadgeNum = 0;
             let hasPrio = false;
 
-            if (snapshot.empty) {
+            if (apts.length === 0) {
                 list.innerHTML = '<p style="font-size:12px; color:#555; text-align:center; margin-top:20px;">Keine Termine im System.</p>';
-                updateBadgeDisplay(hasPrio);
+                updateBadgeDisplay(false, 0);
                 return;
             }
 
-            snapshot.forEach((docSnap) => {
-                const apt = docSnap.data();
-                const id = docSnap.id;
-                window.activeBadgeNum++;
-                
+            apts.forEach((apt) => {
+                const id = apt.id;
                 const isToday = apt.timeLabel.toLowerCase().includes('heute') || apt.date.includes(new Date().toLocaleDateString('de-DE'));
                 const prioClass = isToday ? 'prio-high' : 'prio-normal';
                 const badgeText = isToday ? 'In Kürze' : 'Geplant';
@@ -1201,7 +1196,6 @@
                 `;
                 list.appendChild(card);
 
-                // Handle Pinned Plate
                 if (apt.marked) {
                     const plate = document.createElement('div');
                     plate.className = 'pinned-plate';
@@ -1211,18 +1205,43 @@
                     plate.id = 'pinned-' + id;
                     plate.innerHTML = `<span style="font-size:14px;">${apt.name}</span> <span style="font-size:16px;">-</span> <span style="font-size:12px;">${apt.timeLabel}</span>`;
                     plate.onclick = () => window.openAdmin();
-                    
                     document.getElementById('pinned-container').appendChild(plate);
                 }
             });
-            
-            updateBadgeDisplay(hasPrio);
+            updateBadgeDisplay(hasPrio, apts.length);
+        }
+
+        // Firebase Sync Listener
+        onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
+            if (!snapshot.empty) {
+                const fbApts = [];
+                snapshot.forEach((docSnap) => fbApts.push({ id: docSnap.id, ...docSnap.data() }));
+                // Sync to local backup
+                localStorage.setItem('red_local_apts', JSON.stringify(fbApts));
+                renderAppointments(fbApts);
+            } else {
+                // If Firebase is empty, render local backup if available (fallback offline protection)
+                renderAppointments(localAppointments);
+            }
+        }, (error) => {
+            console.warn("Firebase Read Error: Loading Local Backup", error);
+            renderAppointments(localAppointments);
         });
 
+        // Mark Appointment
         window.markApt = async function(id, newState) {
-            try {
-                await updateDoc(doc(db, "appointments", id), { marked: newState });
-            } catch(e) { console.warn(e); window.showToast('Rechte-Fehler bei Firebase.', 'error'); }
+            try { 
+                await updateDoc(doc(db, "appointments", id), { marked: newState }); 
+            } catch(e) { 
+                // Local Fallback Sync
+                const index = localAppointments.findIndex(a => a.id === id);
+                if(index > -1) {
+                    localAppointments[index].marked = newState;
+                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                    renderAppointments(localAppointments);
+                    window.showToast('Lokal markiert.', 'success');
+                }
+            }
         };
         
         window.editApt = function(id) {
@@ -1241,40 +1260,29 @@
                 if(noteText === '') return;
                 
                 inputEl.classList.remove('active');
+                const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                 
-                try {
-                    window.showToast('Notiz wird gespeichert...', 'success');
-                    const container = document.getElementById(`notes-container-${aptId}`);
-                    const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                // Pure Local Fallback Implementation for Notes (Robust without complex FB Array Unions)
+                const index = localAppointments.findIndex(a => a.id === aptId);
+                if(index > -1) {
+                    if(!localAppointments[index].notes) localAppointments[index].notes = [];
                     
                     if(window.editingNoteElement) {
-                        window.editingNoteElement.querySelector('.note-text-body').innerText = noteText;
-                        window.editingNoteElement.querySelector('.note-meta').innerText = `Geändert: ${timestamp}`;
+                        const nIndex = localAppointments[index].notes.findIndex(n => n.id === window.editingNoteElement.id.replace('note-',''));
+                        if(nIndex > -1) localAppointments[index].notes[nIndex].text = noteText;
                         window.editingNoteElement = null;
-                        window.editingNoteId = null;
-                        window.showToast('Notiz lokal aktualisiert.', 'success');
                     } else {
-                        const noteId = Date.now().toString();
-                        const noteRow = document.createElement('div');
-                        noteRow.className = 'saved-note-row';
-                        noteRow.id = `note-${noteId}`;
-                        noteRow.innerHTML = `
-                            <div style="flex:1;">
-                                <span class="note-text-body">${noteText}</span>
-                                <span class="note-meta">Erstellt: ${timestamp}</span>
-                            </div>
-                            <div class="note-row-actions">
-                                <button class="note-row-btn" onclick="window.triggerEditNote('note-${noteId}', '${aptId}')" title="Notiz bearbeiten"><i class="fa-solid fa-pencil"></i></button>
-                                <button class="note-row-btn del" onclick="window.triggerDeleteNote('note-${noteId}', '${aptId}')" title="Notiz löschen"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        `;
-                        container.appendChild(noteRow);
-                        window.showToast('Notiz hinzugefügt.', 'success');
+                        localAppointments[index].notes.push({ id: Date.now().toString(), text: noteText, timeStr: `Erstellt: ${timestamp}` });
                     }
-                    inputEl.value = '';
-                } catch(err) {
-                    console.warn(err);
+                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                    
+                    // Try to push to Firebase
+                    try { await updateDoc(doc(db, "appointments", aptId), { notes: localAppointments[index].notes }); } catch(err){}
+                    
+                    renderAppointments(localAppointments);
+                    window.showToast('Notiz gespeichert.', 'success');
                 }
+                inputEl.value = '';
             }
         };
 
@@ -1291,16 +1299,20 @@
 
         window.triggerDeleteNote = function(noteDOMId, aptId) {
             window.deleteNoteTargetId = noteDOMId;
-            document.getElementById('delTitleText').innerText = "Notiz löschen?";
-            document.getElementById('delDescText').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
-            document.getElementById('deleteConfirmOverlay').classList.add('open');
+            // Get correct element ID
+            const confirmEl = document.getElementById('deleteConfirmOverlay');
+            confirmEl.querySelector('h3').innerText = "Notiz löschen?";
+            confirmEl.querySelector('p').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
+            confirmEl.classList.add('open');
+            window.deleteTargetId = aptId; // Need this to find parent appointment
         };
 
         window.deleteApt = function(id) {
             window.deleteTargetId = id;
-            document.getElementById('delTitleText').innerText = "Eintrag löschen?";
-            document.getElementById('delDescText').innerText = "Möchten Sie diesen Kundentermin wirklich unwiderruflich aus dem System entfernen?";
-            document.getElementById('deleteConfirmOverlay').classList.add('open');
+            const confirmEl = document.getElementById('deleteConfirmOverlay');
+            confirmEl.querySelector('h3').innerText = "Eintrag löschen?";
+            confirmEl.querySelector('p').innerText = "Möchten Sie diesen Kundentermin wirklich unwiderruflich aus dem System entfernen?";
+            confirmEl.classList.add('open');
         };
 
         window.cancelDelete = function() {
@@ -1310,24 +1322,30 @@
         };
 
         window.confirmDelete = async function() {
-            if(window.deleteTargetId) {
-                try {
-                    await deleteDoc(doc(db, "appointments", window.deleteTargetId));
-                    window.showToast('Termin gelöscht.', 'success');
-                } catch(e) {
-                    console.warn(e);
-                    const el = document.getElementById(window.deleteTargetId);
-                    if(el) el.remove();
-                    window.showToast('Lokal gelöscht (Keine Firebase Rechte).', 'success');
+            // Note Deletion Mode
+            if(window.deleteNoteTargetId) {
+                const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
+                if(index > -1) {
+                    localAppointments[index].notes = localAppointments[index].notes.filter(n => n.id !== window.deleteNoteTargetId.replace('note-',''));
+                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                    try { await updateDoc(doc(db, "appointments", window.deleteTargetId), { notes: localAppointments[index].notes }); } catch(err){}
+                    renderAppointments(localAppointments);
                 }
-                window.cancelDelete();
-            }
-            else if(window.deleteNoteTargetId && document.getElementById(window.deleteNoteTargetId)) {
-                const el = document.getElementById(window.deleteNoteTargetId);
-                if(el) el.remove();
-                window.cancelDelete();
                 window.showToast('Notiz gelöscht.', 'success');
             }
+            // Appointment Deletion Mode
+            else if(window.deleteTargetId) {
+                try {
+                    await deleteDoc(doc(db, "appointments", window.deleteTargetId));
+                    window.showToast('Termin online gelöscht.', 'success');
+                } catch(e) {
+                    localAppointments = localAppointments.filter(a => a.id !== window.deleteTargetId);
+                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                    renderAppointments(localAppointments);
+                    window.showToast('Lokal gelöscht.', 'success');
+                }
+            }
+            window.cancelDelete();
         };
 
         window.executeBooking = async function(event) {
@@ -1341,27 +1359,32 @@
             btn.innerText = 'Übermittle...';
             
             const appointmentData = {
+                id: 'local-' + Date.now(), // Fallback ID
                 name: n, phone: p, email: e, date: d, timeLabel: window.chosenHour || "Ganztägig",
-                service: window.selectedServiceVal, marked: false, notes: [], timestamp: serverTimestamp()
+                service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
             };
 
             try {
-                await addDoc(collection(db, "appointments"), appointmentData);
-                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${window.chosenHour || "Ganztägig"} Uhr wurde erfolgreich gespeichert.`;
-                document.getElementById('confirmModalOverlay').classList.add('open');
-                
-                document.getElementById('bookingForm').reset();
-                document.getElementById('timeWrapper').style.display = 'none';
-                btn.disabled = true;
-                btn.innerText = 'Termin absenden';
-                document.getElementById('selectTriggerText').innerText = "Zulassung (Neuanmeldung)";
-                window.selectedServiceVal = "Anmeldung";
-                window.chosenHour = null;
+                // Remove local ID, let Firebase assign
+                const fbData = {...appointmentData}; delete fbData.id; fbData.timestamp = serverTimestamp();
+                await addDoc(collection(db, "appointments"), fbData);
             } catch(err) {
-                console.warn(err);
-                window.showToast('Fehler bei Firebase Verbindung. Konnte nicht gespeichert werden.', 'error');
-                btn.innerText = 'Fehler! Erneut versuchen';
+                console.warn("Offline Fallback: Saving Local Appointment");
+                localAppointments.unshift(appointmentData);
+                localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                renderAppointments(localAppointments); // Manually trigger if offline
             }
+            
+            document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${window.chosenHour || "Ganztägig"} Uhr wurde erfolgreich gespeichert.`;
+            document.getElementById('confirmModalOverlay').classList.add('open');
+            
+            document.getElementById('bookingForm').reset();
+            document.getElementById('timeWrapper').style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = 'Termin absenden';
+            document.getElementById('selectTriggerText').innerText = "Zulassung (Neuanmeldung)";
+            window.selectedServiceVal = "Anmeldung";
+            window.chosenHour = null;
         };
 
         // --- FIREBASE: FORMS MANAGEMENT ---
@@ -1396,10 +1419,8 @@
             });
         }
         
-        // Initial static render
         renderForms(staticForms);
 
-        // Listen for Firebase Forms (Override if exist)
         onSnapshot(collection(db, "forms"), (snapshot) => {
             if(!snapshot.empty) {
                 const formsData = [];
@@ -1435,7 +1456,6 @@
                 if(e.target.files.length > 0) {
                     const file = e.target.files[0];
                     const url = URL.createObjectURL(file); 
-                    
                     try {
                         await updateDoc(doc(db, "forms", formId), { url: url });
                         window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
@@ -1494,7 +1514,7 @@
                 card.id = car.id;
                 
                 let mediaHtml = '';
-                if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4')) {
+                if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:')) {
                    mediaHtml = `<video src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
                 } else {
                    mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
@@ -1593,9 +1613,10 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const preloader = document.getElementById('intro-preloader');
-            setTimeout(() => { document.getElementById('introCar').style.transition = 'left 1.4s linear'; document.getElementById('introCar').style.left = '320px'; }, 200);
-            setTimeout(() => { const p = document.getElementById('introPlate'); p.style.transform = 'scale(1)'; p.style.opacity = '1'; p.style.transition = '0.4s'; }, 800);
-            setTimeout(() => { const t = document.getElementById('introText'); t.style.transform = 'translateY(0)'; t.style.opacity = '1'; t.style.transition = '0.4s'; }, 1200);
+            // Very smooth optimized preloader phaseout
+            setTimeout(() => { document.getElementById('introCar').style.transform = 'translate3d(370px, 0, 0)'; document.getElementById('introCar').style.transition = 'transform 1.4s ease-in-out'; }, 200);
+            setTimeout(() => { const p = document.getElementById('introPlate'); p.style.transform = 'scale(1)'; p.style.opacity = '1'; }, 800);
+            setTimeout(() => { const t = document.getElementById('introText'); t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 1200);
             setTimeout(() => { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.display = 'none'; }, 600); }, 3100);
         });
 
@@ -1605,47 +1626,8 @@
             window.scrollTo(0,0);
         };
         window.toggleMenu = function() { document.getElementById('quickMenu').classList.toggle('active'); };
-
         window.openAdmin = function() { document.getElementById('adminModal').classList.add('open'); };
         window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
-        window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
-        window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
-
-        window.openLightbox = function(title, mediaUrl) {
-            document.getElementById('lightboxTitle').innerText = title;
-            const container = document.getElementById('lightboxImageContainer');
-            if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
-                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop style="width:100%; height:100%; object-fit:cover; border-radius: 12px;"></video>`;
-            } else {
-                container.innerHTML = `<img src="${mediaUrl}" alt="${title}" style="width:100%; height:100%; object-fit:cover; border-radius: 12px;">`;
-            }
-            document.getElementById('lightboxOverlay').classList.add('open');
-        };
-        window.closeLightbox = function() { document.getElementById('lightboxOverlay').classList.remove('open'); };
-
-        window.chosenHour = null;
-        flatpickr("#datePicker", {
-            locale: "de", minDate: "today", disable: [ d => d.getDay() === 0 || d.getDay() === 6 ],
-            onChange: function() {
-                document.getElementById('timeWrapper').style.display = 'block';
-                const container = document.getElementById('timeSlots');
-                container.innerHTML = '';
-                for(let h = 9; h <= 19; h++) {
-                    const tStr = `${h.toString().padStart(2, '0')}:00`;
-                    const div = document.createElement('div');
-                    div.className = 'time-slot'; div.innerText = tStr;
-                    if(Math.random() > 0.75) div.classList.add('booked');
-                    else {
-                        div.addEventListener('click', () => {
-                            Array.from(container.children).forEach(c => c.classList.remove('active'));
-                            div.classList.add('active');
-                            window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
-                        });
-                    }
-                    container.appendChild(div);
-                }
-            }
-        });
 
         window.showLegal = function(type) {
             const b = document.getElementById('legalBox'); const c = document.getElementById('legalContent');
