@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- V31 NEW: PWA WEB APP ICONS & FAVICON (Car SVG) -->
+    <!-- PWA WEB APP ICONS & FAVICON -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
     <meta name="application-name" content="RED Zulassung">
@@ -34,9 +34,18 @@
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE (V31 FIX) --- */
+        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; padding-top: 90px; -webkit-font-smoothing: antialiased; }
+        
+        body { 
+            font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
+            line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale; 
+        }
+
+        /* Prevent zooming on inputs on iOS */
+        input, select, textarea { font-size: 16px !important; }
 
         /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
         .admin-only-block { display: none !important; }
@@ -62,13 +71,13 @@
         #intro-preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; transition: opacity 0.5s ease; }
         .intro-track { width: 280px; height: 4px; background: rgba(255,255,255,0.03); position: relative; margin-top: 40px; border-radius: 2px; }
         .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); }
-        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(255,255,255,0.1); transform: scale(0); opacity: 0; display: flex; align-items: center; gap: 10px; }
+        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(255,255,255,0.1); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s; }
         .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
-        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); }
+        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(10px); transition: all 0.5s; }
 
         /* --- TOAST NOTIFICATIONS --- */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-msg { background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
+        .toast-msg { background: rgba(10,10,12,0.95); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
         .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
         .toast-success i { color: #25D366; font-size: 16px; }
         .toast-error { border-color: #ff3b30; box-shadow: 0 10px 30px rgba(255,59,48,0.2); }
@@ -99,8 +108,9 @@
         .speech-bubble.show-bubble { opacity: 1; transform: translateY(0); animation: gentleBounce 2s infinite alternate ease-in-out; }
         @keyframes gentleBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-3px); } }
 
-        .logo-car-svg { height: clamp(16px, 3.5vw, 24px); width: auto; flex-shrink: 0; fill: #ffffff; transition: 0.3s; }
+        .logo-car-svg { height: clamp(16px, 3.5vw, 24px); width: auto; flex-shrink: 0; fill: #ffffff; transition: 0.3s; animation: gentleIdle 3s infinite ease-in-out; }
         .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(3px); }
+        @keyframes gentleIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
         .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
         .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
@@ -129,7 +139,6 @@
         .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; }
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-        .ticker-car { font-size: 15px; color: var(--primary-red); }
 
         /* --- FULLSCREEN MENU --- */
         .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
@@ -246,26 +255,23 @@
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- V31 FIX: FLATPICKR CENTERING (MOBILE STABILIZED) --- */
+        /* --- V30 FLATPICKR CENTERING (BULLETPROOF) --- */
         .flatpickr-calendar { 
             background: #0c0c0f !important; border: 1px solid var(--primary-red) !important; 
-            border-radius: 15px !important; box-shadow: 0 15px 50px rgba(0,0,0,0.9) !important; 
+            border-radius: 15px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
             font-family: 'Montserrat', sans-serif !important; 
         }
-        /* Mobile centered, overriding absolute positioning safely */
         .flatpickr-calendar.open {
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            right: auto !important;
-            bottom: auto !important;
-            margin: 0 !important;
-            z-index: 999999 !important;
+            position: fixed !important; top: 50% !important; left: 50% !important; 
+            transform: translate(-50%, -50%) !important; z-index: 999999 !important; 
+            right: auto !important; bottom: auto !important; margin: 0 !important;
+            width: 320px !important; max-width: 90vw !important;
         }
-        .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; color: white !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
+        .flatpickr-month { fill: var(--primary-red) !important; color: var(--primary-red) !important; }
+        .flatpickr-day.flatpickr-disabled { color: #333 !important; }
         
         .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
@@ -276,7 +282,7 @@
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- V30 MOBILE SCALING & ANTI-FLICKER --- */
+        /* --- MOBILE SCALING & ANTI-FLICKER --- */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 80px; }
             nav { padding: 10px 3%; }
@@ -318,6 +324,7 @@
             border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
             text-transform: uppercase; letter-spacing: 1px; 
         }
+        /* Only pulse the inner icon to prevent layout thrashing on mobile */
         .sofort-badge i { animation: pulse-icon 1.5s infinite alternate ease-in-out; }
         @keyframes pulse-icon { 
             0% { color: #ffcc00; transform: scale(1); text-shadow: 0 0 5px #ffcc00; } 
@@ -367,8 +374,9 @@
         .gallery-card:hover img, .gallery-card:hover video { opacity: 0.9; }
         .gallery-card span { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
-        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
-        .admin-del-img-btn:hover { background: #ff3b30; color: #fff; }
+        /* V30 Fix Z-Index */
+        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
+        .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
         /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
@@ -555,7 +563,7 @@
         </div>
     </div>
 
-    <!-- V31 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <!-- V28 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
@@ -764,8 +772,8 @@
                     
                     <div class="form-group" style="margin-top: 10px; position:relative; z-index:10;">
                         <label>Wunschdatum</label>
-                        <!-- V31 FIX: REMOVED readonly, Let Flatpickr handle disableMobile native setting -->
-                        <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer; background-color: #111114; color: white;" required>
+                        <!-- V30 FIX: READONLY ensures native keyboard doesn't hide Flatpickr -->
+                        <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer; background-color: #111114; color: white;" readonly="readonly" required>
                     </div>
                     
                     <div id="timeWrapper" style="display:none; margin-top:20px;">
@@ -925,7 +933,7 @@
                 });
             });
 
-            // --- V31 FLATPICKR INITIALIZATION (GUARANTEED) ---
+            // --- V30 FLATPICKR INITIALIZATION (GUARANTEED) ---
             window.chosenHour = null;
             flatpickr("#datePicker", {
                 locale: "de", 
@@ -1024,7 +1032,7 @@
         };
     </script>
 
-    <!-- FIREBASE V31 MODULE INTEGRATION -->
+    <!-- FIREBASE V32 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1500,6 +1508,7 @@
                 const fbData = {...appointmentData}; delete fbData.id; fbData.timestamp = serverTimestamp();
                 await addDoc(collection(db, "appointments"), fbData);
             } catch(err) {
+                console.warn("Offline Fallback: Saving Local Appointment");
                 localAppointments.unshift(appointmentData);
                 localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
                 renderAppointments(localAppointments);
