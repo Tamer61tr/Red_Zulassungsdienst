@@ -22,28 +22,21 @@
             --bg-card: #0e0e11;
             --text-light: #ffffff;
             --text-muted: #7c7c85;
+            --glass-bg: rgba(12, 12, 15, 0.92);
             --glass-border: rgba(255, 255, 255, 0.08);
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE (V29 FIX) --- */
+        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE (V30 FIX) --- */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
-            touch-action: manipulation;
         }
         
-        /* Removed backdrop-filter to stop mobile flickering / puzzle effect */
         body { 
             font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
             line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
-            -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; 
             -webkit-font-smoothing: antialiased;
-        }
-        input, textarea, select, .admin-note-input {
-            -webkit-touch-callout: default !important;
-            -webkit-user-select: auto !important;
-            user-select: auto !important;
         }
 
         /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
@@ -76,7 +69,7 @@
 
         /* --- TOAST NOTIFICATIONS --- */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-msg { background: rgba(10,10,12,0.95); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
+        .toast-msg { background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
         .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
         .toast-success i { color: #25D366; font-size: 16px; }
         .toast-error { border-color: #ff3b30; box-shadow: 0 10px 30px rgba(255,59,48,0.2); }
@@ -93,12 +86,22 @@
         .logo-text .red-part { color: var(--primary-red); }
         .logo-text .white-part { color: #ffffff; }
         
-        /* V29: Speech Bubble */
-        .speech-bubble { position: absolute; top: 110%; left: 10%; background: var(--primary-red); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 10px rgba(230,0,0,0.4); animation: floatBubble 2.5s infinite ease-in-out; pointer-events: none; text-transform: uppercase; letter-spacing: 0.5px; }
-        .speech-bubble::before { content: ''; position: absolute; top: -4px; left: 15px; border-width: 0 5px 5px 5px; border-style: solid; border-color: transparent transparent var(--primary-red) transparent; }
-        @keyframes floatBubble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        /* V30: Speech Bubble Setup */
+        .speech-bubble { 
+            position: absolute; top: 110%; left: 10%; background: var(--primary-red); color: #fff; 
+            padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; white-space: nowrap; 
+            box-shadow: 0 4px 15px rgba(230,0,0,0.6); pointer-events: none; text-transform: uppercase; 
+            letter-spacing: 0.5px; opacity: 0; transform: translateY(10px); 
+            transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10;
+        }
+        .speech-bubble::before { 
+            content: ''; position: absolute; top: -5px; left: 15px; border-width: 0 6px 6px 6px; 
+            border-style: solid; border-color: transparent transparent var(--primary-red) transparent; 
+        }
+        .speech-bubble.show-bubble { opacity: 1; transform: translateY(0); animation: gentleBounce 2s infinite alternate ease-in-out; }
+        @keyframes gentleBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-3px); } }
 
-        /* V29: Auto Logo SVG */
+        /* Auto Logo SVG */
         .logo-car-svg { height: clamp(16px, 3.5vw, 24px); width: auto; flex-shrink: 0; fill: #ffffff; transition: 0.3s; }
         .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(3px); }
 
@@ -129,7 +132,6 @@
         .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; }
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-        .ticker-car { font-size: 15px; color: var(--primary-red); }
 
         /* --- FULLSCREEN MENU --- */
         .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
@@ -213,16 +215,13 @@
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
         .noble-checkbox-label input:checked + .noble-checkbox-box { background: var(--primary-red); border-color: var(--primary-red); }
-        .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
         /* --- FILE UPLOAD COMPONENT --- */
         .noble-file-upload { position: relative; display: block; width: 100%; margin-top: 8px; }
         .noble-file-upload input { display: none; }
         .noble-file-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; display: block; transition: 0.3s; }
         .noble-file-upload input:change + .noble-file-trigger, .noble-file-trigger:hover { border-color: var(--primary-red); color: white; background: rgba(230,0,0,0.04); }
-
-        /* --- TICKER SYMBOL MATRIX --- */
-        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
 
         /* --- SPA VIEW SECTIONS --- */
         .view-section { display: none; animation: viewFadeIn 0.4s ease forwards; padding-top: 30px; min-height: 100vh; }
@@ -249,16 +248,19 @@
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- V29 FLATPICKR FIX --- */
+        /* --- V30 FLATPICKR FIX --- */
         .flatpickr-calendar { 
-            background: #0c0c0f !important; border: 1px solid var(--primary-red) !important; 
-            border-radius: 15px !important; box-shadow: 0 15px 50px rgba(0,0,0,0.9) !important; 
+            background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; 
+            border-radius: 15px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
             font-family: 'Montserrat', sans-serif !important; 
-            /* Let flatpickr handle display: none / block naturally to fix init bugs */
-            position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; 
-            z-index: 999999 !important; width: 320px !important; max-width: 90vw !important; margin: 0 !important;
         }
-        .flatpickr-day.selected { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
+        .flatpickr-calendar.open {
+            position: fixed !important; top: 50% !important; left: 50% !important; 
+            transform: translate(-50%, -50%) !important; z-index: 999999 !important; 
+            right: auto !important; bottom: auto !important; margin: 0 !important;
+            width: 320px !important; max-width: 90vw !important;
+        }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
         .flatpickr-month { fill: var(--primary-red) !important; color: var(--primary-red) !important; }
@@ -307,14 +309,13 @@
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
-        /* V29: ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
+        /* V30: ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #cc0000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
             padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; 
             border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
             text-transform: uppercase; letter-spacing: 1px; 
         }
-        /* Only pulse the inner icon to prevent layout thrashing on mobile */
         .sofort-badge i { animation: pulse-icon 1.5s infinite alternate ease-in-out; }
         @keyframes pulse-icon { 
             0% { color: #ffcc00; transform: scale(1); text-shadow: 0 0 5px #ffcc00; } 
@@ -367,7 +368,7 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
+        /* --- BERLIN KENNZEICHEN WARNING ACCENT COMPONENT --- */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
@@ -391,6 +392,8 @@
         #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
         #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
 
+        /* TICKER CONFIG SYMBOL MATRIX STYLING */
+        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -414,9 +417,9 @@
     <!-- 3. MAIN NAVBAR HUB & TICKER -->
     <div id="header-wrapper">
         <nav>
-            <div class="logo-container" id="logoHubTrigger" onclick="window.switchView('view-home')">
-                <!-- V29 SPEECH BUBBLE -->
-                <div class="speech-bubble">Schnell Termin vereinbaren</div>
+            <div class="logo-container" id="logoHubTrigger" onclick="window.triggerLogoBubble(event)">
+                <!-- V30 SPEECH BUBBLE -->
+                <div class="speech-bubble" id="logoSpeechBubble">Schnell Termin vereinbaren</div>
                 
                 <!-- NEW HEADER LOGO: Text + Vector Sports Car -->
                 <div class="logo-text">
@@ -553,7 +556,7 @@
         </div>
     </div>
 
-    <!-- V28 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <!-- V30 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
@@ -584,11 +587,10 @@
                 </div>
             </div>
             
-            <!-- V28 UPDATE: ENHANCED MULTIPLE SYMBOL SELECTOR MATRIX -->
             <div class="form-group" style="margin-top:10px;">
                 <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
                 <div class="symbol-grid">
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 Auto</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="noble-checkbox-box"></span> 🚛 LKW</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
@@ -678,7 +680,7 @@
     <div id="view-home" class="view-section active">
         <div class="hero">
             <div class="hero-content">
-                <!-- V29: FLICKER-FREE SOFT ANIMATION -->
+                <!-- V30 Anti Flicker smooth pulse badge (Icon only pulses to prevent layout thrash) -->
                 <div class="sofort-badge">
                     <i class="fa-solid fa-bolt" style="margin-right:8px;"></i> 
                     Sofortkennzeichen zum Mitnehmen! 
@@ -742,7 +744,7 @@
                             <input type="tel" id="formPhone" class="form-control" placeholder="Nummer" required>
                         </div>
                     </div>
-                    <div class="form-row v18-align-fix">
+                    <div class="form-row">
                         <div class="form-group">
                             <label>E-Mail Adresse</label>
                             <input type="email" id="formEmail" class="form-control" placeholder="Mail" required>
@@ -763,8 +765,8 @@
                     
                     <div class="form-group" style="margin-top: 10px;">
                         <label>Wunschdatum</label>
-                        <!-- V29 FIX: CALENDAR INITIALIZATION FIX -->
-                        <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer;" required>
+                        <!-- V30 FIX: READONLY ensures native keyboard doesn't hide Flatpickr -->
+                        <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer; background-color: #111114; color: white;" readonly="readonly" required>
                     </div>
                     
                     <div id="timeWrapper" style="display:none; margin-top:20px;">
@@ -910,7 +912,7 @@
         </div>
     </footer>
 
-    <!-- FIREBASE V29 MODULE INTEGRATION -->
+    <!-- FIREBASE V30 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -939,7 +941,7 @@
             setTimeout(() => { toast.remove(); }, 3800);
         };
 
-        // --- 1. OVERLAY CLICK TO CLOSE ENGINE (V29 Fixed missing refs) ---
+        // --- 1. OVERLAY CLICK TO CLOSE ENGINE ---
         document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
                 if(e.target === this) {
@@ -950,7 +952,20 @@
             });
         });
 
-        // --- 2. ADMIN LIVE AUTH SHELL ---
+        // --- 2. V30 Logo Bubble & Routing Logic ---
+        window.triggerLogoBubble = function(e) {
+            e.preventDefault();
+            window.switchView('view-home'); // Always scroll to top/home
+            const bubble = document.getElementById('logoSpeechBubble');
+            bubble.classList.add('show-bubble');
+            
+            if(window.bubbleTimeout) clearTimeout(window.bubbleTimeout);
+            window.bubbleTimeout = setTimeout(() => {
+                bubble.classList.remove('show-bubble');
+            }, 3000);
+        };
+
+        // --- 3. ADMIN LIVE AUTH SHELL ---
         window.currentAdminUser = "Tamer Yazici";
         window.currentAdminPass = "616161";
         window.isAuthorized = false;
@@ -1020,7 +1035,7 @@
             }
         };
         
-        // --- FIREBASE: VISITOR COUNTER V29 ---
+        // --- FIREBASE: VISITOR COUNTER ---
         const visitorDocRef = doc(db, "settings", "visitors");
         let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
         
@@ -1102,7 +1117,7 @@
                 window.showToast('Lokal angewendet (Permissions?).', 'error');
                 applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
             }
-            window.closeTickerConfig(); // V29: Closes the window immediately after clicking save!
+            window.closeTickerConfig();
         };
 
         function applyTickerLocally(data) {
@@ -1411,6 +1426,7 @@
                 const fbData = {...appointmentData}; delete fbData.id; fbData.timestamp = serverTimestamp();
                 await addDoc(collection(db, "appointments"), fbData);
             } catch(err) {
+                console.warn("Offline Fallback: Saving Local Appointment");
                 localAppointments.unshift(appointmentData);
                 localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
                 renderAppointments(localAppointments);
@@ -1661,16 +1677,41 @@
         }
         runPlates();
 
-        // --- V29 FIX: PRELOADER & LOGO ROUTING ---
+        // --- V30 FIX: DOM INITIALIZATION & FLATPICKR ---
         window.addEventListener('DOMContentLoaded', () => {
+            // Intro
             const preloader = document.getElementById('intro-preloader');
             setTimeout(() => { document.getElementById('introCar').style.transform = 'translate3d(370px, 0, 0)'; document.getElementById('introCar').style.transition = 'transform 1.4s ease-in-out'; }, 200);
             setTimeout(() => { const p = document.getElementById('introPlate'); p.style.transform = 'scale(1)'; p.style.opacity = '1'; }, 800);
             setTimeout(() => { const t = document.getElementById('introText'); t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 1200);
             setTimeout(() => { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.display = 'none'; }, 600); }, 3100);
+
+            // V30: Initialize Flatpickr strictly on DOMContentLoaded without external blockers
+            window.chosenHour = null;
+            flatpickr("#datePicker", {
+                locale: "de", minDate: "today", disable: [ d => d.getDay() === 0 || d.getDay() === 6 ],
+                onChange: function(selectedDates, dateStr, instance) {
+                    document.getElementById('timeWrapper').style.display = 'block';
+                    const container = document.getElementById('timeSlots');
+                    container.innerHTML = '';
+                    for(let h = 9; h <= 19; h++) {
+                        const tStr = `${h.toString().padStart(2, '0')}:00`;
+                        const div = document.createElement('div');
+                        div.className = 'time-slot'; div.innerText = tStr;
+                        if(Math.random() > 0.75) div.classList.add('booked');
+                        else {
+                            div.addEventListener('click', () => {
+                                Array.from(container.children).forEach(c => c.classList.remove('active'));
+                                div.classList.add('active');
+                                window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
+                            });
+                        }
+                        container.appendChild(div);
+                    }
+                }
+            });
         });
 
-        // V29 FIX: LOGO OPENS HOMEPAGE & SCROLLS TO TOP
         window.switchView = function(viewId) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
@@ -1703,31 +1744,6 @@
             else text.innerHTML = 'Unser Express-Service sichert Ihnen die schnellstmögliche Bearbeitung direkt über unsere internen Schnittstellen. Vorgänge werden taggleich eingereicht und innerhalb von 24h finalisiert.';
             document.getElementById('infoPopupOverlay').classList.add('open');
         };
-
-        // --- V29 FIX: FLATPICKR VISIBILITY OVERRIDE REMOVED ---
-        window.chosenHour = null;
-        flatpickr("#datePicker", {
-            locale: "de", minDate: "today", disable: [ d => d.getDay() === 0 || d.getDay() === 6 ],
-            onChange: function() {
-                document.getElementById('timeWrapper').style.display = 'block';
-                const container = document.getElementById('timeSlots');
-                container.innerHTML = '';
-                for(let h = 9; h <= 19; h++) {
-                    const tStr = `${h.toString().padStart(2, '0')}:00`;
-                    const div = document.createElement('div');
-                    div.className = 'time-slot'; div.innerText = tStr;
-                    if(Math.random() > 0.75) div.classList.add('booked');
-                    else {
-                        div.addEventListener('click', () => {
-                            Array.from(container.children).forEach(c => c.classList.remove('active'));
-                            div.classList.add('active');
-                            window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
-                        });
-                    }
-                    container.appendChild(div);
-                }
-            }
-        });
 
         window.showLegal = function(type) {
             const b = document.getElementById('legalBox'); const c = document.getElementById('legalContent');
