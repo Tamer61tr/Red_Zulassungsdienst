@@ -27,8 +27,23 @@
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; padding-top: 100px; }
+        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE --- */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: manipulation;
+        }
+        body { 
+            font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
+            line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
+            -webkit-touch-callout: none; /* Prevent iOS Callout */
+            -webkit-user-select: none; user-select: none; /* Prevent unwanted selection */
+        }
+        input, textarea, select, .admin-note-input {
+            -webkit-touch-callout: default !important;
+            -webkit-user-select: auto !important;
+            user-select: auto !important;
+        }
 
         /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
         .admin-only-block { display: none !important; }
@@ -68,21 +83,21 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.9); } }
 
-        /* --- NAVBAR & TICKER ARCHITECTURE --- */
+        /* --- NAVBAR & LOGO ARCHITECTURE --- */
         #header-wrapper { position: fixed; top: 0; width: 100%; z-index: 1000; }
-        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 7, 0.98); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; position: relative; }
-        .logo-text { font-size: clamp(14px, 2vw, 22px); font-weight: 900; color: var(--text-light); text-transform: uppercase; white-space: nowrap; }
+        nav { padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 7, 0.98); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
-        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
-        .logo-container:hover .admin-ticker-edit-icon.active { display: block; }
-        .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
+        .logo-container { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; position: relative; max-width: 70%; }
+        .logo-text { font-size: clamp(10px, 2.8vw, 18px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; }
+        .logo-text .red-part { color: var(--primary-red); }
+        .logo-text .white-part { color: #ffffff; }
+        
+        /* New Sportscar Logo SVG */
+        .logo-car-svg { height: clamp(18px, 3.5vw, 26px); width: auto; flex-shrink: 0; fill: #ffffff; transition: 0.3s; }
+        .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(3px); }
 
-        .driving-scene { position: relative; width: 65px; height: 30px; display: flex; align-items: center; overflow: hidden; }
-        .car-icon { position: absolute; color: var(--primary-red); font-size: 22px; z-index: 2; left: -40px; animation: smoothDrive 5s infinite linear; }
-        .tire-tracks { position: absolute; left: 0; bottom: 5px; height: 2px; width: 100%; background: rgba(255,255,255,0.15); transform: scaleX(0); transform-origin: left; animation: smoothTrack 5s infinite linear; }
-        @keyframes smoothDrive { 0% { left: -40px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 70px; opacity: 0; } }
-        @keyframes smoothTrack { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
+        .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
 
         .nav-actions { display: flex; align-items: center; gap: 12px; }
         .visitor-counter { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ccc; display: flex; align-items: center; gap: 5px; }
@@ -94,7 +109,6 @@
         .key-icon-wrapper i { color: #fff; font-size: 16px; transition: 0.3s; }
         body.is-admin .key-icon-wrapper i { color: #25D366; }
 
-        /* V26 FIX: BADGE HIDDEN BY DEFAULT, ONLY SHOWS IF > 0 */
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
         .notification-badge.prio-pulse { animation: badgePulse 1s infinite alternate; }
         @keyframes badgePulse { 0% { transform: scale(1); background: #ff3b30; box-shadow: 0 0 10px #ff3b30; } 100% { transform: scale(1.2); background: #ff3b30; box-shadow: 0 0 20px #ff3b30; } }
@@ -124,7 +138,6 @@
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
-        /* V26 FIX: MODALS ARE SCROLLABLE SO NOTHING IS CUT OFF ON MOBILE */
         .custom-dialog-window { 
             background: linear-gradient(135deg, #121216 0%, #070709 100%); 
             border: 1px solid rgba(255,255,255,0.05); border-top: 2px solid var(--primary-red);
@@ -221,7 +234,7 @@
         /* NOBLE CUSTOM DROPDOWN SELECTS */
         .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
         .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .noble-select-trigger::after { content: '▼'; font-family: sans-serif; font-size: 10px; color: var(--primary-red); transition: 0.3s; }
+        .noble-select-trigger::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--primary-red); font-size: 10px; transition: 0.3s; }
         .noble-select-box.open .noble-select-trigger::after { transform: rotate(180deg); }
         .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; overflow: hidden; }
         .noble-select-box.open .noble-options-dropdown { display: block; }
@@ -229,10 +242,12 @@
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
         /* --- FLATPICKR CENTERING & THEMING --- */
-        .flatpickr-calendar { background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; border-radius: 15px !important; box-shadow: 0 20px 50px rgba(0,0,0,0.8) !important; font-family: 'Montserrat', sans-serif !important; width: 300px !important; margin: 0 auto; }
+        .flatpickr-calendar { background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; font-family: 'Montserrat', sans-serif !important; width: 300px !important; position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 999999 !important; display: none; }
+        .flatpickr-calendar.open { display: block !important; }
         .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
+        .flatpickr-day.flatpickr-disabled { color: #2a2a30 !important; }
         
         .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
@@ -243,15 +258,25 @@
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- MOBILE SCALING & FIXES (V26) --- */
+        /* --- MOBILE SCALING (V28 ANTI-FLICKER & RESPONSIVE FIXES) --- */
         @media (max-width: 768px) {
-            body { font-size: 12px; padding-top: 90px; }
-            nav { padding: 10px 4%; }
+            body { font-size: 12px; padding-top: 80px; }
+            nav { padding: 10px 3%; }
+            .logo-container { max-width: 60%; gap: 6px; }
+            .logo-text { font-size: clamp(9px, 3.2vw, 14px); white-space: normal; line-height: 1.2; }
+            .logo-car-svg { height: clamp(14px, 4vw, 20px); margin-left: 2px; }
+            
             .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
+            .visitor-counter { display: none; } /* Hidden to ensure header fits cleanly */
+            
             .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
-            .hero-content { padding: 30px 15px !important; border-radius: 20px !important; }
-            .sofort-badge { padding: 8px 16px !important; font-size: 11px !important; margin-bottom: 15px !important; }
+            .hero { margin-top: 15px; }
+            .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
+            
+            /* Anti Flicker Mobile Adjustments */
+            .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
+            
             .card { padding: 25px 15px !important; height: 160px !important; }
             .booking-wrapper { padding: 25px 15px !important; }
             .admin-window, .custom-dialog-window { padding: 30px 18px !important; width: 95% !important; }
@@ -261,17 +286,22 @@
             .download-item { flex-direction: column; text-align: center; gap: 8px; }
             .apt-actions-horizontal { justify-content: center; }
             .symbol-grid { grid-template-columns: repeat(2, 1fr) !important; }
-            #tickerConfigOverlay .custom-dialog-window { max-height: 85vh; padding: 20px 15px; } /* Mobile Config Scroll Fix */
+            #tickerConfigOverlay .custom-dialog-window { max-height: 85vh; padding: 20px 15px; }
         }
 
-        /* --- HERO --- */
-        .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 5%; margin-top: 20px; }
+        /* --- HERO & COMPONENTS --- */
+        .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
+        /* V28 ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #b30000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
             padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; border: 2px solid rgba(255,255,255,0.5);
-            will-change: transform, box-shadow; backface-visibility: hidden; transform: translateZ(0); -webkit-font-smoothing: subpixel-antialiased;
+            /* Strict Hardware Acceleration for iOS/Android */
+            -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0);
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            -webkit-perspective: 1000px; perspective: 1000px;
+            will-change: transform, box-shadow; -webkit-font-smoothing: subpixel-antialiased;
             animation: mega-pulse-badge 1.5s infinite alternate ease-in-out; text-transform: uppercase; letter-spacing: 1px; 
         }
         @keyframes mega-pulse-badge { 
@@ -282,7 +312,7 @@
         .section-header { text-align: center; margin-bottom: 35px; }
         .section-header h2 { font-size: clamp(22px, 3.5vw, 34px); font-weight: 900; text-transform: uppercase; }
         
-        /* --- SERVICE CARDS --- */
+        /* --- SERVICE CARDS (ON-CARD REVEAL) --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .card { background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .card:hover { border-color: rgba(230,0,0,0.5); }
@@ -292,7 +322,7 @@
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* --- DOWNLOADS COMPONENT --- */
+        /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE VIA V20 CLASS) --- */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
@@ -305,17 +335,17 @@
         .user-dl { color: var(--text-muted); }
         .user-dl:hover { color: var(--primary-red); transform: translateY(-2px); }
         
-        .admin-up { color: #b38728; }
+        .admin-up { color: #b38728; margin-right: 5px; }
         .admin-up:hover { color: #fff; transform: scale(1.1); }
         .admin-del { color: #ff3b30; margin-left: 5px; }
         .admin-del:hover { color: #fff; transform: scale(1.1); }
 
-        /* --- AUTO ANKAUF REAL PICTURE GALLERY --- */
+        /* --- AUTO ANKAUF REAL PICTURE GALLERY (COMPACT) --- */
         .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
         
-        .gallery-card { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-border); height: 130px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
+        .gallery-card { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border); height: 130px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
         .gallery-card img, .gallery-card video { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.6; z-index: 1; transition: 0.3s; }
         .gallery-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)); z-index: 2; }
         .gallery-card:hover { transform: scale(1.03); border-color: #b38728; }
@@ -325,7 +355,7 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; }
 
-        /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
+        /* --- BERLIN KENNZEICHEN WARNING ACCENT COMPONENT --- */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
@@ -349,9 +379,8 @@
         #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
         #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
 
-        /* TICKER CONFIG SYMBOL MATRIX STYLING */
-        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
-        @media (max-width: 480px) { .symbol-grid { grid-template-columns: repeat(2, 1fr); } }
+        /* V28 FIX: ALIGN TEXT IN FORMS */
+        .v18-align-fix { margin-top: 0px !important; }
     </style>
 </head>
 <body>
@@ -376,12 +405,19 @@
     <div id="header-wrapper">
         <nav>
             <div class="logo-container" id="logoHubTrigger">
-                <div class="driving-scene">
-                    <i class="fa-solid fa-car-side car-icon" id="navCar"></i>
-                    <div class="tire-tracks" id="navTracks"></div>
+                <!-- V28 NEW HEADER LOGO: Text + Vector Sports Car -->
+                <div class="logo-text">
+                    <span class="red-part">RED</span> 
+                    <span class="white-part">ZULASSUNGSDIENST</span>
                 </div>
-                <div class="logo-text">RED <span>Zulassung</span></div>
-                <!-- ADMIN TICKER EDIT ICON SECURE -->
+                <!-- Sleek aggressive sports car silhouette -->
+                <svg class="logo-car-svg" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="currentColor"/>
+                    <path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="currentColor"/>
+                    <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/>
+                </svg>
+                
+                <!-- V28 ADMIN TICKER EDIT ICON SECURE -->
                 <i class="fa-solid fa-pen admin-ticker-edit-icon admin-only-block" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker & Symbole bearbeiten"></i>
             </div>
             
@@ -432,7 +468,7 @@
                     <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="Benutzername eingeben">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Passwort eingeben">
+                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Master-Passwort eingeben">
                 </div>
                 
                 <label class="noble-checkbox-label" style="justify-content: center;">
@@ -504,7 +540,7 @@
         </div>
     </div>
 
-    <!-- EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS WITH MOBILE SCROLL FIX -->
+    <!-- V28 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
@@ -662,7 +698,7 @@
             </div>
         </section>
 
-        <!-- BOOKING ENGINE -->
+        <!-- NOBLE COMPACT TRANSACT WRAPPER -->
         <section id="termin" style="background: rgba(0,0,0,0.4); border-top:1px solid var(--glass-border); padding: 60px 5%;">
             <div class="section-header">
                 <h2>Termin Buchen</h2>
@@ -681,7 +717,7 @@
                             <input type="tel" id="formPhone" class="form-control" placeholder="Nummer" required>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row v18-align-fix">
                         <div class="form-group">
                             <label>E-Mail Adresse</label>
                             <input type="email" id="formEmail" class="form-control" placeholder="Mail" required>
@@ -726,7 +762,7 @@
         
         <!-- ADMIN AREA FORMULARE MANAGEMENT AREA -->
         <div id="adminFormSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.15); border-radius: 15px; padding: 20px;">
-            <h4 style="color:var(--primary-red); margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-folder-plus"></i> Admin: Formular-Verwaltung Terminal</h4>
+            <h4 style="color:var(--primary-red); margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-folder-plus"></i> Admin: Neues Formular hinzufügen</h4>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <input type="text" id="newFormTitle" class="form-control" placeholder="Titel" style="flex:1; margin-bottom:0;">
                 <input type="text" id="newFormUrl" class="form-control" placeholder="Link/URL" style="flex:1; margin-bottom:0;">
@@ -754,7 +790,7 @@
         </div>
         
         <!-- ADMIN AREA ANKAUF PHOTO MEDIA STORAGE -->
-        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border: 1px solid rgba(179,135,40,0.2); border-radius: 15px; padding: 20px;">
+        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border-color: rgba(179,135,40,0.2); border-radius: 15px; padding: 20px;">
             <h4 style="color:#b38728; margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Ankauf Galerie - Unbegrenzt)</h4>
             <div class="config-row" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                 <input type="text" id="newCarTitle" class="form-control" placeholder="Modellname" style="flex:1; margin-bottom:0;">
@@ -848,7 +884,7 @@
         </div>
     </footer>
 
-    <!-- FIREBASE V26 MODULE INTEGRATION -->
+    <!-- FIREBASE V28 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -948,7 +984,7 @@
             }
         };
         
-        // --- FIREBASE: VISITOR COUNTER V26 ---
+        // --- FIREBASE: VISITOR COUNTER V28 ---
         const visitorDocRef = doc(db, "settings", "visitors");
         let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
         
@@ -986,6 +1022,7 @@
             window.closeTickerConfig();
             window.showToast(window.tickerIsVisible ? 'Ticker aktiviert' : 'Ticker deaktiviert', 'success');
             
+            // Save state to Firebase
             try { setDoc(doc(db, "settings", "ticker_state"), { isVisible: window.tickerIsVisible }, {merge: true}); } catch(e){}
         };
         
@@ -1017,7 +1054,7 @@
                 window.showToast('Ticker-Einstellungen in Firebase gespeichert!', 'success');
             } catch(e) {
                 console.warn(e);
-                window.showToast('Lokal angewendet (Permissions?).', 'error');
+                window.showToast('Fehler (Berechtigungen?). Lokal angewendet.', 'error');
                 applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
                 window.closeTickerConfig();
             }
@@ -1051,10 +1088,12 @@
             wrapperEl.style.animationDuration = data.speed || "15s";
         }
 
+        // Firebase Ticker Listener
         onSnapshot(doc(db, "settings", "ticker"), (docSnap) => {
             if(docSnap.exists()) {
                 applyTickerLocally(docSnap.data());
                 
+                // Update inputs for admin
                 const data = docSnap.data();
                 document.getElementById('tickerFullText').value = data.fullText || '';
                 document.getElementById('tickerBlinkWord').value = data.blinkWord || '';
@@ -1086,17 +1125,18 @@
              }
         });
 
-        // --- FIREBASE: LIVE APPOINTMENTS (V26 SYNC) ---
+        // --- FIREBASE: LIVE APPOINTMENTS ---
         window.activeBadgeNum = 0;
         
         function updateBadgeDisplay(hasPrio) {
             const b = document.getElementById('notif-badge');
             b.innerText = window.activeBadgeNum;
-            b.style.display = window.activeBadgeNum > 0 ? 'flex' : 'none'; // Only display if > 0
+            b.style.display = window.activeBadgeNum > 0 ? 'flex' : 'none';
             b.classList.remove('prio-pulse');
             if(hasPrio) b.classList.add('prio-pulse');
         }
 
+        // Listen to Appointments
         onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
             const list = document.getElementById('admin-list');
             list.innerHTML = '';
@@ -1106,7 +1146,7 @@
 
             if (snapshot.empty) {
                 list.innerHTML = '<p style="font-size:12px; color:#555; text-align:center; margin-top:20px;">Keine Termine im System.</p>';
-                updateBadgeDisplay(false);
+                updateBadgeDisplay(hasPrio);
                 return;
             }
 
@@ -1161,6 +1201,7 @@
                 `;
                 list.appendChild(card);
 
+                // Handle Pinned Plate
                 if (apt.marked) {
                     const plate = document.createElement('div');
                     plate.className = 'pinned-plate';
@@ -1179,8 +1220,9 @@
         });
 
         window.markApt = async function(id, newState) {
-            try { await updateDoc(doc(db, "appointments", id), { marked: newState }); } 
-            catch(e) { console.warn(e); window.showToast('Rechte-Fehler bei Firebase.', 'error'); }
+            try {
+                await updateDoc(doc(db, "appointments", id), { marked: newState });
+            } catch(e) { console.warn(e); window.showToast('Rechte-Fehler bei Firebase.', 'error'); }
         };
         
         window.editApt = function(id) {
@@ -1230,7 +1272,9 @@
                         window.showToast('Notiz hinzugefügt.', 'success');
                     }
                     inputEl.value = '';
-                } catch(err) { console.warn(err); }
+                } catch(err) {
+                    console.warn(err);
+                }
             }
         };
 
@@ -1272,13 +1316,15 @@
                     window.showToast('Termin gelöscht.', 'success');
                 } catch(e) {
                     console.warn(e);
-                    document.getElementById(window.deleteTargetId).remove();
-                    window.showToast('Lokal gelöscht.', 'success');
+                    const el = document.getElementById(window.deleteTargetId);
+                    if(el) el.remove();
+                    window.showToast('Lokal gelöscht (Keine Firebase Rechte).', 'success');
                 }
                 window.cancelDelete();
             }
             else if(window.deleteNoteTargetId && document.getElementById(window.deleteNoteTargetId)) {
-                document.getElementById(window.deleteNoteTargetId).remove();
+                const el = document.getElementById(window.deleteNoteTargetId);
+                if(el) el.remove();
                 window.cancelDelete();
                 window.showToast('Notiz gelöscht.', 'success');
             }
@@ -1313,7 +1359,7 @@
                 window.chosenHour = null;
             } catch(err) {
                 console.warn(err);
-                window.showToast('Fehler bei Firebase Verbindung.', 'error');
+                window.showToast('Fehler bei Firebase Verbindung. Konnte nicht gespeichert werden.', 'error');
                 btn.innerText = 'Fehler! Erneut versuchen';
             }
         };
@@ -1350,8 +1396,10 @@
             });
         }
         
+        // Initial static render
         renderForms(staticForms);
 
+        // Listen for Firebase Forms (Override if exist)
         onSnapshot(collection(db, "forms"), (snapshot) => {
             if(!snapshot.empty) {
                 const formsData = [];
@@ -1387,6 +1435,7 @@
                 if(e.target.files.length > 0) {
                     const file = e.target.files[0];
                     const url = URL.createObjectURL(file); 
+                    
                     try {
                         await updateDoc(doc(db, "forms", formId), { url: url });
                         window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
@@ -1511,7 +1560,8 @@
                     await deleteDoc(doc(db, "cars", cardId));
                     window.showToast('Fahrzeug aus Firebase entfernt.', 'success');
                 } catch(err) {
-                    document.getElementById(cardId).remove();
+                    const el = document.getElementById(cardId);
+                    if(el) el.remove();
                     window.showToast('Lokal entfernt.', 'success');
                 }
             }
@@ -1540,18 +1590,6 @@
             });
         });
         document.addEventListener('click', () => trigger.classList.remove('open'));
-
-        function runPlates() {
-            const container = document.getElementById('plate-container');
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            for(let i=0; i<8; i++) {
-                let p = document.createElement('div'); p.className = 'plate';
-                p.innerHTML = `B - ${chars[Math.floor(Math.random()*26)]}${chars[Math.floor(Math.random()*26)]} ${Math.floor(1000+Math.random()*9000)}`;
-                p.style.left = `${Math.random() * 90}vw`; p.style.animationDelay = `${Math.random() * 15}s`;
-                container.appendChild(p);
-            }
-        }
-        runPlates();
 
         window.addEventListener('DOMContentLoaded', () => {
             const preloader = document.getElementById('intro-preloader');
@@ -1584,15 +1622,6 @@
             document.getElementById('lightboxOverlay').classList.add('open');
         };
         window.closeLightbox = function() { document.getElementById('lightboxOverlay').classList.remove('open'); };
-
-        window.openInfo = function(type) {
-            const title = document.getElementById('pTitle'); const text = document.getElementById('pText');
-            title.innerText = type;
-            if(type === 'Anmeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Fahrzeugbrief<br>• Fahrzeugschein<br>• Personalausweis oder Pass<br>• Gültiger TÜV-Bericht (HU)<br>• eVB-Nummer Ihrer Kfz-Versicherung';
-            else if(type === 'Ummeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Bisherige Kennzeichen (falls Schildertausch gewünscht)<br>• Zulassungsbescheinigung I & II<br>• Aktueller HU-Prüfbericht';
-            else text.innerHTML = 'Unser Express-Service sichert Ihnen die schnellstmögliche Bearbeitung direkt über unsere internen Schnittstellen. Vorgänge werden taggleich eingereicht und innerhalb von 24h finalisiert.';
-            document.getElementById('infoPopupOverlay').classList.add('open');
-        };
 
         window.chosenHour = null;
         flatpickr("#datePicker", {
