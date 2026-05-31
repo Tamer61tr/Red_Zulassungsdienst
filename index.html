@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#d30000">
-    <title>RED Zulassungsdienst Berlin | Master Premium V23 Ultra</title>
+    <title>RED Zulassungsdienst Berlin</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -74,7 +74,8 @@
         .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; position: relative; }
         .logo-text { font-size: clamp(14px, 2vw, 22px); font-weight: 900; color: var(--text-light); text-transform: uppercase; white-space: nowrap; }
         
-        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; }
+        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
+        .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
 
         .driving-scene { position: relative; width: 65px; height: 30px; display: flex; align-items: center; overflow: hidden; }
         .car-icon { position: absolute; color: var(--primary-red); font-size: 22px; z-index: 2; left: -40px; animation: smoothDrive 5s infinite linear; }
@@ -112,7 +113,8 @@
         /* --- FULLSCREEN MENU --- */
         .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); backdrop-filter: blur(25px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
         .fullscreen-menu.active { opacity: 1; pointer-events: all; }
-        .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: white; cursor: pointer; }
+        .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: white; cursor: pointer; transition: 0.3s; }
+        .close-menu:hover { color: var(--primary-red); transform: rotate(90deg); }
         .fullscreen-menu a { color: white; font-size: 24px; font-weight: 800; text-transform: uppercase; text-decoration: none; margin: 12px 0; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
         .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
 
@@ -138,9 +140,9 @@
         #confirmModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15); }
         #deleteConfirmOverlay .custom-dialog-window { max-width: 400px; border-top-color: #ff3b30; box-shadow: 0 20px 50px rgba(255,59,48,0.15); }
         #logoutConfirmOverlay .custom-dialog-window { max-width: 400px; }
-        #tickerConfigOverlay .custom-dialog-window { max-width: 520px; border-top-color: #007aff; }
+        #tickerConfigOverlay .custom-dialog-window { max-width: 580px; border-top-color: #007aff; }
         #lightboxOverlay .custom-dialog-window { max-width: 600px; border-top-color: #b38728; padding: 25px; }
-        #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } /* Fixed info popup styling */
+        #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } 
 
         /* --- ADMIN ENGINE & CARDS --- */
         .admin-list-wrapper { max-height: 350px; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
@@ -181,7 +183,7 @@
         .pinned-plate::before { content: 'D'; background: #003399; color: #fff; padding: 2px 4px; font-size: 12px; border-radius: 3px; }
         @keyframes slideInPlate { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* --- CHECKBOX FIX (UNICODE SAFE) --- */
+        /* --- CHECKBOX DESIGN --- */
         .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
@@ -212,7 +214,7 @@
         /* NOBLE CUSTOM DROPDOWN SELECTS */
         .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
         .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .noble-select-trigger::after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: var(--primary-red); font-size: 10px; transition: 0.3s; }
+        .noble-select-trigger::after { content: '▼'; font-family: sans-serif; font-size: 10px; color: var(--primary-red); transition: 0.3s; }
         .noble-select-box.open .noble-select-trigger::after { transform: rotate(180deg); }
         .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; overflow: hidden; }
         .noble-select-box.open .noble-options-dropdown { display: block; }
@@ -236,13 +238,13 @@
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- MOBILE SCALING (MINIMAL) --- */
+        /* --- MOBILE SCALING (MINIMAL ANTI-FLICKER) --- */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 90px; }
             nav { padding: 10px 4%; }
             .hero { margin-top: 20px; }
             .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
-            .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
+            .quick-menu-btn { padding: 6px 10px !important; font-size: 10px !important; }
             .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
             .hero-content { padding: 30px 15px !important; border-radius: 20px !important; }
             .sofort-badge { padding: 8px 16px !important; font-size: 11px !important; margin-bottom: 15px !important; }
@@ -254,15 +256,24 @@
             .auto-ankauf-box { padding: 30px 15px !important; border-radius: 15px !important; }
             .download-item { flex-direction: column; text-align: center; gap: 8px; }
             .apt-actions-horizontal { justify-content: center; }
+            #tickerConfigOverlay .custom-dialog-window { max-width: 95% !important; }
         }
 
         /* --- HERO & COMPONENTS --- */
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
-        /* MEGA EYE CATCHING SOFORTKENNZEICHEN */
-        .sofort-badge { background: linear-gradient(45deg, #ff0000, #b30000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; border: 2px solid #fff; box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); animation: mega-pulse-badge 1s infinite alternate; text-transform: uppercase; letter-spacing: 1px; }
-        @keyframes mega-pulse-badge { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); } 100% { transform: scale(1.08); box-shadow: 0 0 60px rgba(255, 0, 0, 1); border-color: #ffcc00; color: #ffcc00; } }
+        /* V24 ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
+        .sofort-badge { 
+            background: linear-gradient(45deg, #ff0000, #b30000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
+            padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; border: 2px solid rgba(255,255,255,0.5);
+            will-change: transform, box-shadow; backface-visibility: hidden; transform: translateZ(0); -webkit-font-smoothing: subpixel-antialiased;
+            animation: mega-pulse-badge 1.5s infinite alternate ease-in-out; text-transform: uppercase; letter-spacing: 1px; 
+        }
+        @keyframes mega-pulse-badge { 
+            0% { transform: scale(1) translateZ(0); box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); border-color: rgba(255,255,255,0.5); color: #fff; } 
+            100% { transform: scale(1.04) translateZ(0); box-shadow: 0 0 40px rgba(255, 0, 0, 0.9); border-color: #ffcc00; color: #ffcc00; } 
+        }
 
         /* --- CORE SERVICES (ON-CARD REVEAL) --- */
         .section-header { text-align: center; margin-bottom: 35px; }
@@ -277,33 +288,35 @@
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* --- DOWNLOADS COMPONENT (WITH ADMIN DELETE) --- */
+        /* --- DOWNLOADS COMPONENT (USER DL + ADMIN UP + ADMIN DEL FORMS) --- */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
         .download-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 600; }
-        .download-item.selected { background: rgba(230,0,0,0.12); border-color: var(--primary-red); box-shadow: 0 0 15px rgba(230,0,0,0.25); }
+        .download-item.selected { background: rgba(230,0,0,0.12); border-color: var(--primary-red); box-shadow: 0 0 15px rgba(230,0,0,0.3); }
         .download-info i { font-size: 18px; color: var(--text-muted); flex-shrink: 0; }
         .download-item.selected .download-info i { color: var(--primary-red); }
         .download-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .download-actions i { font-size: 16px; transition: 0.3s; }
         .user-dl { color: var(--text-muted); }
         .user-dl:hover { color: var(--primary-red); transform: translateY(-2px); }
-        .admin-up { color: #b38728; margin-right: 5px; }
+        
+        .admin-up { color: #b38728; }
         .admin-up:hover { color: #fff; transform: scale(1.1); }
         .admin-del { color: #ff3b30; margin-left: 5px; }
         .admin-del:hover { color: #fff; transform: scale(1.1); }
 
-        /* --- AUTO ANKAUF REAL PICTURE GALLERY (COMPACT) --- */
+        /* --- AUTO ANKAUF REAL PICTURE GALLERY --- */
         .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
-        .gallery-card { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-border); height: 130px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
-        .gallery-card img, .gallery-card video { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.6; z-index: 1; transition: 0.3s; }
+        
+        .gallery-card { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--glass-border); height: 140px; background: #111; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; transition: 0.3s; }
+        .gallery-card img, .gallery-card video { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; z-index: 1; transition: 0.3s; opacity: 0.6; }
         .gallery-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)); z-index: 2; }
         .gallery-card:hover { transform: scale(1.03); border-color: #b38728; }
         .gallery-card:hover img, .gallery-card:hover video { opacity: 0.9; }
-        .gallery-card span { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .gallery-card span { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; }
@@ -332,8 +345,9 @@
         #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
         #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
 
-        /* V18/V22 FIX: ALIGN TEXT IN FORMS */
-        .v18-align-fix { margin-top: 0px !important; }
+        /* V24 ADMIN SYMBOL MATRIX STYLING */
+        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
+        @media (max-width: 480px) { .symbol-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
@@ -351,7 +365,7 @@
         <div class="intro-text" id="introText">Herzlich Willkommen zu Ihrem<br><span style="color:var(--primary-red);">Zulassungsdienst RED Berlin</span></div>
     </div>
 
-    <!-- 2. BACKGROUND PLATES -->
+    <!-- 2. BACKGROUND FLOATING NUMBERS -->
     <div class="plate-bg" id="plate-container"></div>
 
     <!-- 3. MAIN NAVBAR HUB & TICKER -->
@@ -454,7 +468,7 @@
     </div>
 
     <div class="custom-dialog-overlay" id="confirmModalOverlay">
-        <div class="custom-dialog-window" style="border-top-color:#25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15);">
+        <div class="custom-dialog-window" style="border-top-color:#25D366; box-shadow: 0 20px 40px rgba(37,211,102,0.15);">
             <i class="fa-solid fa-circle-check" style="font-size:45px; color:#25D366; margin-bottom:15px;"></i>
             <h3 style="color:#fff; font-weight:900;" id="confirmModalTitle">Termin Reserviert!</h3>
             <p style="color:var(--text-muted); font-size:13px; margin:10px 0 20px;" id="confirmModalText"></p>
@@ -486,12 +500,12 @@
         </div>
     </div>
 
-    <!-- V22 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <!-- V24 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
-        <div class="custom-dialog-window" style="max-width: 520px; border-top-color: #007aff;">
+        <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="closeTickerConfig()"></i>
             <h3 style="color:#007aff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-text-width"></i> Ticker & Info-Leiste</h3>
-            <p style="font-size:11px; color:var(--text-muted); margin-bottom:20px;">Passen Sie den Ticker-Satz, die Farbe des blinkenden Wortes sowie Icons an.</p>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:20px;">Passen Sie den Text, Farben, Schriftart und gleitende Symbole an.</p>
             
             <div class="form-group">
                 <label>Gesamter Ticker-Text</label>
@@ -506,23 +520,30 @@
                 <div class="form-group">
                     <label>Farbe des blinkenden Wortes</label>
                     <select id="tickerBlinkColor" class="form-control" style="background:#111114;">
-                        <option value="#e60000" selected>Leuchtend Rot</option>
+                        <option value="#e60000" selected>Rot</option>
                         <option value="#ffcc00">Premium Gold</option>
                         <option value="#25D366">WhatsApp Grün</option>
                         <option value="#007aff">Neon Blau</option>
+                        <option value="#ff00ff">Magenta Pink</option>
+                        <option value="#ff9500">Orange</option>
+                        <option value="#00ffff">Cyan</option>
                     </select>
                 </div>
             </div>
             
-            <!-- V22 UPDATE: MULTIPLE SYMBOL SELECTOR MATRIX -->
+            <!-- V24 UPDATE: ENHANCED MULTIPLE SYMBOL SELECTOR MATRIX -->
             <div class="form-group" style="margin-top:10px;">
-                <label style="margin-bottom:8px;">Gleitende Ticker-Symbole wählen (Mehrfachauswahl)</label>
-                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW Silhouette</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="noble-checkbox-box"></span> ⚡ Express Blitz</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="noble-checkbox-box"></span> 🏁 Rennflagge</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Nummernschild</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Premium Stern</label>
+                <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
+                <div class="symbol-grid">
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 Auto</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="noble-checkbox-box"></span> ⚡ Blitz</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="noble-checkbox-box"></span> 🏁 Flagge</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Stern</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symKey"><span class="noble-checkbox-box"></span> 🔑 Schlüssel</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symClock"><span class="noble-checkbox-box"></span> ⏱️ Uhr</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFire"><span class="noble-checkbox-box"></span> 🔥 Feuer</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symInfo"><span class="noble-checkbox-box"></span> ℹ️ Info</label>
                 </div>
             </div>
             
@@ -530,7 +551,7 @@
                 <div class="form-group">
                     <label>Lauf-Geschwindigkeit</label>
                     <select id="tickerSpeed" class="form-control" style="background:#111114;">
-                        <option value="35s">Sehr Langsam</option>
+                        <option value="40s">Sehr Langsam</option>
                         <option value="25s">Langsam</option>
                         <option value="15s" selected>Normal</option>
                         <option value="9s">Schnell</option>
@@ -542,6 +563,8 @@
                         <option value="#ffffff" selected>Clean Weiß</option>
                         <option value="#ccc">Muted Grau</option>
                         <option value="#ffcc00">Gold</option>
+                        <option value="#00ffff">Cyan</option>
+                        <option value="#39ff14">Neon Grün</option>
                     </select>
                 </div>
             </div>
@@ -596,6 +619,7 @@
     <div id="view-home" class="view-section active">
         <div class="hero">
             <div class="hero-content">
+                <!-- V24 Anti Flicker class added -->
                 <div class="sofort-badge"><i class="fa-solid fa-bolt" style="margin-right:8px;"></i> Sofortkennzeichen zum Mitnehmen! <i class="fa-solid fa-bolt" style="margin-left:8px;"></i></div>
                 <h1 style="font-size: clamp(22px, 4.5vw, 42px); line-height: 1.1; margin-bottom: 15px;">Schnell. Zuverlässig.<br><span style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
                 <p style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 30px;">Zulassungstermine innerhalb von 1-2 Werktagen in Berlin Neukölln.</p>
@@ -902,7 +926,6 @@
                     <i class="fa-solid fa-euro-sign" style="color:var(--primary-red); margin-right:8px;"></i> NUR BARZAHLUNG
                 </div>
             </div>
-            
             <div class="social-icons">
                 <a href="https://instagram.com/red_zulassungsdienst" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                 <a href="#" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
@@ -941,11 +964,10 @@
         }
 
         // --- 1. OVERLAY CLICK TO CLOSE ENGINE ---
-        document.querySelectorAll('.custom-dialog-overlay').forEach(overlay => {
+        document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
                 if(e.target === this) {
-                    this.classList.remove('open');
-                    // Special resets
+                    this.classList.remove('open', 'active');
                     if(this.id === 'deleteConfirmOverlay') { deleteTargetId = null; deleteNoteTargetId = null; }
                     if(this.id === 'passChangeOverlay') document.getElementById('newPassInput').value = '';
                 }
@@ -965,13 +987,10 @@
             const p = document.getElementById('adminPass').value;
             if(u === currentAdminUser && p === currentAdminPass) {
                 isAuthorized = true;
-                
-                // V22 SECURE CLASS TRIGGER
                 document.body.classList.add('is-admin');
                 
                 document.getElementById('authBox').style.display = 'none';
                 document.getElementById('dashboardBox').style.display = 'block';
-                
                 showToast('Erfolgreich als Admin angemeldet.', 'success');
                 
                 if(activeBadgeNum === 0) addDummyAppointments();
@@ -1065,7 +1084,6 @@
             const card = document.getElementById(id);
             card.classList.toggle('marked');
             
-            // PINNED PLATE ON THE WEBSITE
             if (card.classList.contains('marked')) {
                 const nameText = card.querySelector('p').innerText.split('|')[0].replace('', '').trim();
                 const timeText = card.querySelector('p').innerText.split('|')[1].trim();
@@ -1096,7 +1114,6 @@
             if(input.classList.contains('active')) input.focus();
         }
         
-        // --- REAL TIME SEPARATED NOTES MANAGEMENT ---
         function saveNote(e, inputEl, cardId) {
             if(e.key === 'Enter') {
                 e.preventDefault();
@@ -1150,20 +1167,14 @@
             deleteNoteTargetId = noteId;
             document.getElementById('delTitleText').innerText = "Notiz löschen?";
             document.getElementById('delDescText').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
-            
-            // Fix dialog assignment for Custom Ovals
-            const customOverlay = document.getElementById('deleteConfirmOverlay');
-            customOverlay.querySelector('h3').innerText = "Notiz löschen?";
-            customOverlay.querySelector('p').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
-            customOverlay.classList.add('open');
+            document.getElementById('deleteConfirmOverlay').classList.add('open');
         }
 
         function deleteApt(id) {
             deleteTargetId = id;
-            const customOverlay = document.getElementById('deleteConfirmOverlay');
-            customOverlay.querySelector('h3').innerText = "Eintrag löschen?";
-            customOverlay.querySelector('p').innerText = "Möchten Sie diesen Datensatz wirklich unwiderruflich aus dem System entfernen?";
-            customOverlay.classList.add('open');
+            document.getElementById('delTitleText').innerText = "Eintrag löschen?";
+            document.getElementById('delDescText').innerText = "Möchten Sie diesen Kundentermin wirklich unwiderruflich aus dem System entfernen?";
+            document.getElementById('deleteConfirmOverlay').classList.add('open');
         }
 
         function cancelDelete() {
@@ -1173,7 +1184,6 @@
         }
 
         function confirmDelete() {
-            // Handle Appointment Deletion
             if(deleteTargetId && document.getElementById(deleteTargetId)) {
                 document.getElementById(deleteTargetId).remove();
                 if(activeBadgeNum > 0) activeBadgeNum--; 
@@ -1183,7 +1193,6 @@
                 cancelDelete();
                 showToast('Termin dauerhaft gelöscht.', 'success');
             }
-            // Handle Separate Note Deletion
             else if(deleteNoteTargetId && document.getElementById(deleteNoteTargetId)) {
                 document.getElementById(deleteNoteTargetId).remove();
                 cancelDelete();
@@ -1191,7 +1200,7 @@
             }
         }
 
-        // --- V22 TICKER CONFIGURATION (ADMIN) ---
+        // --- V24 TICKER CONFIGURATION (ADMIN) ---
         function openTickerConfig() {
             if(!isAuthorized) return;
             document.getElementById('tickerConfigOverlay').classList.add('open');
@@ -1224,6 +1233,10 @@
             if(document.getElementById('symFlag').checked) symbols.push('fa-flag-checkered');
             if(document.getElementById('symCard').checked) symbols.push('fa-id-card');
             if(document.getElementById('symStar').checked) symbols.push('fa-star');
+            if(document.getElementById('symKey').checked) symbols.push('fa-key');
+            if(document.getElementById('symClock').checked) symbols.push('fa-clock');
+            if(document.getElementById('symFire').checked) symbols.push('fa-fire');
+            if(document.getElementById('symInfo').checked) symbols.push('fa-circle-info');
             
             const contentEl = document.getElementById('tickerTextContent');
             const wrapperEl = document.getElementById('tickerWrapper');
@@ -1405,7 +1418,6 @@
         }
         runPlates();
 
-        // --- PRELOADER INTRO SCENE ---
         window.addEventListener('DOMContentLoaded', () => {
             const preloader = document.getElementById('intro-preloader');
             setTimeout(() => { document.getElementById('introCar').style.transition = 'left 1.4s linear'; document.getElementById('introCar').style.left = '320px'; }, 200);
@@ -1437,15 +1449,6 @@
             document.getElementById('lightboxOverlay').classList.add('open');
         }
         function closeLightbox() { document.getElementById('lightboxOverlay').classList.remove('open'); }
-
-        function openInfo(type) {
-            const title = document.getElementById('pTitle'); const text = document.getElementById('pText');
-            title.innerText = type;
-            if(type === 'Anmeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Fahrzeugbrief<br>• Fahrzeugschein<br>• Personalausweis oder Pass<br>• Gültiger TÜV-Bericht (HU)<br>• eVB-Nummer Ihrer Kfz-Versicherung';
-            else if(type === 'Ummeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Bisherige Kennzeichen (falls Schildertausch gewünscht)<br>• Zulassungsbescheinigung I & II<br>• Aktueller HU-Prüfbericht';
-            else text.innerHTML = 'Unser Express-Service sichert Ihnen die schnellstmögliche Bearbeitung direkt über unsere internen Schnittstellen. Vorgänge werden taggleich eingereicht und innerhalb von 24h finalisiert.';
-            document.getElementById('infoPopupOverlay').classList.add('open');
-        }
 
         function selectForm(element) {
             document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
