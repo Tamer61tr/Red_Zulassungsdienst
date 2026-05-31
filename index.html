@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- V31 NEW: PWA WEB APP ICONS & FAVICON (Car SVG) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#d30000">
+    <meta name="apple-mobile-web-app-title" content="RED Zulassung">
+    <meta name="application-name" content="RED Zulassung">
+    <meta name="theme-color" content="#050507">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 271 83' fill='%23e60000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z'/%3E%3Cpath d='M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z'/%3E%3Cpath d='M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 271 83' fill='%23e60000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z'/%3E%3Cpath d='M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z'/%3E%3Cpath d='M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z'/%3E%3C/svg%3E">
+    
     <title>RED Zulassungsdienst Berlin</title>
     
     <!-- Fonts & Icons -->
@@ -27,17 +34,9 @@
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE (V30 FIX) --- */
-        * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
-        body { 
-            font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
-            line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
-            -webkit-font-smoothing: antialiased;
-        }
+        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE (V31 FIX) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; padding-top: 90px; -webkit-font-smoothing: antialiased; }
 
         /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
         .admin-only-block { display: none !important; }
@@ -86,7 +85,6 @@
         .logo-text .red-part { color: var(--primary-red); }
         .logo-text .white-part { color: #ffffff; }
         
-        /* V30: Speech Bubble Setup */
         .speech-bubble { 
             position: absolute; top: 110%; left: 10%; background: var(--primary-red); color: #fff; 
             padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; white-space: nowrap; 
@@ -101,7 +99,6 @@
         .speech-bubble.show-bubble { opacity: 1; transform: translateY(0); animation: gentleBounce 2s infinite alternate ease-in-out; }
         @keyframes gentleBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-3px); } }
 
-        /* Auto Logo SVG */
         .logo-car-svg { height: clamp(16px, 3.5vw, 24px); width: auto; flex-shrink: 0; fill: #ffffff; transition: 0.3s; }
         .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(3px); }
 
@@ -132,6 +129,7 @@
         .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; }
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .ticker-car { font-size: 15px; color: var(--primary-red); }
 
         /* --- FULLSCREEN MENU --- */
         .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
@@ -233,7 +231,7 @@
         .form-row { display: flex; gap: 15px; }
         @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
         
-        .form-group { position: relative; margin-bottom: 15px; text-align: left; flex: 1; }
+        .form-group { position: relative; margin-bottom: 15px; text-align: left; flex: 1; z-index: 10; }
         .form-group label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
         .form-control { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; font-family: inherit; font-size: 13px; outline: none; transition: 0.3s; }
         .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 12px rgba(230,0,0,0.3); }
@@ -248,22 +246,26 @@
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- V30 FLATPICKR FIX --- */
+        /* --- V31 FIX: FLATPICKR CENTERING (MOBILE STABILIZED) --- */
         .flatpickr-calendar { 
-            background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; 
-            border-radius: 15px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
+            background: #0c0c0f !important; border: 1px solid var(--primary-red) !important; 
+            border-radius: 15px !important; box-shadow: 0 15px 50px rgba(0,0,0,0.9) !important; 
             font-family: 'Montserrat', sans-serif !important; 
         }
+        /* Mobile centered, overriding absolute positioning safely */
         .flatpickr-calendar.open {
-            position: fixed !important; top: 50% !important; left: 50% !important; 
-            transform: translate(-50%, -50%) !important; z-index: 999999 !important; 
-            right: auto !important; bottom: auto !important; margin: 0 !important;
-            width: 320px !important; max-width: 90vw !important;
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            right: auto !important;
+            bottom: auto !important;
+            margin: 0 !important;
+            z-index: 999999 !important;
         }
         .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
-        .flatpickr-month { fill: var(--primary-red) !important; color: var(--primary-red) !important; }
         
         .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
@@ -274,7 +276,7 @@
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- MOBILE SCALING & ANTI-FLICKER --- */
+        /* --- V30 MOBILE SCALING & ANTI-FLICKER --- */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 80px; }
             nav { padding: 10px 3%; }
@@ -365,10 +367,10 @@
         .gallery-card:hover img, .gallery-card:hover video { opacity: 0.9; }
         .gallery-card span { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
-        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
-        .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
+        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
+        .admin-del-img-btn:hover { background: #ff3b30; color: #fff; }
 
-        /* --- BERLIN KENNZEICHEN WARNING ACCENT COMPONENT --- */
+        /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
@@ -392,8 +394,6 @@
         #legalBox { max-width: 800px; margin: 20px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; display: none; }
         #legalContent { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; color: #aaa; font-size: 12px; }
 
-        /* TICKER CONFIG SYMBOL MATRIX STYLING */
-        .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -426,7 +426,6 @@
                     <span class="red-part">RED</span> 
                     <span class="white-part">ZULASSUNGSDIENST</span>
                 </div>
-                <!-- Sleek aggressive sports car silhouette -->
                 <svg class="logo-car-svg" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="currentColor"/>
                     <path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="currentColor"/>
@@ -556,7 +555,7 @@
         </div>
     </div>
 
-    <!-- V30 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
+    <!-- V31 EXTENDED DYNAMIC TICKER SETUP FOR ADMIN USERS -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window" style="max-width: 580px; border-top-color: #007aff;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
@@ -590,7 +589,7 @@
             <div class="form-group" style="margin-top:10px;">
                 <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
                 <div class="symbol-grid">
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 Auto</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="noble-checkbox-box"></span> 🚛 LKW</label>
                     <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
@@ -744,7 +743,7 @@
                             <input type="tel" id="formPhone" class="form-control" placeholder="Nummer" required>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row v18-align-fix">
                         <div class="form-group">
                             <label>E-Mail Adresse</label>
                             <input type="email" id="formEmail" class="form-control" placeholder="Mail" required>
@@ -763,10 +762,10 @@
                         </div>
                     </div>
                     
-                    <div class="form-group" style="margin-top: 10px;">
+                    <div class="form-group" style="margin-top: 10px; position:relative; z-index:10;">
                         <label>Wunschdatum</label>
-                        <!-- V30 FIX: READONLY ensures native keyboard doesn't hide Flatpickr -->
-                        <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer; background-color: #111114; color: white;" readonly="readonly" required>
+                        <!-- V31 FIX: REMOVED readonly, Let Flatpickr handle disableMobile native setting -->
+                        <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer; background-color: #111114; color: white;" required>
                     </div>
                     
                     <div id="timeWrapper" style="display:none; margin-top:20px;">
@@ -912,25 +911,50 @@
         </div>
     </footer>
 
-    <!-- FIREBASE V30 MODULE INTEGRATION -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    <!-- UI DOM LOGIC (Outside module for guarantee execution!) -->
+    <script>
+        // --- 1. OVERLAY CLICK TO CLOSE ENGINE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if(e.target === this) {
+                        this.classList.remove('open', 'active');
+                        if(this.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
+                        if(this.id === 'passChangeOverlay') document.getElementById('newPassInput').value = '';
+                    }
+                });
+            });
 
-        // FIREBASE CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyDa10ia02K0vsHgzj-iTf4S6BwKzQruqyY",
-            authDomain: "red-zulassungsdienst.firebaseapp.com",
-            projectId: "red-zulassungsdienst",
-            storageBucket: "red-zulassungsdienst.firebasestorage.app",
-            messagingSenderId: "426545703080",
-            appId: "1:426545703080:web:282cbe0bb5eb5fc09f7a9d"
-        };
+            // --- V31 FLATPICKR INITIALIZATION (GUARANTEED) ---
+            window.chosenHour = null;
+            flatpickr("#datePicker", {
+                locale: "de", 
+                minDate: "today", 
+                disableMobile: true, // Forces Flatpickr's custom UI, fixing iOS/Android native bugs!
+                disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
+                onChange: function(selectedDates, dateStr, instance) {
+                    document.getElementById('timeWrapper').style.display = 'block';
+                    const container = document.getElementById('timeSlots');
+                    container.innerHTML = '';
+                    for(let h = 9; h <= 19; h++) {
+                        const tStr = `${h.toString().padStart(2, '0')}:00`;
+                        const div = document.createElement('div');
+                        div.className = 'time-slot'; div.innerText = tStr;
+                        if(Math.random() > 0.75) div.classList.add('booked');
+                        else {
+                            div.addEventListener('click', () => {
+                                Array.from(container.children).forEach(c => c.classList.remove('active'));
+                                div.classList.add('active');
+                                window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
+                            });
+                        }
+                        container.appendChild(div);
+                    }
+                }
+            });
+        });
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // --- TOAST ENGINE ---
+        // --- GLOBAL TOAST ENGINE ---
         window.showToast = function(msg, type='success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -941,18 +965,7 @@
             setTimeout(() => { toast.remove(); }, 3800);
         };
 
-        // --- 1. OVERLAY CLICK TO CLOSE ENGINE ---
-        document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
-            overlay.addEventListener('click', function(e) {
-                if(e.target === this) {
-                    this.classList.remove('open', 'active');
-                    if(this.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
-                    if(this.id === 'passChangeOverlay') document.getElementById('newPassInput').value = '';
-                }
-            });
-        });
-
-        // --- 2. V30 Logo Bubble & Routing Logic ---
+        // --- V30 Logo Bubble & Routing Logic ---
         window.triggerLogoBubble = function(e) {
             e.preventDefault();
             window.switchView('view-home'); // Always scroll to top/home
@@ -965,7 +978,70 @@
             }, 3000);
         };
 
-        // --- 3. ADMIN LIVE AUTH SHELL ---
+        window.switchView = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        
+        window.toggleMenu = function() { document.getElementById('quickMenu').classList.toggle('active'); };
+        window.openAdmin = function() { document.getElementById('adminModal').classList.add('open'); };
+        window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
+        window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
+        window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
+
+        window.openLightbox = function(title, mediaUrl) {
+            document.getElementById('lightboxTitle').innerText = title;
+            const container = document.getElementById('lightboxImageContainer');
+            if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
+                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop style="width:100%; height:100%; object-fit:cover; border-radius: 12px;"></video>`;
+            } else {
+                container.innerHTML = `<img src="${mediaUrl}" alt="${title}" style="width:100%; height:100%; object-fit:cover; border-radius: 12px;">`;
+            }
+            document.getElementById('lightboxOverlay').classList.add('open');
+        };
+        window.closeLightbox = function() { document.getElementById('lightboxOverlay').classList.remove('open'); };
+
+        // Custom Select handling
+        const trigger = document.getElementById('serviceSelectBox');
+        window.selectedServiceVal = "Anmeldung";
+        trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
+        document.querySelectorAll('.noble-option').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.selectedServiceVal = opt.getAttribute('data-value');
+                document.getElementById('selectTriggerText').innerText = opt.innerText;
+                trigger.classList.remove('open');
+            });
+        });
+        document.addEventListener('click', () => trigger.classList.remove('open'));
+
+        window.toggleCardSlide = function(card) {
+            event.stopPropagation();
+            const isActive = card.classList.contains('reveal-active');
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
+            if(!isActive) card.classList.add('reveal-active');
+        };
+    </script>
+
+    <!-- FIREBASE V31 MODULE INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDa10ia02K0vsHgzj-iTf4S6BwKzQruqyY",
+            authDomain: "red-zulassungsdienst.firebaseapp.com",
+            projectId: "red-zulassungsdienst",
+            storageBucket: "red-zulassungsdienst.firebasestorage.app",
+            messagingSenderId: "426545703080",
+            appId: "1:426545703080:web:282cbe0bb5eb5fc09f7a9d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- 2. ADMIN LIVE AUTH SHELL (WITH AUTO-LOGIN FIX) ---
         window.currentAdminUser = "Tamer Yazici";
         window.currentAdminPass = "616161";
         window.isAuthorized = false;
@@ -973,7 +1049,6 @@
         window.deleteNoteTargetId = null;
         window.editingNoteElement = null;
 
-        // Auto-Login Check on load
         if(localStorage.getItem('red_admin_saved') === 'true') {
             document.body.classList.add('is-admin');
             window.isAuthorized = true;
@@ -1035,7 +1110,7 @@
             }
         };
         
-        // --- FIREBASE: VISITOR COUNTER ---
+        // --- FIREBASE: VISITOR COUNTER V29 ---
         const visitorDocRef = doc(db, "settings", "visitors");
         let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
         
@@ -1117,7 +1192,7 @@
                 window.showToast('Lokal angewendet (Permissions?).', 'error');
                 applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
             }
-            window.closeTickerConfig();
+            window.closeTickerConfig(); 
         };
 
         function applyTickerLocally(data) {
@@ -1279,7 +1354,6 @@
             updateBadgeDisplay(hasPrio, apts.length);
         }
 
-        // Firebase Sync Listener
         onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
             if (!snapshot.empty) {
                 const fbApts = [];
@@ -1426,7 +1500,6 @@
                 const fbData = {...appointmentData}; delete fbData.id; fbData.timestamp = serverTimestamp();
                 await addDoc(collection(db, "appointments"), fbData);
             } catch(err) {
-                console.warn("Offline Fallback: Saving Local Appointment");
                 localAppointments.unshift(appointmentData);
                 localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
                 renderAppointments(localAppointments);
@@ -1642,115 +1715,6 @@
                     window.showToast('Lokal entfernt.', 'success');
                 }
             }
-        };
-
-        window.toggleCardSlide = function(card) {
-            event.stopPropagation();
-            const isActive = card.classList.contains('reveal-active');
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
-            if(!isActive) card.classList.add('reveal-active');
-        };
-
-        // Custom Select handling
-        const trigger = document.getElementById('serviceSelectBox');
-        window.selectedServiceVal = "Anmeldung";
-        trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
-        document.querySelectorAll('.noble-option').forEach(opt => {
-            opt.addEventListener('click', (e) => {
-                e.stopPropagation();
-                window.selectedServiceVal = opt.getAttribute('data-value');
-                document.getElementById('selectTriggerText').innerText = opt.innerText;
-                trigger.classList.remove('open');
-            });
-        });
-        document.addEventListener('click', () => trigger.classList.remove('open'));
-
-        function runPlates() {
-            const container = document.getElementById('plate-container');
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            for(let i=0; i<8; i++) {
-                let p = document.createElement('div'); p.className = 'plate';
-                p.innerHTML = `B - ${chars[Math.floor(Math.random()*26)]}${chars[Math.floor(Math.random()*26)]} ${Math.floor(1000+Math.random()*9000)}`;
-                p.style.left = `${Math.random() * 90}vw`; p.style.animationDelay = `${Math.random() * 15}s`;
-                container.appendChild(p);
-            }
-        }
-        runPlates();
-
-        // --- V30 FIX: DOM INITIALIZATION & FLATPICKR ---
-        window.addEventListener('DOMContentLoaded', () => {
-            // Intro
-            const preloader = document.getElementById('intro-preloader');
-            setTimeout(() => { document.getElementById('introCar').style.transform = 'translate3d(370px, 0, 0)'; document.getElementById('introCar').style.transition = 'transform 1.4s ease-in-out'; }, 200);
-            setTimeout(() => { const p = document.getElementById('introPlate'); p.style.transform = 'scale(1)'; p.style.opacity = '1'; }, 800);
-            setTimeout(() => { const t = document.getElementById('introText'); t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 1200);
-            setTimeout(() => { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.display = 'none'; }, 600); }, 3100);
-
-            // V30: Initialize Flatpickr strictly on DOMContentLoaded without external blockers
-            window.chosenHour = null;
-            flatpickr("#datePicker", {
-                locale: "de", minDate: "today", disable: [ d => d.getDay() === 0 || d.getDay() === 6 ],
-                onChange: function(selectedDates, dateStr, instance) {
-                    document.getElementById('timeWrapper').style.display = 'block';
-                    const container = document.getElementById('timeSlots');
-                    container.innerHTML = '';
-                    for(let h = 9; h <= 19; h++) {
-                        const tStr = `${h.toString().padStart(2, '0')}:00`;
-                        const div = document.createElement('div');
-                        div.className = 'time-slot'; div.innerText = tStr;
-                        if(Math.random() > 0.75) div.classList.add('booked');
-                        else {
-                            div.addEventListener('click', () => {
-                                Array.from(container.children).forEach(c => c.classList.remove('active'));
-                                div.classList.add('active');
-                                window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
-                            });
-                        }
-                        container.appendChild(div);
-                    }
-                }
-            });
-        });
-
-        window.switchView = function(viewId) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-        
-        window.toggleMenu = function() { document.getElementById('quickMenu').classList.toggle('active'); };
-        window.openAdmin = function() { document.getElementById('adminModal').classList.add('open'); };
-        window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
-        window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
-        window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
-
-        window.openLightbox = function(title, mediaUrl) {
-            document.getElementById('lightboxTitle').innerText = title;
-            const container = document.getElementById('lightboxImageContainer');
-            if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
-                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop style="width:100%; height:100%; object-fit:cover; border-radius: 12px;"></video>`;
-            } else {
-                container.innerHTML = `<img src="${mediaUrl}" alt="${title}" style="width:100%; height:100%; object-fit:cover; border-radius: 12px;">`;
-            }
-            document.getElementById('lightboxOverlay').classList.add('open');
-        };
-        window.closeLightbox = function() { document.getElementById('lightboxOverlay').classList.remove('open'); };
-
-        window.openInfo = function(type) {
-            const title = document.getElementById('pTitle'); const text = document.getElementById('pText');
-            title.innerText = type;
-            if(type === 'Anmeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Fahrzeugbrief<br>• Fahrzeugschein<br>• Personalausweis oder Pass<br>• Gültiger TÜV-Bericht (HU)<br>• eVB-Nummer Ihrer Kfz-Versicherung';
-            else if(type === 'Ummeldung') text.innerHTML = '<strong>Mitzubringen im Original vor Ort:</strong><br>• Bisherige Kennzeichen (falls Schildertausch gewünscht)<br>• Zulassungsbescheinigung I & II<br>• Aktueller HU-Prüfbericht';
-            else text.innerHTML = 'Unser Express-Service sichert Ihnen die schnellstmögliche Bearbeitung direkt über unsere internen Schnittstellen. Vorgänge werden taggleich eingereicht und innerhalb von 24h finalisiert.';
-            document.getElementById('infoPopupOverlay').classList.add('open');
-        };
-
-        window.showLegal = function(type) {
-            const b = document.getElementById('legalBox'); const c = document.getElementById('legalContent');
-            b.style.display = 'block';
-            if(type === 'impressum') c.innerHTML = '<strong>Impressum gemäß § 5 TMG:</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6, 12053 Berlin<br>Tel: 0178 378 38 75';
-            else c.innerHTML = '<strong>Datenschutzerklärung:</strong><br><br>Sämtliche Eingabedaten werden verschlüsselt verarbeitet und direkt in der geschützten Datenbank synchronisiert. Es findet kein unbefugtes Tracking statt.';
-            window.scrollTo(0, document.body.scrollHeight);
         };
     </script>
 </body>
