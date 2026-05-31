@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA WEB APP ICONS & FAVICON -->
+    <!-- PWA WEB APP ICONS & FAVICON (V33 Elite) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
     <meta name="application-name" content="RED Zulassung">
     <meta name="theme-color" content="#050507">
@@ -67,17 +68,28 @@
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
 
-        /* --- INTRO PRELOADER --- */
-        #intro-preloader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; transition: opacity 0.5s ease; }
+        /* --- V33 100% BULLETPROOF PURE CSS PRELOADER (NO JS NEEDED!) --- */
+        #intro-preloader { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; 
+            animation: hidePreloader 0.5s ease 3.5s forwards; 
+        }
+        @keyframes hidePreloader { 100% { opacity: 0; visibility: hidden; z-index: -100; pointer-events: none; display: none; } }
+        
         .intro-track { width: 280px; height: 4px; background: rgba(255,255,255,0.03); position: relative; margin-top: 40px; border-radius: 2px; }
-        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); }
-        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(255,255,255,0.1); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s; }
+        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); animation: driveCar 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards; }
+        @keyframes driveCar { 100% { transform: translateX(380px); } }
+        
+        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(255,255,255,0.1); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; animation: popPlate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.8s forwards; }
         .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
-        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(10px); transition: all 0.5s; }
+        @keyframes popPlate { 100% { transform: scale(1); opacity: 1; } }
+        
+        .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); animation: fadeText 0.5s ease 1.2s forwards; }
+        @keyframes fadeText { 100% { transform: translateY(0); opacity: 1; } }
 
         /* --- TOAST NOTIFICATIONS --- */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-msg { background: rgba(10,10,12,0.95); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
+        .toast-msg { background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
         .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
         .toast-success i { color: #25D366; font-size: 16px; }
         .toast-error { border-color: #ff3b30; box-shadow: 0 10px 30px rgba(255,59,48,0.2); }
@@ -94,6 +106,7 @@
         .logo-text .red-part { color: var(--primary-red); }
         .logo-text .white-part { color: #ffffff; }
         
+        /* V33: Speech Bubble Setup */
         .speech-bubble { 
             position: absolute; top: 110%; left: 10%; background: var(--primary-red); color: #fff; 
             padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; white-space: nowrap; 
@@ -255,17 +268,11 @@
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- V30 FLATPICKR CENTERING (BULLETPROOF) --- */
+        /* --- V33 FLATPICKR CSS FIX --- */
         .flatpickr-calendar { 
-            background: #0c0c0f !important; border: 1px solid var(--primary-red) !important; 
+            background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; 
             border-radius: 15px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
             font-family: 'Montserrat', sans-serif !important; 
-        }
-        .flatpickr-calendar.open {
-            position: fixed !important; top: 50% !important; left: 50% !important; 
-            transform: translate(-50%, -50%) !important; z-index: 999999 !important; 
-            right: auto !important; bottom: auto !important; margin: 0 !important;
-            width: 320px !important; max-width: 90vw !important;
         }
         .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; color: white !important; }
         .flatpickr-day { color: #fff !important; }
@@ -317,14 +324,13 @@
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
-        /* V30: ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
+        /* V33: ANTI-FLICKER MEGA EYE CATCHING SOFORTKENNZEICHEN */
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #cc0000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
             padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; 
             border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
             text-transform: uppercase; letter-spacing: 1px; 
         }
-        /* Only pulse the inner icon to prevent layout thrashing on mobile */
         .sofort-badge i { animation: pulse-icon 1.5s infinite alternate ease-in-out; }
         @keyframes pulse-icon { 
             0% { color: #ffcc00; transform: scale(1); text-shadow: 0 0 5px #ffcc00; } 
@@ -374,11 +380,10 @@
         .gallery-card:hover img, .gallery-card:hover video { opacity: 0.9; }
         .gallery-card span { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; z-index: 3; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
-        /* V30 Fix Z-Index */
-        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
+        .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
+        /* --- BERLIN KENNZEICHEN WARNING ACCENT COMPONENT --- */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
@@ -412,7 +417,7 @@
     <!-- PINNED PLATES CONTAINER -->
     <div id="pinned-container"></div>
 
-    <!-- 1. INTRO PRELOADER SCENE -->
+    <!-- 1. INTRO PRELOADER SCENE (V33 BULLETPROOF ANIMATION) -->
     <div id="intro-preloader">
         <div class="intro-plate" id="introPlate">B <span style="color:var(--primary-red);">-</span> RED 2026</div>
         <div class="intro-track"><i class="fa-solid fa-car-side intro-car" id="introCar"></i></div>
@@ -687,7 +692,7 @@
     <div id="view-home" class="view-section active">
         <div class="hero">
             <div class="hero-content">
-                <!-- V30 Anti Flicker smooth pulse badge (Icon only pulses to prevent layout thrash) -->
+                <!-- V30 Anti Flicker smooth pulse badge -->
                 <div class="sofort-badge">
                     <i class="fa-solid fa-bolt" style="margin-right:8px;"></i> 
                     Sofortkennzeichen zum Mitnehmen! 
@@ -751,7 +756,7 @@
                             <input type="tel" id="formPhone" class="form-control" placeholder="Nummer" required>
                         </div>
                     </div>
-                    <div class="form-row v18-align-fix">
+                    <div class="form-row">
                         <div class="form-group">
                             <label>E-Mail Adresse</label>
                             <input type="email" id="formEmail" class="form-control" placeholder="Mail" required>
@@ -919,10 +924,13 @@
         </div>
     </footer>
 
-    <!-- UI DOM LOGIC (Outside module for guarantee execution!) -->
+    <!-- V30 VANILLA JS UI SCRIPT (LOADS GUARANTEED, NO MODULE BLOCKING!) -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+
     <script>
-        // --- 1. OVERLAY CLICK TO CLOSE ENGINE ---
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. OVERLAY CLICK TO CLOSE ENGINE
             document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
                 overlay.addEventListener('click', function(e) {
                     if(e.target === this) {
@@ -933,33 +941,56 @@
                 });
             });
 
-            // --- V30 FLATPICKR INITIALIZATION (GUARANTEED) ---
-            window.chosenHour = null;
-            flatpickr("#datePicker", {
-                locale: "de", 
-                minDate: "today", 
-                disableMobile: true, // Forces Flatpickr's custom UI, fixing iOS/Android native bugs!
-                disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
-                onChange: function(selectedDates, dateStr, instance) {
-                    document.getElementById('timeWrapper').style.display = 'block';
-                    const container = document.getElementById('timeSlots');
-                    container.innerHTML = '';
-                    for(let h = 9; h <= 19; h++) {
-                        const tStr = `${h.toString().padStart(2, '0')}:00`;
-                        const div = document.createElement('div');
-                        div.className = 'time-slot'; div.innerText = tStr;
-                        if(Math.random() > 0.75) div.classList.add('booked');
-                        else {
-                            div.addEventListener('click', () => {
-                                Array.from(container.children).forEach(c => c.classList.remove('active'));
-                                div.classList.add('active');
-                                window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
-                            });
+            // 2. V30 FLATPICKR INITIALIZATION (GUARANTEED)
+            try {
+                window.chosenHour = null;
+                flatpickr("#datePicker", {
+                    locale: "de", 
+                    minDate: "today", 
+                    disableMobile: true, // Forces Flatpickr's custom UI, fixing iOS/Android native bugs!
+                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
+                    onChange: function(selectedDates, dateStr, instance) {
+                        document.getElementById('timeWrapper').style.display = 'block';
+                        const container = document.getElementById('timeSlots');
+                        container.innerHTML = '';
+                        for(let h = 9; h <= 19; h++) {
+                            const tStr = `${h.toString().padStart(2, '0')}:00`;
+                            const div = document.createElement('div');
+                            div.className = 'time-slot'; div.innerText = tStr;
+                            if(Math.random() > 0.75) div.classList.add('booked');
+                            else {
+                                div.addEventListener('click', () => {
+                                    Array.from(container.children).forEach(c => c.classList.remove('active'));
+                                    div.classList.add('active');
+                                    window.chosenHour = tStr; document.getElementById('submitBtn').disabled = false;
+                                });
+                            }
+                            container.appendChild(div);
                         }
-                        container.appendChild(div);
                     }
-                }
+                });
+            } catch(e) {
+                console.error("Flatpickr Error:", e);
+                // Fallback mechanism if library fails
+                const dp = document.getElementById('datePicker');
+                dp.type = 'date';
+                dp.removeAttribute('readonly');
+                dp.addEventListener('change', () => { document.getElementById('submitBtn').disabled = false; window.chosenHour = "Ganztägig"; });
+            }
+
+            // 3. Custom Dropdown Logic
+            const trigger = document.getElementById('serviceSelectBox');
+            window.selectedServiceVal = "Anmeldung";
+            trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
+            document.querySelectorAll('.noble-option').forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.selectedServiceVal = opt.getAttribute('data-value');
+                    document.getElementById('selectTriggerText').innerText = opt.innerText;
+                    trigger.classList.remove('open');
+                });
             });
+            document.addEventListener('click', () => trigger.classList.remove('open'));
         });
 
         // --- GLOBAL TOAST ENGINE ---
@@ -1010,20 +1041,6 @@
         };
         window.closeLightbox = function() { document.getElementById('lightboxOverlay').classList.remove('open'); };
 
-        // Custom Select handling
-        const trigger = document.getElementById('serviceSelectBox');
-        window.selectedServiceVal = "Anmeldung";
-        trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
-        document.querySelectorAll('.noble-option').forEach(opt => {
-            opt.addEventListener('click', (e) => {
-                e.stopPropagation();
-                window.selectedServiceVal = opt.getAttribute('data-value');
-                document.getElementById('selectTriggerText').innerText = opt.innerText;
-                trigger.classList.remove('open');
-            });
-        });
-        document.addEventListener('click', () => trigger.classList.remove('open'));
-
         window.toggleCardSlide = function(card) {
             event.stopPropagation();
             const isActive = card.classList.contains('reveal-active');
@@ -1032,7 +1049,7 @@
         };
     </script>
 
-    <!-- FIREBASE V32 MODULE INTEGRATION -->
+    <!-- FIREBASE V33 MODULE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1724,6 +1741,14 @@
                     window.showToast('Lokal entfernt.', 'success');
                 }
             }
+        };
+
+        window.showLegal = function(type) {
+            const b = document.getElementById('legalBox'); const c = document.getElementById('legalContent');
+            b.style.display = 'block';
+            if(type === 'impressum') c.innerHTML = '<strong>Impressum gemäß § 5 TMG:</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6, 12053 Berlin<br>Tel: 0178 378 38 75';
+            else c.innerHTML = '<strong>Datenschutzerklärung:</strong><br><br>Sämtliche Eingabedaten werden verschlüsselt verarbeitet und direkt in der geschützten Datenbank synchronisiert. Es findet kein unbefugtes Tracking statt.';
+            window.scrollTo(0, document.body.scrollHeight);
         };
     </script>
 </body>
