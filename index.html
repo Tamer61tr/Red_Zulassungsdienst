@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA WEB APP ICONS & FAVICON (V51 Elite Multi-Admin) -->
+    <!-- PWA WEB APP ICONS & FAVICON (V52 Elite Supervisor & Storage) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
@@ -48,13 +48,23 @@
 
         input, select, textarea { font-size: 16px !important; }
 
-        /* Admin Berechtigungen CSS */
-        .admin-only-block { display: none !important; }
-        .admin-only-flex { display: none !important; }
-        .admin-only-inline { display: none !important; }
+        /* Admin & Supervisor Berechtigungen CSS */
+        .admin-only-block, .supervisor-only-block { display: none !important; }
+        .admin-only-flex, .supervisor-only-flex { display: none !important; }
+        .admin-only-inline, .supervisor-only-inline { display: none !important; }
+        
+        /* Basis Admin Rechte (kann vom Supervisor per JS überschrieben werden) */
         body.is-admin .admin-only-block { display: block !important; }
         body.is-admin .admin-only-flex { display: flex !important; }
         body.is-admin .admin-only-inline { display: inline-flex !important; }
+        
+        /* Absolute Supervisor Rechte (Immer sichtbar) */
+        body.is-supervisor .admin-only-block, body.is-supervisor .supervisor-only-block { display: block !important; }
+        body.is-supervisor .admin-only-flex, body.is-supervisor .supervisor-only-flex { display: flex !important; }
+        body.is-supervisor .admin-only-inline, body.is-supervisor .supervisor-only-inline { display: inline-flex !important; }
+
+        /* Dynamische Admin Module Hide Classes (Gesteuert durch Supervisor) */
+        .hide-module-perm { display: none !important; }
 
         /* Scrollbar Design */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -164,9 +174,9 @@
         @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-colon { animation: blinkColon 1s steps(1) infinite; }
         
-        /* Visitor Heart Animation Fix (Ohne rote Linie) */
+        /* Visitor Heart Animation */
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
-        .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; text-decoration: none !important; border: none !important; outline: none !important; margin: 15px 0; }
+        .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; }
 
         .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
         .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
@@ -181,10 +191,12 @@
         .key-ring:hover { background: rgba(230,0,0,0.2); }
         .key-icon-wrapper { display: flex; align-items: center; justify-content: center; }
         .key-icon-wrapper i { color: #fff; font-size: 16px; transition: 0.3s; }
+        
+        /* Key Icon Status Colors */
         body.is-admin .key-icon-wrapper i { color: #25D366; }
         body.is-supervisor .key-icon-wrapper i { color: #ff00ff; }
 
-        /* Notification Badge auf dem Schlüssel nur für ADMIN sichtbar */
+        /* Notification Badge (nur für ADMIN / SUPERVISOR sichtbar) */
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
         body.is-admin .notification-badge { display: flex !important; }
         
@@ -245,6 +257,9 @@
 
         /* Widget Modal */
         #widgetModalOverlay .custom-dialog-window { max-width: 380px; border-top-color: #fff; box-shadow: 0 20px 50px rgba(255,255,255,0.05); }
+
+        /* Supervisor Perms Modal */
+        #supervisorPermsOverlay .custom-dialog-window { max-width: 450px; border-top-color: #ff00ff; box-shadow: 0 20px 50px rgba(255,0,255,0.15); }
 
         /* Admin Termin Karten */
         .admin-list-wrapper { max-height: 350px; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
@@ -393,7 +408,7 @@
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
             
             .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
-            .hero { margin-top: 15px; } /* V51: Mehr Platz oben */
+            .hero { margin-top: 5px; } 
             .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
             
             .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
@@ -415,7 +430,7 @@
             .tuev-plakette { width: 14px; height: 14px; font-size: 7px; }
         }
 
-        /* Admin Info Container (Collapsible) */
+        /* Admin Info Container (Erweitert & Collapsible) */
         .admin-details { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
         .admin-details summary { padding: 15px 20px; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; }
         .admin-details summary::-webkit-details-marker { display: none; }
@@ -623,11 +638,11 @@
                     <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="Benutzername eingeben">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Passwort eingeben">
+                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Master-Passwort eingeben">
                 </div>
                 
                 <label class="noble-checkbox-label" style="justify-content: center;">
-                    <input type="checkbox" class="cookie-checkbox" id="rememberMe">
+                    <input type="checkbox" id="rememberMe">
                     <span class="cookie-checkbox-box" style="margin-right: 8px;"></span>
                     Anmeldung für das nächste Mal merken
                 </label>
@@ -639,13 +654,56 @@
                 <h3 style="color:var(--primary-red); font-weight:900;"><i class="fa-solid fa-user-shield"></i> Live-Leads Terminal</h3>
                 <p style="font-size:12px; color:var(--text-muted);">Angemeldet als: <strong id="loggedInUser"></strong></p>
                 
-                <div style="margin-top:15px; display:flex; justify-content:center; gap:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
-                    <button class="btn-primary" style="background:transparent; border:1px solid #b38728; color:#b38728; padding:8px 15px;" onclick="window.changePassPrompt()"><i class="fa-solid fa-key"></i> Passwort ändern</button>
-                    <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; padding:8px 15px;" onclick="window.triggerLogoutConfirm()"><i class="fa-solid fa-right-from-bracket"></i> Abmelden</button>
+                <div style="margin-top:15px; display:flex; justify-content:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
+                    <button class="btn-primary" style="background:transparent; border:1px solid #b38728; color:#b38728; padding:8px 15px; flex:1;" onclick="window.changePassPrompt()"><i class="fa-solid fa-key"></i> Passwort</button>
+                    <!-- V52: Supervisor Rechte Button -->
+                    <button class="btn-primary supervisor-only-inline" style="background:transparent; border:1px solid #ff00ff; color:#ff00ff; padding:8px 15px; flex:1;" onclick="window.openSupervisorPanel()"><i class="fa-solid fa-crown"></i> Rechte</button>
+                    <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; padding:8px 15px; flex:1;" onclick="window.triggerLogoutConfirm()"><i class="fa-solid fa-right-from-bracket"></i> Abmelden</button>
                 </div>
 
-                <div class="admin-list-wrapper" id="admin-list"></div>
+                <div class="admin-list-wrapper hide-module-perm" id="admin-module-leads">
+                    <div id="admin-list"></div>
+                </div>
+                <p id="leads-locked-msg" style="display:none; color:var(--text-muted); font-size:11px; margin-top:20px;"><i class="fa-solid fa-lock"></i> Der Supervisor hat diesen Bereich für Administratoren gesperrt.</p>
             </div>
+        </div>
+    </div>
+
+    <!-- Supervisor Permissions Modal (V52) -->
+    <div class="custom-dialog-overlay" id="supervisorPermsOverlay">
+        <div class="custom-dialog-window" style="max-width: 450px; border-top-color: #ff00ff; box-shadow: 0 20px 50px rgba(255,0,255,0.15);">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeSupervisorPanel()"></i>
+            <h3 style="color:#ff00ff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-crown"></i> Supervisor Control Center</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px; text-align:left;">Legen Sie hier fest, welche Bereiche und Module der normale Administrator ("Tamer Yazici") sehen und bearbeiten darf. Neue Code-Blöcke sind standardmäßig gesperrt.</p>
+            
+            <div style="text-align:left; background:rgba(0,0,0,0.4); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:20px;">
+                <label class="noble-checkbox-label" style="display:flex; margin-top:0; margin-bottom:10px;">
+                    <input type="checkbox" id="permLeads">
+                    <span class="cookie-checkbox-box"></span> Live-Leads Terminal (Terminliste)
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
+                    <input type="checkbox" id="permCustomblocks">
+                    <span class="cookie-checkbox-box"></span> Infoblock Manager (Bausteine)
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
+                    <input type="checkbox" id="permCompanydata">
+                    <span class="cookie-checkbox-box"></span> Firmendaten & Impressum bearbeiten
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
+                    <input type="checkbox" id="permForms">
+                    <span class="cookie-checkbox-box"></span> Formulare & PDF Manager
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
+                    <input type="checkbox" id="permCars">
+                    <span class="cookie-checkbox-box"></span> Auto Ankauf Galerie Manager
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:0;">
+                    <input type="checkbox" id="permTicker">
+                    <span class="cookie-checkbox-box"></span> Ticker & Info-Leiste bearbeiten
+                </label>
+            </div>
+            
+            <button class="btn-primary" style="background:#ff00ff; width:100%; justify-content:center;" onclick="window.saveSupervisorPerms()">Berechtigungen anwenden</button>
         </div>
     </div>
 
@@ -684,7 +742,7 @@
         <div class="custom-dialog-window" style="border-top-color:var(--primary-red); max-width:380px;">
             <i class="fa-solid fa-right-from-bracket" style="font-size:40px; color:var(--primary-red); margin-bottom:15px;"></i>
             <h3>Abmelden?</h3>
-            <p style="color:var(--text-muted); font-size:12px; margin:10px 0 20px;">Sind Sie sicher, dass Sie sich aus dem Admin-Bereich abmelden möchten?</p>
+            <p style="color:var(--text-muted); font-size:12px; margin:10px 0 20px;">Sind Sie sicher, dass Sie sich abmelden möchten?</p>
             <div style="display:flex; gap:10px;">
                 <button class="btn-primary" style="background:transparent; border:1px solid #333; color:#fff; flex:1; justify-content:center;" onclick="window.cancelLogout()">Nein</button>
                 <button class="btn-primary" style="flex:1; justify-content:center;" onclick="window.executeLogout()">Ja, Abmelden</button>
@@ -832,9 +890,9 @@
     <!-- ========================================== -->
     <div id="view-home" class="view-section active">
         
-        <!-- ADMIN AREA: Aufklappbare Module -->
+        <!-- V52: ADMIN AREA: Aufklappbare Module mit Rechteprüfung -->
         <div class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 20px auto 0;">
-            <details class="admin-details">
+            <details class="admin-details hide-module-perm" id="admin-module-customblock">
                 <summary><span style="color:#007aff;"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span></summary>
                 <div class="admin-details-content">
                     
@@ -850,7 +908,6 @@
                         </div>
                     </div>
 
-                    <!-- Titel Styling -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Titel Schriftart</label>
@@ -874,7 +931,6 @@
                         </div>
                     </div>
 
-                    <!-- Media & Border -->
                     <div class="form-row" style="margin-top: 5px;">
                         <div class="form-group">
                             <label>Rahmendicke (Border)</label>
@@ -886,15 +942,14 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Bild / Video Hochladen (Optional)</label>
+                            <label>Bild / Video (Firebase Storage)</label>
                             <label class="noble-file-upload" style="margin-top:0;">
                                 <input type="file" id="cbMediaFile" accept="image/*,video/*" onchange="window.updateCbFileLabel(this)">
-                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-upload"></i> Durchsuchen</span>
+                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Banner Options mit Emojis Select -->
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
                         <label style="color:var(--primary-red); font-size:11px; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-flag"></i> Integriertes Banner (Wie "Sofortkennzeichen")</label>
                         <div class="form-row" style="margin-top:10px;">
@@ -942,7 +997,6 @@
                         </div>
                     </div>
 
-                    <!-- Text Area & Text Styling -->
                     <div class="form-group">
                         <textarea id="cbText" class="form-control" rows="3" placeholder="Beschreibungstext..." style="resize:vertical;"></textarea>
                     </div>
@@ -970,13 +1024,13 @@
                         </div>
                     </div>
 
-                    <button class="btn-primary" style="background:#007aff; width:100%; justify-content:center; margin-top:10px;" onclick="window.addCustomBlock()">Baustein Erstellen & Veröffentlichen</button>
+                    <button class="btn-primary" id="btnCustomBlockUpload" style="background:#007aff; width:100%; justify-content:center; margin-top:10px;" onclick="window.addCustomBlock(event)">Baustein Erstellen & Veröffentlichen</button>
                     
                     <div id="adminBlocksList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px; text-align:left;"></div>
                 </div>
             </details>
 
-            <details class="admin-details">
+            <details class="admin-details hide-module-perm" id="admin-module-companydata">
                 <summary><span style="color:#ffcc00;"><i class="fa-solid fa-address-card"></i> Firmendaten & Impressum bearbeiten</span></summary>
                 <div class="admin-details-content">
                     <div class="form-row">
@@ -1132,7 +1186,7 @@
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
         </div>
         
-        <div id="adminFormSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.15); border-radius: 15px; padding: 20px;">
+        <div id="adminFormSection" class="admin-workspace-box admin-only-block hide-module-perm" style="max-width:800px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.15); border-radius: 15px; padding: 20px;">
             <h4 style="color:var(--primary-red); margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-folder-plus"></i> Admin: Neues Formular hinzufügen</h4>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <input type="text" id="newFormTitle" class="form-control" placeholder="Titel" style="flex:1; margin-bottom:0;">
@@ -1160,17 +1214,17 @@
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
         </div>
         
-        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border-color: rgba(179,135,40,0.2); border-radius: 15px; padding: 20px;">
-            <h4 style="color:#b38728; margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Ankauf Galerie - Unbegrenzt)</h4>
+        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block hide-module-perm" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border-color: rgba(179,135,40,0.2); border-radius: 15px; padding: 20px;">
+            <h4 style="color:#b38728; margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Firebase Storage)</h4>
             <div class="config-row" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                 <input type="text" id="newCarTitle" class="form-control" placeholder="Modellname" style="flex:1; margin-bottom:0;">
                 
                 <label class="noble-file-upload" style="flex:1; margin-top:0;">
                     <input type="file" id="newCarFile" accept="image/*,video/*" onchange="window.updateFileLabel(this)">
-                    <span class="noble-file-trigger" id="fileLabelText"><i class="fa-solid fa-folder-open"></i> Datei auswählen</span>
+                    <span class="noble-file-trigger" id="fileLabelText"><i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen</span>
                 </label>
                 
-                <button class="btn-primary" style="background:#b38728;" onclick="window.uploadNewCarMedia()">Veröffentlichen</button>
+                <button class="btn-primary" id="btnUploadCar" style="background:#b38728;" onclick="window.uploadNewCarMedia(event)">Veröffentlichen</button>
             </div>
         </div>
 
@@ -1220,7 +1274,6 @@
             <div style="background:var(--glass-bg); padding:20px; border-radius:18px; border:1px solid var(--glass-border);">
                 <h3 style="font-size:14px;"><i class="fa-solid fa-phone" style="color:var(--primary-red);"></i> Support-Hotlines</h3>
                 <p style="margin-top:5px; font-size:12px;" class="live-phone">0178 378 38 75</p>
-                <!-- WhatsApp Sync -->
                 <a href="#" id="wa-contact-btn" target="_blank" class="btn-primary" style="background:#25D366; margin-top:10px; width:100%; justify-content:center;"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> WhatsApp Chat</a>
             </div>
             
@@ -1262,7 +1315,6 @@
 
     <!-- Initiale Oberflächen Interaktion -->
     <script>
-        // Globale Daten
         window.currentWeatherData = null;
         window.modalClockInterval = null;
         window.dynamicContactData = { 
@@ -1272,27 +1324,70 @@
             ig: 'https://instagram.com/red_zulassungsdienst', 
             fb: '#' 
         };
+        // V52: Default Admin Permissions State
+        window.adminPermissions = {
+            leads: false,
+            customblocks: false,
+            companydata: false,
+            forms: false,
+            cars: false,
+            ticker: false
+        };
 
         window.applyContactInfo = function(data) {
             if(!data) return;
             window.dynamicContactData = data;
-            
             document.querySelectorAll('.live-phone').forEach(el => el.innerText = data.phone);
             document.querySelectorAll('.live-email').forEach(el => el.innerText = data.email);
-            
             document.getElementById('link-ig').href = data.ig;
             document.getElementById('link-fb').href = data.fb;
-            
             let waPhone = data.phone.replace(/\\D/g,'');
             if(waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
             document.getElementById('wa-contact-btn').href = "https://wa.me/" + waPhone;
             document.getElementById('menu-wa-link').href = "https://wa.me/" + waPhone;
-            
             document.getElementById('email-contact-btn').href = "mailto:" + data.email;
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // V52: UI Module Enforcement Logic
+        window.applyAdminModulePermissions = function(perms) {
+            if(!perms) return;
+            window.adminPermissions = perms;
+            const isSuper = window.loggedInUser === 'musadmin';
+            const isAdmin = window.loggedInUser === 'Tamer Yazici';
             
+            // Checkboxen im Supervisor-Panel syncen
+            if(document.getElementById('permLeads')) {
+                document.getElementById('permLeads').checked = perms.leads;
+                document.getElementById('permCustomblocks').checked = perms.customblocks;
+                document.getElementById('permCompanydata').checked = perms.companydata;
+                document.getElementById('permForms').checked = perms.forms;
+                document.getElementById('permCars').checked = perms.cars;
+                document.getElementById('permTicker').checked = perms.ticker;
+            }
+
+            // Sichtbarkeit für normalen Admin anwenden
+            if(isAdmin) {
+                document.getElementById('admin-module-leads').style.display = perms.leads ? 'block' : 'none';
+                document.getElementById('leads-locked-msg').style.display = perms.leads ? 'none' : 'block';
+                
+                document.getElementById('admin-module-customblock').style.display = perms.customblocks ? 'block' : 'none';
+                document.getElementById('admin-module-companydata').style.display = perms.companydata ? 'block' : 'none';
+                document.getElementById('adminFormSection').style.display = perms.forms ? 'block' : 'none';
+                document.getElementById('adminAnkaufSection').style.display = perms.cars ? 'block' : 'none';
+                document.getElementById('adminTickerIcon').style.display = perms.ticker ? 'block' : 'none';
+            } else if(isSuper) {
+                // Supervisor sieht alles bedingungslos
+                document.getElementById('admin-module-leads').style.display = 'block';
+                document.getElementById('leads-locked-msg').style.display = 'none';
+                document.getElementById('admin-module-customblock').style.display = 'block';
+                document.getElementById('admin-module-companydata').style.display = 'block';
+                document.getElementById('adminFormSection').style.display = 'block';
+                document.getElementById('adminAnkaufSection').style.display = 'block';
+                document.getElementById('adminTickerIcon').style.display = 'block';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
             const savedContact = JSON.parse(localStorage.getItem('red_contact'));
             if(savedContact) window.applyContactInfo(savedContact);
 
@@ -1429,7 +1524,7 @@
                 flatpickr("#datePicker", {
                     locale: "de", 
                     minDate: "today", 
-                    disableMobile: "true", 
+                    disableMobile: true, 
                     dateFormat: "d.m.Y", 
                     disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
                     onChange: function(selectedDates, dateStr, instance) {
@@ -1478,7 +1573,7 @@
                 if(input.files && input.files[0]) {
                     labelText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color:#25D366;"></i> ${input.files[0].name}`;
                 } else {
-                    labelText.innerHTML = `<i class="fa-solid fa-upload"></i> Durchsuchen`;
+                    labelText.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen`;
                 }
             };
 
@@ -1488,23 +1583,29 @@
                 document.getElementById('dynamic-client-section-ankauf').innerHTML = '';
                 
                 const adminList = document.getElementById('adminBlocksList');
-                adminList.innerHTML = '';
+                if(adminList) adminList.innerHTML = '';
 
                 if(!blocksList || blocksList.length === 0) return;
 
                 blocksList.forEach(block => {
-                    const adminEl = document.createElement('div');
-                    adminEl.style.cssText = "background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border-left:3px solid #007aff; display:flex; justify-content:space-between; align-items:center;";
-                    adminEl.innerHTML = `
-                        <div><strong style="color:#007aff; font-size:12px;">${block.title}</strong><br><span style="font-size:10px; color:#aaa;">Seite: ${block.page}</span></div>
-                        <button class="apt-btn delete" onclick="window.deleteCustomBlock('${block.id}')"><i class="fa-solid fa-trash-can"></i></button>
-                    `;
-                    adminList.appendChild(adminEl);
+                    if(adminList) {
+                        const adminEl = document.createElement('div');
+                        adminEl.style.cssText = "background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border-left:3px solid #007aff; display:flex; justify-content:space-between; align-items:center;";
+                        adminEl.innerHTML = `
+                            <div><strong style="color:#007aff; font-size:12px;">${block.title}</strong><br><span style="font-size:10px; color:#aaa;">Seite: ${block.page}</span></div>
+                            <button class="apt-btn delete" onclick="window.deleteCustomBlock('${block.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                        `;
+                        adminList.appendChild(adminEl);
+                    }
 
                     let mediaHtml = '';
                     if(block.mediaUrl && block.mediaUrl.trim() !== '') {
-                        if(block.mediaUrl.includes('video/') || block.mediaUrl.endsWith('.mp4') || block.mediaUrl.startsWith('blob:')) {
+                        if(block.mediaUrl.includes('video/') || block.mediaUrl.endsWith('.mp4') || block.mediaUrl.startsWith('blob:') || block.mediaUrl.includes('firebasestorage')) {
                             mediaHtml = `<div class="dynamic-block-media"><video src="${block.mediaUrl}" controls autoplay loop muted></video></div>`;
+                            // Quick guess if it's an image despite complex URL, normally we'd check metadata
+                            if(block.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || block.mediaUrl.includes('alt=')) {
+                                mediaHtml = `<div class="dynamic-block-media"><img src="${block.mediaUrl}" alt="${block.title}"></div>`;
+                            }
                         } else {
                             mediaHtml = `<div class="dynamic-block-media"><img src="${block.mediaUrl}" alt="${block.title}"></div>`;
                         }
@@ -1533,9 +1634,6 @@
                     }
                 });
             };
-            
-            const localBlocks = JSON.parse(localStorage.getItem('red_customblocks')) || [];
-            window.renderCustomBlocks(localBlocks);
         });
 
         window.showToast = function(msg, type='success') {
@@ -1567,8 +1665,27 @@
         };
         
         window.toggleMenu = function() { document.getElementById('quickMenu').classList.toggle('active'); };
-        window.openAdmin = function() { document.getElementById('adminModal').classList.add('open'); };
+        
+        // V52: Admin Trigger Login Modals
+        window.openAdmin = function() { 
+            if(window.isAuthorized) {
+                document.getElementById('adminModal').classList.add('open'); 
+            } else {
+                document.getElementById('authBox').style.display = 'block';
+                document.getElementById('dashboardBox').style.display = 'none';
+                document.getElementById('adminModal').classList.add('open'); 
+            }
+        };
         window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
+        
+        // V52: Supervisor Modal Control
+        window.openSupervisorPanel = function() {
+            document.getElementById('supervisorPermsOverlay').classList.add('open');
+        };
+        window.closeSupervisorPanel = function() {
+            document.getElementById('supervisorPermsOverlay').classList.remove('open');
+        };
+
         window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
         window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
 
@@ -1591,7 +1708,6 @@
             if(!isActive) card.classList.add('reveal-active');
         };
 
-        // Pointer Events Drag and Drop (Mobil- und Desktopkompatibel)
         window.makeDraggable = function(elmnt, id) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             
@@ -1640,10 +1756,12 @@
         };
     </script>
 
-    <!-- Firebase Datenbank Anbindung -->
+    <!-- V52: Firebase Storage & Firestore Anbindung -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // V52: Import Firebase Storage
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         // Konfigurationsdaten
         const firebaseConfig = {
@@ -1656,129 +1774,58 @@
         };
 
         let db;
+        let storage;
         try {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
+            storage = getStorage(app); // V52 Storage Initialize
         } catch(err) {
             console.error("Firebase konnte nicht initialisiert werden.", err);
         }
 
-        // V51: MULTI ADMIN & SUPERVISOR LOGIK
-        let savedPasswords = JSON.parse(localStorage.getItem('red_admin_passwords')) || {};
-        window.admins = {
-            "Tamer Yazici": { pass: savedPasswords["Tamer Yazici"] || "616161", role: "admin" },
-            "musadmin": { pass: savedPasswords["musadmin"] || "25361980", role: "supervisor" }
-        };
-        window.isAuthorized = false;
-        window.loggedInUser = null;
+        // Supervisor Perms Save Function
+        window.saveSupervisorPerms = async function() {
+            const perms = {
+                leads: document.getElementById('permLeads').checked,
+                customblocks: document.getElementById('permCustomblocks').checked,
+                companydata: document.getElementById('permCompanydata').checked,
+                forms: document.getElementById('permForms').checked,
+                cars: document.getElementById('permCars').checked,
+                ticker: document.getElementById('permTicker').checked,
+                timestamp: Date.now()
+            };
 
-        if(localStorage.getItem('red_admin_saved') === 'true') {
-            const savedUser = localStorage.getItem('red_logged_in_user') || "Tamer Yazici";
-            
-            if (window.admins[savedUser]) {
-                window.isAuthorized = true;
-                window.loggedInUser = savedUser;
-                document.body.classList.add('is-admin');
-                if(window.admins[savedUser].role === "supervisor") {
-                    document.body.classList.add('is-supervisor');
+            if(db) {
+                try {
+                    await setDoc(doc(db, "settings", "admin_permissions"), perms);
+                    window.showToast('Rechte für Admin erfolgreich aktualisiert!', 'success');
+                } catch(e) {
+                    localStorage.setItem('red_admin_perms', JSON.stringify(perms));
+                    window.applyAdminModulePermissions(perms);
+                    window.showToast('Lokal gespeichert (Firebase Rechte fehlten).', 'success');
                 }
-                document.getElementById('authBox').style.display = 'none';
-                document.getElementById('dashboardBox').style.display = 'block';
-                
-                // Wait for DOM to insert name correctly
-                document.addEventListener('DOMContentLoaded', () => {
-                    if(document.getElementById('loggedInUser')) {
-                        document.getElementById('loggedInUser').innerText = savedUser;
-                    }
-                });
-            } else {
-                localStorage.removeItem('red_admin_saved');
-                localStorage.removeItem('red_logged_in_user');
             }
-        }
-
-        window.tryLogin = function() {
-            const u = document.getElementById('adminUser').value.trim();
-            const p = document.getElementById('adminPass').value;
-            const remember = document.getElementById('rememberMe').checked;
-            
-            if(window.admins[u] && window.admins[u].pass === p) {
-                window.isAuthorized = true;
-                window.loggedInUser = u;
-                document.body.classList.add('is-admin');
-                
-                if(window.admins[u].role === "supervisor") {
-                    document.body.classList.add('is-supervisor');
-                }
-                
-                if(remember) {
-                    localStorage.setItem('red_admin_saved', 'true');
-                    localStorage.setItem('red_logged_in_user', u);
-                }
-                
-                document.getElementById('authBox').style.display = 'none';
-                document.getElementById('dashboardBox').style.display = 'block';
-                document.getElementById('loggedInUser').innerText = u;
-                window.showToast('Erfolgreich als ' + u + ' angemeldet.', 'success');
-            } else {
-                window.showToast('Zugriff verweigert! Falscher Name oder Passwort.', 'error');
-            }
-        };
-        
-        window.triggerLogoutConfirm = function() { document.getElementById('logoutConfirmOverlay').classList.add('open'); };
-        window.cancelLogout = function() { document.getElementById('logoutConfirmOverlay').classList.remove('open'); };
-        window.executeLogout = function() {
-            window.isAuthorized = false;
-            window.loggedInUser = null;
-            document.body.classList.remove('is-admin');
-            document.body.classList.remove('is-supervisor');
-            localStorage.removeItem('red_admin_saved');
-            localStorage.removeItem('red_logged_in_user');
-            
-            document.getElementById('adminUser').value = '';
-            document.getElementById('adminPass').value = '';
-            document.getElementById('dashboardBox').style.display = 'none';
-            document.getElementById('authBox').style.display = 'block';
-            
-            window.cancelLogout();
-            window.showToast('Erfolgreich abgemeldet.', 'success');
+            window.closeSupervisorPanel();
         };
 
-        window.changePassPrompt = function() {
-            if(!window.isAuthorized) return;
-            document.getElementById('passChangeOverlay').classList.add('open');
-        };
-        window.closePassPrompt = function() {
-            document.getElementById('passChangeOverlay').classList.remove('open');
-            document.getElementById('newPassInput').value = '';
-        };
-        window.confirmPassChange = function() {
-            const newP = document.getElementById('newPassInput').value;
-            if(newP && newP.trim().length > 3) {
-                window.admins[window.loggedInUser].pass = newP;
-                let savedPasswords = JSON.parse(localStorage.getItem('red_admin_passwords')) || {};
-                savedPasswords[window.loggedInUser] = newP;
-                localStorage.setItem('red_admin_passwords', JSON.stringify(savedPasswords));
-                
-                window.closePassPrompt();
-                window.showToast('Passwort für ' + window.loggedInUser + ' geändert!', 'success');
-            } else {
-                window.showToast('Ungültiges Passwort (min. 4 Zeichen)!', 'error');
-            }
-        };
-        
         if(db) {
+            // V52: Permissions Sync
+            onSnapshot(doc(db, "settings", "admin_permissions"), (docSnap) => {
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    window.applyAdminModulePermissions(data);
+                } else {
+                    // Default if not set in DB
+                    window.applyAdminModulePermissions(window.adminPermissions);
+                }
+            });
+            
+            // Visitor Sync
             const visitorDocRef = doc(db, "settings", "visitors");
             let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
-            
             try {
-                setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {
-                    localCount++;
-                    localStorage.setItem('vCountFin', localCount);
-                    document.querySelectorAll('#vCount').forEach(el => el.innerText = localCount.toLocaleString('de-DE'));
-                });
+                setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {});
             } catch(e) {}
-            
             onSnapshot(visitorDocRef, (docSnap) => {
                 if(docSnap.exists()) {
                     const count = docSnap.data().count || 0;
@@ -1786,6 +1833,7 @@
                 }
             });
             
+            // Contact Sync
             onSnapshot(doc(db, "settings", "contact"), (docSnap) => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
@@ -1816,6 +1864,7 @@
                 }
             };
             
+            // Custom Blocks Sync
             onSnapshot(collection(db, "customblocks"), (snapshot) => {
                 if(!snapshot.empty) {
                     const blocksData = [];
@@ -1827,7 +1876,10 @@
                 }
             });
 
-            window.addCustomBlock = async function() {
+            // V52: Firebase Storage Custom Block Upload
+            window.addCustomBlock = async function(event) {
+                const btn = event.target;
+                const originalText = btn.innerText;
                 const title = document.getElementById('cbTitle').value;
                 const icon = document.getElementById('cbIcon').value;
                 const page = document.getElementById('cbPage').value;
@@ -1851,7 +1903,7 @@
 
                 const fileInput = document.getElementById('cbMediaFile');
                 
-                const finishAdding = async (mediaUrl) => {
+                const saveToFirestore = async (mediaUrl) => {
                     const data = { 
                         title, icon, page, text, 
                         titleFont, titleSize, titleColor,
@@ -1868,22 +1920,41 @@
                         localBlocks.push({id: 'cb-'+Date.now(), ...data, timestamp: Date.now()});
                         localStorage.setItem('red_customblocks', JSON.stringify(localBlocks));
                         window.renderCustomBlocks(localBlocks);
-                        window.showToast('Lokal hinzugefügt.', 'success');
+                        window.showToast('Lokal hinzugefügt (Fehlende DB Rechte).', 'success');
                     }
                     
                     document.getElementById('cbTitle').value = '';
                     document.getElementById('cbText').value = '';
                     document.getElementById('cbBannerText').value = '';
                     fileInput.value = '';
-                    document.getElementById('cbFileLabelText').innerHTML = `<i class="fa-solid fa-upload"></i> Durchsuchen`;
+                    document.getElementById('cbFileLabelText').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen`;
+                    btn.innerText = originalText;
+                    btn.disabled = false;
                 };
 
-                if(fileInput.files && fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) { finishAdding(e.target.result); };
-                    reader.readAsDataURL(fileInput.files[0]);
+                if(fileInput.files && fileInput.files[0] && storage) {
+                    btn.innerText = 'Upload läuft...';
+                    btn.disabled = true;
+                    const file = fileInput.files[0];
+                    const storageRef = ref(storage, 'blocks/' + Date.now() + '_' + file.name);
+                    const uploadTask = uploadBytesResumable(storageRef, file);
+
+                    uploadTask.on('state_changed', 
+                        null, 
+                        (error) => { 
+                            window.showToast('Storage Upload Fehler.', 'error');
+                            // Fallback to local Base64 if storage fails
+                            const reader = new FileReader();
+                            reader.onload = function(e) { saveToFirestore(e.target.result); };
+                            reader.readAsDataURL(file);
+                        }, 
+                        async () => {
+                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                            saveToFirestore(downloadURL);
+                        }
+                    );
                 } else {
-                    finishAdding('');
+                    saveToFirestore('');
                 }
             };
 
@@ -1901,6 +1972,7 @@
                 }
             }
 
+            // Ticker Konfiguration
             window.openTickerConfig = function() {
                 if(!window.isAuthorized) return;
                 document.getElementById('tickerConfigOverlay').classList.add('open');
@@ -1960,7 +2032,7 @@
                     });
                     window.showToast('Ticker in Firebase gespeichert!', 'success');
                 } catch(e) {
-                    window.showToast('Lokal angewendet (Fehlende Firebase Rechte).', 'error');
+                    window.showToast('Lokal angewendet.', 'error');
                     applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
                 }
                 window.closeTickerConfig(); 
@@ -2307,6 +2379,7 @@
                     service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
                 };
 
+                // Speichern in Firebase
                 try {
                     const fbData = {...appointmentData}; delete fbData.id; fbData.timestamp = serverTimestamp();
                     await addDoc(collection(db, "appointments"), fbData);
@@ -2349,7 +2422,7 @@
                 window.chosenHour = null;
             };
 
-            // Formular Logik
+            // V52: Firebase Storage f. Formulare (Triggered Upload)
             const staticForms = [
                 {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
                 {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
@@ -2365,6 +2438,12 @@
                 {id: 'static-12', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'}
             ];
 
+            let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
+            if(!localForms || localForms.length === 0) {
+                localForms = staticForms;
+                localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+            }
+
             function renderForms(formsList) {
                 const grid = document.getElementById('formItemsGrid');
                 grid.innerHTML = '';
@@ -2378,7 +2457,7 @@
                     element.innerHTML = `
                         <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="${form.title}">${form.title}</span></div>
                         <div class="download-actions">
-                            <i class="fa-solid fa-upload admin-up admin-only-inline" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
+                            <i class="fa-solid fa-cloud-arrow-up admin-up admin-only-inline" title="In Firebase Storage hochladen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
                             <i class="fa-solid fa-trash-can admin-del admin-only-inline" title="Formular löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
                             
                             <i class="fa-solid fa-eye user-view" title="Ansehen / Öffnen" onclick="event.stopPropagation(); window.openForm(this)"></i>
@@ -2387,12 +2466,6 @@
                     `;
                     grid.appendChild(element);
                 });
-            }
-            
-            let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
-            if(!localForms || localForms.length === 0) {
-                localForms = staticForms;
-                localStorage.setItem('red_local_forms', JSON.stringify(localForms));
             }
 
             onSnapshot(collection(db, "forms"), (snapshot) => {
@@ -2421,27 +2494,56 @@
                     localForms.push({id: 'local-form-'+Date.now(), title, url});
                     localStorage.setItem('red_local_forms', JSON.stringify(localForms));
                     renderForms(localForms);
-                    window.showToast('Rechte-Fehler. Lokal hinzugefügt.', 'error');
+                    window.showToast('Lokal hinzugefügt.', 'error');
                 }
             };
 
+            // V52: Form Upload strictly to Storage
             window.triggerAdminUpload = function(iconEl, formId) {
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
-                fileInput.accept = '.pdf,.doc,.docx';
+                fileInput.accept = '.pdf,.doc,.docx,.jpg,.png';
                 fileInput.onchange = async e => {
-                    if(e.target.files.length > 0) {
+                    if(e.target.files.length > 0 && storage) {
                         const file = e.target.files[0];
-                        const url = URL.createObjectURL(file); 
-                        try {
-                            await updateDoc(doc(db, "forms", formId), { url: url });
-                            window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
-                        } catch(err) {
-                            iconEl.style.color = '#25D366';
-                            const parentItem = document.getElementById(formId);
-                            if(parentItem) parentItem.setAttribute('data-url', url);
-                            window.showToast('Lokal verknüpft.', 'success');
-                        }
+                        iconEl.className = "fa-solid fa-spinner fa-spin admin-up admin-only-inline";
+                        
+                        const storageRef = ref(storage, 'forms/' + Date.now() + '_' + file.name);
+                        const uploadTask = uploadBytesResumable(storageRef, file);
+
+                        uploadTask.on('state_changed', 
+                            null, 
+                            (error) => { 
+                                window.showToast('Upload gescheitert. Bitte Storage-Rules prüfen!', 'error');
+                                iconEl.className = "fa-solid fa-cloud-arrow-up admin-up admin-only-inline";
+                            }, 
+                            async () => {
+                                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                                try {
+                                    await updateDoc(doc(db, "forms", formId), { url: downloadURL });
+                                    window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
+                                } catch(err) {
+                                    const parentItem = document.getElementById(formId);
+                                    if(parentItem) parentItem.setAttribute('data-url', downloadURL);
+                                    window.showToast('Lokal in DOM verknüpft.', 'success');
+                                }
+                                iconEl.className = "fa-solid fa-cloud-arrow-up admin-up admin-only-inline";
+                                iconEl.style.color = '#25D366';
+                            }
+                        );
+                    } else if(e.target.files.length > 0) {
+                        window.showToast("Firebase Storage nicht geladen. Lokaler Fallback...", "error");
+                        const file = e.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = async function(ev) {
+                            try {
+                                await updateDoc(doc(db, "forms", formId), { url: ev.target.result });
+                                window.showToast('Base64 in DB verknüpft.', 'success');
+                            } catch(err) {
+                                document.getElementById(formId).setAttribute('data-url', ev.target.result);
+                            }
+                        };
+                        reader.readAsDataURL(file);
                     }
                 };
                 fileInput.click();
@@ -2491,7 +2593,7 @@
                 element.classList.add('selected');
             };
 
-            // Auto Ankauf Galerie Sync 
+            // V52: Firebase Storage f. Autos
             const staticCars = [
                 {id: 'car-static-1', title: 'Chevrolet Corvette', mediaUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80'},
                 {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&w=800&q=80'},
@@ -2514,8 +2616,11 @@
                     card.id = car.id; 
                     
                     let mediaHtml = '';
-                    if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:')) {
+                    if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
                        mediaHtml = `<video src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
+                       if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || car.mediaUrl.includes('alt=')) {
+                           mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                       }
                     } else {
                        mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
                     }
@@ -2546,22 +2651,24 @@
                 if(input.files && input.files[0]) {
                     labelText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color:#25D366;"></i> ${input.files[0].name}`;
                 } else {
-                    labelText.innerHTML = `<i class="fa-solid fa-folder-open"></i> Datei auswählen`;
+                    labelText.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen`;
                 }
             };
 
-            window.uploadNewCarMedia = async function() {
+            // V52 Storage Direct Upload
+            window.uploadNewCarMedia = async function(event) {
                 const title = document.getElementById('newCarTitle').value;
                 const fileInput = document.getElementById('newCarFile');
                 if(!title || !fileInput.files[0]) { window.showToast('Bitte Modellnamen und Datei angeben.', 'error'); return; }
                 
                 const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    const mediaUrl = e.target.result; 
+                const btn = event.target;
+                const originalText = btn.innerText;
+
+                const saveToFirestore = async (mediaUrl) => {
                     try {
                         await addDoc(collection(db, "cars"), { title, mediaUrl, timestamp: serverTimestamp() });
-                        window.showToast('Fahrzeug erfolgreich in Firebase veröffentlicht.', 'success');
+                        window.showToast('Fahrzeug in Firebase veröffentlicht.', 'success');
                     } catch(err) {
                         localCars.unshift({id: 'local-car-'+Date.now(), title, mediaUrl});
                         localStorage.setItem('red_local_cars', JSON.stringify(localCars));
@@ -2570,9 +2677,35 @@
                     }
                     document.getElementById('newCarTitle').value = '';
                     fileInput.value = '';
-                    document.getElementById('fileLabelText').innerHTML = `<i class="fa-solid fa-folder-open"></i> Datei auswählen`;
+                    document.getElementById('fileLabelText').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen`;
+                    btn.innerText = originalText;
+                    btn.disabled = false;
                 };
-                reader.readAsDataURL(file);
+
+                if(storage) {
+                    btn.innerText = 'Upload läuft...';
+                    btn.disabled = true;
+                    const storageRef = ref(storage, 'cars/' + Date.now() + '_' + file.name);
+                    const uploadTask = uploadBytesResumable(storageRef, file);
+
+                    uploadTask.on('state_changed', 
+                        null, 
+                        (error) => { 
+                            window.showToast('Firebase Storage Fehler! Fallback...', 'error');
+                            const reader = new FileReader();
+                            reader.onload = function(e) { saveToFirestore(e.target.result); };
+                            reader.readAsDataURL(file);
+                        }, 
+                        async () => {
+                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                            saveToFirestore(downloadURL);
+                        }
+                    );
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) { saveToFirestore(e.target.result); };
+                    reader.readAsDataURL(file);
+                }
             };
             
             window.deleteGalleryImage = async function(cardId) {
