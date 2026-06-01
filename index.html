@@ -4,25 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA WEB APP ICONS & FAVICON -->
+    <!-- Web App Konfiguration -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
     <meta name="application-name" content="RED Zulassung">
     <meta name="theme-color" content="#050507">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 271 83' fill='%23e60000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z'/%3E%3Cpath d='M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z'/%3E%3Cpath d='M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z'/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 271 83' fill='%23e60000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z'/%3E%3Cpath d='M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z'/%3E%3Cpath d='M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z'/%3E%3C/svg%3E">
     
     <title>RED Zulassungsdienst Berlin</title>
     
-    <!-- Fonts & Icons -->
+    <!-- Externe Ressourcen -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Flatpickr Custom Theme -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
     <style>
+        /* Farbpalette und Variablen */
         :root {
             --primary-red: #e60000;
             --dark-red: #8a0000;
@@ -35,7 +36,7 @@
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
-        /* --- MOBILE TOUCH & ANTI-FLICKER ENGINE --- */
+        /* Basis Layout & Mobile Touch Optimierung */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -45,10 +46,9 @@
             -moz-osx-font-smoothing: grayscale; 
         }
 
-        /* Prevent zooming on inputs on iOS */
         input, select, textarea { font-size: 16px !important; }
 
-        /* --- ADMIN SECURITY VISIBILITY ENGINE --- */
+        /* Admin Berechtigungen CSS */
         .admin-only-block { display: none !important; }
         .admin-only-flex { display: none !important; }
         .admin-only-inline { display: none !important; }
@@ -56,19 +56,19 @@
         body.is-admin .admin-only-flex { display: flex !important; }
         body.is-admin .admin-only-inline { display: inline-flex !important; }
 
-        /* --- STYLISH CUSTOM SCROLLBARS --- */
+        /* Scrollbar Design */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #050507; }
         ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #ff1a1a; }
 
-        /* --- BACKGROUND PLATES --- */
+        /* Dekorative Hintergrundelemente */
         .plate-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: -1; overflow: hidden; }
         .plate { position: absolute; background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 5px 15px; border-radius: 5px; border: 2px solid #000; opacity: 0.12; display: flex; align-items: center; gap: 10px; animation: float 22s linear infinite; }
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
 
-        /* --- BULLETPROOF PURE CSS PRELOADER --- */
+        /* Ladebildschirm Animation (Pure CSS, hängt nicht!) */
         #intro-preloader { 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; 
@@ -87,7 +87,7 @@
         .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); animation: fadeText 0.5s ease 1.2s forwards; }
         @keyframes fadeText { 100% { transform: translateY(0); opacity: 1; } }
 
-        /* --- TOAST NOTIFICATIONS --- */
+        /* Systembenachrichtigungen (Toasts) */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast-msg { background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
         .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
@@ -97,7 +97,7 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.9); } }
 
-        /* --- NAVBAR & LOGO ARCHITECTURE --- */
+        /* Navigation */
         #header-wrapper { position: fixed; top: 0; width: 100%; z-index: 1000; }
         nav { padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 7, 0.98); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
@@ -144,7 +144,7 @@
         .quick-menu-btn { background: none; border: 1px solid var(--glass-border); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; transition: 0.3s; }
         .quick-menu-btn:hover { background: rgba(255,255,255,0.1); }
 
-        /* --- DYNAMIC INFO TICKER --- */
+        /* Info Ticker */
         #ticker-container { background: linear-gradient(90deg, #1a0000, #000, #1a0000); border-bottom: 1px solid rgba(255,0,0,0.3); padding: 5px 0; overflow: hidden; white-space: nowrap; position: relative; display: flex; align-items: center; }
         .ticker-text-wrapper { display: inline-block; padding-left: 100%; animation: tickerAnim linear infinite; }
         @keyframes tickerAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
@@ -152,7 +152,7 @@
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
-        /* --- FULLSCREEN MENU --- */
+        /* Fullscreen Menü */
         .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
         .fullscreen-menu.active { opacity: 1; pointer-events: all; }
         .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: white; cursor: pointer; transition: 0.3s; }
@@ -160,7 +160,7 @@
         .fullscreen-menu a { color: white; font-size: 24px; font-weight: 800; text-transform: uppercase; text-decoration: none; margin: 12px 0; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
         .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
 
-        /* --- OVAL DIALOG ARCHITECTURE --- */
+        /* Modale Dialoge */
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
@@ -190,7 +190,7 @@
         #lightboxOverlay .custom-dialog-window { max-width: 600px; border-top-color: #b38728; padding: 25px; }
         #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } 
 
-        /* --- ADMIN ENGINE & CARDS --- */
+        /* Admin Termin Karten */
         .admin-list-wrapper { max-height: 350px; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
         .admin-apt-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; margin-top: 12px; position: relative; border-left: 4px solid #555; text-align: left; transition: 0.3s; }
         .admin-apt-card.marked { border: 1px solid #b38728; background: rgba(179,135,40,0.08); box-shadow: 0 0 15px rgba(179,135,40,0.2); border-left-width: 4px; }
@@ -217,65 +217,68 @@
         .note-row-btn:hover { color: #fff; }
         .note-row-btn.del:hover { color: var(--primary-red); }
 
-        /* --- PINNED PLATE (KENNZEICHEN) WIDGET --- */
-        #pinned-container { position: fixed; bottom: 20px; right: 20px; z-index: 9000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
-        .pinned-plate { background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); pointer-events: all; cursor: pointer; transition: transform 0.3s; animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        .pinned-plate.urgent-today { border-color: #e60000; color: #e60000; animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, urgentGlow 2s 0.5s infinite alternate ease-in-out; }
-        @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); border-color: #e60000; } 100% { box-shadow: 0 10px 30px rgba(230,0,0,1); border-color: #ff4d4d; background: #fffafa; } }
-        
+        /* Draggable Angeheftete Kennzeichen Widget */
+        .pinned-plate { position: fixed; background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); cursor: grab; z-index: 9000; transition: box-shadow 0.3s; user-select: none; }
+        .pinned-plate:active { cursor: grabbing; }
+        .pinned-plate.urgent-today { border-color: #e60000; color: #e60000; animation: urgentGlow 2s infinite alternate ease-in-out; }
+        @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); } 100% { box-shadow: 0 10px 30px rgba(230,0,0,1); } }
         .pinned-plate.normal-day { border-color: #b38728; color: #333; }
-        .pinned-plate:hover { transform: translateY(-5px) scale(1.02); }
         .pinned-plate::before { content: 'D'; background: #003399; color: #fff; padding: 2px 4px; font-size: 12px; border-radius: 3px; }
-        @keyframes slideInPlate { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* --- CHECKBOX FIX --- */
+        /* Formular Checkboxen */
         .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
         .noble-checkbox-label input:checked + .noble-checkbox-box { background: var(--primary-red); border-color: var(--primary-red); }
         .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* --- FILE UPLOAD COMPONENT --- */
+        /* Datei Upload Komponente */
         .noble-file-upload { position: relative; display: block; width: 100%; margin-top: 8px; }
         .noble-file-upload input { display: none; }
         .noble-file-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; display: block; transition: 0.3s; }
         .noble-file-upload input:change + .noble-file-trigger, .noble-file-trigger:hover { border-color: var(--primary-red); color: white; background: rgba(230,0,0,0.04); }
 
-        /* --- TICKER SYMBOL MATRIX --- */
+        /* Ticker Symbol Auswahl */
         .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
 
-        /* --- SPA VIEW SECTIONS --- */
+        /* Container Wechsel Logik */
         .view-section { display: none; animation: viewFadeIn 0.4s ease forwards; padding-top: 30px; min-height: 100vh; }
         .view-section.active { display: block; }
         @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- COMPACT BOOKING FORM --- */
+        /* Termin Formular Styling */
         .booking-wrapper { max-width: 750px; margin: 0 auto; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
         .form-row { display: flex; gap: 15px; }
         @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
         
-        .form-group { position: relative; margin-bottom: 15px; text-align: left; flex: 1; z-index: 10; }
+        /* Z-Index Priority Fix for Form Dropdown */
+        .form-group { position: relative; margin-bottom: 15px; text-align: left; flex: 1; }
+        .form-group.z-high { z-index: 9999 !important; }
+        
         .form-group label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
         .form-control { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; font-family: inherit; font-size: 13px; outline: none; transition: 0.3s; }
         .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 12px rgba(230,0,0,0.3); }
 
-        /* NOBLE CUSTOM DROPDOWN SELECTS */
+        /* Custom Dropdown Selects */
         .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
         .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
         .noble-select-trigger::after { content: '▼'; font-family: sans-serif; font-size: 10px; color: var(--primary-red); transition: 0.3s; }
         .noble-select-box.open .noble-select-trigger::after { transform: rotate(180deg); }
-        .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; overflow: hidden; }
+        .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); display: none; overflow: hidden; z-index: 99999; }
         .noble-select-box.open .noble-options-dropdown { display: block; }
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* --- FLATPICKR CSS FIX --- */
+        /* Kalender Konfiguration */
         .flatpickr-calendar { 
             background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; 
-            border-radius: 15px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
-            font-family: 'Montserrat', sans-serif !important; 
+            border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
+            font-family: 'Montserrat', sans-serif !important; width: 300px !important; 
+            position: fixed !important; top: 50% !important; left: 50% !important; 
+            transform: translate(-50%, -50%) !important; z-index: 999999 !important; display: none; 
+            right: auto !important; bottom: auto !important; margin: 0 !important;
         }
+        .flatpickr-calendar.open { display: block !important; }
         .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--primary-red) !important; border-color: var(--primary-red) !important; color: white !important; }
         .flatpickr-day { color: #fff !important; }
         .flatpickr-current-month, .flatpickr-weekday { color: var(--primary-red) !important; }
@@ -287,11 +290,11 @@
         .time-slot.active { background: var(--primary-red); border-color: var(--primary-red); color: white; }
         .time-slot.booked { opacity: 0.2; text-decoration: line-through; cursor: not-allowed; }
 
-        /* --- GLOBAL BUTTONS --- */
+        /* Globale Buttons */
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* --- MOBILE SCALING & ANTI-FLICKER --- */
+        /* Mobile Ansicht & Responsive Design */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 80px; }
             nav { padding: 10px 3%; }
@@ -321,10 +324,11 @@
             #tickerConfigOverlay .custom-dialog-window { max-height: 85vh; padding: 20px 15px; }
         }
 
-        /* --- HERO & COMPONENTS --- */
+        /* Hauptbereich Container */
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
+        /* Sofortkennzeichen Badge Animation */
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #cc0000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
             padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 30px; 
@@ -340,7 +344,7 @@
         .section-header { text-align: center; margin-bottom: 35px; }
         .section-header h2 { font-size: clamp(22px, 3.5vw, 34px); font-weight: 900; text-transform: uppercase; }
         
-        /* --- SERVICE CARDS --- */
+        /* Leistungskarten */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .card { background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .card:hover { border-color: rgba(230,0,0,0.5); }
@@ -350,7 +354,7 @@
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* --- DOWNLOADS COMPONENT --- */
+        /* Formular Download Bereich */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
@@ -368,7 +372,7 @@
         .admin-del { color: #ff3b30; margin-left: 5px; }
         .admin-del:hover { color: #fff; transform: scale(1.1); }
 
-        /* --- AUTO ANKAUF REAL PICTURE GALLERY --- */
+        /* Auto Ankauf Galerie */
         .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
@@ -383,14 +387,14 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* --- BERLIN KENNZEICHEN WARNING ACCENT --- */
+        /* Kennzeichen Warnung Panel */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
         .plate-text { color: black; font-family: 'Courier New', monospace; font-weight: bold; font-size: 20px; padding: 0 12px; }
         .warning-text { display: flex; align-items: center; gap: 10px; font-size: 13px; color: white; text-align: left; }
 
-        /* --- FOOTER & CONTACT --- */
+        /* Footer und Kontakt */
         .contact-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 50px 5% 20px; }
         .map-box { border-radius: 18px; overflow: hidden; border: 1px solid var(--glass-border); min-height: 250px; }
         .map-box iframe { width: 100%; height: 100%; border: none; filter: grayscale(1) invert(0.9) contrast(1.2); }
@@ -414,8 +418,12 @@
     <!-- Toast Notifications -->
     <div id="toast-container"></div>
 
-    <!-- Angeheftete Termine -->
-    <div id="pinned-container"></div>
+    <!-- Start Preloader Ebene (Pure CSS - Kann niemals hängen bleiben) -->
+    <div id="intro-preloader">
+        <div class="intro-plate" id="introPlate">B <span style="color:var(--primary-red);">-</span> RED 2026</div>
+        <div class="intro-track"><i class="fa-solid fa-car-side intro-car" id="introCar"></i></div>
+        <div class="intro-text" id="introText">Herzlich Willkommen zu Ihrem<br><span style="color:var(--primary-red);">Zulassungsdienst RED Berlin</span></div>
+    </div>
 
     <!-- Hintergrund Matrix -->
     <div class="plate-bg" id="plate-container"></div>
@@ -670,12 +678,8 @@
         </div>
     </div>
 
-    <!-- Start Preloader Ebene (PURE CSS) -->
-    <div id="intro-preloader">
-        <div class="intro-plate" id="introPlate">B <span style="color:var(--primary-red);">-</span> RED 2026</div>
-        <div class="intro-track"><i class="fa-solid fa-car-side intro-car" id="introCar"></i></div>
-        <div class="intro-text" id="introText">Herzlich Willkommen zu Ihrem<br><span style="color:var(--primary-red);">Zulassungsdienst RED Berlin</span></div>
-    </div>
+    <!-- Angeheftete Termine Wrapper -->
+    <div id="pinned-container"></div>
 
     <!-- ========================================== -->
     <!-- VIEW 1: STARTSEITE UND KERNBEREICH         -->
@@ -737,21 +741,21 @@
             <div class="booking-wrapper">
                 <form id="bookingForm" onsubmit="window.executeBooking(event)">
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group z-high">
                             <label>Vor- und Nachname</label>
                             <input type="text" id="formName" class="form-control" placeholder="Name" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group z-high">
                             <label>Telefonnummer</label>
                             <input type="tel" id="formPhone" class="form-control" placeholder="Nummer" required>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
+                    <div class="form-row v18-align-fix">
+                        <div class="form-group z-high">
                             <label>E-Mail Adresse</label>
                             <input type="email" id="formEmail" class="form-control" placeholder="Mail" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group z-high">
                             <label>Anliegen</label>
                             <div class="noble-select-box" id="serviceSelectBox">
                                 <div class="noble-select-trigger" id="selectTriggerText">Zulassung (Neuanmeldung)</div>
@@ -767,7 +771,6 @@
                     
                     <div class="form-group" style="margin-top: 10px;">
                         <label>Wunschdatum</label>
-                        <!-- PURE INPUT NO READONLY -->
                         <input type="text" id="datePicker" class="form-control" placeholder="Wunschdatum auswählen..." style="text-align:center; font-weight:bold; letter-spacing:1px; cursor:pointer;" required>
                     </div>
                     
@@ -908,10 +911,10 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
-    <!-- Initiale Oberflächen Interaktion (SAFE ISOLATION) -->
+    <!-- Initiale Oberflächen Interaktion -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Overlay Klick-Logik
+            
             document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
                 overlay.addEventListener('click', function(e) {
                     if(e.target === this) {
@@ -922,13 +925,12 @@
                 });
             });
 
-            // Kalender Initialisierung (Absolute Garantie)
             window.chosenHour = null;
             try {
                 flatpickr("#datePicker", {
                     locale: "de", 
                     minDate: "today", 
-                    disableMobile: "true", // Dies zwingt das Handy, den schönen Desktop-Kalender zu nehmen!
+                    disableMobile: true, 
                     disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
                     onChange: function(selectedDates, dateStr, instance) {
                         document.getElementById('timeWrapper').style.display = 'block';
@@ -951,10 +953,12 @@
                     }
                 });
             } catch (err) {
-                console.warn('Flatpickr Fehler. Lade Standard-Kalender.');
+                console.warn('Flatpickr Fallback aktiviert.');
+                const dp = document.getElementById('datePicker');
+                dp.type = 'date';
+                dp.addEventListener('change', () => { document.getElementById('submitBtn').disabled = false; window.chosenHour = "Ganztägig"; });
             }
 
-            // Dropdown Logik
             const trigger = document.getElementById('serviceSelectBox');
             window.selectedServiceVal = "Anmeldung";
             trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
@@ -1022,6 +1026,70 @@
             const isActive = card.classList.contains('reveal-active');
             document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
             if(!isActive) card.classList.add('reveal-active');
+        };
+
+        // --- DRAG AND DROP KENNZEICHEN (STECKNADEL) LOGIK ---
+        window.makeDraggable = function(elmnt, id) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            elmnt.onmousedown = dragMouseDown;
+            elmnt.ontouchstart = dragTouchStart;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                // e.preventDefault(); // Nicht blockieren, sonst gehen Klicks verloren!
+                if(e.target.tagName === 'I' || e.target.tagName === 'BUTTON') return;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function dragTouchStart(e) {
+                if(e.target.tagName === 'I' || e.target.tagName === 'BUTTON') return;
+                const touch = e.touches[0];
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                document.ontouchend = closeDragElement;
+                document.ontouchmove = elementTouchDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.bottom = "auto";
+                elmnt.style.right = "auto";
+            }
+
+            function elementTouchDrag(e) {
+                const touch = e.touches[0];
+                pos1 = pos3 - touch.clientX;
+                pos2 = pos4 - touch.clientY;
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.bottom = "auto";
+                elmnt.style.right = "auto";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                document.ontouchend = null;
+                document.ontouchmove = null;
+                
+                // Position dauerhaft lokal sichern
+                let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+                positions[id] = { top: elmnt.style.top, left: elmnt.style.left };
+                localStorage.setItem('pin_positions', JSON.stringify(positions));
+            }
         };
     </script>
 
@@ -1293,6 +1361,9 @@
                 return;
             }
 
+            // Hole alte Positionen für die "Stecknadel"-Kennzeichen
+            let savedPositions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+
             apts.forEach((apt) => {
                 const id = apt.id;
                 const isToday = apt.timeLabel.toLowerCase().includes('heute') || apt.date.includes(new Date().toLocaleDateString('de-DE'));
@@ -1341,6 +1412,7 @@
                 `;
                 list.appendChild(card);
 
+                // Erzeuge das Draggable "Kennzeichen"
                 if (apt.marked) {
                     const plate = document.createElement('div');
                     plate.className = 'pinned-plate';
@@ -1348,9 +1420,23 @@
                     else plate.classList.add('normal-day');
                     
                     plate.id = 'pinned-' + id;
-                    plate.innerHTML = `<span style="font-size:14px;">${apt.name}</span> <span style="font-size:16px;">-</span> <span style="font-size:12px;">${apt.timeLabel}</span>`;
-                    plate.onclick = () => window.openAdmin();
+                    plate.innerHTML = `<span style="font-size:14px; pointer-events:none;">${apt.name}</span> <span style="font-size:16px; pointer-events:none;">-</span> <span style="font-size:12px; pointer-events:none;">${apt.timeLabel}</span>`;
+                    
+                    // Lade alte Position, falls vorhanden
+                    if(savedPositions[id]) {
+                        plate.style.top = savedPositions[id].top;
+                        plate.style.left = savedPositions[id].left;
+                    } else {
+                        // Standard Position unten rechts, gestapelt
+                        const offset = document.querySelectorAll('.pinned-plate').length * 55;
+                        plate.style.bottom = (20 + offset) + 'px';
+                        plate.style.right = '20px';
+                    }
+
                     document.getElementById('pinned-container').appendChild(plate);
+                    
+                    // Aktiviere Drag and Drop (Stecknadel)
+                    window.makeDraggable(plate, id);
                 }
             });
             updateBadgeDisplay(hasPrio, apts.length);
@@ -1471,6 +1557,14 @@
             else if(window.deleteTargetId) {
                 try {
                     await deleteDoc(doc(db, "appointments", window.deleteTargetId));
+                    
+                    // Lösche auch die gemerkte Position, falls vorhanden
+                    let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+                    if(positions[window.deleteTargetId]) {
+                        delete positions[window.deleteTargetId];
+                        localStorage.setItem('pin_positions', JSON.stringify(positions));
+                    }
+                    
                     window.showToast('Termin online gelöscht.', 'success');
                 } catch(e) {
                     localAppointments = localAppointments.filter(a => a.id !== window.deleteTargetId);
@@ -1508,7 +1602,17 @@
                 renderAppointments(localAppointments);
             }
             
-            document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${window.chosenHour || "Ganztägig"} Uhr wurde erfolgreich gespeichert.`;
+            // --- AUTOMATISCHE EMAIL BESTÄTIGUNG ---
+            // Öffnet das E-Mail-Programm des Kunden mit vorgefertigtem Text
+            const emailSubject = encodeURIComponent("Ihre Terminbestätigung bei RED Zulassungsdienst Berlin");
+            const emailBody = encodeURIComponent(`Guten Tag ${n},\n\nvielen Dank für Ihre Buchung bei RED Zulassungsdienst Berlin.\n\nHiermit bestätigen wir Ihren Termin:\n\n📅 Datum: ${d}\n⏰ Uhrzeit: ${window.chosenHour || "Ganztägig"} Uhr\n👨‍💼 Berater: Tamer Yazici\n📍 Ort: Kienitzer Str. 6, 12053 Berlin\n📝 Anliegen: ${window.selectedServiceVal}\n\nBitte bringen Sie alle benötigten Unterlagen im Original mit.\n\nWir freuen uns auf Ihren Besuch!\n\nMit freundlichen Grüßen,\nIhr Team vom RED Zulassungsdienst`);
+            
+            // Verzögerung, damit die UI zuerst lädt, dann öffnet sich das Mail-Fenster
+            setTimeout(() => {
+                window.location.href = `mailto:${e}?subject=${emailSubject}&body=${emailBody}`;
+            }, 800);
+            
+            document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${window.chosenHour || "Ganztägig"} Uhr wurde erfolgreich gespeichert.\n\nWir bereiten soeben Ihre E-Mail Bestätigung vor.`;
             document.getElementById('confirmModalOverlay').classList.add('open');
             
             document.getElementById('bookingForm').reset();
