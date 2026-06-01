@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA WEB APP ICONS & FAVICON (V53 Elite Final Fix) -->
+    <!-- PWA WEB APP ICONS & FAVICON (V54 Elite Ultimate Supervisor Fix) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
@@ -48,23 +48,49 @@
 
         input, select, textarea { font-size: 16px !important; }
 
-        /* Admin & Supervisor Berechtigungen CSS */
-        .admin-only-block, .supervisor-only-block { display: none !important; }
-        .admin-only-flex, .supervisor-only-flex { display: none !important; }
-        .admin-only-inline, .supervisor-only-inline { display: none !important; }
+        /* V54: CSS Basiertes Rollen/Rechte-System (Kugelsicher) */
         
-        /* Basis Admin Rechte (kann vom Supervisor per JS überschrieben werden) */
+        /* 1. Module generell verstecken */
+        .mod-leads, .mod-blocks, .mod-data, .mod-forms, .mod-cars, .mod-ticker { display: none !important; }
+        .action-forms, .action-cars { display: none !important; }
+        .mod-leads-locked { display: none; }
+
+        /* 2. Admin mit Rechten ausrüsten */
+        body.is-admin.perm-leads .mod-leads { display: block !important; }
+        body.is-admin:not(.perm-leads):not(.is-supervisor) .mod-leads-locked { display: block !important; }
+        
+        body.is-admin.perm-blocks .mod-blocks { display: block !important; }
+        body.is-admin.perm-data .mod-data { display: block !important; }
+        body.is-admin.perm-forms .mod-forms { display: block !important; }
+        body.is-admin.perm-cars .mod-cars { display: block !important; }
+        body.is-admin.perm-ticker .mod-ticker { display: flex !important; }
+        
+        body.is-admin.perm-forms .action-forms { display: inline-flex !important; }
+        body.is-admin.perm-cars .action-cars { display: flex !important; }
+
+        /* 3. Supervisor (Darf immer ALLES) */
+        body.is-supervisor .mod-leads,
+        body.is-supervisor .mod-blocks,
+        body.is-supervisor .mod-data,
+        body.is-supervisor .mod-forms,
+        body.is-supervisor .mod-cars { display: block !important; }
+        
+        body.is-supervisor .mod-ticker { display: flex !important; }
+        body.is-supervisor .action-forms { display: inline-flex !important; }
+        body.is-supervisor .action-cars { display: flex !important; }
+        body.is-supervisor .mod-leads-locked { display: none !important; }
+
+        /* Basis Admin Boxen Control */
+        .admin-only-block { display: none !important; }
+        .admin-only-flex { display: none !important; }
+        .admin-only-inline { display: none !important; }
         body.is-admin .admin-only-block { display: block !important; }
         body.is-admin .admin-only-flex { display: flex !important; }
         body.is-admin .admin-only-inline { display: inline-flex !important; }
         
-        /* Absolute Supervisor Rechte (Immer sichtbar) */
-        body.is-supervisor .admin-only-block, body.is-supervisor .supervisor-only-block { display: block !important; }
-        body.is-supervisor .admin-only-flex, body.is-supervisor .supervisor-only-flex { display: flex !important; }
-        body.is-supervisor .admin-only-inline, body.is-supervisor .supervisor-only-inline { display: inline-flex !important; }
+        .supervisor-only-inline { display: none !important; }
+        body.is-supervisor .supervisor-only-inline { display: inline-flex !important; }
 
-        /* Dynamische Admin Module Hide Classes (Gesteuert durch Supervisor) */
-        .hide-module-perm { display: none !important; }
 
         /* Scrollbar Design */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -174,16 +200,16 @@
         @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-colon { animation: blinkColon 1s steps(1) infinite; }
         
-        /* Visitor Heart Animation */
+        /* Visitor Heart Animation Fix (Ohne rote Linie) */
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
-        .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; }
+        .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; border: none; outline: none; text-decoration: none; }
 
         .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
         .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
 
         .nav-actions { display: flex; align-items: center; gap: 12px; }
         
-        .visitor-counter { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ccc; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; text-decoration: none; }
+        .visitor-counter { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ccc; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; text-decoration: none; outline: none; }
         .visitor-counter:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
         .visitor-counter span { color: var(--primary-red); }
         
@@ -314,7 +340,7 @@
             box-sizing: border-box; transform: rotate(15deg); opacity: 0.2;
         }
 
-        /* Checkboxen (V53 Fix: Die noble-checkbox CSS repariert!) */
+        /* Checkboxen & File Upload */
         .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
@@ -377,7 +403,7 @@
         .time-slot.booked { opacity: 0.2; text-decoration: line-through; cursor: not-allowed; }
 
         /* Globale Buttons */
-        .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
+        .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; outline: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
         .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: #fff; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
@@ -432,7 +458,7 @@
 
         /* Admin Info Container (Collapsible) */
         .admin-details { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
-        .admin-details summary { padding: 15px 20px; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+        .admin-details summary { padding: 15px 20px; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; }
         .admin-details summary::-webkit-details-marker { display: none; }
         .admin-details summary::after { content: '▼'; font-family: sans-serif; font-size: 14px; transition: transform 0.3s; }
         .admin-details[open] summary::after { transform: rotate(180deg); }
@@ -530,7 +556,7 @@
     <!-- Popups -->
     <div id="toast-container"></div>
     
-    <!-- Angeheftete Termine -->
+    <!-- Angeheftete Termine (Startet versteckt, nur für Admin/Supervisor) -->
     <div id="pinned-container" class="admin-only-flex" style="flex-direction: column; gap: 12px; position: fixed; bottom: 20px; right: 20px; z-index: 9000; pointer-events: none;"></div>
 
     <!-- Start Animation CSS -->
@@ -547,15 +573,15 @@
             <p>Wir verwenden Cookies, um Ihnen das beste Nutzererlebnis zu bieten. Einige Cookies sind für den Betrieb der Seite essenziell, andere helfen uns, diese Website zu verbessern und Ihre Anmeldung lokal zu speichern.</p>
             <div class="cookie-options">
                 <label class="noble-checkbox-label">
-                    <input type="checkbox" checked disabled>
+                    <input type="checkbox" class="cookie-checkbox" checked disabled>
                     <span class="noble-checkbox-box"></span> Notwendig (Immer aktiv)
                 </label>
                 <label class="noble-checkbox-label">
-                    <input type="checkbox" id="cookieAnalytics">
+                    <input type="checkbox" class="cookie-checkbox" id="cookieAnalytics">
                     <span class="noble-checkbox-box"></span> Analyse & Statistik
                 </label>
                 <label class="noble-checkbox-label">
-                    <input type="checkbox" id="cookieMarketing">
+                    <input type="checkbox" class="cookie-checkbox" id="cookieMarketing">
                     <span class="noble-checkbox-box"></span> Marketing
                 </label>
             </div>
@@ -585,7 +611,7 @@
                     <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/>
                 </svg>
                 
-                <i class="fa-solid fa-pen admin-ticker-edit-icon admin-only-block" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker bearbeiten"></i>
+                <i class="fa-solid fa-pen admin-ticker-edit-icon mod-ticker" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker bearbeiten"></i>
             </div>
             
             <div class="nav-actions">
@@ -641,7 +667,6 @@
                     <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Passwort eingeben">
                 </div>
                 
-                <!-- V53 FIX: Checkbox mit noble-class repariert -->
                 <label class="noble-checkbox-label" style="justify-content: center;">
                     <input type="checkbox" id="rememberMe">
                     <span class="noble-checkbox-box" style="margin-right: 8px;"></span>
@@ -662,10 +687,11 @@
                     <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; padding:8px 15px; flex:1;" onclick="window.triggerLogoutConfirm()"><i class="fa-solid fa-right-from-bracket"></i> Abmelden</button>
                 </div>
 
-                <div class="admin-list-wrapper hide-module-perm" id="admin-module-leads">
+                <div class="admin-list-wrapper mod-leads" id="admin-module-leads">
                     <div id="admin-list"></div>
                 </div>
-                <p id="leads-locked-msg" style="display:none; color:var(--text-muted); font-size:11px; margin-top:20px;"><i class="fa-solid fa-lock"></i> Der Supervisor hat diesen Bereich für Administratoren gesperrt.</p>
+                <!-- Zeigt Sperr-Nachricht, wenn mod-leads durch Supervisor gesperrt ist -->
+                <p class="mod-leads-locked" style="color:var(--text-muted); font-size:11px; margin-top:20px;"><i class="fa-solid fa-lock"></i> Der Supervisor hat das Termin-Modul gesperrt.</p>
             </div>
         </div>
     </div>
@@ -692,7 +718,7 @@
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
                     <input type="checkbox" id="permForms">
-                    <span class="noble-checkbox-box"></span> Formulare & PDF Manager
+                    <span class="noble-checkbox-box"></span> Formulare & PDF Uploads
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
                     <input type="checkbox" id="permCars">
@@ -892,8 +918,8 @@
     <div id="view-home" class="view-section active">
         
         <!-- ADMIN AREA: Aufklappbare Module -->
-        <div class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 20px auto 0;">
-            <details class="admin-details hide-module-perm" id="admin-module-customblock">
+        <div class="admin-workspace-box mod-blocks" style="max-width:800px; margin: 20px auto 0;">
+            <details class="admin-details">
                 <summary><span style="color:#007aff;"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span></summary>
                 <div class="admin-details-content">
                     
@@ -909,7 +935,6 @@
                         </div>
                     </div>
 
-                    <!-- Titel Styling -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>Titel Schriftart</label>
@@ -933,7 +958,6 @@
                         </div>
                     </div>
 
-                    <!-- Media & Border -->
                     <div class="form-row" style="margin-top: 5px;">
                         <div class="form-group">
                             <label>Rahmendicke (Border)</label>
@@ -945,15 +969,14 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Bild / Video (Firebase Storage)</label>
+                            <label>Bild / Video Hochladen (Optional)</label>
                             <label class="noble-file-upload" style="margin-top:0;">
                                 <input type="file" id="cbMediaFile" accept="image/*,video/*" onchange="window.updateCbFileLabel(this)">
-                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen</span>
+                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-upload"></i> Durchsuchen</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Banner Options mit Emojis Select -->
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
                         <label style="color:var(--primary-red); font-size:11px; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-flag"></i> Integriertes Banner (Wie "Sofortkennzeichen")</label>
                         <div class="form-row" style="margin-top:10px;">
@@ -1001,7 +1024,6 @@
                         </div>
                     </div>
 
-                    <!-- Text Area & Text Styling -->
                     <div class="form-group">
                         <textarea id="cbText" class="form-control" rows="3" placeholder="Beschreibungstext..." style="resize:vertical;"></textarea>
                     </div>
@@ -1029,13 +1051,13 @@
                         </div>
                     </div>
 
-                    <button class="btn-primary" id="btnCustomBlockUpload" style="background:#007aff; width:100%; justify-content:center; margin-top:10px;" onclick="window.addCustomBlock(event)">Baustein Erstellen & Veröffentlichen</button>
+                    <button class="btn-primary" style="background:#007aff; width:100%; justify-content:center; margin-top:10px;" onclick="window.addCustomBlock()">Baustein Erstellen & Veröffentlichen</button>
                     
                     <div id="adminBlocksList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px; text-align:left;"></div>
                 </div>
             </details>
 
-            <details class="admin-details hide-module-perm" id="admin-module-companydata">
+            <details class="admin-details mod-data">
                 <summary><span style="color:#ffcc00;"><i class="fa-solid fa-address-card"></i> Firmendaten & Impressum bearbeiten</span></summary>
                 <div class="admin-details-content">
                     <div class="form-row">
@@ -1191,7 +1213,7 @@
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
         </div>
         
-        <div id="adminFormSection" class="admin-workspace-box admin-only-block hide-module-perm" style="max-width:800px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.15); border-radius: 15px; padding: 20px;">
+        <div id="adminFormSection" class="admin-workspace-box mod-forms" style="max-width:800px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.15); border-radius: 15px; padding: 20px;">
             <h4 style="color:var(--primary-red); margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-folder-plus"></i> Admin: Neues Formular hinzufügen</h4>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <input type="text" id="newFormTitle" class="form-control" placeholder="Titel" style="flex:1; margin-bottom:0;">
@@ -1219,17 +1241,17 @@
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
         </div>
         
-        <div id="adminAnkaufSection" class="admin-workspace-box admin-only-block hide-module-perm" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border-color: rgba(179,135,40,0.2); border-radius: 15px; padding: 20px;">
-            <h4 style="color:#b38728; margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Firebase Storage)</h4>
+        <div id="adminAnkaufSection" class="admin-workspace-box mod-cars" style="max-width:800px; margin: 0 auto 30px; background: rgba(179,135,40,0.05); border-color: rgba(179,135,40,0.2); border-radius: 15px; padding: 20px;">
+            <h4 style="color:#b38728; margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Auto Galerie)</h4>
             <div class="config-row" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                 <input type="text" id="newCarTitle" class="form-control" placeholder="Modellname" style="flex:1; margin-bottom:0;">
                 
                 <label class="noble-file-upload" style="flex:1; margin-top:0;">
                     <input type="file" id="newCarFile" accept="image/*,video/*" onchange="window.updateFileLabel(this)">
-                    <span class="noble-file-trigger" id="fileLabelText"><i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen</span>
+                    <span class="noble-file-trigger" id="fileLabelText"><i class="fa-solid fa-folder-open"></i> Datei auswählen</span>
                 </label>
                 
-                <button class="btn-primary" id="btnUploadCar" style="background:#b38728;" onclick="window.uploadNewCarMedia(event)">Veröffentlichen</button>
+                <button class="btn-primary" style="background:#b38728;" onclick="window.uploadNewCarMedia()">Veröffentlichen</button>
             </div>
         </div>
 
@@ -1354,17 +1376,12 @@
             document.getElementById('email-contact-btn').href = "mailto:" + data.email;
         };
 
-        // V53 FIX: Globale Permission-Apply-Function (Wird auch beim Login direkt aufgerufen!)
+        // V54 FIX: CSS Basiertes Permissions System
         window.applyAdminModulePermissions = function(perms) {
-            if(!perms) return;
+            if(!perms) perms = { leads: false, customblocks: false, companydata: false, forms: false, cars: false, ticker: false };
             window.adminPermissions = perms;
             
-            // Safety Check: Nur anwenden wenn jemand eingeloggt ist!
-            if(!window.loggedInUser) return;
-            
-            const isSuper = window.loggedInUser === 'musadmin';
-            const isAdmin = window.loggedInUser === 'Tamer Yazici';
-            
+            // Setze Haken im Supervisor Menü
             if(document.getElementById('permLeads')) {
                 document.getElementById('permLeads').checked = perms.leads;
                 document.getElementById('permCustomblocks').checked = perms.customblocks;
@@ -1374,23 +1391,13 @@
                 document.getElementById('permTicker').checked = perms.ticker;
             }
 
-            if(isAdmin) {
-                document.getElementById('admin-module-leads').style.display = perms.leads ? 'block' : 'none';
-                document.getElementById('leads-locked-msg').style.display = perms.leads ? 'none' : 'block';
-                document.getElementById('admin-module-customblock').style.display = perms.customblocks ? 'block' : 'none';
-                document.getElementById('admin-module-companydata').style.display = perms.companydata ? 'block' : 'none';
-                document.getElementById('adminFormSection').style.display = perms.forms ? 'block' : 'none';
-                document.getElementById('adminAnkaufSection').style.display = perms.cars ? 'block' : 'none';
-                document.getElementById('adminTickerIcon').style.display = perms.ticker ? 'block' : 'none';
-            } else if(isSuper) {
-                document.getElementById('admin-module-leads').style.display = 'block';
-                document.getElementById('leads-locked-msg').style.display = 'none';
-                document.getElementById('admin-module-customblock').style.display = 'block';
-                document.getElementById('admin-module-companydata').style.display = 'block';
-                document.getElementById('adminFormSection').style.display = 'block';
-                document.getElementById('adminAnkaufSection').style.display = 'block';
-                document.getElementById('adminTickerIcon').style.display = 'block';
-            }
+            // Setze CSS Klassen auf dem Body Tag für globale Sichtbarkeit
+            document.body.classList.toggle('perm-leads', perms.leads);
+            document.body.classList.toggle('perm-blocks', perms.customblocks);
+            document.body.classList.toggle('perm-data', perms.companydata);
+            document.body.classList.toggle('perm-forms', perms.forms);
+            document.body.classList.toggle('perm-cars', perms.cars);
+            document.body.classList.toggle('perm-ticker', perms.ticker);
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1572,76 +1579,6 @@
                 });
             });
             document.addEventListener('click', () => trigger.classList.remove('open'));
-            
-            // Custom Block Client Render
-            window.updateCbFileLabel = function(input) {
-                const labelText = document.getElementById('cbFileLabelText');
-                if(input.files && input.files[0]) {
-                    labelText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color:#25D366;"></i> ${input.files[0].name}`;
-                } else {
-                    labelText.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen`;
-                }
-            };
-
-            window.renderCustomBlocks = function(blocksList) {
-                document.getElementById('dynamic-client-section-home').innerHTML = '';
-                document.getElementById('dynamic-client-section-formulare').innerHTML = '';
-                document.getElementById('dynamic-client-section-ankauf').innerHTML = '';
-                
-                const adminList = document.getElementById('adminBlocksList');
-                if(adminList) adminList.innerHTML = '';
-
-                if(!blocksList || blocksList.length === 0) return;
-
-                blocksList.forEach(block => {
-                    if(adminList) {
-                        const adminEl = document.createElement('div');
-                        adminEl.style.cssText = "background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border-left:3px solid #007aff; display:flex; justify-content:space-between; align-items:center;";
-                        adminEl.innerHTML = `
-                            <div><strong style="color:#007aff; font-size:12px;">${block.title}</strong><br><span style="font-size:10px; color:#aaa;">Seite: ${block.page}</span></div>
-                            <button class="apt-btn delete" onclick="window.deleteCustomBlock('${block.id}')"><i class="fa-solid fa-trash-can"></i></button>
-                        `;
-                        adminList.appendChild(adminEl);
-                    }
-
-                    let mediaHtml = '';
-                    if(block.mediaUrl && block.mediaUrl.trim() !== '') {
-                        if(block.mediaUrl.includes('video/') || block.mediaUrl.endsWith('.mp4') || block.mediaUrl.startsWith('blob:') || block.mediaUrl.includes('firebasestorage')) {
-                            mediaHtml = `<div class="dynamic-block-media"><video src="${block.mediaUrl}" controls autoplay loop muted></video></div>`;
-                            if(block.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || block.mediaUrl.includes('alt=')) {
-                                mediaHtml = `<div class="dynamic-block-media"><img src="${block.mediaUrl}" alt="${block.title}"></div>`;
-                            }
-                        } else {
-                            mediaHtml = `<div class="dynamic-block-media"><img src="${block.mediaUrl}" alt="${block.title}"></div>`;
-                        }
-                    }
-
-                    let bannerHtml = '';
-                    if(block.bannerText && block.bannerText.trim() !== '') {
-                        let emo = block.bannerEmoji ? block.bannerEmoji : '';
-                        bannerHtml = `<div class="sofort-badge" style="background: linear-gradient(45deg, ${block.bannerColor || '#e60000'}, #111); margin-top: -20px; display: inline-flex;"><i class="pulse-emoji" style="margin-right:8px;">${emo}</i> ${block.bannerText} <i class="pulse-emoji" style="margin-left:8px;">${emo}</i></div>`;
-                    }
-
-                    const targetSection = document.getElementById(`dynamic-client-section-${block.page}`);
-                    if(targetSection) {
-                        const blockEl = document.createElement('div');
-                        blockEl.className = 'dynamic-block-inner';
-                        blockEl.style.borderWidth = block.borderSize || '1px';
-                        blockEl.style.borderColor = 'var(--primary-red)';
-                        
-                        blockEl.innerHTML = `
-                            ${bannerHtml}
-                            <h2 style="font-family: ${block.titleFont || "'Montserrat', sans-serif"}; font-size: ${block.titleSize || 'clamp(20px, 3vw, 28px)'}; color: ${block.titleColor || 'var(--primary-red)'}; margin-bottom: 15px;"><i class="${block.icon || ''}" style="display:${block.icon?'inline-block':'none'};"></i> ${block.title}</h2>
-                            <p style="font-family: ${block.textFont || "'Montserrat', sans-serif"}; font-size: ${block.textSize || '14px'}; color: ${block.textColor || '#ccc'}; line-height: 1.8; margin-bottom: 15px; white-space: pre-wrap;">${block.text}</p>
-                            ${mediaHtml}
-                        `;
-                        targetSection.appendChild(blockEl);
-                    }
-                });
-            };
-            
-            const localBlocks = JSON.parse(localStorage.getItem('red_customblocks')) || [];
-            window.renderCustomBlocks(localBlocks);
         });
 
         window.showToast = function(msg, type='success') {
@@ -1787,7 +1724,6 @@
             console.error("Firebase konnte nicht initialisiert werden.", err);
         }
 
-        // V53 FIX: MULTI ADMIN & SUPERVISOR LOGIK WIEDERHERGESTELLT!
         let savedPasswords = JSON.parse(localStorage.getItem('red_admin_passwords')) || {};
         window.admins = {
             "Tamer Yazici": { pass: savedPasswords["Tamer Yazici"] || "616161", role: "admin" },
@@ -1813,7 +1749,6 @@
                     if(document.getElementById('loggedInUser')) {
                         document.getElementById('loggedInUser').innerText = savedUser;
                     }
-                    // Apply Perms on Auto-Login
                     let localPerms = JSON.parse(localStorage.getItem('red_admin_perms'));
                     if(localPerms) window.applyAdminModulePermissions(localPerms);
                 });
@@ -1846,7 +1781,6 @@
                 document.getElementById('dashboardBox').style.display = 'block';
                 document.getElementById('loggedInUser').innerText = u;
                 
-                // V53 FIX: Perms sofort nach manuellem Login anwenden!
                 let localPerms = JSON.parse(localStorage.getItem('red_admin_perms'));
                 if(localPerms) window.applyAdminModulePermissions(localPerms);
 
@@ -1861,8 +1795,8 @@
         window.executeLogout = function() {
             window.isAuthorized = false;
             window.loggedInUser = null;
-            document.body.classList.remove('is-admin');
-            document.body.classList.remove('is-supervisor');
+            document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-blocks', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker');
+            
             localStorage.removeItem('red_admin_saved');
             localStorage.removeItem('red_logged_in_user');
             
@@ -1916,7 +1850,7 @@
                 } catch(e) {
                     localStorage.setItem('red_admin_perms', JSON.stringify(perms));
                     window.applyAdminModulePermissions(perms);
-                    window.showToast('Lokal gespeichert (Firebase Rechte fehlten).', 'success');
+                    window.showToast('Lokal gespeichert.', 'success');
                 }
             } else {
                 localStorage.setItem('red_admin_perms', JSON.stringify(perms));
@@ -2066,6 +2000,10 @@
                             saveToFirestore(downloadURL);
                         }
                     );
+                } else if(fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) { saveToFirestore(e.target.result); };
+                    reader.readAsDataURL(fileInput.files[0]);
                 } else {
                     saveToFirestore('');
                 }
@@ -2533,7 +2471,218 @@
                 window.chosenHour = null;
             };
 
-            // V52 Storage Direct Upload für Autos
+            // V54: Formulare komplett sichtbar für Gäste
+            const staticForms = [
+                {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
+                {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
+                {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
+                {id: 'static-4', title: 'Antrag auf Steuervergünstigung', url: '#'},
+                {id: 'static-5', title: 'Empfangsbevollmächtigung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f242094-bevollmaechtigung.pdf'}, 
+                {id: 'static-6', title: 'Eidesstattliche Versicherung (EV I)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123018-verlust_zbi.pdf'},
+                {id: 'static-7', title: 'Eidesstattliche Versicherung (EV II)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123019-verlust_zbii.pdf'}, 
+                {id: 'static-8', title: 'EV (Schilder)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f122851-verlust_kennzeichen.pdf'},
+                {id: 'static-9', title: 'Kennzeichenreservierung', url: '#'}, 
+                {id: 'static-10', title: 'Mitteilung für Umsatzsteuerzwecke', url: '#'},
+                {id: 'static-11', title: 'SEPA-Lastschriftmandat', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f394016-sepa_lastschriftmandat_20140327__2_.pdf'}, 
+                {id: 'static-12', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'}
+            ];
+
+            let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
+            if(!localForms || localForms.length === 0) {
+                localForms = staticForms;
+                localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+            }
+
+            function renderForms(formsList) {
+                const grid = document.getElementById('formItemsGrid');
+                grid.innerHTML = '';
+                formsList.forEach(form => {
+                    const element = document.createElement('div');
+                    element.className = 'download-item';
+                    element.id = form.id;
+                    element.setAttribute('data-url', form.url);
+                    element.setAttribute('onclick', 'window.selectForm(this)');
+                    
+                    element.innerHTML = `
+                        <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="${form.title}">${form.title}</span></div>
+                        <div class="download-actions">
+                            <i class="fa-solid fa-upload action-forms" title="In Firebase Storage hochladen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
+                            <i class="fa-solid fa-trash-can action-forms" title="Formular löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')" style="margin-right:8px;"></i>
+                            
+                            <i class="fa-solid fa-eye user-view" title="Ansehen / Öffnen" onclick="event.stopPropagation(); window.openForm(this)"></i>
+                            <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"></i>
+                        </div>
+                    `;
+                    grid.appendChild(element);
+                });
+            }
+
+            onSnapshot(collection(db, "forms"), (snapshot) => {
+                if(!snapshot.empty) {
+                    const formsData = [];
+                    snapshot.forEach(docSnap => {
+                        formsData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    renderForms([...staticForms, ...formsData]);
+                } else {
+                    renderForms(localForms);
+                }
+            });
+
+            window.addNewFormItem = async function() {
+                const title = document.getElementById('newFormTitle').value;
+                const url = document.getElementById('newFormUrl').value || '#';
+                if(!title) { window.showToast('Bitte Formular-Titel eingeben.', 'error'); return; }
+                
+                try {
+                    await addDoc(collection(db, "forms"), { title, url, timestamp: serverTimestamp() });
+                    window.showToast('Formular erfolgreich zu Firebase hinzugefügt.', 'success');
+                    document.getElementById('newFormTitle').value = '';
+                    document.getElementById('newFormUrl').value = '';
+                } catch(e) {
+                    localForms.push({id: 'local-form-'+Date.now(), title, url});
+                    localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+                    renderForms(localForms);
+                    window.showToast('Lokal hinzugefügt.', 'error');
+                }
+            };
+
+            window.triggerAdminUpload = function(iconEl, formId) {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = '.pdf,.doc,.docx,.jpg,.png';
+                fileInput.onchange = async e => {
+                    if(e.target.files.length > 0 && storage) {
+                        const file = e.target.files[0];
+                        iconEl.className = "fa-solid fa-spinner fa-spin action-forms";
+                        
+                        const storageRef = ref(storage, 'forms/' + Date.now() + '_' + file.name);
+                        const uploadTask = uploadBytesResumable(storageRef, file);
+
+                        uploadTask.on('state_changed', 
+                            null, 
+                            (error) => { 
+                                window.showToast('Upload gescheitert.', 'error');
+                                iconEl.className = "fa-solid fa-cloud-arrow-up action-forms";
+                            }, 
+                            async () => {
+                                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                                try {
+                                    await updateDoc(doc(db, "forms", formId), { url: downloadURL });
+                                    window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
+                                } catch(err) {
+                                    const parentItem = document.getElementById(formId);
+                                    if(parentItem) parentItem.setAttribute('data-url', downloadURL);
+                                    window.showToast('Lokal in DOM verknüpft.', 'success');
+                                }
+                                iconEl.className = "fa-solid fa-cloud-arrow-up action-forms";
+                                iconEl.style.color = '#25D366';
+                            }
+                        );
+                    }
+                };
+                fileInput.click();
+            };
+            
+            window.adminDeleteForm = async function(formId) {
+                if(confirm('Möchten Sie dieses Formular komplett löschen?')) {
+                    try {
+                        await deleteDoc(doc(db, "forms", formId));
+                        window.showToast('Formular in Firebase gelöscht.', 'success');
+                    } catch(e) {
+                        const item = document.getElementById(formId);
+                        if(item) item.remove();
+                        localForms = localForms.filter(f => f.id !== formId);
+                        localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+                        window.showToast('Lokal gelöscht.', 'success');
+                    }
+                }
+            };
+
+            window.openForm = function(iconEl) {
+                const url = iconEl.closest('.download-item').getAttribute('data-url');
+                if(url && url !== '#') {
+                    window.open(url, '_blank');
+                } else {
+                    window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+                }
+            };
+
+            window.downloadForm = function(iconEl) { 
+                const url = iconEl.closest('.download-item').getAttribute('data-url');
+                if(url && url !== '#') {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = ''; 
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.showToast('Download gestartet...', 'success');
+                } else {
+                    window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+                }
+            };
+
+            window.selectForm = function(element) {
+                document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
+                element.classList.add('selected');
+            };
+
+            // V54: Auto Ankauf Galerie komplett sichtbar für Gäste
+            const staticCars = [
+                {id: 'car-static-1', title: 'Chevrolet Corvette', mediaUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80'},
+                {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&w=800&q=80'},
+                {id: 'car-static-3', title: 'Porsche 911 Classic', mediaUrl: 'https://images.unsplash.com/photo-1503375800000-84c4f3460e4d?auto=format&fit=crop&w=800&q=80'},
+                {id: 'car-static-4', title: 'VW Käfer', mediaUrl: 'https://images.unsplash.com/photo-1490902931801-d6f80ca94f0f?auto=format&fit=crop&w=800&q=80'}
+            ];
+
+            let localCars = JSON.parse(localStorage.getItem('red_local_cars'));
+            if(!localCars || localCars.length === 0) {
+                localCars = staticCars;
+                localStorage.setItem('red_local_cars', JSON.stringify(localCars));
+            }
+
+            function renderGallery(carsList) {
+                const grid = document.getElementById('carsGalleryGrid');
+                grid.innerHTML = '';
+                carsList.forEach(car => {
+                    const card = document.createElement('div');
+                    card.className = 'gallery-card';
+                    card.id = car.id; 
+                    
+                    let mediaHtml = '';
+                    if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
+                       mediaHtml = `<video src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
+                       if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || car.mediaUrl.includes('alt=')) {
+                           mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                       }
+                    } else {
+                       mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="admin-del-img-btn action-cars" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
+                        ${mediaHtml}
+                        <span onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')">${car.title}</span>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            onSnapshot(collection(db, "cars"), (snapshot) => {
+                if(!snapshot.empty) {
+                    const carsData = [];
+                    snapshot.forEach(docSnap => {
+                        carsData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    renderGallery(carsData);
+                } else {
+                    renderGallery(localCars);
+                }
+            }, (error) => {
+                renderGallery(localCars);
+            });
+
             window.uploadNewCarMedia = async function(event) {
                 const title = document.getElementById('newCarTitle').value;
                 const fileInput = document.getElementById('newCarFile');
@@ -2548,7 +2697,6 @@
                         await addDoc(collection(db, "cars"), { title, mediaUrl, timestamp: serverTimestamp() });
                         window.showToast('Fahrzeug in Firebase veröffentlicht.', 'success');
                     } catch(err) {
-                        // FIX: Muss localCars definieren
                         let localCars = JSON.parse(localStorage.getItem('red_local_cars')) || [];
                         localCars.unshift({id: 'local-car-'+Date.now(), title, mediaUrl});
                         localStorage.setItem('red_local_cars', JSON.stringify(localCars));
@@ -2591,33 +2739,25 @@
                 }
             };
             
-            // Auto Ankauf Fallback Event Listener
             window.addEventListener('localCarsUpdated', (e) => {
-                const grid = document.getElementById('carsGalleryGrid');
-                grid.innerHTML = '';
-                e.detail.forEach(car => {
-                    const card = document.createElement('div');
-                    card.className = 'gallery-card';
-                    card.id = car.id; 
-                    
-                    let mediaHtml = '';
-                    if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
-                       mediaHtml = `<video src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
-                       if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || car.mediaUrl.includes('alt=')) {
-                           mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
-                       }
-                    } else {
-                       mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
-                    }
-                    
-                    card.innerHTML = `
-                        <div class="admin-del-img-btn admin-up admin-only-flex" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
-                        ${mediaHtml}
-                        <span onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')">${car.title}</span>
-                    `;
-                    grid.appendChild(card);
-                });
+                renderGallery(e.detail);
             });
+            
+            window.deleteGalleryImage = async function(cardId) {
+                if(confirm('Möchten Sie dieses Fahrzeug dauerhaft entfernen?')) {
+                    try {
+                        await deleteDoc(doc(db, "cars", cardId));
+                    } catch(err) {
+                        console.log("Fallback delete.");
+                    }
+                    const el = document.getElementById(cardId);
+                    if(el) el.remove();
+                    
+                    localCars = localCars.filter(c => c.id !== cardId);
+                    localStorage.setItem('red_local_cars', JSON.stringify(localCars));
+                    window.showToast('Erfolgreich entfernt.', 'success');
+                }
+            };
         } 
     </script>
 </body>
