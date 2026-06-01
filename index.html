@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA WEB APP ICONS & FAVICON -->
+    <!-- Web App Konfiguration -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
     <meta name="application-name" content="RED Zulassung">
     <meta name="theme-color" content="#050507">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 271 83' fill='%23e60000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z'/%3E%3Cpath d='M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z'/%3E%3Cpath d='M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z'/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 271 83' fill='%23e60000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z'/%3E%3Cpath d='M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z'/%3E%3Cpath d='M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z'/%3E%3C/svg%3E">
     
@@ -43,6 +45,7 @@
             line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
             -webkit-font-smoothing: antialiased; 
             -moz-osx-font-smoothing: grayscale; 
+            touch-action: pan-y; 
         }
 
         input, select, textarea { font-size: 16px !important; }
@@ -123,14 +126,15 @@
         .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(3px); }
         @keyframes gentleIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
-        /* V38 Header Widgets (Blinking Colon Fix) */
+        /* Wetter und Uhrzeit Block */
         .header-widgets-wrapper {
             display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
             gap: 2px; pointer-events: none; margin-left: auto; margin-right: 15px;
+            -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
         }
-        .header-clock-date { font-size: 10px; font-weight: 700; color: #ccc; letter-spacing: 0.5px; display:flex; align-items:center; gap:5px; white-space: nowrap; }
+        .header-clock-date { font-size: 9px; font-weight: 700; color: #ccc; letter-spacing: 0.5px; display:flex; align-items:center; gap:4px; white-space: nowrap; }
         .header-clock-date span { color: var(--primary-red); }
-        .header-weather { font-size: 9px; font-weight: 600; color: #aaa; display:flex; align-items:center; gap:4px; white-space: nowrap; }
+        .header-weather { font-size: 8px; font-weight: 600; color: #aaa; display:flex; align-items:center; gap:4px; white-space: nowrap; }
 
         @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-colon { animation: blinkColon 1s steps(1) infinite; }
@@ -155,7 +159,7 @@
         .quick-menu-btn { background: none; border: 1px solid var(--glass-border); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; transition: 0.3s; }
         .quick-menu-btn:hover { background: rgba(255,255,255,0.1); }
 
-        /* Info Ticker */
+        /* Ticker Info Leiste */
         #ticker-container { background: linear-gradient(90deg, #1a0000, #000, #1a0000); border-bottom: 1px solid rgba(255,0,0,0.3); padding: 5px 0; overflow: hidden; white-space: nowrap; position: relative; display: flex; align-items: center; }
         .ticker-text-wrapper { display: inline-block; padding-left: 100%; animation: tickerAnim linear infinite; }
         @keyframes tickerAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
@@ -171,7 +175,7 @@
         .fullscreen-menu a { color: white; font-size: 24px; font-weight: 800; text-transform: uppercase; text-decoration: none; margin: 12px 0; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
         .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
 
-        /* Modale Dialoge */
+        /* Overlay und Dialoge */
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
@@ -191,7 +195,6 @@
         .close-dialog-btn { position: absolute; top: 20px; right: 25px; font-size: 22px; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10; }
         .close-dialog-btn:hover { color: #fff; transform: scale(1.1); }
 
-        /* Specific Modal Colors */
         #adminModal .custom-dialog-window { max-width: 550px; }
         #passChangeOverlay .custom-dialog-window { max-width: 380px; border-top-color: #b38728; }
         #confirmModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15); }
@@ -228,8 +231,10 @@
         .note-row-btn:hover { color: #fff; }
         .note-row-btn.del:hover { color: var(--primary-red); }
 
-        /* Draggable Angeheftete Kennzeichen Widget + TÜV Plakette */
-        #pinned-container { position: fixed; bottom: 20px; right: 20px; z-index: 9000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+        /* Datenschutz: Nur Admin darf gemerkte Termine sehen */
+        #pinned-container { position: fixed; bottom: 20px; right: 20px; z-index: 9000; display: none; flex-direction: column; gap: 12px; pointer-events: none; }
+        body.is-admin #pinned-container { display: flex !important; }
+
         .pinned-plate { position: fixed; background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); cursor: grab; z-index: 9000; transition: box-shadow 0.3s; user-select: none; pointer-events: all; animation: slideInPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); touch-action: none; }
         .pinned-plate:active { cursor: grabbing; }
         .pinned-plate.urgent-today { border-color: #e60000; color: #e60000; animation: urgentGlow 2s infinite alternate ease-in-out; }
@@ -237,7 +242,7 @@
         .pinned-plate.normal-day { border-color: #b38728; color: #333; }
         .pinned-plate::before { content: 'D'; background: #003399; color: #fff; padding: 2px 4px; font-size: 12px; border-radius: 3px; }
         
-        /* Das Elite TÜV / AU Siegel CSS (Miniaturisiert) */
+        /* TÜV Plakette Design */
         .tuev-plakette {
             display: inline-flex; align-items: center; justify-content: center;
             width: 16px; height: 16px; border-radius: 50%;
@@ -252,20 +257,18 @@
             box-sizing: border-box; transform: rotate(15deg); opacity: 0.2;
         }
 
-        /* Formular Checkboxen */
+        /* Checkboxen & File Upload */
         .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
         .noble-checkbox-label input:checked + .noble-checkbox-box { background: var(--primary-red); border-color: var(--primary-red); }
         .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* Datei Upload Komponente */
         .noble-file-upload { position: relative; display: block; width: 100%; margin-top: 8px; }
         .noble-file-upload input { display: none; }
         .noble-file-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; display: block; transition: 0.3s; }
         .noble-file-upload input:change + .noble-file-trigger, .noble-file-trigger:hover { border-color: var(--primary-red); color: white; background: rgba(230,0,0,0.04); }
 
-        /* Ticker Symbol Auswahl */
         .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
 
         /* Container Wechsel Logik */
@@ -285,17 +288,17 @@
         .form-control { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; font-family: inherit; font-size: 13px; outline: none; transition: 0.3s; }
         .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 12px rgba(230,0,0,0.3); }
 
-        /* Custom Dropdown Selects */
+        /* Dropdown Menü (Z-Index und Style) */
         .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
         .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
         .noble-select-trigger::after { content: '▼'; font-family: sans-serif; font-size: 10px; color: var(--primary-red); transition: 0.3s; }
         .noble-select-box.open .noble-select-trigger::after { transform: rotate(180deg); }
-        .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); display: none; overflow: hidden; z-index: 99; }
+        .noble-options-dropdown { position: absolute; top: calc(100% + 5px); left: 0; width: 100%; background: #0c0c0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); display: none; overflow: hidden; z-index: 99999; }
         .noble-select-box.open .noble-options-dropdown { display: block; }
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* Kalender Konfiguration */
+        /* Flatpickr Setup */
         .flatpickr-calendar { 
             background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; 
             border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
@@ -316,11 +319,10 @@
         .time-slot.active { background: var(--primary-red); border-color: var(--primary-red); color: white; }
         .time-slot.booked { opacity: 0.2; text-decoration: line-through; cursor: not-allowed; }
 
-        /* Globale Buttons */
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
 
-        /* Mobile Ansicht & Responsive Design */
+        /* Mobile Anpassungen */
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 80px; }
             nav { padding: 10px 3%; }
@@ -328,7 +330,7 @@
             .logo-text { font-size: clamp(10px, 3.2vw, 15px); white-space: normal; line-height: 1.2; }
             .logo-car-svg { height: clamp(14px, 4vw, 20px); margin-left: 2px; }
             
-            .header-widgets-wrapper { display:none; } /* Versteckt die Uhr/Wetter auf kleinen Handys aus Platzgründen */
+            .header-widgets-wrapper { display:none; } 
             
             .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
@@ -338,7 +340,6 @@
             .hero { margin-top: 15px; }
             .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
             
-            /* Anti Flicker Mobile Adjustments */
             .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
             
             .card { padding: 25px 15px !important; height: 160px !important; }
@@ -351,9 +352,14 @@
             .apt-actions-horizontal { justify-content: center; }
             .symbol-grid { grid-template-columns: repeat(2, 1fr) !important; }
             #tickerConfigOverlay .custom-dialog-window { max-height: 85vh; padding: 20px 15px; }
+
+            /* Skalierung des angehefteten Kennzeichens für Mobile Geräte */
+            .pinned-plate { font-size: 11px; padding: 4px 8px; border-width: 2px; }
+            .pinned-plate::before { font-size: 10px; padding: 1px 3px; }
+            .pinned-plate span { font-size: 10px !important; }
+            .tuev-plakette { width: 14px; height: 14px; font-size: 7px; }
         }
 
-        /* Hauptbereich Container */
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
         .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
         
@@ -372,7 +378,6 @@
         .section-header { text-align: center; margin-bottom: 35px; }
         .section-header h2 { font-size: clamp(22px, 3.5vw, 34px); font-weight: 900; text-transform: uppercase; }
         
-        /* Leistungskarten */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .card { background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .card:hover { border-color: rgba(230,0,0,0.5); }
@@ -382,7 +387,6 @@
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* Formular Download Bereich */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
@@ -400,7 +404,6 @@
         .admin-del { color: #ff3b30; margin-left: 5px; }
         .admin-del:hover { color: #fff; transform: scale(1.1); }
 
-        /* Auto Ankauf Galerie */
         .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
@@ -415,14 +418,12 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* Kennzeichen Warnung Panel */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
         .plate-text { color: black; font-family: 'Courier New', monospace; font-weight: bold; font-size: 20px; padding: 0 12px; }
         .warning-text { display: flex; align-items: center; gap: 10px; font-size: 13px; color: white; text-align: left; }
 
-        /* Footer und Kontakt */
         .contact-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 50px 5% 20px; }
         .map-box { border-radius: 18px; overflow: hidden; border: 1px solid var(--glass-border); min-height: 250px; }
         .map-box iframe { width: 100%; height: 100%; border: none; filter: grayscale(1) invert(0.9) contrast(1.2); }
@@ -443,17 +444,20 @@
 </head>
 <body>
 
-    <!-- Toast Notifications -->
+    <!-- Popups -->
     <div id="toast-container"></div>
+    
+    <!-- Angeheftete Termine (Startet versteckt) -->
+    <div id="pinned-container" class="admin-only-flex" style="flex-direction: column; gap: 12px; position: fixed; bottom: 20px; right: 20px; z-index: 9000; pointer-events: none;"></div>
 
-    <!-- Start Preloader Ebene -->
+    <!-- Start Animation CSS -->
     <div id="intro-preloader">
         <div class="intro-plate" id="introPlate">B <span style="color:var(--primary-red);">-</span> RED 2026</div>
         <div class="intro-track"><i class="fa-solid fa-car-side intro-car" id="introCar"></i></div>
         <div class="intro-text" id="introText">Herzlich Willkommen zu Ihrem<br><span style="color:var(--primary-red);">Zulassungsdienst RED Berlin</span></div>
     </div>
 
-    <!-- Hintergrund Matrix -->
+    <!-- Background Layer -->
     <div class="plate-bg" id="plate-container"></div>
 
     <!-- Hauptnavigation und Admin Header -->
@@ -475,6 +479,7 @@
                 <i class="fa-solid fa-pen admin-ticker-edit-icon admin-only-block" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker bearbeiten"></i>
             </div>
             
+            <!-- Wetter und Uhrzeit Block -->
             <div class="header-widgets-wrapper">
                 <div class="header-clock-date" id="liveHeaderDate">Lade...</div>
                 <div class="header-weather" id="liveHeaderWeather">Abfrage läuft <i class="fa-solid fa-spinner fa-spin"></i></div>
@@ -711,9 +716,6 @@
         </div>
     </div>
 
-    <!-- Angeheftete Termine Wrapper -->
-    <div id="pinned-container"></div>
-
     <!-- ========================================== -->
     <!-- VIEW 1: STARTSEITE UND KERNBEREICH         -->
     <!-- ========================================== -->
@@ -731,7 +733,7 @@
             </div>
         </div>
 
-        <!-- V38: ERWEITERTE LEISTUNGEN -->
+        <!-- ERWEITERTE LEISTUNGEN -->
         <section id="leistungen" style="padding-top: 10px;">
             <div class="section-header">
                 <h2>Unsere Leistungen</h2>
@@ -765,7 +767,7 @@
                 <div class="card" onclick="window.toggleCardSlide(this)">
                     <i class="fa-solid fa-stopwatch main-icon"></i>
                     <h3>Kurzzeitkennzeichen</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Für Probefahrten (5 Tage).</p>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Nach Wahl (5 oder 6 Tage).</p>
                     <div class="card-info-slide">
                         <p><strong>Mitzubringen (Original):</strong><br>• Ausweis / Pass<br>• eVB-Nummer für Kurzzeit<br>• Fahrzeugpapiere (Kopie/Original)<br>• Gültige HU</p>
                     </div>
@@ -773,7 +775,7 @@
                 <div class="card" onclick="window.toggleCardSlide(this)">
                     <i class="fa-solid fa-globe main-icon"></i>
                     <h3>Zollkennzeichen</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Für den Fahrzeug-Export.</p>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">30 Tage Gültigkeit.</p>
                     <div class="card-info-slide">
                         <p><strong>Mitzubringen (Original):</strong><br>• Ausweis / Pass<br>• Fahrzeugpapiere (ZBI & ZBII)<br>• Gültige HU<br>• Gelbes Versicherungskärtchen</p>
                     </div>
@@ -937,6 +939,13 @@
                 <p style="margin-top:5px; font-size:12px;">Zulassung: 0178 378 38 75</p>
                 <a href="https://wa.me/491783783875" target="_blank" class="btn-primary" style="background:#25D366; margin-top:10px; width:100%; justify-content:center;"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> WhatsApp Chat</a>
             </div>
+            
+            <div style="background:var(--glass-bg); padding:20px; border-radius:18px; border:1px solid var(--glass-border);">
+                <h3 style="font-size:14px;"><i class="fa-solid fa-envelope" style="color:var(--primary-red);"></i> E-Mail</h3>
+                <p style="margin-top:8px; font-size:12px;">Redzulassungsdienst@gmail.com</p>
+                <!-- Oeffnet das E-Mail Programm des Nutzers -->
+                <a href="mailto:Redzulassungsdienst@gmail.com" class="btn-primary" style="background:#007aff; margin-top:10px; width:100%; justify-content:center;"><i class="fa-solid fa-paper-plane" style="font-size:16px;"></i> E-Mail schreiben</a>
+            </div>
         </div>
         
         <div style="grid-column: 1 / -1;">
@@ -967,27 +976,26 @@
         </div>
     </footer>
 
-    <!-- Basis Bibliotheken V38 -->
+    <!-- Basis Bibliotheken -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
-    <!-- Initiale Oberflächen Interaktion (SAFE ISOLATION V38) -->
+    <!-- Initiale Oberflächen Interaktion -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // Header Live Widget Updates (Uhrzeit & Datum)
+            // Uhrzeit und Wetter Block Updates
             function updateHeaderWidgets() {
                 const now = new Date();
                 const h = String(now.getHours()).padStart(2, '0');
                 const m = String(now.getMinutes()).padStart(2, '0');
                 const dateStr = now.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
-                // V38: Doppelpunkt blinkt im Sekundentakt
                 document.getElementById('liveHeaderDate').innerHTML = `<i class="fa-regular fa-calendar"></i> ${dateStr} <span style="margin:0 4px;">|</span> <i class="fa-regular fa-clock"></i> <span>${h}<span class="blink-colon">:</span>${m}</span>`;
             }
             setInterval(updateHeaderWidgets, 1000);
             updateHeaderWidgets();
 
-            // Wetter Abfrage (IP basiert)
+            // Automatisches Wetter (Berlin)
             async function fetchWeather() {
                 try {
                     const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=52.5244&longitude=13.4105&current_weather=true');
@@ -1014,14 +1022,14 @@
                 });
             });
 
-            // Kalender Initialisierung (Absolute Garantie)
+            // Kalender Initialisierung
             window.chosenHour = null;
             try {
                 flatpickr("#datePicker", {
                     locale: "de", 
                     minDate: "today", 
                     disableMobile: "true", 
-                    dateFormat: "d.m.Y", // Deutsches Format fixieren
+                    dateFormat: "d.m.Y", 
                     disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
                     onChange: function(selectedDates, dateStr, instance) {
                         document.getElementById('timeWrapper').style.display = 'block';
@@ -1120,7 +1128,7 @@
             if(!isActive) card.classList.add('reveal-active');
         };
 
-        // --- V38 DRAG AND DROP POINTER EVENTS (Kugelsicher für iOS/Android & Desktop) ---
+        // Pointer Events Drag and Drop (Mobil- und Desktopkompatibel)
         window.makeDraggable = function(elmnt, id) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             
@@ -1160,7 +1168,7 @@
         };
     </script>
 
-    <!-- Firebase Datenbank Anbindung (V38 Elite) -->
+    <!-- Firebase Datenbank Anbindung -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1175,7 +1183,6 @@
             appId: "1:426545703080:web:282cbe0bb5eb5fc09f7a9d"
         };
 
-        // Versuch Firebase zu laden, Fehler abfangen damit die Seite nicht abstürzt
         let db;
         try {
             const app = initializeApp(firebaseConfig);
@@ -1468,10 +1475,13 @@
                         });
                     }
 
+                    // Uhrzeiten Anzeige im Backend Card Modul anpassen
+                    const displayTime = apt.timeLabel === "Ganztägig" ? "Ganztägig" : apt.timeLabel.includes("Uhr") ? apt.timeLabel : apt.timeLabel + " Uhr";
+
                     card.innerHTML = `
                         <div class="prio-badge">${badgeText}</div>
                         <h4 style="font-size:14px; margin-bottom:5px;">${apt.service}</h4>
-                        <p style="font-size:11px; color:#ccc;"><i class="fa-solid fa-user"></i> ${apt.name} | Datum: ${apt.date} (${apt.timeLabel} Uhr)</p>
+                        <p style="font-size:11px; color:#ccc;"><i class="fa-solid fa-user"></i> ${apt.name} | Datum: ${apt.date} (${displayTime})</p>
                         <p style="font-size:10px; color:var(--text-muted); margin-bottom:5px;"><i class="fa-solid fa-envelope"></i> ${apt.email} | <i class="fa-solid fa-phone"></i> ${apt.phone}</p>
                         
                         <div class="notes-list-box" id="notes-container-${id}">${notesHtml}</div>
@@ -1485,6 +1495,7 @@
                     `;
                     list.appendChild(card);
 
+                    // Nur rendern, wenn es markiert ist
                     if (apt.marked) {
                         const plate = document.createElement('div');
                         plate.className = 'pinned-plate';
@@ -1493,7 +1504,7 @@
                         
                         plate.id = 'pinned-' + id;
                         
-                        // V37 TÜV Plaketten Logik (Jetzt etwas kleiner 16px)
+                        // TÜV Plaketten Logik
                         let tuevYear = '26';
                         let tuevColor = '#007aff';
                         if(apt.date.includes('2024')) { tuevYear = '24'; tuevColor = '#28a745'; }
@@ -1503,7 +1514,6 @@
                         if(apt.date.includes('2029')) { tuevYear = '29'; tuevColor = '#ff69b4'; }
                         
                         const tuevTextColor = (tuevColor === '#ffcc00') ? '#000' : '#fff';
-                        const displayTime = apt.timeLabel === "Ganztägig" ? "Ganztägig" : apt.timeLabel + " Uhr";
 
                         plate.innerHTML = `
                             <span style="font-size:14px; pointer-events:none;">${apt.name}</span> 
@@ -1643,6 +1653,7 @@
                     try {
                         await deleteDoc(doc(db, "appointments", window.deleteTargetId));
                         
+                        // Lösche auch die gemerkte Position, falls vorhanden
                         let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
                         if(positions[window.deleteTargetId]) {
                             delete positions[window.deleteTargetId];
@@ -1686,21 +1697,35 @@
                     renderAppointments(localAppointments);
                 }
                 
-                // --- V37 FIX: WHATSAPP AUTOMATISIERUNG OHNE MAIL-POPUP ---
-                if(p && p.trim().length > 5) {
-                    const timeString = window.chosenHour ? window.chosenHour + " Uhr" : "Ganztägig";
-                    const waMessage = `Guten Tag ${n},\n\nvielen Dank für Ihre Buchung bei RED Zulassungsdienst Berlin.\n\nHiermit bestätigen wir Ihren Termin:\n\n📅 Datum: ${d}\n⏰ Uhrzeit: ${timeString}\n👨‍💼 Berater: Tamer Yazici\n📍 Ort: Kienitzer Str. 6, 12053 Berlin\n📝 Anliegen: ${window.selectedServiceVal}\n\nBitte bringen Sie alle benötigten Unterlagen im Original mit.\n\nWir freuen uns auf Ihren Besuch!\n\nMit freundlichen Grüßen,\nIhr Team vom RED Zulassungsdienst`;
-                    
-                    // Deine angeforderte Zielnummer
-                    const targetPhone = "491783783875"; 
-                    const waUrl = "https://wa.me/" + targetPhone + "?text=" + encodeURIComponent(waMessage);
-                    
-                    setTimeout(() => {
-                        window.open(waUrl, '_blank');
-                    }, 500);
+                // Formatiere die Benachrichtigung (WhatsApp Email Redirect System)
+                let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
+                if (!timeString.includes("Uhr") && timeString !== "Ganztägig") {
+                    timeString += " Uhr";
                 }
                 
-                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${window.chosenHour || "Ganztägig"} Uhr wurde erfolgreich gespeichert.\n\nEin WhatsApp Chat zur Bestätigung wird geöffnet!`;
+                const notificationMsg = `Guten Tag ${n},%0D%0A%0D%0Avielen Dank für Ihre Buchung bei RED Zulassungsdienst Berlin.%0D%0A%0D%0AHiermit bestätigen wir Ihren Termin:%0D%0A%0D%0A📅 Datum: ${d}%0D%0A⏰ Uhrzeit: ${timeString}%0D%0A👨‍💼 Berater: Tamer Yazici%0D%0A📍 Ort: Kienitzer Str. 6, 12053 Berlin%0D%0A📝 Anliegen: ${window.selectedServiceVal}%0D%0A%0D%0ABitte bringen Sie alle benötigten Unterlagen im Original mit.%0D%0A%0D%0AWir freuen uns auf Ihren Besuch!%0D%0A%0D%0AMit freundlichen Grüßen,%0D%0AIhr Team vom RED Zulassungsdienst`;
+
+                // Hintergrund Mail (via mailto) an die neue Mail triggern
+                setTimeout(() => {
+                    const mailSubject = encodeURIComponent(`Neuer Termin: ${n}`);
+                    window.location.href = `mailto:Redzulassungsdienst@gmail.com?subject=${mailSubject}&body=${notificationMsg}`;
+                }, 300);
+
+                // Optionale WhatsApp Nachricht, falls Nummer vorhanden
+                if(p && p.trim().length > 5) {
+                    // Falls eine 0 vorne ist, durch Ländervorwahl ersetzen für korrekte WhatsApp Funktion
+                    let waPhone = p.replace(/\s+/g, '').replace(/^\+/, '');
+                    if(waPhone.startsWith('0')) {
+                        waPhone = '49' + waPhone.substring(1);
+                    }
+                    
+                    const waUrl = "https://wa.me/" + waPhone + "?text=" + notificationMsg;
+                    setTimeout(() => {
+                        window.open(waUrl, '_blank');
+                    }, 800);
+                }
+                
+                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${timeString} wurde erfolgreich gespeichert.\n\nDas E-Mail Programm und der WhatsApp-Chat (falls Nummer hinterlegt) öffnen sich in Kürze!`;
                 document.getElementById('confirmModalOverlay').classList.add('open');
                 
                 document.getElementById('bookingForm').reset();
@@ -1712,14 +1737,16 @@
                 window.chosenHour = null;
             };
 
-            // Formular Downloads Logik
+            // Formular Downloads Logik mit originalen LABO Berlin Links
             const staticForms = [
-                {id: 'static-1', title: 'Allgemeine Vollmacht', url: '#'}, {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
-                {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: '#'}, {id: 'static-4', title: 'Antrag auf Steuervergünstigung', url: '#'},
-                {id: 'static-5', title: 'Empfangsbevollmächtigung', url: '#'}, {id: 'static-6', title: 'Eidesstattliche Versicherung (EV I)', url: '#'},
-                {id: 'static-7', title: 'Eidesstattliche Versicherung (EV II)', url: '#'}, {id: 'static-8', title: 'EV (Schilder)', url: '#'},
-                {id: 'static-9', title: 'Kennzeichenreservierung', url: '#'}, {id: 'static-10', title: 'Mitteilung für Umsatzsteuerzwecke', url: '#'},
-                {id: 'static-11', title: 'SEPA-Lastschriftmandat', url: '#'}, {id: 'static-12', title: 'Zulassungsantrag', url: '#'}
+                {id: 'static-1', title: 'SEPA-Lastschriftmandat (Zoll/Steuer)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f394016-sepa_lastschriftmandat_20140327__2_.pdf'}, 
+                {id: 'static-2', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'},
+                {id: 'static-3', title: 'Vollmacht Kfz-Zulassung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
+                {id: 'static-4', title: 'Empfangsbevollmächtigung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f242094-bevollmaechtigung.pdf'},
+                {id: 'static-5', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
+                {id: 'static-6', title: 'Verlusterklärung Zulassungsbescheinigung (Teil I)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123018-verlust_zbi.pdf'},
+                {id: 'static-7', title: 'Verlusterklärung Zulassungsbescheinigung (Teil II)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123019-verlust_zbii.pdf'}, 
+                {id: 'static-8', title: 'Verlust von Kennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f122851-verlust_kennzeichen.pdf'}
             ];
 
             function renderForms(formsList) {
@@ -1826,8 +1853,8 @@
 
             // Auto Ankauf Galerie Sync
             const staticCars = [
-                {id: 'car-static-1', title: 'Mercedes Adenauer', mediaUrl: 'http://googleusercontent.com/image_collection/image_retrieval/14573198169554396966'},
-                {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'http://googleusercontent.com/image_collection/image_retrieval/12058880479335895744'}
+                {id: 'car-static-1', title: 'Mercedes Adenauer', mediaUrl: 'https://images.unsplash.com/photo-1595180424564-9be8ac7eb54f?auto=format&fit=crop&q=80&w=800'},
+                {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&q=80&w=800'}
             ];
 
             function renderGallery(carsList) {
@@ -1913,68 +1940,5 @@
             };
         } 
     </script>
-
-    <script id="misali-whatsapp-fix">
-    // 🚀 FIX: WhatsApp Encoding (Entfernt  Zeichen)
-    function cleanWhatsAppText(text) {
-        if(!text) return "";
-        // Ersetzt "" (Replacement Character), harte Leerzeichen (\u00A0) und Zero-Width Spaces
-        let cleaned = text.replace(/[\uFFFD\u00A0\u200B]/g, ' ');
-        // Kodiert den Text sauber für die URL
-        return encodeURIComponent(cleaned);
-    }
-
-    // 💡 BEISPIEL FÜR DEINE EINBINDUNG:
-    // Wenn dein alter Code so aussah:
-    // let url = "https://wa.me/?text=" + meinText;
-    //
-    // Ändere ihn zu:
-    // let url = "https://wa.me/?text=" + cleanWhatsAppText(meinText);
-</script>
-
-<style id="misali-header-mobile-fix">
-    /* 🚀 FIX: WETTER, UHR & DATUM (Ultra-Kompakt für Mobile & Webkit-Safe) */
-    @media screen and (max-width: 768px) {
-        /* Ich nutze Wildcard-Selektoren, um deine IDs sicher zu treffen */
-        .header-info, 
-        [id*="weather"], [id*="clock"], [id*="date"],
-        [id*="hava"], [id*="saat"], [id*="tarih"],
-        [class*="weather"], [class*="clock"], [class*="date"] {
-            transform: scale(0.85) !important; /* 15% kleiner für edle App-Optik */
-            transform-origin: center top !important; /* Skaliert sauber von oben */
-            margin-bottom: -5px !important; /* Verhindert leere Lücken */
-            
-            /* Apple/Webkit Touch-Sperre */
-            -webkit-touch-callout: none !important; 
-            -webkit-user-select: none !important; 
-            user-select: none !important;
-        }
-    }
-</style>
-
-<style id="misali-form-cards-fix">
-    /* 🚀 FIX: FORMULAR KARTEN (Kompakter für Mobile & Webkit-Safe) */
-    @media screen and (max-width: 768px) {
-        /* Passt alle Formular-Karten und Grid-Items an */
-        .form-card, 
-        .pdf-card, 
-        [class*="formular"], 
-        [class*="dokument"],
-        .merkterminkennzeichen-item {
-            transform: scale(0.92) !important; /* 8% kleiner */
-            transform-origin: center !important;
-            margin-bottom: -4px !important; 
-            
-            /* Verhindert Flackern beim Skalieren auf schwachen Handys */
-            backface-visibility: hidden; 
-            
-            /* Apple/Webkit Touch-Sperre */
-            -webkit-touch-callout: none !important; 
-            -webkit-user-select: none !important;
-            user-select: none !important;
-        }
-    }
-</style>
-
 </body>
 </html>
