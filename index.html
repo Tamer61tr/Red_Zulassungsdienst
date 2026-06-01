@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA WEB APP ICONS & FAVICON (V48 Elite) -->
+    <!-- PWA WEB APP ICONS & FAVICON (V49 Elite) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
@@ -150,32 +150,30 @@
 
         /* Klickbare Header Widgets */
         .header-widgets-wrapper {
-            display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
-            gap: 2px; margin-left: auto; margin-right: 15px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; margin-left: auto; margin-right: 15px;
             -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
         }
-        .header-widget-item { cursor: pointer; transition: 0.3s; padding: 2px 6px; border-radius: 6px; }
+        .header-widget-item { cursor: pointer; transition: 0.3s; padding: 4px 8px; border-radius: 6px; }
         .header-widget-item:hover { background: rgba(255,255,255,0.05); transform: scale(1.05); }
         
-        .header-clock-date { font-size: 9px; font-weight: 700; color: #ccc; letter-spacing: 0.5px; display:flex; align-items:center; gap:4px; white-space: nowrap; }
+        .header-clock-date { font-size: 11px; font-weight: 700; color: #ccc; letter-spacing: 0.5px; display:flex; align-items:center; gap:5px; white-space: nowrap; }
         .header-clock-date span { color: var(--primary-red); }
-        .header-weather { font-size: 8px; font-weight: 600; color: #aaa; display:flex; align-items:center; gap:4px; white-space: nowrap; }
+        .header-weather { font-size: 11px; font-weight: 600; color: #aaa; display:flex; align-items:center; gap:5px; white-space: nowrap; }
 
         @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-colon { animation: blinkColon 1s steps(1) infinite; }
         
         /* Visitor Heart Animation Fix (Ohne rote Linie) */
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
-        .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; text-decoration: none !important; border: none !important; outline: none !important; }
+        .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; text-decoration: none !important; border: none !important; outline: none !important; margin: 15px 0; }
 
         .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
         .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
 
         .nav-actions { display: flex; align-items: center; gap: 12px; }
-        /* V48 FIX: Besucherzähler für alle sichtbar, Zähler jedoch nur für Admin in echt, für andere statisch oder live aber ohne Klick, wart, user said "besuche sollten auch kunden sehen, aber die animation bekommt unter den herz so eine rote linie andauernd, das auch fixen.. der admin anmeldeschlüssel sollte für die kunden kein zähler angezeigt werden, nur für admin..."
-        Ah, notification-badge = "Anmeldeschlüssel Zähler"!
-        Visitor counter = "Besuche" */
         
+        /* FIX: Besucherzähler für alle sichtbar */
         .visitor-counter { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ccc; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; text-decoration: none; }
         .visitor-counter:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
         .visitor-counter span { color: var(--primary-red); }
@@ -186,7 +184,7 @@
         .key-icon-wrapper i { color: #fff; font-size: 16px; transition: 0.3s; }
         body.is-admin .key-icon-wrapper i { color: #25D366; }
 
-        /* V48 FIX: Notification Badge auf dem Schlüssel nur für ADMIN sichtbar */
+        /* V49 FIX: Notification Badge auf dem Schlüssel nur für ADMIN sichtbar */
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
         body.is-admin .notification-badge { display: flex !important; }
         
@@ -275,7 +273,7 @@
         .note-row-btn:hover { color: #fff; }
         .note-row-btn.del:hover { color: var(--primary-red); }
 
-        /* Draggable Kennzeichen */
+        /* V49: Draggable Kennzeichen (Robust Fix) */
         #pinned-container { position: fixed; bottom: 20px; right: 20px; z-index: 9000; display: none; flex-direction: column; gap: 12px; pointer-events: none; }
         body.is-admin #pinned-container { display: flex !important; }
 
@@ -369,24 +367,34 @@
         .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: #fff; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* V48: Animation Banner Emojis */
+        /* Animation Banner Emojis */
         .pulse-emoji { display: inline-block; font-style: normal; animation: pulse-icon 1.5s infinite alternate ease-in-out; }
 
-        /* Mobile Ansicht & Responsive Design */
+        /* V49: Mobile Ansicht & Responsive Design FIX für Webkit/Android Überlappungen */
         @media (max-width: 768px) {
-            body { font-size: 12px; padding-top: 80px; }
-            nav { padding: 10px 3%; }
-            .logo-container { max-width: 50%; gap: 6px; }
+            body { font-size: 12px; padding-top: 120px; } /* Mehr Platz für den 2-zeiligen Header */
+            
+            nav { flex-wrap: wrap; padding: 10px 3%; }
+            .logo-container { order: 1; max-width: 60%; }
             .logo-text { font-size: clamp(10px, 3.2vw, 15px); white-space: normal; line-height: 1.2; }
             .logo-car-svg { height: clamp(14px, 4vw, 20px); margin-left: 2px; }
             
-            .header-widgets-wrapper { display:none; } 
+            .nav-actions { order: 2; width: auto; margin-left: auto; }
+            
+            /* V49 FIX: Header Widgets auf 2. Zeile verschoben, keine Überlappungen mehr! */
+            .header-widgets-wrapper { 
+                order: 3; flex-basis: 100%; display: flex !important; flex-direction: row; 
+                justify-content: center; gap: 20px; margin-top: 8px; padding-top: 8px; 
+                border-top: 1px solid rgba(255,255,255,0.08); 
+            }
+            .header-widget-item { padding: 4px 10px; background: rgba(255,255,255,0.03); }
+            .header-clock-date, .header-weather { font-size: 10px; }
             
             .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
             
             .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
-            .hero { margin-top: 15px; }
+            .hero { margin-top: 5px; }
             .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
             
             .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
@@ -408,7 +416,7 @@
             .tuev-plakette { width: 14px; height: 14px; font-size: 7px; }
         }
 
-        /* V48 Admin Info Container (Erweitert & Collapsible) */
+        /* Admin Info Container (Erweitert & Collapsible) */
         .admin-details { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
         .admin-details summary { padding: 15px 20px; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; }
         .admin-details summary::-webkit-details-marker { display: none; }
@@ -417,7 +425,7 @@
         .admin-details-content { padding: 0 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 10px; padding-top: 15px; }
 
         .dynamic-block-container { padding-top: 30px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .dynamic-block-inner { max-width: 800px; margin: 0 auto; background: var(--glass-bg); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--primary-red); box-shadow: 0 15px 40px rgba(0,0,0,0.5); text-align: center; }
+        .dynamic-block-inner { max-width: 800px; margin: 0 auto; background: var(--glass-bg); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--primary-red); box-shadow: 0 15px 40px rgba(230,0,0,0.5); text-align: center; }
         .dynamic-block-media img, .dynamic-block-media video { max-width: 100%; border-radius: 12px; margin-top: 15px; }
 
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
@@ -481,14 +489,12 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* Kennzeichen Warnung Panel */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
         .plate-text { color: black; font-family: 'Courier New', monospace; font-weight: bold; font-size: 20px; padding: 0 12px; }
         .warning-text { display: flex; align-items: center; gap: 10px; font-size: 13px; color: white; text-align: left; }
 
-        /* Footer und Kontakt */
         .contact-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 50px 5% 20px; }
         .map-box { border-radius: 18px; overflow: hidden; border: 1px solid var(--glass-border); min-height: 250px; }
         .map-box iframe { width: 100%; height: 100%; border: none; filter: grayscale(1) invert(0.9) contrast(1.2); }
@@ -568,11 +574,6 @@
                 <i class="fa-solid fa-pen admin-ticker-edit-icon admin-only-block" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker bearbeiten"></i>
             </div>
             
-            <div class="header-widgets-wrapper">
-                <div class="header-clock-date header-widget-item" id="liveHeaderDate" onclick="window.openWidgetModal('time')" title="Details anzeigen">Lade...</div>
-                <div class="header-weather header-widget-item" id="liveHeaderWeather" onclick="window.openWidgetModal('weather')" title="Wetter Details anzeigen">Abfrage läuft <i class="fa-solid fa-spinner fa-spin"></i></div>
-            </div>
-
             <div class="nav-actions">
                 <div class="visitor-counter" onclick="window.openWidgetModal('visitors')" title="System Status"><i class="fa-solid fa-users"></i> Besuche: <span id="vCount">0</span></div>
                 
@@ -582,6 +583,12 @@
                 </div>
                 
                 <button class="quick-menu-btn" onclick="window.toggleMenu()"><i class="fa-solid fa-bars"></i> Menü</button>
+            </div>
+            
+            <!-- V49 FIX: Header Widgets umgelagert für perfekte Mobile-Anordnung -->
+            <div class="header-widgets-wrapper">
+                <div class="header-clock-date header-widget-item" id="liveHeaderDate" onclick="window.openWidgetModal('time')" title="Details anzeigen">Lade...</div>
+                <div class="header-weather header-widget-item" id="liveHeaderWeather" onclick="window.openWidgetModal('weather')" title="Wetter Details anzeigen">Abfrage läuft <i class="fa-solid fa-spinner fa-spin"></i></div>
             </div>
         </nav>
         
@@ -827,7 +834,7 @@
     <!-- ========================================== -->
     <div id="view-home" class="view-section active">
         
-        <!-- V48 MEGA ADMIN AREA: Multi-Bausteine mit Media-Upload & Border Settings -->
+        <!-- ADMIN AREA: Aufklappbare Module -->
         <div class="admin-workspace-box admin-only-block" style="max-width:800px; margin: 20px auto 0;">
             <details class="admin-details">
                 <summary><span style="color:#007aff;"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span></summary>
@@ -865,7 +872,7 @@
                         </div>
                         <div class="form-group">
                             <label>Titel Farbe</label>
-                            <input type="color" id="cbTitleColor" class="form-control" value="#e60000" style="padding: 2px; height: 42px;">
+                            <input type="color" id="cbTitleColor" class="form-control" value="#e60000" style="padding: 2px; height: 42px; cursor: pointer;">
                         </div>
                     </div>
 
@@ -881,15 +888,15 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Bild / Video (Optional)</label>
+                            <label>Bild / Video Hochladen (Optional)</label>
                             <label class="noble-file-upload" style="margin-top:0;">
                                 <input type="file" id="cbMediaFile" accept="image/*,video/*" onchange="window.updateCbFileLabel(this)">
-                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-folder-open"></i> Durchsuchen</span>
+                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-upload"></i> Durchsuchen</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- V48 Banner Options -->
+                    <!-- V49 Banner Options mit 30 Emojis Select -->
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
                         <label style="color:var(--primary-red); font-size:11px; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-flag"></i> Integriertes Banner (Wie "Sofortkennzeichen")</label>
                         <div class="form-row" style="margin-top:10px;">
@@ -897,10 +904,43 @@
                                 <input type="text" id="cbBannerText" class="form-control" placeholder="Banner Text (z.B. Aktion!)">
                             </div>
                             <div class="form-group">
-                                <input type="text" id="cbBannerEmoji" class="form-control" placeholder="Emoji (z.B. 🔥)">
+                                <!-- V49 Emoji Dropdown Picker -->
+                                <select id="cbBannerEmoji" class="form-control" style="background:#111114;">
+                                    <option value="">Kein Emoji</option>
+                                    <option value="🔥">🔥 Feuer</option>
+                                    <option value="⚡">⚡ Blitz</option>
+                                    <option value="⭐">⭐ Stern</option>
+                                    <option value="✨">✨ Funkeln</option>
+                                    <option value="🎉">🎉 Party</option>
+                                    <option value="💥">💥 Boom</option>
+                                    <option value="🚨">🚨 Alarm</option>
+                                    <option value="🛑">🛑 Stopp</option>
+                                    <option value="⚠️">⚠️ Warnung</option>
+                                    <option value="ℹ️">ℹ️ Info</option>
+                                    <option value="📌">📌 Pin</option>
+                                    <option value="📍">📍 Ort</option>
+                                    <option value="🚗">🚗 Auto</option>
+                                    <option value="🏎️">🏎️ Rennwagen</option>
+                                    <option value="🚀">🚀 Rakete</option>
+                                    <option value="🏁">🏁 Flagge</option>
+                                    <option value="🏆">🏆 Pokal</option>
+                                    <option value="🥇">🥇 Gold-Medaille</option>
+                                    <option value="💎">💎 Diamant</option>
+                                    <option value="✅">✅ Check</option>
+                                    <option value="💯">💯 Hundert</option>
+                                    <option value="🤝">🤝 Deal</option>
+                                    <option value="💶">💶 Euro</option>
+                                    <option value="💰">💰 Geld</option>
+                                    <option value="💳">💳 Karte</option>
+                                    <option value="📅">📅 Kalender</option>
+                                    <option value="⏱️">⏱️ Stoppuhr</option>
+                                    <option value="⏳">⏳ Sanduhr</option>
+                                    <option value="📞">📞 Telefon</option>
+                                    <option value="✉️">✉️ E-Mail</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <input type="color" id="cbBannerColor" class="form-control" value="#e60000" title="Banner Hintergrundfarbe" style="padding: 2px; height: 42px;">
+                                <input type="color" id="cbBannerColor" class="form-control" value="#e60000" title="Banner Hintergrundfarbe" style="padding: 2px; height: 42px; cursor: pointer;">
                             </div>
                         </div>
                     </div>
@@ -929,7 +969,7 @@
                         </div>
                         <div class="form-group">
                             <label>Text Farbe</label>
-                            <input type="color" id="cbTextColor" class="form-control" value="#cccccc" style="padding: 2px; height: 42px;">
+                            <input type="color" id="cbTextColor" class="form-control" value="#cccccc" style="padding: 2px; height: 42px; cursor: pointer;">
                         </div>
                     </div>
 
@@ -1441,7 +1481,7 @@
                 if(input.files && input.files[0]) {
                     labelText.innerHTML = `<i class="fa-solid fa-file-circle-check" style="color:#25D366;"></i> ${input.files[0].name}`;
                 } else {
-                    labelText.innerHTML = `<i class="fa-solid fa-folder-open"></i> Durchsuchen`;
+                    labelText.innerHTML = `<i class="fa-solid fa-upload"></i> Durchsuchen`;
                 }
             };
 
@@ -1557,6 +1597,53 @@
             if(!isActive) card.classList.add('reveal-active');
         };
 
+        // V49 Pointer Drag Fix
+        window.makeDraggable = function(elmnt, id) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            elmnt.onpointerdown = dragPointerDown;
+
+            function initDragPosition() {
+                if(elmnt.style.bottom || elmnt.style.right) {
+                    const rect = elmnt.getBoundingClientRect();
+                    elmnt.style.top = rect.top + 'px';
+                    elmnt.style.left = rect.left + 'px';
+                    elmnt.style.bottom = 'auto';
+                    elmnt.style.right = 'auto';
+                }
+            }
+
+            function dragPointerDown(e) {
+                if(e.target.tagName === 'I' || e.target.tagName === 'BUTTON') return;
+                e.preventDefault(); 
+                initDragPosition();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onpointerup = closeDragElement;
+                document.onpointermove = elementDrag;
+                elmnt.setPointerCapture(e.pointerId);
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement(e) {
+                document.onpointerup = null;
+                document.onpointermove = null;
+                elmnt.releasePointerCapture(e.pointerId);
+                
+                let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+                positions[id] = { top: elmnt.style.top, left: elmnt.style.left };
+                localStorage.setItem('pin_positions', JSON.stringify(positions));
+            }
+        };
     </script>
 
     <!-- Firebase Datenbank Anbindung -->
@@ -1696,7 +1783,6 @@
                 }
             };
             
-            // V48 Dynamic Custom Blocks (Multi-Feature with Media & Banner)
             onSnapshot(collection(db, "customblocks"), (snapshot) => {
                 if(!snapshot.empty) {
                     const blocksData = [];
@@ -1756,7 +1842,7 @@
                     document.getElementById('cbText').value = '';
                     document.getElementById('cbBannerText').value = '';
                     fileInput.value = '';
-                    document.getElementById('cbFileLabelText').innerHTML = `<i class="fa-solid fa-folder-open"></i> Durchsuchen`;
+                    document.getElementById('cbFileLabelText').innerHTML = `<i class="fa-solid fa-upload"></i> Durchsuchen`;
                 };
 
                 if(fileInput.files && fileInput.files[0]) {
@@ -2230,27 +2316,21 @@
                 window.chosenHour = null;
             };
 
-            // Formular Downloads Logik mit originalen LABO Berlin Links
+            // Formulare (VOLLSTÄNDIG)
             const staticForms = [
-                {id: 'static-1', title: 'SEPA-Lastschriftmandat (Zoll/Steuer)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f394016-sepa_lastschriftmandat_20140327__2_.pdf'}, 
-                {id: 'static-2', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'},
-                {id: 'static-3', title: 'Vollmacht Kfz-Zulassung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
-                {id: 'static-4', title: 'Empfangsbevollmächtigung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f242094-bevollmaechtigung.pdf'},
-                {id: 'static-5', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
-                {id: 'static-6', title: 'Verlusterklärung Zulassungsbescheinigung (Teil I)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123018-verlust_zbi.pdf'},
-                {id: 'static-7', title: 'Verlusterklärung Zulassungsbescheinigung (Teil II)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123019-verlust_zbii.pdf'}, 
-                {id: 'static-8', title: 'Verlust von Kennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f122851-verlust_kennzeichen.pdf'},
-                {id: 'static-9', title: 'Allgemeine Vollmacht', url: '#'}, 
+                {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
+                {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
+                {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
+                {id: 'static-4', title: 'Antrag auf Steuervergünstigung', url: '#'},
+                {id: 'static-5', title: 'Empfangsbevollmächtigung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f242094-bevollmaechtigung.pdf'}, 
+                {id: 'static-6', title: 'Eidesstattliche Versicherung (EV I)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123018-verlust_zbi.pdf'},
+                {id: 'static-7', title: 'Eidesstattliche Versicherung (EV II)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123019-verlust_zbii.pdf'}, 
+                {id: 'static-8', title: 'EV (Schilder)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f122851-verlust_kennzeichen.pdf'},
+                {id: 'static-9', title: 'Kennzeichenreservierung', url: '#'}, 
                 {id: 'static-10', title: 'Mitteilung für Umsatzsteuerzwecke', url: '#'},
-                {id: 'static-11', title: 'Antrag auf Ausnahmegenehmigung', url: '#'}, 
-                {id: 'static-12', title: 'Antrag auf Steuervergünstigung', url: '#'}
+                {id: 'static-11', title: 'SEPA-Lastschriftmandat', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f394016-sepa_lastschriftmandat_20140327__2_.pdf'}, 
+                {id: 'static-12', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'}
             ];
-
-            let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
-            if(!localForms || localForms.length === 0) {
-                localForms = staticForms;
-                localStorage.setItem('red_local_forms', JSON.stringify(localForms));
-            }
 
             function renderForms(formsList) {
                 const grid = document.getElementById('formItemsGrid');
@@ -2276,7 +2356,11 @@
                 });
             }
             
-            renderForms(localForms);
+            let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
+            if(!localForms || localForms.length === 0) {
+                localForms = staticForms;
+                localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+            }
 
             onSnapshot(collection(db, "forms"), (snapshot) => {
                 if(!snapshot.empty) {
@@ -2376,10 +2460,10 @@
 
             // Auto Ankauf Galerie Sync 
             const staticCars = [
-                {id: 'car-static-1', title: 'Chevrolet Corvette', mediaUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-3', title: 'Porsche 911 Classic', mediaUrl: 'https://images.unsplash.com/photo-1503375800000-84c4f3460e4d?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-4', title: 'VW Käfer', mediaUrl: 'https://images.unsplash.com/photo-1490902931801-d6f80ca94f0f?auto=format&fit=crop&w=800&q=80'}
+                {id: 'car-static-1', title: 'Mercedes Benz W189', mediaUrl: 'https://images.unsplash.com/photo-1552615526-40e47a79f9d7?q=80&w=800&auto=format&fit=crop'},
+                {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&q=80&w=800'},
+                {id: 'car-static-3', title: 'Chevrolet Corvette', mediaUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=800&auto=format&fit=crop'},
+                {id: 'car-static-4', title: 'Mercedes Classic', mediaUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=800&auto=format&fit=crop'}
             ];
 
             let localCars = JSON.parse(localStorage.getItem('red_local_cars'));
@@ -2418,10 +2502,12 @@
                     snapshot.forEach(docSnap => {
                         carsData.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                    renderGallery([...staticCars, ...carsData]);
+                    renderGallery(carsData);
                 } else {
                     renderGallery(localCars);
                 }
+            }, (error) => {
+                renderGallery(localCars);
             });
 
             window.updateFileLabel = function(input) {
@@ -2446,7 +2532,7 @@
                         await addDoc(collection(db, "cars"), { title, mediaUrl, timestamp: serverTimestamp() });
                         window.showToast('Fahrzeug erfolgreich in Firebase veröffentlicht.', 'success');
                     } catch(err) {
-                        localCars.push({id: 'local-car-'+Date.now(), title, mediaUrl});
+                        localCars.unshift({id: 'local-car-'+Date.now(), title, mediaUrl});
                         localStorage.setItem('red_local_cars', JSON.stringify(localCars));
                         renderGallery(localCars);
                         window.showToast('Rechte-Fehler. Lokal hinzugefügt.', 'error');
