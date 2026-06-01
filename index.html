@@ -1913,5 +1913,68 @@
             };
         } 
     </script>
+
+    <script id="misali-whatsapp-fix">
+    // 🚀 FIX: WhatsApp Encoding (Entfernt  Zeichen)
+    function cleanWhatsAppText(text) {
+        if(!text) return "";
+        // Ersetzt "" (Replacement Character), harte Leerzeichen (\u00A0) und Zero-Width Spaces
+        let cleaned = text.replace(/[\uFFFD\u00A0\u200B]/g, ' ');
+        // Kodiert den Text sauber für die URL
+        return encodeURIComponent(cleaned);
+    }
+
+    // 💡 BEISPIEL FÜR DEINE EINBINDUNG:
+    // Wenn dein alter Code so aussah:
+    // let url = "https://wa.me/?text=" + meinText;
+    //
+    // Ändere ihn zu:
+    // let url = "https://wa.me/?text=" + cleanWhatsAppText(meinText);
+</script>
+
+<style id="misali-header-mobile-fix">
+    /* 🚀 FIX: WETTER, UHR & DATUM (Ultra-Kompakt für Mobile & Webkit-Safe) */
+    @media screen and (max-width: 768px) {
+        /* Ich nutze Wildcard-Selektoren, um deine IDs sicher zu treffen */
+        .header-info, 
+        [id*="weather"], [id*="clock"], [id*="date"],
+        [id*="hava"], [id*="saat"], [id*="tarih"],
+        [class*="weather"], [class*="clock"], [class*="date"] {
+            transform: scale(0.85) !important; /* 15% kleiner für edle App-Optik */
+            transform-origin: center top !important; /* Skaliert sauber von oben */
+            margin-bottom: -5px !important; /* Verhindert leere Lücken */
+            
+            /* Apple/Webkit Touch-Sperre */
+            -webkit-touch-callout: none !important; 
+            -webkit-user-select: none !important; 
+            user-select: none !important;
+        }
+    }
+</style>
+
+<style id="misali-form-cards-fix">
+    /* 🚀 FIX: FORMULAR KARTEN (Kompakter für Mobile & Webkit-Safe) */
+    @media screen and (max-width: 768px) {
+        /* Passt alle Formular-Karten und Grid-Items an */
+        .form-card, 
+        .pdf-card, 
+        [class*="formular"], 
+        [class*="dokument"],
+        .merkterminkennzeichen-item {
+            transform: scale(0.92) !important; /* 8% kleiner */
+            transform-origin: center !important;
+            margin-bottom: -4px !important; 
+            
+            /* Verhindert Flackern beim Skalieren auf schwachen Handys */
+            backface-visibility: hidden; 
+            
+            /* Apple/Webkit Touch-Sperre */
+            -webkit-touch-callout: none !important; 
+            -webkit-user-select: none !important;
+            user-select: none !important;
+        }
+    }
+</style>
+
 </body>
 </html>
