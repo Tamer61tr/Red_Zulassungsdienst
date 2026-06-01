@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- PWA WEB APP ICONS & FAVICON (V50 Elite) -->
+    <!-- PWA WEB APP ICONS & FAVICON (V51 Elite Multi-Admin) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
@@ -164,7 +164,7 @@
         @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-colon { animation: blinkColon 1s steps(1) infinite; }
         
-        /* Visitor Heart Animation */
+        /* Visitor Heart Animation Fix (Ohne rote Linie) */
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
         .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; text-decoration: none !important; border: none !important; outline: none !important; margin: 15px 0; }
 
@@ -182,7 +182,9 @@
         .key-icon-wrapper { display: flex; align-items: center; justify-content: center; }
         .key-icon-wrapper i { color: #fff; font-size: 16px; transition: 0.3s; }
         body.is-admin .key-icon-wrapper i { color: #25D366; }
+        body.is-supervisor .key-icon-wrapper i { color: #ff00ff; }
 
+        /* Notification Badge auf dem Schlüssel nur für ADMIN sichtbar */
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 8px var(--primary-red); transition: 0.3s; }
         body.is-admin .notification-badge { display: flex !important; }
         
@@ -298,7 +300,6 @@
         }
 
         /* Checkboxen & File Upload */
-        /* V50 FIX: Die Klasse `noble-checkbox-box` wird nun korrekt auch im Admin-Login angewendet */
         .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
@@ -392,7 +393,7 @@
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
             
             .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
-            .hero { margin-top: 5px; }
+            .hero { margin-top: 15px; } /* V51: Mehr Platz oben */
             .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
             
             .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
@@ -514,7 +515,7 @@
     <!-- Popups -->
     <div id="toast-container"></div>
     
-    <!-- Angeheftete Termine (Startet versteckt, nur für Admin) -->
+    <!-- Angeheftete Termine (Startet versteckt, nur für Admin/Supervisor) -->
     <div id="pinned-container" class="admin-only-flex" style="flex-direction: column; gap: 12px; position: fixed; bottom: 20px; right: 20px; z-index: 9000; pointer-events: none;"></div>
 
     <!-- Start Animation CSS -->
@@ -622,12 +623,12 @@
                     <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="Benutzername eingeben">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Master-Passwort eingeben">
+                    <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Passwort eingeben">
                 </div>
                 
                 <label class="noble-checkbox-label" style="justify-content: center;">
-                    <input type="checkbox" id="rememberMe">
-                    <span class="noble-checkbox-box" style="margin-right: 8px;"></span>
+                    <input type="checkbox" class="cookie-checkbox" id="rememberMe">
+                    <span class="cookie-checkbox-box" style="margin-right: 8px;"></span>
                     Anmeldung für das nächste Mal merken
                 </label>
                 
@@ -636,7 +637,7 @@
 
             <div id="dashboardBox" style="display:none;">
                 <h3 style="color:var(--primary-red); font-weight:900;"><i class="fa-solid fa-user-shield"></i> Live-Leads Terminal</h3>
-                <p style="font-size:12px; color:var(--text-muted);">Admin: <strong id="loggedInUser">Tamer Yazici</strong></p>
+                <p style="font-size:12px; color:var(--text-muted);">Angemeldet als: <strong id="loggedInUser"></strong></p>
                 
                 <div style="margin-top:15px; display:flex; justify-content:center; gap:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
                     <button class="btn-primary" style="background:transparent; border:1px solid #b38728; color:#b38728; padding:8px 15px;" onclick="window.changePassPrompt()"><i class="fa-solid fa-key"></i> Passwort ändern</button>
@@ -652,7 +653,7 @@
     <div class="custom-dialog-overlay" id="passChangeOverlay">
         <div class="custom-dialog-window" style="border-top-color:#b38728; max-width:350px;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closePassPrompt()"></i>
-            <h3 style="color:#b38728; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-key"></i> Master Passwort</h3>
+            <h3 style="color:#b38728; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-key"></i> Neues Passwort</h3>
             <input type="password" id="newPassInput" class="form-control" style="text-align:center;" placeholder="Neues Passwort eingeben">
             <button class="btn-primary" style="background:#b38728; width:100%; justify-content:center; margin-top:10px;" onclick="window.confirmPassChange()">Speichern</button>
         </div>
@@ -725,21 +726,21 @@
             <div class="form-group" style="margin-top:10px;">
                 <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
                 <div class="symbol-grid">
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="noble-checkbox-box"></span> 🚛 LKW</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="noble-checkbox-box"></span> ⚡ Blitz</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="noble-checkbox-box"></span> 🏁 Flagge</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Stern</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symKey"><span class="noble-checkbox-box"></span> 🔑 Schlüssel</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symClock"><span class="noble-checkbox-box"></span> ⏱️ Uhr</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFire"><span class="noble-checkbox-box"></span> 🔥 Feuer</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symInfo"><span class="noble-checkbox-box"></span> ℹ️ Info</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCalendar"><span class="noble-checkbox-box"></span> 📅 Kalender</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symPin"><span class="noble-checkbox-box"></span> 📍 Pin</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symHand"><span class="noble-checkbox-box"></span> 🤝 Deal</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMedal"><span class="noble-checkbox-box"></span> 🥇 Nr. 1</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="cookie-checkbox-box"></span> 🚗 PKW</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="cookie-checkbox-box"></span> 🏍️ Motorrad</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="cookie-checkbox-box"></span> 🚛 LKW</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="cookie-checkbox-box"></span> 🪪 Schild</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="cookie-checkbox-box"></span> ⚡ Blitz</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="cookie-checkbox-box"></span> 🏁 Flagge</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="cookie-checkbox-box"></span> ⭐ Stern</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symKey"><span class="cookie-checkbox-box"></span> 🔑 Schlüssel</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symClock"><span class="cookie-checkbox-box"></span> ⏱️ Uhr</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFire"><span class="cookie-checkbox-box"></span> 🔥 Feuer</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symInfo"><span class="cookie-checkbox-box"></span> ℹ️ Info</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCalendar"><span class="cookie-checkbox-box"></span> 📅 Kalender</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symPin"><span class="cookie-checkbox-box"></span> 📍 Pin</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symHand"><span class="cookie-checkbox-box"></span> 🤝 Deal</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMedal"><span class="cookie-checkbox-box"></span> 🥇 Nr. 1</label>
                 </div>
             </div>
             
@@ -893,7 +894,7 @@
                         </div>
                     </div>
 
-                    <!-- Banner Options mit 30 Emojis Select -->
+                    <!-- Banner Options mit Emojis Select -->
                     <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
                         <label style="color:var(--primary-red); font-size:11px; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-flag"></i> Integriertes Banner (Wie "Sofortkennzeichen")</label>
                         <div class="form-row" style="margin-top:10px;">
@@ -1590,6 +1591,7 @@
             if(!isActive) card.classList.add('reveal-active');
         };
 
+        // Pointer Events Drag and Drop (Mobil- und Desktopkompatibel)
         window.makeDraggable = function(elmnt, id) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             
@@ -1661,31 +1663,63 @@
             console.error("Firebase konnte nicht initialisiert werden.", err);
         }
 
-        window.currentAdminUser = "Tamer Yazici";
-        window.currentAdminPass = "616161";
+        // V51: MULTI ADMIN & SUPERVISOR LOGIK
+        let savedPasswords = JSON.parse(localStorage.getItem('red_admin_passwords')) || {};
+        window.admins = {
+            "Tamer Yazici": { pass: savedPasswords["Tamer Yazici"] || "616161", role: "admin" },
+            "musadmin": { pass: savedPasswords["musadmin"] || "25361980", role: "supervisor" }
+        };
         window.isAuthorized = false;
+        window.loggedInUser = null;
 
         if(localStorage.getItem('red_admin_saved') === 'true') {
-            document.body.classList.add('is-admin');
-            window.isAuthorized = true;
-            document.getElementById('authBox').style.display = 'none';
-            document.getElementById('dashboardBox').style.display = 'block';
+            const savedUser = localStorage.getItem('red_logged_in_user') || "Tamer Yazici";
+            
+            if (window.admins[savedUser]) {
+                window.isAuthorized = true;
+                window.loggedInUser = savedUser;
+                document.body.classList.add('is-admin');
+                if(window.admins[savedUser].role === "supervisor") {
+                    document.body.classList.add('is-supervisor');
+                }
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('dashboardBox').style.display = 'block';
+                
+                // Wait for DOM to insert name correctly
+                document.addEventListener('DOMContentLoaded', () => {
+                    if(document.getElementById('loggedInUser')) {
+                        document.getElementById('loggedInUser').innerText = savedUser;
+                    }
+                });
+            } else {
+                localStorage.removeItem('red_admin_saved');
+                localStorage.removeItem('red_logged_in_user');
+            }
         }
 
         window.tryLogin = function() {
-            const u = document.getElementById('adminUser').value;
+            const u = document.getElementById('adminUser').value.trim();
             const p = document.getElementById('adminPass').value;
             const remember = document.getElementById('rememberMe').checked;
             
-            if(u === window.currentAdminUser && p === window.currentAdminPass) {
+            if(window.admins[u] && window.admins[u].pass === p) {
                 window.isAuthorized = true;
+                window.loggedInUser = u;
                 document.body.classList.add('is-admin');
                 
-                if(remember) localStorage.setItem('red_admin_saved', 'true');
+                if(window.admins[u].role === "supervisor") {
+                    document.body.classList.add('is-supervisor');
+                }
+                
+                if(remember) {
+                    localStorage.setItem('red_admin_saved', 'true');
+                    localStorage.setItem('red_logged_in_user', u);
+                }
                 
                 document.getElementById('authBox').style.display = 'none';
                 document.getElementById('dashboardBox').style.display = 'block';
-                window.showToast('Erfolgreich als Admin angemeldet.', 'success');
+                document.getElementById('loggedInUser').innerText = u;
+                window.showToast('Erfolgreich als ' + u + ' angemeldet.', 'success');
             } else {
                 window.showToast('Zugriff verweigert! Falscher Name oder Passwort.', 'error');
             }
@@ -1695,8 +1729,11 @@
         window.cancelLogout = function() { document.getElementById('logoutConfirmOverlay').classList.remove('open'); };
         window.executeLogout = function() {
             window.isAuthorized = false;
+            window.loggedInUser = null;
             document.body.classList.remove('is-admin');
+            document.body.classList.remove('is-supervisor');
             localStorage.removeItem('red_admin_saved');
+            localStorage.removeItem('red_logged_in_user');
             
             document.getElementById('adminUser').value = '';
             document.getElementById('adminPass').value = '';
@@ -1718,11 +1755,15 @@
         window.confirmPassChange = function() {
             const newP = document.getElementById('newPassInput').value;
             if(newP && newP.trim().length > 3) {
-                window.currentAdminPass = newP;
+                window.admins[window.loggedInUser].pass = newP;
+                let savedPasswords = JSON.parse(localStorage.getItem('red_admin_passwords')) || {};
+                savedPasswords[window.loggedInUser] = newP;
+                localStorage.setItem('red_admin_passwords', JSON.stringify(savedPasswords));
+                
                 window.closePassPrompt();
-                window.showToast('Passwort lokal geändert (Sitzung)!', 'success');
+                window.showToast('Passwort für ' + window.loggedInUser + ' geändert!', 'success');
             } else {
-                window.showToast('Ungültiges Passwort!', 'error');
+                window.showToast('Ungültiges Passwort (min. 4 Zeichen)!', 'error');
             }
         };
         
@@ -2308,7 +2349,7 @@
                 window.chosenHour = null;
             };
 
-            // Formulare (VOLLSTÄNDIG)
+            // Formular Logik
             const staticForms = [
                 {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
                 {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
@@ -2494,7 +2535,7 @@
                     snapshot.forEach(docSnap => {
                         carsData.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                    renderGallery([...staticCars, ...carsData]);
+                    renderGallery(carsData);
                 } else {
                     renderGallery(localCars);
                 }
