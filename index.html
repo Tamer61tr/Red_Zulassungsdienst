@@ -83,9 +83,10 @@
         .supervisor-only-inline { display: none !important; }
         body.is-supervisor .supervisor-only-inline { display: inline-flex !important; }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #050507; }
-        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 10px; }
+        /* Globale ovale und eingelassene Scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; margin: 10px 0; border-radius: 100vw; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 100vw; border: 2px solid var(--bg-dark); background-clip: padding-box; }
         ::-webkit-scrollbar-thumb:hover { background: #ff1a1a; }
 
         .plate-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: -1; overflow: hidden; }
@@ -231,20 +232,25 @@
         .custom-dialog-window { 
             background: linear-gradient(135deg, #121216 0%, #070709 100%); 
             border: 1px solid rgba(255,255,255,0.05); border-top: 2px solid var(--primary-red);
-            width: 92%; max-width: 490px; max-height: 90vh; overflow-y: auto; 
-            border-radius: 30px; padding: 40px 30px; 
+            width: 92%; max-width: 490px; max-height: 90vh; overflow-y: auto; overflow-x: hidden;
+            border-radius: 30px; padding: 40px 30px; padding-right: 25px;
             position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.7); 
             transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
             text-align: center; 
         }
-        .custom-dialog-window::-webkit-scrollbar { width: 4px; }
-        .custom-dialog-window::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 4px; }
+
+        /* Ovale Scrollbars für Modal-Fenster */
+        .custom-dialog-window::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-dialog-window::-webkit-scrollbar-track { background: transparent; margin: 20px 0; border-radius: 100vw; }
+        .custom-dialog-window::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 100vw; border: 2px solid #121216; background-clip: padding-box; }
+        .custom-dialog-window::-webkit-scrollbar-thumb:hover { background: #ff1a1a; }
 
         .custom-dialog-overlay.open .custom-dialog-window { transform: scale(1); }
         .close-dialog-btn { position: absolute; top: 20px; right: 25px; font-size: 22px; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10; }
         .close-dialog-btn:hover { color: #fff; transform: scale(1.1); }
 
         #adminModal .custom-dialog-window { max-width: 550px; }
+        #crmOverlay .custom-dialog-window { max-width: 800px; border-top-color: #00ffff; box-shadow: 0 20px 60px rgba(0,255,255,0.2); text-align: left; }
         #passChangeOverlay .custom-dialog-window { max-width: 380px; border-top-color: #b38728; }
         #confirmModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15); }
         #deleteConfirmOverlay .custom-dialog-window { max-width: 400px; border-top-color: #ff3b30; box-shadow: 0 20px 50px rgba(255,59,48,0.15); }
@@ -266,7 +272,11 @@
         #widgetModalOverlay .custom-dialog-window { max-width: 380px; border-top-color: #fff; box-shadow: 0 20px 50px rgba(255,255,255,0.05); }
         #supervisorPermsOverlay .custom-dialog-window { max-width: 450px; border-top-color: #ff00ff; box-shadow: 0 20px 50px rgba(255,0,255,0.15); }
 
-        .admin-list-wrapper { max-height: 350px; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
+        .admin-list-wrapper { max-height: 350px; overflow-y: auto; overflow-x: hidden; margin-top: 15px; padding-right: 5px; }
+        .admin-list-wrapper::-webkit-scrollbar { width: 6px; }
+        .admin-list-wrapper::-webkit-scrollbar-track { background: transparent; border-radius: 100vw; margin: 10px 0; }
+        .admin-list-wrapper::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 100vw; }
+
         .admin-apt-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; margin-top: 12px; position: relative; border-left: 4px solid #555; text-align: left; transition: 0.3s; }
         .admin-apt-card.marked { border: 1px solid #b38728; background: rgba(179,135,40,0.08); box-shadow: 0 0 15px rgba(179,135,40,0.2); border-left-width: 4px; }
         .admin-apt-card.prio-high { border-left-color: #ff3b30; background: rgba(255,59,48,0.05); }
@@ -295,9 +305,9 @@
         .pinned-plate { 
             position: fixed; background: #fff; color: #000; border: 2px solid #000; border-radius: 6px; 
             padding: 3px 6px; font-family: 'Courier New', monospace; font-weight: bold; 
-            display: flex; align-items: center; gap: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); 
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); 
             cursor: grab; z-index: 9000; transition: box-shadow 0.3s, filter 0.3s, opacity 0.3s; 
-            user-select: none; touch-action: none; pointer-events: auto; width: max-content;
+            user-select: none; touch-action: none; pointer-events: auto; width: max-content; max-width: 90vw;
         }
         .pinned-plate:active { cursor: grabbing; box-shadow: 0 15px 35px rgba(0,0,0,0.9); }
         
@@ -314,12 +324,12 @@
         .expired-plate:hover { opacity: 0.9 !important; filter: grayscale(0%); z-index: 9999; }
 
         .tuev-plakette {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 14px; height: 14px; border-radius: 50%;
-            border: 1px solid #111; color: #000 !important; background: #007aff;
-            font-family: Arial, sans-serif; font-weight: 900; font-size: 7px;
+            display: flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 1px solid #000; color: #000 !important; background: #007aff;
+            font-family: Arial, sans-serif; font-weight: 900; font-size: 8px;
             box-shadow: 0 0 2px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.8);
-            position: relative; flex-shrink: 0; pointer-events: none; margin: 0 4px;
+            flex-shrink: 0;
         }
 
         .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
@@ -412,23 +422,23 @@
         .section-edit-btn { display: none !important; }
         .admin-action-btn { display: none !important; }
         
-        body.is-admin.perm-content .editable-section:hover .section-edit-btn,
-        body.is-supervisor .editable-section:hover .section-edit-btn { 
+        body.is-admin.perm-content .editable-section .section-edit-btn,
+        body.is-supervisor .editable-section .section-edit-btn { 
             display: flex !important; position: absolute; top: 15px; right: 15px; z-index: 100; background: rgba(0,0,0,0.9);
             color: #00ffff; width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center;
             font-size: 16px; border: 1px solid #00ffff; transition: 0.3s; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
         .section-edit-btn:hover { background: #00ffff; color: #000; transform: scale(1.1); }
         
-        body.is-admin.perm-prices .card:hover .admin-action-btn.action-prices,
-        body.is-supervisor .card:hover .admin-action-btn.action-prices { 
+        body.is-admin.perm-prices .card .admin-action-btn.action-prices,
+        body.is-supervisor .card .admin-action-btn.action-prices { 
             display: flex !important; position: absolute; z-index: 90; background: rgba(0,0,0,0.95); 
             width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center; 
             font-size: 16px; transition: 0.3s; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
         
-        body.is-admin.perm-blocks .dynamic-block-inner:hover .admin-action-btn.action-blocks,
-        body.is-supervisor .dynamic-block-inner:hover .admin-action-btn.action-blocks { 
+        body.is-admin.perm-blocks .dynamic-block-inner .admin-action-btn.action-blocks,
+        body.is-supervisor .dynamic-block-inner .admin-action-btn.action-blocks { 
             display: flex !important; position: absolute; z-index: 90; background: rgba(0,0,0,0.95); 
             width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center; 
             font-size: 16px; transition: 0.3s; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
@@ -701,6 +711,7 @@
                 <div style="margin-top:15px; display:flex; justify-content:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
                     <button class="btn-primary" style="background:transparent; border:1px solid #b38728; color:#b38728; padding:8px 15px; flex:1;" onclick="window.changePassPrompt()"><i class="fa-solid fa-key"></i> Passwort</button>
                     <button class="btn-primary supervisor-only-inline" style="background:transparent; border:1px solid #ff00ff; color:#ff00ff; padding:8px 15px; flex:1;" onclick="window.openSupervisorPanel()"><i class="fa-solid fa-crown"></i> Rechte</button>
+                    <button class="btn-primary" style="background:transparent; border:1px solid #00ffff; color:#00ffff; padding:8px 15px; flex:1;" onclick="window.openCRM()"><i class="fa-solid fa-users"></i> Kunden</button>
                     <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; padding:8px 15px; flex:1;" onclick="window.triggerLogoutConfirm()"><i class="fa-solid fa-right-from-bracket"></i> Abmelden</button>
                 </div>
 
@@ -708,6 +719,72 @@
                     <div id="admin-list"></div>
                 </div>
                 <p class="mod-leads-locked" style="color:var(--text-muted); font-size:11px; margin-top:20px;"><i class="fa-solid fa-lock"></i> Der Supervisor hat das Termin-Modul gesperrt.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="crmOverlay">
+        <div class="custom-dialog-window" style="max-width: 800px; border-top-color: #00ffff; text-align: left;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCRM()"></i>
+            <h3 style="color:#00ffff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-users"></i> Kundenregister (CRM)</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px;">Alle buchenden Kunden werden hier vollautomatisch inklusive einzigartiger RED-ID erfasst.</p>
+            <input type="text" id="crmSearch" class="form-control" placeholder="Suche nach Name, E-Mail, Telefon oder Kunden-ID..." onkeyup="window.filterCRM()" style="margin-bottom: 20px;">
+            
+            <div id="crmList" class="admin-list-wrapper" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;"></div>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="crmDetailOverlay">
+        <div class="custom-dialog-window" style="max-width: 600px; border-top-color: #00ffff; text-align: left;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCRMDetail()"></i>
+            <h3 style="color:#00ffff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-user-pen"></i> Kunden-Akte</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px;">Bearbeiten Sie hier die detaillierten Informationen dieses Kunden.</p>
+            
+            <input type="hidden" id="crmEditClientId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kunden-ID (Schreibgeschützt)</label>
+                    <input type="text" id="crmEditClientIdView" class="form-control" readonly style="color:#00ffff; font-family:'Courier New', monospace; font-weight:bold; background:rgba(0,0,0,0.8);">
+                </div>
+                <div class="form-group">
+                    <label>Vor- und Nachname</label>
+                    <input type="text" id="crmEditName" class="form-control">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Telefonnummer</label>
+                    <input type="text" id="crmEditPhone" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>E-Mail Adresse</label>
+                    <input type="email" id="crmEditEmail" class="form-control">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Geburtstag</label>
+                    <input type="date" id="crmEditBirthday" class="form-control" style="color:white; background:#111114;">
+                </div>
+                <div class="form-group">
+                    <label>Adresse (Straße & Hausnr.)</label>
+                    <input type="text" id="crmEditAddress" class="form-control">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>PLZ / Ort</label>
+                    <input type="text" id="crmEditCity" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notizen / Kunden-Historie</label>
+                <textarea id="crmEditNotes" class="form-control" rows="4" style="resize:vertical;"></textarea>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; flex:1; justify-content:center;" onclick="window.deleteCRMClient()"><i class="fa-solid fa-trash"></i> Akte löschen</button>
+                <button class="btn-primary" style="background:#00ffff; color:#000; flex:2; justify-content:center;" onclick="window.saveCRMDetail()"><i class="fa-solid fa-floppy-disk"></i> Akte Speichern</button>
             </div>
         </div>
     </div>
@@ -1289,7 +1366,7 @@
         </div>
 
         <div class="hero editable-section">
-            <div class="section-edit-btn action-content" onclick="window.openContentEditor('hero')" style="right:5%; top:20px;"><i class="fa-solid fa-pencil"></i></div>
+            <div class="section-edit-btn action-content" onclick="window.openContentEditor('hero')"><i class="fa-solid fa-pencil"></i></div>
             <div class="hero-content">
                 <div class="sofort-badge">
                     <i class="fa-solid fa-bolt" style="margin-right:8px;"></i> 
@@ -1730,6 +1807,100 @@
             document.body.classList.toggle('perm-ticker', perms.ticker);
         };
 
+        // KUNDENREGISTER / CRM LOGIK
+        window.openCRM = function() {
+            document.getElementById('crmOverlay').classList.add('open');
+            window.renderCRM();
+        };
+
+        window.closeCRM = function() {
+            document.getElementById('crmOverlay').classList.remove('open');
+        };
+
+        window.openCRMDetail = function(clientId, name, phone, email) {
+            document.getElementById('crmEditClientId').value = clientId;
+            document.getElementById('crmEditClientIdView').value = clientId !== 'N/A' ? clientId : 'Nicht vergeben';
+            document.getElementById('crmEditName').value = name !== 'undefined' ? name : '';
+            document.getElementById('crmEditPhone').value = phone !== 'undefined' && phone ? phone : '';
+            document.getElementById('crmEditEmail').value = email !== 'undefined' && email ? email : '';
+
+            const detail = window.crmClientsDetail[clientId] || {};
+            document.getElementById('crmEditBirthday').value = detail.birthday || '';
+            document.getElementById('crmEditAddress').value = detail.address || '';
+            document.getElementById('crmEditCity').value = detail.city || '';
+            document.getElementById('crmEditNotes').value = detail.notes || '';
+
+            document.getElementById('crmDetailOverlay').classList.add('open');
+        };
+
+        window.closeCRMDetail = function() {
+            document.getElementById('crmDetailOverlay').classList.remove('open');
+        };
+
+        window.renderCRM = function() {
+            const list = document.getElementById('crmList');
+            list.innerHTML = '';
+            
+            // Gruppieren der buchenden Kunden anhand von ID/Email
+            let clientsMap = {};
+            (window.redApts || []).forEach(apt => {
+                let key = apt.clientId || apt.email || apt.name;
+                if(!clientsMap[key]) {
+                    clientsMap[key] = {
+                        clientId: apt.clientId || 'N/A',
+                        name: apt.name,
+                        phone: apt.phone,
+                        email: apt.email,
+                        bookings: 1,
+                        latestDate: apt.date,
+                        mapKey: key
+                    };
+                } else {
+                    clientsMap[key].bookings++;
+                }
+            });
+            
+            let clients = Object.values(clientsMap);
+            
+            if(clients.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Noch keine Kunden im System erfasst.</p>';
+                return;
+            }
+            
+            clients.forEach(c => {
+                let waLink = c.phone ? `https://wa.me/${c.phone.replace(/\D/g,'').replace(/^0/,'49')}` : '#';
+                list.innerHTML += `
+                    <div class="crm-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                            <div>
+                                <h4 style="color:#fff; font-size:14px; margin-bottom:4px;">${c.name}</h4>
+                                <span style="font-family:'Courier New', monospace; font-size:11px; color:#00ffff; font-weight:bold; background:rgba(0,255,255,0.1); padding:2px 6px; border-radius:4px;">${c.clientId}</span>
+                                <span style="font-size:10px; color:var(--text-muted); margin-left:10px;">Buchungen: ${c.bookings}</span>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                ${c.phone ? `
+                                <a href="tel:${c.phone}" class="btn-primary" style="padding:6px 10px; background:#007aff; font-size:12px;" title="Anrufen"><i class="fa-solid fa-phone"></i></a>
+                                <a href="sms:${c.phone}" class="btn-primary" style="padding:6px 10px; background:#ff9500; font-size:12px;" title="SMS senden"><i class="fa-solid fa-comment-sms"></i></a>
+                                <a href="${waLink}" target="_blank" class="btn-primary" style="padding:6px 10px; background:#25D366; font-size:12px;" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                ` : ''}
+                                ${c.email ? `<a href="mailto:${c.email}" class="btn-primary" style="padding:6px 10px; background:#ff3b30; font-size:12px;" title="E-Mail schreiben"><i class="fa-solid fa-envelope"></i></a>` : ''}
+                                <button class="btn-primary" style="padding:6px 10px; background:rgba(0,255,255,0.1); color:#00ffff; border:1px solid #00ffff; font-size:12px;" onclick="window.openCRMDetail('${c.mapKey}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${c.email}')" title="Kunden-Akte öffnen & bearbeiten"><i class="fa-solid fa-user-pen"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.filterCRM = function() {
+            let filter = document.getElementById('crmSearch').value.toLowerCase();
+            let cards = document.getElementById('crmList').getElementsByClassName('crm-card');
+            for(let card of cards) {
+                let text = card.innerText.toLowerCase();
+                card.style.display = text.includes(filter) ? "block" : "none";
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const savedContact = JSON.parse(localStorage.getItem('red_contact'));
             if(savedContact) window.applyContactInfo(savedContact);
@@ -2090,6 +2261,56 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // --- NEU: Laden & Verwalten der Kunden-Detaildaten (CRM) ---
+        window.crmClientsDetail = JSON.parse(localStorage.getItem('red_crm_details') || '{}');
+        
+        onSnapshot(doc(db, "settings", "crm_details"), (docSnap) => {
+             if(docSnap.exists()) {
+                 window.crmClientsDetail = docSnap.data().details || {};
+                 localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+             }
+        });
+
+        window.saveCRMDetail = async function() {
+            const clientId = document.getElementById('crmEditClientId').value;
+            const detail = {
+                name: document.getElementById('crmEditName').value,
+                phone: document.getElementById('crmEditPhone').value,
+                email: document.getElementById('crmEditEmail').value,
+                birthday: document.getElementById('crmEditBirthday').value,
+                address: document.getElementById('crmEditAddress').value,
+                city: document.getElementById('crmEditCity').value,
+                notes: document.getElementById('crmEditNotes').value,
+            };
+
+            window.crmClientsDetail[clientId] = detail;
+            try {
+                await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
+                window.showToast('Kunden-Akte gespeichert!', 'success');
+            } catch(e) {
+                localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+                window.showToast('Lokal gespeichert.', 'success');
+            }
+            window.closeCRMDetail();
+            window.renderCRM();
+        };
+
+        window.deleteCRMClient = async function() {
+            const clientId = document.getElementById('crmEditClientId').value;
+            if(confirm('Möchten Sie diese Akte (mitsamt Notizen & Basisdaten) wirklich löschen?')) {
+                delete window.crmClientsDetail[clientId];
+                try {
+                    await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
+                } catch(e) {
+                    localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+                }
+                window.showToast('Kunden-Akte gelöscht.', 'success');
+                window.closeCRMDetail();
+                window.renderCRM();
+            }
+        };
+        // -----------------------------------------------------------
 
         window.sysAuth = {
             "Tamer Yazici": { pass: "616161", role: "admin" },
@@ -2728,7 +2949,7 @@
                     document.getElementById('tickerBlinkWord').value = data.blinkWord || '';
                     document.getElementById('tickerSpeed').value = data.speed || '15s';
                     document.getElementById('tickerColor').value = data.color || '#ffffff';
-                    document.getElementById('tickerBlinkColor').value = data.blinkColor || '#e60000';
+                    document.getElementById('tickerBlinkColor').value= data.blinkColor || '#e60000';
                     document.getElementById('tickerFont').value = data.font || "'Montserrat', sans-serif";
                     document.getElementById('tickerSize').value = data.size || '13px';
                     
@@ -3287,7 +3508,7 @@
                            mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
                        }
                     } else {
-                       mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                        mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
                     }
                     
                     card.innerHTML = `
