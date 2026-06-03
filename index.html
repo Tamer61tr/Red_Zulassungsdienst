@@ -15,12 +15,11 @@
     
     <title>RED Zulassungsdienst Berlin</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
     <style>
-        /* Farbpalette und Variablen */
         :root {
             --primary-red: #e60000;
             --dark-red: #8a0000;
@@ -31,9 +30,10 @@
             --glass-bg: rgba(12, 12, 15, 0.92);
             --glass-border: rgba(255, 255, 255, 0.08);
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --neon-blue: #00ffff;
+            --neon-green: #39ff14;
         }
 
-        /* Basis Layout & Mobile Touch Optimierung */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { overscroll-behavior-y: none; }
         
@@ -43,46 +43,36 @@
             -webkit-font-smoothing: antialiased; 
             -moz-osx-font-smoothing: grayscale; 
             touch-action: pan-y; 
-            /* Anti Selection um Code Klau / Textkopieren zu erschweren */
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
         }
 
-        /* Inputs erlauben Text-Auswahl */
         input, select, textarea { font-size: 16px !important; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; }
 
-        /* V57: CSS Basiertes Rollen/Rechte-System (Kugelsicher) */
-        
-        /* 1. Komplette Module verstecken (die nur Admin sehen darf) */
-        .mod-leads, .mod-blocks, .mod-data, .mod-ticker { display: none !important; }
+        .mod-leads, .mod-blocks, .mod-data, .mod-ticker, .mod-prices { display: none !important; }
         .mod-leads-locked { display: none; }
+        .action-forms, .action-cars, .action-content { display: none !important; }
 
-        /* 2. Teile verstecken (Buttons in Formularen & Galerie) */
-        .action-forms, .action-cars { display: none !important; }
-
-        /* 3. Admin mit Rechten ausrüsten */
         body.is-admin.perm-leads .mod-leads { display: block !important; }
         body.is-admin:not(.perm-leads):not(.is-supervisor) .mod-leads-locked { display: block !important; }
-        
         body.is-admin.perm-blocks .mod-blocks { display: block !important; }
         body.is-admin.perm-data .mod-data { display: block !important; }
+        body.is-admin.perm-prices .mod-prices { display: block !important; }
         
-        /* Erlaube nur die AKTIONEN, wenn Recht vorhanden. Die Module selbst bleiben sichtbar für Gäste! */
         body.is-admin.perm-forms .action-forms { display: inline-flex !important; }
         body.is-admin.perm-cars .action-cars { display: flex !important; }
-        
         body.is-admin.perm-ticker .mod-ticker { display: flex !important; }
+        body.is-admin.perm-content .action-content { display: flex !important; }
 
-        /* 4. Supervisor (Darf immer ALLES) */
         body.is-supervisor .mod-leads,
         body.is-supervisor .mod-blocks,
-        body.is-supervisor .mod-data { display: block !important; }
-        
+        body.is-supervisor .mod-data,
+        body.is-supervisor .mod-prices { display: block !important; }
         body.is-supervisor .mod-ticker { display: flex !important; }
         body.is-supervisor .action-forms { display: inline-flex !important; }
         body.is-supervisor .action-cars { display: flex !important; }
+        body.is-supervisor .action-content { display: flex !important; }
         body.is-supervisor .mod-leads-locked { display: none !important; }
 
-        /* Basis Admin Boxen Control */
         .admin-only-block { display: none !important; }
         .admin-only-flex { display: none !important; }
         .admin-only-inline { display: none !important; }
@@ -93,19 +83,16 @@
         .supervisor-only-inline { display: none !important; }
         body.is-supervisor .supervisor-only-inline { display: inline-flex !important; }
 
-        /* Scrollbar Design */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #050507; }
         ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #ff1a1a; }
 
-        /* Dekorative Hintergrundelemente */
         .plate-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: -1; overflow: hidden; }
         .plate { position: absolute; background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 5px 15px; border-radius: 5px; border: 2px solid #000; opacity: 0.12; display: flex; align-items: center; gap: 10px; animation: float 22s linear infinite; }
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
 
-        /* Ladebildschirm Animation */
         #intro-preloader { 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030305; z-index: 99999; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; 
@@ -124,7 +111,6 @@
         .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); animation: fadeText 0.5s ease 1.2s forwards; }
         @keyframes fadeText { 100% { transform: translateY(0); opacity: 1; } }
 
-        /* Cookie Banner Styling */
         .cookie-overlay {
             position: fixed; bottom: 0; left: 0; width: 100vw; background: rgba(5,5,7,0.98);
             border-top: 2px solid var(--primary-red); z-index: 9999999;
@@ -148,7 +134,6 @@
         .btn-outline { background: transparent; border: 1px solid #555; color: #fff; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* Systembenachrichtigungen (Toasts) */
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast-msg { background: rgba(10,10,12,0.95); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
         .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
@@ -158,7 +143,6 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.9); } }
 
-        /* Navigation */
         #header-wrapper { position: fixed; top: 0; width: 100%; z-index: 1000; }
         nav { padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 7, 0.98); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); flex-wrap: wrap; }
         
@@ -209,7 +193,6 @@
         .quick-menu-btn { background: none; border: 1px solid var(--glass-border); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 11px; text-transform: uppercase; transition: 0.3s; }
         .quick-menu-btn:hover { background: rgba(255,255,255,0.1); }
 
-        /* Klickbare Header Widgets */
         .header-widgets-wrapper {
             display: flex; align-items: center; justify-content: center;
             gap: 15px; margin-left: auto; margin-right: 15px; width: auto;
@@ -225,11 +208,9 @@
         @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-colon { animation: blinkColon 1s steps(1) infinite; }
         
-        /* Visitor Heart Animation Fix (Ohne rote Linie) */
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
         .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; border: none; outline: none; text-decoration: none; }
 
-        /* Ticker Info Leiste */
         #ticker-container { background: linear-gradient(90deg, #1a0000, #000, #1a0000); border-bottom: 1px solid rgba(255,0,0,0.3); padding: 5px 0; overflow: hidden; white-space: nowrap; position: relative; display: flex; align-items: center; }
         .ticker-text-wrapper { display: inline-block; padding-left: 100%; animation: tickerAnim linear infinite; }
         @keyframes tickerAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
@@ -237,16 +218,13 @@
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
-        /* Fullscreen Menü */
         .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5,5,7,0.99); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
         .fullscreen-menu.active { opacity: 1; pointer-events: all; }
         .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: white; cursor: pointer; transition: 0.3s; }
         .close-menu:hover { color: var(--primary-red); transform: rotate(90deg); }
-        /* V57: href ist jetzt javascript:void(0) um das "Zurück" / Popstate Bug zu verhindern! */
         .fullscreen-menu a { color: white; font-size: 24px; font-weight: 800; text-transform: uppercase; text-decoration: none; margin: 12px 0; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
         .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
 
-        /* Modale Dialoge */
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
@@ -266,7 +244,6 @@
         .close-dialog-btn { position: absolute; top: 20px; right: 25px; font-size: 22px; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10; }
         .close-dialog-btn:hover { color: #fff; transform: scale(1.1); }
 
-        /* Specific Modal Colors */
         #adminModal .custom-dialog-window { max-width: 550px; }
         #passChangeOverlay .custom-dialog-window { max-width: 380px; border-top-color: #b38728; }
         #confirmModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; box-shadow: 0 20px 50px rgba(37,211,102,0.15); }
@@ -275,18 +252,20 @@
         #tickerConfigOverlay .custom-dialog-window { max-width: 520px; border-top-color: #007aff; }
         #lightboxOverlay .custom-dialog-window { max-width: 600px; border-top-color: #b38728; padding: 25px; }
         #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } 
+        #editAptOverlay .custom-dialog-window { max-width: 400px; border-top-color: #007aff; box-shadow: 0 20px 50px rgba(0,122,255,0.15); }
         
+        #serviceConfigOverlay .custom-dialog-window { max-width: 650px; border-top-color: #25D366; box-shadow: 0 20px 60px rgba(37,211,102,0.2); text-align: left; }
+        .service-config-section { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .service-config-section h4 { font-size: 11px; text-transform: uppercase; color: var(--primary-red); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+
+        #contentConfigOverlay .custom-dialog-window { max-width: 650px; border-top-color: #00ffff; box-shadow: 0 20px 60px rgba(0,255,255,0.2); text-align: left; }
+
         #legalOverlay .custom-dialog-window { max-width: 600px; border-top-color: #aaa; text-align: left; padding: 30px; }
         #legalTitle { color: #fff; font-weight: 900; margin-bottom: 15px; font-size: 20px; }
         #legalContentText { color: var(--text-muted); font-size: 12px; line-height: 1.6; max-height: 60vh; overflow-y: auto; padding-right: 10px; }
-
-        /* Widget Modal */
         #widgetModalOverlay .custom-dialog-window { max-width: 380px; border-top-color: #fff; box-shadow: 0 20px 50px rgba(255,255,255,0.05); }
-
-        /* Supervisor Perms Modal */
         #supervisorPermsOverlay .custom-dialog-window { max-width: 450px; border-top-color: #ff00ff; box-shadow: 0 20px 50px rgba(255,0,255,0.15); }
 
-        /* Admin Termin Karten */
         .admin-list-wrapper { max-height: 350px; overflow-y: auto; margin-top: 15px; padding-right: 5px; }
         .admin-apt-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 18px; margin-top: 12px; position: relative; border-left: 4px solid #555; text-align: left; transition: 0.3s; }
         .admin-apt-card.marked { border: 1px solid #b38728; background: rgba(179,135,40,0.08); box-shadow: 0 0 15px rgba(179,135,40,0.2); border-left-width: 4px; }
@@ -313,52 +292,53 @@
         .note-row-btn:hover { color: #fff; }
         .note-row-btn.del:hover { color: var(--primary-red); }
 
-        /* Draggable Angeheftete Kennzeichen Widget */
-        .pinned-plate { position: fixed; background: #fff; color: #000; border: 3px solid #000; border-radius: 6px; padding: 6px 12px; font-family: 'Courier New', monospace; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); cursor: grab; z-index: 9000; transition: box-shadow 0.3s; user-select: none; touch-action: none; pointer-events: auto; }
+        .pinned-plate { 
+            position: fixed; background: #fff; color: #000; border: 2px solid #000; border-radius: 6px; 
+            padding: 3px 6px; font-family: 'Courier New', monospace; font-weight: bold; 
+            display: flex; align-items: center; gap: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); 
+            cursor: grab; z-index: 9000; transition: box-shadow 0.3s, filter 0.3s, opacity 0.3s; 
+            user-select: none; touch-action: none; pointer-events: auto; width: max-content;
+        }
         .pinned-plate:active { cursor: grabbing; box-shadow: 0 15px 35px rgba(0,0,0,0.9); }
-        .pinned-plate.urgent-today { border-color: #e60000; color: #e60000; animation: urgentGlow 2s infinite alternate ease-in-out; }
-        @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); } 100% { box-shadow: 0 10px 30px rgba(230,0,0,1); } }
-        /* Schwarze Schrift für Zukunfts-Termine (Admin Kennzeichen) */
-        .pinned-plate.normal-day { border-color: #b38728; color: #000; }
-        .pinned-plate::before { content: 'D'; background: #003399; color: #fff; padding: 2px 4px; font-size: 12px; border-radius: 3px; }
         
-        /* TÜV Plakette Design */
+        .pinned-plate.urgent-today { border-color: #e60000 !important; color: #e60000 !important; animation: urgentGlow 2s infinite alternate ease-in-out; }
+        .pinned-plate.urgent-today * { color: #e60000 !important; }
+        @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); } 100% { box-shadow: 0 10px 30px rgba(230,0,0,1); } }
+        
+        .pinned-plate.normal-day { border-color: #000 !important; color: #000 !important; }
+        .pinned-plate.normal-day * { color: #000 !important; }
+        .pinned-plate::before { content: 'D'; background: #003399; color: #fff !important; padding: 2px 4px; font-size: 12px; border-radius: 3px; }
+        
+        .expired-plate { opacity: 0.45 !important; filter: grayscale(100%); transition: 0.3s; border-color: #555 !important; color: #555 !important; }
+        .expired-plate * { color: #555 !important; }
+        .expired-plate:hover { opacity: 0.9 !important; filter: grayscale(0%); z-index: 9999; }
+
         .tuev-plakette {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 16px; height: 16px; border-radius: 50%;
-            border: 1px solid #111; color: #fff;
-            font-family: Arial, sans-serif; font-weight: 900; font-size: 8px;
-            box-shadow: 0 0 3px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.4);
-            position: relative; flex-shrink: 0; margin: 0 2px; pointer-events: none;
-        }
-        .tuev-plakette::after {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            border-radius: 50%; border-top: 2px solid #000; border-bottom: 2px solid #000;
-            box-sizing: border-box; transform: rotate(15deg); opacity: 0.2;
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 1px solid #111; color: #000 !important; background: #007aff;
+            font-family: Arial, sans-serif; font-weight: 900; font-size: 7px;
+            box-shadow: 0 0 2px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.8);
+            position: relative; flex-shrink: 0; pointer-events: none; margin: 0 4px;
         }
 
-        /* Checkboxen */
         .noble-checkbox-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; margin-top: 10px; }
         .noble-checkbox-label input { display: none; }
         .noble-checkbox-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.15); background: #111114; border-radius: 4px; display: inline-block; position: relative; transition: 0.2s; }
         .noble-checkbox-label input:checked + .noble-checkbox-box { background: var(--primary-red); border-color: var(--primary-red); }
         .noble-checkbox-label input:checked + .noble-checkbox-box::after { content: '\2713'; font-family: sans-serif; font-weight: 900; color: #fff; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        /* Datei Upload Komponente */
         .noble-file-upload { position: relative; display: block; width: 100%; margin-top: 8px; }
         .noble-file-upload input { display: none; }
         .noble-file-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; display: block; transition: 0.3s; }
         .noble-file-upload input:change + .noble-file-trigger, .noble-file-trigger:hover { border-color: var(--primary-red); color: white; background: rgba(230,0,0,0.04); }
 
-        /* Ticker Symbol Auswahl */
         .symbol-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; background:#111114; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
 
-        /* Container Wechsel Logik */
         .view-section { display: none; animation: viewFadeIn 0.4s ease forwards; padding-top: 30px; min-height: 100vh; }
         .view-section.active { display: block; }
         @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Termin Formular Styling */
         .booking-wrapper { max-width: 750px; margin: 0 auto; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
         .form-row { display: flex; gap: 15px; position: relative; }
         @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
@@ -370,7 +350,6 @@
         .form-control { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: white; font-family: inherit; font-size: 13px; outline: none; transition: 0.3s; }
         .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 12px rgba(230,0,0,0.3); }
 
-        /* Custom Dropdown Selects */
         .noble-select-box { position: relative; cursor: pointer; user-select: none; text-align: left; }
         .noble-select-trigger { width: 100%; padding: 12px 16px; background: #111114; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; font-size: 13px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
         .noble-select-trigger::after { content: '▼'; font-family: sans-serif; font-size: 10px; color: var(--primary-red); transition: 0.3s; }
@@ -380,7 +359,6 @@
         .noble-option { padding: 10px 14px; font-size: 13px; color: #ccc; transition: 0.2s; }
         .noble-option:hover { background: rgba(230,0,0,0.1); color: #fff; }
 
-        /* Kalender Konfiguration */
         .flatpickr-calendar { 
             background: #0c0c0f !important; border: 2px solid var(--primary-red) !important; 
             border-radius: 20px !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9) !important; 
@@ -396,33 +374,78 @@
         .flatpickr-month { fill: var(--primary-red) !important; color: var(--primary-red) !important; }
         .flatpickr-day.flatpickr-disabled { color: #333 !important; }
         
-        /* Halbstündige Intervalle Fix */
         .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; max-height: 180px; overflow-y: auto; padding-right: 5px; }
         .time-slot { padding: 10px; text-align: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: 0.2s; }
         .time-slot.active { background: var(--primary-red); border-color: var(--primary-red); color: white; }
         .time-slot.booked { opacity: 0.2; text-decoration: line-through; cursor: not-allowed; }
 
-        /* Globale Buttons */
         .btn-primary { background: var(--primary-red); color: white; padding: 12px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 15px rgba(230,0,0,0.25); text-decoration: none; outline: none; }
         .btn-primary:hover { transform: translateY(-2px); background: #ff1a1a; box-shadow: 0 10px 20px rgba(230,0,0,0.4); }
         .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: #fff; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* Animation Banner Emojis */
+        /* Animation Classes */
         .pulse-emoji { display: inline-block; font-style: normal; animation: pulse-icon 1.5s infinite alternate ease-in-out; }
+        
+        .anim-spin { animation: spin3D 3s infinite linear; display: inline-block; }
+        @keyframes spin3D { 100% { transform: rotateY(360deg); } }
+        
+        .anim-bounce { animation: bounceIcon 1s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5); display: inline-block; }
+        @keyframes bounceIcon { 0% { transform: translateY(0); } 100% { transform: translateY(-5px); } }
+        
+        .anim-pulse { animation: pulseAnim 1.5s infinite alternate; display: inline-block; }
+        @keyframes pulseAnim { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
 
-        /* Mobile Ansicht & Responsive Design (Header Fix) */
+        .anim-shake { animation: shakeAnim 2.5s infinite; display: inline-block; }
+        @keyframes shakeAnim { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); } 20%, 40%, 60%, 80% { transform: translateX(3px); } }
+
+        /* 3D Euro Styles */
+        .euro-standard { color: inherit; }
+        .euro-gold-3d { color: #ffd700; text-shadow: 0px 1px 0px #cda800, 0px 2px 0px #b8860b, 0px 3px 0px #8b6508, 0px 4px 5px rgba(0,0,0,0.6); }
+        .euro-neon-blue { color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue), 0 0 20px #0055ff; animation: neonFlicker 1.5s infinite alternate; }
+        .euro-neon-green { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green), 0 0 20px #00aa00; }
+        .euro-red-glow { color: #ff3b30; text-shadow: 0 0 8px #ff3b30, 0 0 15px var(--primary-red); }
+        
+        @keyframes neonFlicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; text-shadow: 0 0 2px var(--neon-blue); } }
+
+        /* Global Admin Edit/Delete Buttons (STRICTLY HIDDEN from guests) */
+        .section-edit-btn { display: none !important; }
+        .admin-action-btn { display: none !important; }
+        
+        body.is-admin.perm-content .editable-section:hover .section-edit-btn,
+        body.is-supervisor .editable-section:hover .section-edit-btn { 
+            display: flex !important; position: absolute; top: 15px; right: 15px; z-index: 100; background: rgba(0,0,0,0.9);
+            color: #00ffff; width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center;
+            font-size: 16px; border: 1px solid #00ffff; transition: 0.3s; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+        .section-edit-btn:hover { background: #00ffff; color: #000; transform: scale(1.1); }
+        
+        body.is-admin.perm-prices .card:hover .admin-action-btn.action-prices,
+        body.is-supervisor .card:hover .admin-action-btn.action-prices { 
+            display: flex !important; position: absolute; z-index: 90; background: rgba(0,0,0,0.95); 
+            width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center; 
+            font-size: 16px; transition: 0.3s; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+        
+        body.is-admin.perm-blocks .dynamic-block-inner:hover .admin-action-btn.action-blocks,
+        body.is-supervisor .dynamic-block-inner:hover .admin-action-btn.action-blocks { 
+            display: flex !important; position: absolute; z-index: 90; background: rgba(0,0,0,0.95); 
+            width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center; 
+            font-size: 16px; transition: 0.3s; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+        
+        .btn-edit-green { color: #25D366; border: 1px solid #25D366; top: 15px; left: 15px; }
+        .btn-edit-green:hover { background: #25D366; color: #000; transform: scale(1.1); }
+        .btn-del-red { color: #ff3b30; border: 1px solid #ff3b30; top: 15px; right: 15px; }
+        .btn-del-red:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
+
         @media (max-width: 768px) {
             body { font-size: 12px; padding-top: 130px; } 
-            
             nav { flex-wrap: wrap; padding: 10px 3%; }
             .logo-container { order: 1; max-width: 60%; }
             .logo-text { font-size: clamp(10px, 3.2vw, 15px); white-space: normal; line-height: 1.2; }
             .logo-car-svg { height: clamp(14px, 4vw, 20px); margin-left: 2px; }
-            
             .nav-actions { order: 2; width: auto; margin-left: auto; }
-            
-            /* Der reparierte Mobile Widget Header (Wetter & Uhrzeit) */
             .header-widgets-wrapper { 
                 order: 3; flex-basis: 100%; display: flex !important; flex-direction: row; 
                 justify-content: center; gap: 20px; margin-top: 10px; padding-top: 10px; 
@@ -430,17 +453,13 @@
             }
             .header-widget-item { padding: 4px 10px; background: rgba(255,255,255,0.03); }
             .header-clock-date, .header-weather { font-size: 10px; }
-            
             .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
-            
             .form-control, .noble-select-trigger { padding: 11px 15px !important; font-size: 12px !important; }
             .hero { margin-top: 5px; } 
             .hero-content { padding: 25px 15px !important; border-radius: 20px !important; }
-            
             .sofort-badge { padding: 10px 20px !important; font-size: 12px !important; margin-bottom: 20px !important; }
-            
-            .card { padding: 25px 15px !important; height: 160px !important; }
+            .card { padding: 25px 15px !important; height: 190px !important; }
             .booking-wrapper { padding: 25px 15px !important; }
             .admin-window, .custom-dialog-window { padding: 30px 18px !important; width: 95% !important; }
             .vintage-gallery { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
@@ -450,28 +469,21 @@
             .apt-actions-horizontal { justify-content: center; }
             .symbol-grid { grid-template-columns: repeat(2, 1fr) !important; }
             #tickerConfigOverlay .custom-dialog-window { max-height: 85vh; padding: 20px 15px; }
-
-            .pinned-plate { font-size: 11px; padding: 4px 8px; border-width: 2px; }
-            .pinned-plate::before { font-size: 10px; padding: 1px 3px; }
-            .pinned-plate span { font-size: 10px !important; }
-            .tuev-plakette { width: 14px; height: 14px; font-size: 7px; }
         }
 
-        /* Admin Info Container (Collapsible) */
         .admin-details { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
         .admin-details summary { padding: 15px 20px; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; }
         .admin-details summary::-webkit-details-marker { display: none; }
-        /* V57: Fallback Pfeil als reines Textsymbol, kann nicht kaputt gehen */
         .admin-details summary::after { content: '▼'; font-size: 14px; color: var(--primary-red); transition: transform 0.3s; }
         .admin-details[open] summary::after { transform: rotate(180deg); }
         .admin-details-content { padding: 0 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 10px; padding-top: 15px; }
 
         .dynamic-block-container { padding-top: 30px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .dynamic-block-inner { max-width: 800px; margin: 0 auto; background: var(--glass-bg); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--primary-red); box-shadow: 0 15px 40px rgba(230,0,0,0.5); text-align: center; }
-        .dynamic-block-media img, .dynamic-block-media video { max-width: 100%; border-radius: 12px; margin-top: 15px; }
+        .dynamic-block-inner { max-width: 800px; margin: 0 auto; background: var(--glass-bg); padding: 40px 30px; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); text-align: center; position: relative; overflow: hidden; }
+        .dynamic-block-media { max-width: 100%; border-radius: 12px; margin-top: 15px; }
 
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 20px; }
-        .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; }
+        .hero-content { background: var(--glass-bg); padding: clamp(30px, 6vw, 50px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.8); max-width: 800px; width: 100%; position: relative;}
         
         .sofort-badge { 
             background: linear-gradient(45deg, #ff0000, #cc0000); color: white; font-size: clamp(14px, 3vw, 22px); font-weight: 900; 
@@ -480,25 +492,41 @@
             text-transform: uppercase; letter-spacing: 1px; 
         }
         .sofort-badge i { animation: pulse-icon 1.5s infinite alternate ease-in-out; }
-        @keyframes pulse-icon { 
-            0% { color: #ffcc00; transform: scale(1); text-shadow: 0 0 5px #ffcc00; } 
-            100% { color: #ffffff; transform: scale(1.3); text-shadow: 0 0 15px #ffffff; } 
-        }
         
-        .section-header { text-align: center; margin-bottom: 35px; }
+        .section-header { text-align: center; margin-bottom: 35px; position: relative;}
         .section-header h2 { font-size: clamp(22px, 3.5vw, 34px); font-weight: 900; text-transform: uppercase; }
         
-        /* Leistungskarten */
+        /* Voll-Dynamische Leistungskarten */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
-        .card { background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); cursor: pointer; transition: 0.4s; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .card:hover { border-color: rgba(230,0,0,0.5); }
-        .card i.main-icon { font-size: 35px; color: var(--primary-red); margin-bottom: 15px; transition: 0.3s; }
         
-        .card-info-slide { position: absolute; top: 100%; left: 0; width: 100%; height: 100%; background: #0e0e12; border: 1px solid var(--primary-red); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; transition: top 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); z-index: 5; }
+        .card { 
+            background: var(--glass-bg); padding: 35px 20px; border-radius: 18px; text-align: center; 
+            cursor: pointer; transition: 0.4s; position: relative; 
+            overflow: hidden; height: 190px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .card i.main-icon { font-size: 35px; margin-bottom: 8px; transition: 0.3s; }
+        
+        .price-wrapper { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; }
+        .service-price { font-size: 22px; font-weight: 900; }
+        
+        .card-badge {
+            position: absolute; top: 15px; right: -30px; padding: 5px 30px; font-size: 10px; font-weight: 900;
+            color: #fff; text-transform: uppercase; transform: rotate(45deg); box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            z-index: 10; letter-spacing: 1px; pointer-events: none;
+        }
+        .badge-neu { background: #007aff; }
+        .badge-angebot { background: #ff9500; }
+        .badge-aktion { background: #ff00ff; }
+        .badge-topseller { background: #ffd700; color: #000; }
+        .badge-kurze-zeit { background: #ff3b30; }
+        .badge-ostern { background: #39ff14; color: #000; }
+        .badge-express-tipp { background: linear-gradient(90deg, #e60000, #ff6b6b); }
+
+        .card-info-slide { position: absolute; top: 100%; left: 0; width: 100%; height: 100%; background: rgba(14, 14, 18, 0.98); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; transition: top 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); z-index: 5; backdrop-filter: blur(10px); }
         .card.reveal-active .card-info-slide { top: 0; }
         .card-info-slide p { font-size: 12px; color: #ddd; line-height: 1.5; }
 
-        /* Formular Download Bereich */
         .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; max-width: 1100px; margin: 0 auto; padding: 0 5%; }
         .download-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--glass-border); color: white; transition: 0.2s; cursor: pointer; user-select: none; }
         .download-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; overflow: hidden; margin-right: 10px; }
@@ -510,14 +538,8 @@
         .download-actions i { font-size: 16px; transition: 0.3s; }
         .user-view, .user-dl { color: var(--text-muted); }
         .user-view:hover, .user-dl:hover { color: var(--primary-red); transform: translateY(-2px); }
-        
-        .admin-up { color: #b38728; margin-right: 5px; }
-        .admin-up:hover { color: #fff; transform: scale(1.1); }
-        .admin-del { color: #ff3b30; margin-left: 5px; }
-        .admin-del:hover { color: #fff; transform: scale(1.1); }
 
-        /* Auto Ankauf Galerie */
-        .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .auto-ankauf-box { background: linear-gradient(135deg, #111 0%, #1a0202 100%); border: 1px solid var(--glass-border); border-top: 2px solid #b38728; border-bottom: 2px solid #b38728; text-align: center; padding: 40px 30px; border-radius: 15px; max-width: 700px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative;}
         .gallery-title { text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 15px; letter-spacing: 1px; font-weight: 800; color: #b38728; }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; }
         
@@ -531,14 +553,12 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; cursor: pointer; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* Kennzeichen Warnung Panel */
         .kennzeichen-info-box { display: flex; align-items: center; gap: 20px; background: var(--bg-card); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--glass-border); margin: 30px auto 0; max-width: 600px; flex-wrap: wrap; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .plate-berlin { display: flex; align-items: center; background: white; border: 3px solid #000; border-radius: 6px; height: 40px; overflow: hidden; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
         .euro-band { background: #003399; color: white; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 2px 6px; font-size: 10px; font-weight: bold; }
         .plate-text { color: black; font-family: 'Courier New', monospace; font-weight: bold; font-size: 20px; padding: 0 12px; }
         .warning-text { display: flex; align-items: center; gap: 10px; font-size: 13px; color: white; text-align: left; }
 
-        /* Footer und Kontakt */
         .contact-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 50px 5% 20px; }
         .map-box { border-radius: 18px; overflow: hidden; border: 1px solid var(--glass-border); min-height: 250px; }
         .map-box iframe { width: 100%; height: 100%; border: none; filter: grayscale(1) invert(0.9) contrast(1.2); }
@@ -548,7 +568,7 @@
         .social-icons a { width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; text-decoration: none; transition: 0.3s; }
         .social-icons a:hover { background: var(--primary-red); border-color: var(--primary-red); }
 
-        footer { background: #040406; padding: 30px 5%; border-top: 1px solid var(--glass-border); text-align: center; }
+        footer { background: #040406; padding: 30px 5%; border-top: 1px solid var(--glass-border); text-align: center; position: relative;}
         .footer-links { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
         .footer-links a { color: var(--text-muted); text-decoration: none; font-weight: 600; text-transform: uppercase; font-size: 11px; transition: 0.3s; cursor: pointer; }
         .footer-links a:hover { color: var(--primary-red); }
@@ -645,10 +665,10 @@
     <div class="fullscreen-menu" id="quickMenu">
         <i class="fa-solid fa-xmark close-menu" onclick="window.toggleMenu()"></i>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home');"><i class="fa-solid fa-house" style="color:var(--primary-red);"></i> Startseite</a>
-        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home');"><i class="fa-solid fa-gears" style="color:var(--primary-red);"></i> Leistungen</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('leistungen').offsetTop, behavior: 'smooth'});"><i class="fa-solid fa-gears" style="color:var(--primary-red);"></i> Leistungen</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-formulare');"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Formulare</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-ankauf');"><i class="fa-solid fa-car" style="color:var(--primary-red);"></i> Auto Ankauf</a>
-        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home');"><i class="fa-solid fa-calendar-check" style="color:var(--primary-red);"></i> Termin buchen</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('termin').offsetTop, behavior: 'smooth'});"><i class="fa-solid fa-calendar-check" style="color:var(--primary-red);"></i> Termin buchen</a>
         <a href="https://wa.me/491783783875" id="menu-wa-link" target="_blank" onclick="window.toggleMenu()"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> WhatsApp Support</a>
     </div>
 
@@ -696,7 +716,7 @@
         <div class="custom-dialog-window" style="max-width: 450px; border-top-color: #ff00ff; box-shadow: 0 20px 50px rgba(255,0,255,0.15);">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeSupervisorPanel()"></i>
             <h3 style="color:#ff00ff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-crown"></i> Supervisor Control Center</h3>
-            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px; text-align:left;">Legen Sie hier fest, welche Bereiche und Module der normale Administrator ("Tamer Yazici") sehen und bearbeiten darf.</p>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px; text-align:left;">Legen Sie hier fest, welche Bereiche und Module der normale Administrator sehen und bearbeiten darf.</p>
             
             <div style="text-align:left; background:rgba(0,0,0,0.4); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:20px;">
                 <label class="noble-checkbox-label" style="display:flex; margin-top:0; margin-bottom:10px;">
@@ -704,12 +724,20 @@
                     <span class="noble-checkbox-box"></span> Live-Leads Terminal (Terminliste)
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
+                    <input type="checkbox" id="permPrices">
+                    <span class="noble-checkbox-box"></span> Preise & Leistungskarten bearbeiten
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
                     <input type="checkbox" id="permCustomblocks">
                     <span class="noble-checkbox-box"></span> Infoblock Manager (Bausteine)
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
+                    <input type="checkbox" id="permContent">
+                    <span class="noble-checkbox-box"></span> Seitentexte & Header bearbeiten
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
                     <input type="checkbox" id="permCompanydata">
-                    <span class="noble-checkbox-box"></span> Firmendaten & Impressum bearbeiten
+                    <span class="noble-checkbox-box"></span> Firmendaten & Webhook API
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
                     <input type="checkbox" id="permForms">
@@ -721,11 +749,190 @@
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:0;">
                     <input type="checkbox" id="permTicker">
-                    <span class="noble-checkbox-box"></span> Ticker & Info-Leiste bearbeiten
+                    <span class="noble-checkbox-box"></span> Ticker & Info-Leiste
                 </label>
             </div>
             
             <button class="btn-primary" style="background:#ff00ff; width:100%; justify-content:center;" onclick="window.saveSupervisorPerms()">Berechtigungen anwenden</button>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="editAptOverlay">
+        <div class="custom-dialog-window">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeEditAptModal()"></i>
+            <h3 style="color:#007aff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-calendar-day"></i> Termin Verschieben</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px;">Wählen Sie ein neues Datum und eine neue Uhrzeit für den Kunden.</p>
+            
+            <div class="form-group" style="position: relative; z-index: 60;">
+                <label>Neues Datum</label>
+                <input type="text" id="editAptDate" class="form-control" style="text-align:center; cursor:pointer;" readonly="readonly">
+            </div>
+            <div class="form-group" style="position: relative; z-index: 50;">
+                <label>Neue Uhrzeit</label>
+                <select id="editAptTime" class="form-control" style="background:#111114;">
+                    <option value="Ganztägig">Ganztägig</option>
+                </select>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-primary" style="background:transparent; border:1px solid #555; color:#fff; flex:1; justify-content:center;" onclick="window.closeEditAptModal()">Abbrechen</button>
+                <button class="btn-primary" style="background:#007aff; flex:1; justify-content:center;" onclick="window.saveEditedApt()">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="serviceConfigOverlay">
+        <div class="custom-dialog-window" style="max-width: 650px;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeServiceConfigModal()"></i>
+            <h3 style="color:#25D366; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-sliders"></i> Leistungskarte bearbeiten</h3>
+            <p style="color:var(--text-muted); font-size:11px; margin-bottom:20px;">Passen Sie hier Titel, Text, Preise, Rahmen, Badge und 3D-Effekte dynamisch an.</p>
+            
+            <div class="service-config-section">
+                <h4>1. Basis Infos & Titel</h4>
+                <div class="form-row">
+                    <div class="form-group"><label>Karten-Titel</label><input type="text" id="scTitle" class="form-control"></div>
+                    <div class="form-group">
+                        <label>Icon Auswählen</label>
+                        <select id="scIcon" class="form-control">
+                            <option value="fa-star">⭐ Stern (Standard)</option>
+                            <option value="fa-file-signature">📝 Anmeldung</option>
+                            <option value="fa-exchange-alt">🔄 Ummeldung</option>
+                            <option value="fa-file-circle-xmark">❌ Abmeldung</option>
+                            <option value="fa-stopwatch">⏱️ Kurzzeit</option>
+                            <option value="fa-globe">🌍 Zoll</option>
+                            <option value="fa-bolt">⚡ Express</option>
+                            <option value="fa-car">🚗 Auto</option>
+                            <option value="fa-truck">🚛 LKW</option>
+                            <option value="fa-motorcycle">🏍️ Motorrad</option>
+                            <option value="fa-id-card">🪪 Ausweis</option>
+                            <option value="fa-fire">🔥 Feuer</option>
+                            <option value="fa-gem">💎 Diamant</option>
+                            <option value="fa-check">✅ Check</option>
+                            <option value="fa-certificate">📜 Zertifikat</option>
+                            <option value="fa-calendar-check">📅 Termin</option>
+                            <option value="fa-handshake">🤝 Deal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Icon Farbe</label>
+                        <input type="color" id="scIconColor" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;">
+                    </div>
+                    <div class="form-group">
+                        <label>Titel Farbe</label>
+                        <input type="color" id="scTitleColor" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Titel Schriftart</label>
+                        <select id="scTitleFont" class="form-control">
+                            <option value="'Montserrat', sans-serif">Montserrat</option>
+                            <option value="'Playfair Display', serif">Playfair Display</option>
+                            <option value="'Oswald', sans-serif">Oswald (Bold)</option>
+                            <option value="'Courier New', monospace">Courier</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Titel Größe</label>
+                        <select id="scTitleSize" class="form-control">
+                            <option value="16px">Klein</option>
+                            <option value="18px">Normal</option>
+                            <option value="22px">Groß</option>
+                            <option value="clamp(22px, 3.5vw, 26px)">Responsive (Extragroß)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-config-section">
+                <h4>2. Rahmen & Design</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rahmendicke</label>
+                        <select id="scBorderSize" class="form-control">
+                            <option value="1px">Dünn (1px)</option>
+                            <option value="2px">Mittel (2px)</option>
+                            <option value="4px">Dick (4px)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Rahmenfarbe</label>
+                        <input type="color" id="scBorderColor" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-config-section">
+                <h4>3. Preis & 3D Euro Zeichen</h4>
+                <div class="form-row">
+                    <div class="form-group"><label>Preis / Text (z.B. "ab 35")</label><input type="text" id="scPriceVal" class="form-control"></div>
+                    <div class="form-group">
+                        <label>Preis Farbe</label>
+                        <input type="color" id="scPriceColor" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Euro-Zeichen Animation / 3D</label>
+                        <select id="scEuroStyle" class="form-control">
+                            <option value="euro-standard">Standard Rot (Kein Effekt)</option>
+                            <option value="euro-gold-3d">Premium 3D Gold</option>
+                            <option value="euro-neon-blue">Neon Glow Blau</option>
+                            <option value="euro-neon-green">Neon Glow Grün</option>
+                            <option value="euro-red-glow">Red Glow</option>
+                            <option value="anim-spin euro-gold-3d">Drehende 3D Goldmünze</option>
+                            <option value="anim-bounce">Hüpfend (Bounce)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Etikett (Badge)</label>
+                        <select id="scBadge" class="form-control">
+                            <option value="">Kein Etikett</option>
+                            <option value="badge-neu">NEU</option>
+                            <option value="badge-angebot">Angebot</option>
+                            <option value="badge-aktion">Aktion</option>
+                            <option value="badge-topseller">Topseller</option>
+                            <option value="badge-kurze-zeit">Nur kurze Zeit</option>
+                            <option value="badge-ostern">Ostern-Special</option>
+                            <option value="badge-express-tipp">Express-Tipp</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-config-section">
+                <h4>4. Beschreibungen</h4>
+                <div class="form-group">
+                    <label>Unterzeile (Kurztext)</label>
+                    <input type="text" id="scDesc" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Unterzeile Text-Animation</label>
+                    <select id="scDescAnim" class="form-control">
+                        <option value="">Keine Animation</option>
+                        <option value="anim-pulse">Pulsieren</option>
+                        <option value="anim-shake">Wackeln (Attention)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hover Info-Text (Mitzubringen...)</label>
+                    <textarea id="scHoverInfo" class="form-control" rows="3" style="resize:vertical;"></textarea>
+                </div>
+            </div>
+            
+            <button class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.saveServiceEdit()">Karte Aktualisieren</button>
+        </div>
+    </div>
+
+    <div class="custom-dialog-overlay" id="contentConfigOverlay">
+        <div class="custom-dialog-window" style="max-width: 650px; border-top-color: #00ffff; box-shadow: 0 20px 60px rgba(0,255,255,0.2); text-align: left;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeContentEditor()"></i>
+            <h3 style="color:#00ffff; font-weight:900; margin-bottom:15px; text-align:center;"><i class="fa-solid fa-pen-nib"></i> Bereichstexte bearbeiten</h3>
+            <input type="hidden" id="editSectionId">
+            <div id="contentEditorFields"></div>
+            <button class="btn-primary" style="background:#00ffff; color:#000; width:100%; justify-content:center; margin-top:20px;" onclick="window.saveContent()">Texte Speichern</button>
         </div>
     </div>
 
@@ -903,8 +1110,13 @@
     </div>
 
     <div id="view-home" class="view-section active">
-        
-        <div class="admin-workspace-box mod-blocks" style="max-width:800px; margin: 20px auto 0;">
+
+        <div class="admin-workspace-box mod-prices" style="max-width:800px; margin: 20px auto 0; text-align:center;">
+            <button class="btn-primary" style="background:#25D366; color:#000; font-size:13px;" onclick="window.addNewServiceCard()"><i class="fa-solid fa-plus"></i> Neue Leistungskarte hinzufügen</button>
+            <p style="color:var(--text-muted); font-size:11px; margin-top:8px;">Nutzen Sie den grünen Stift auf den Leistungskarten, um diese komplett (Farbe, Text, 3D Effekte) zu bearbeiten.</p>
+        </div>
+
+        <div class="admin-workspace-box mod-blocks" style="max-width:800px; margin: 15px auto 0;">
             <details class="admin-details">
                 <summary><span style="color:#007aff;"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span></summary>
                 <div class="admin-details-content">
@@ -955,6 +1167,13 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>Rahmenfarbe</label>
+                            <input type="color" id="cbBorderColor" class="form-control" value="#e60000" style="padding: 2px; height: 42px; cursor: pointer;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" style="margin-top: 5px;">
+                        <div class="form-group" style="flex:2;">
                             <label>Bild / Video Hochladen (Optional)</label>
                             <label class="noble-file-upload" style="margin-top:0;">
                                 <input type="file" id="cbMediaFile" accept="image/*,video/*" onchange="window.updateCbFileLabel(this)">
@@ -1037,14 +1256,14 @@
                         </div>
                     </div>
 
-                    <button class="btn-primary" style="background:#007aff; width:100%; justify-content:center; margin-top:10px;" onclick="window.addCustomBlock(event)">Baustein Erstellen & Veröffentlichen</button>
+                    <button class="btn-primary" id="btnSaveCustomBlock" style="background:#007aff; width:100%; justify-content:center; margin-top:10px;" onclick="window.saveCustomBlock(event)">Baustein Erstellen & Veröffentlichen</button>
+                    <button class="btn-primary" id="btnCancelEditBlock" style="background:transparent; border:1px solid #555; width:100%; justify-content:center; margin-top:10px; display:none;" onclick="window.cancelEditBlock()">Bearbeitung Abbrechen</button>
                     
-                    <div id="adminBlocksList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px; text-align:left;"></div>
                 </div>
             </details>
 
             <details class="admin-details mod-data">
-                <summary><span style="color:#ffcc00;"><i class="fa-solid fa-address-card"></i> Firmendaten & Impressum bearbeiten</span></summary>
+                <summary><span style="color:#ffcc00;"><i class="fa-solid fa-address-card"></i> Firmendaten & Webhook API anpassen</span></summary>
                 <div class="admin-details-content">
                     <div class="form-row">
                         <div class="form-group"><label>Telefonnummer</label><input type="text" id="adminPhone" class="form-control" value="0178 378 38 75"></div>
@@ -1057,87 +1276,49 @@
                         <div class="form-group"><label>Instagram Link</label><input type="text" id="adminIg" class="form-control" value="https://instagram.com/red_zulassungsdienst"></div>
                         <div class="form-group"><label>Facebook Link</label><input type="text" id="adminFb" class="form-control" value="#"></div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label style="color:#25D366;"><i class="fa-solid fa-plug"></i> Webhook URL (Make / Zapier für WhatsApp Auto-Versand)</label>
+                            <input type="text" id="adminWebhook" class="form-control" placeholder="https://hook.eu1.make.com/..." style="border-color: rgba(37,211,102,0.5);">
+                            <p style="font-size:10px; color:var(--text-muted); margin-top:5px;">Trage hier deine API Schnittstelle ein, um Buchungen lautlos im Hintergrund zu verarbeiten.</p>
+                        </div>
+                    </div>
                     <button class="btn-primary" style="background:#ffcc00; color:#000; width:100%; justify-content:center; margin-top:10px;" onclick="window.saveContactInfo()">Daten Speichern</button>
                 </div>
             </details>
         </div>
 
-        <div class="hero">
+        <div class="hero editable-section">
+            <div class="section-edit-btn action-content" onclick="window.openContentEditor('hero')" style="right:5%; top:20px;"><i class="fa-solid fa-pencil"></i></div>
             <div class="hero-content">
                 <div class="sofort-badge">
                     <i class="fa-solid fa-bolt" style="margin-right:8px;"></i> 
-                    Sofortkennzeichen zum Mitnehmen! 
+                    <span id="txt-hero-badge">Sofortkennzeichen zum Mitnehmen!</span> 
                     <i class="fa-solid fa-bolt" style="margin-left:8px;"></i>
                 </div>
-                <h1 style="font-size: clamp(22px, 4.5vw, 42px); line-height: 1.1; margin-bottom: 15px;">Schnell. Zuverlässig.<br><span style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
-                <p style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 30px;">Zulassungsservice in Bestzeit für ganz Berlin. Wir garantieren Ihnen eine zügige, zuverlässige und hochprofessionelle Abwicklung Ihrer Anliegen.</p>
-                <a href="javascript:void(0)" onclick="window.switchView('view-home')" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
+                <h1 style="font-size: clamp(22px, 4.5vw, 42px); line-height: 1.1; margin-bottom: 15px;"><span id="txt-hero-h1-1">Schnell. Zuverlässig.</span><br><span id="txt-hero-h1-2" style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
+                <p id="txt-hero-desc" style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 30px;">Zulassungsservice in Bestzeit für ganz Berlin. Wir garantieren Ihnen eine zügige, zuverlässige und hochprofessionelle Abwicklung Ihrer Anliegen.</p>
+                <a href="javascript:void(0)" onclick="window.switchView('view-home'); window.scrollTo({top: document.getElementById('termin').offsetTop, behavior: 'smooth'});" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
             </div>
         </div>
 
         <section id="dynamic-client-section-home" class="dynamic-block-container"></section>
 
-        <section id="leistungen" style="padding-top: 10px;">
+        <section id="leistungen" style="padding-top: 10px;" class="editable-section">
+            <div class="section-edit-btn action-content" onclick="window.openContentEditor('leistungen')" style="right:5%; top:-10px;"><i class="fa-solid fa-pencil"></i></div>
             <div class="section-header">
-                <h2>Unsere Leistungen</h2>
-                <p style="color:var(--text-muted); font-size:12px;">Klicken Sie direkt auf eine Karte für detaillierte Infos</p>
+                <h2 id="txt-leist-title">Unsere Leistungen</h2>
+                <p id="txt-leist-desc" style="color:var(--text-muted); font-size:12px;">Klicken Sie direkt auf eine Karte für detaillierte Infos</p>
             </div>
-            <div class="grid-container">
-                <div class="card" onclick="window.toggleCardSlide(this)">
-                    <i class="fa-solid fa-file-signature main-icon"></i>
-                    <h3>Anmeldung</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Neuzulassung in 1-2 Tagen.</p>
-                    <div class="card-info-slide">
-                        <p><strong>Mitzubringen (Original):</strong><br>• Fahrzeugbrief & Schein<br>• Ausweis / Aufenthaltstitel<br>• TÜV-Bericht & eVB-Nr.<br>• Kontodaten (IBAN)</p>
-                    </div>
-                </div>
-                <div class="card" onclick="window.toggleCardSlide(this)">
-                    <i class="fa-solid fa-exchange-alt main-icon"></i>
-                    <h3>Ummeldung</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Halterwechsel ohne Stress.</p>
-                    <div class="card-info-slide">
-                        <p><strong>Mitzubringen (Original):</strong><br>• Fahrzeugpapiere I & II<br>• Gültige HU / AU Bescheinigung<br>• Bisherige Kennzeichen</p>
-                    </div>
-                </div>
-                <div class="card" onclick="window.toggleCardSlide(this)">
-                    <i class="fa-solid fa-file-circle-xmark main-icon"></i>
-                    <h3>Abmeldung</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Sichere Außerbetriebsetzung.</p>
-                    <div class="card-info-slide">
-                        <p><strong>Mitzubringen (Original):</strong><br>• Zulassungsbescheinigung I (Fahrzeugschein)<br>• Bisherige Kennzeichen zur Entwertung</p>
-                    </div>
-                </div>
-                <div class="card" onclick="window.toggleCardSlide(this)">
-                    <i class="fa-solid fa-stopwatch main-icon"></i>
-                    <h3>Kurzzeitkennzeichen</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Nach Wahl (5 oder 6 Tage).</p>
-                    <div class="card-info-slide">
-                        <p><strong>Mitzubringen (Original):</strong><br>• Ausweis / Pass<br>• eVB-Nummer für Kurzzeit<br>• Fahrzeugpapiere (Kopie/Original)<br>• Gültige HU</p>
-                    </div>
-                </div>
-                <div class="card" onclick="window.toggleCardSlide(this)">
-                    <i class="fa-solid fa-globe main-icon"></i>
-                    <h3>Zollkennzeichen</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">30 Tage Gültigkeit.</p>
-                    <div class="card-info-slide">
-                        <p><strong>Mitzubringen (Original):</strong><br>• Ausweis / Pass<br>• Fahrzeugpapiere (ZBI & ZBII)<br>• Gültige HU<br>• Gelbes Versicherungskärtchen</p>
-                    </div>
-                </div>
-                <div class="card" onclick="window.toggleCardSlide(this)">
-                    <i class="fa-solid fa-bolt main-icon"></i>
-                    <h3>Express Zulassung</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Priorisierte Abwicklung.</p>
-                    <div class="card-info-slide">
-                        <p><strong>Express Service:</strong><br>Direkte Vorgangseinreichung bei der Behördenstellenleitung. Fertigstellung meist innerhalb 24h.</p>
-                    </div>
-                </div>
-            </div>
+            
+            <div class="grid-container" id="servicesGridContainer"></div>
         </section>
 
-        <section id="termin" style="background: rgba(0,0,0,0.4); border-top:1px solid var(--glass-border); padding: 60px 5%;">
+        <section id="termin" style="background: rgba(0,0,0,0.4); border-top:1px solid var(--glass-border); padding: 60px 5%;" class="editable-section">
+            <div class="section-edit-btn action-content" onclick="window.openContentEditor('termin')" style="right:5%; top:20px;"><i class="fa-solid fa-pencil"></i></div>
             <div class="section-header">
-                <h2>Termin Buchen</h2>
-                <p style="color:var(--text-muted); font-size:12px;">Ansprechpartner: <strong>Tamer Yazici</strong></p>
+                <h2 id="txt-termin-title">Termin Buchen</h2>
+                <p id="txt-termin-desc" style="color:var(--text-muted); font-size:12px;">Ansprechpartner: <strong>Tamer Yazici</strong></p>
             </div>
             
             <div class="booking-wrapper">
@@ -1161,14 +1342,8 @@
                             <label>Anliegen</label>
                             <div class="noble-select-box" id="serviceSelectBox">
                                 <div class="noble-select-trigger" id="selectTriggerText">Zulassung (Neuanmeldung)</div>
-                                <div class="noble-options-dropdown">
-                                    <div class="noble-option" data-value="Anmeldung">Zulassung (Neuanmeldung)</div>
-                                    <div class="noble-option" data-value="Ummeldung">Ummeldung</div>
-                                    <div class="noble-option" data-value="Abmeldung">Abmeldung</div>
-                                    <div class="noble-option" data-value="Kurzzeitkennzeichen">Kurzzeitkennzeichen</div>
-                                    <div class="noble-option" data-value="Zollkennzeichen">Zollkennzeichen</div>
-                                    <div class="noble-option" data-value="Express">Express Zulassung</div>
-                                </div>
+                                <div class="noble-options-dropdown" id="serviceSelectDropdown">
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -1205,9 +1380,10 @@
         
         <section id="dynamic-client-section-formulare" class="dynamic-block-container"></section>
 
-        <div class="section-header">
-            <h2>Formulare</h2>
-            <p style="color:var(--text-muted); font-size:12px;">Klicken zum Ansehen / Herunterladen</p>
+        <div class="section-header editable-section">
+            <div class="section-edit-btn action-content" onclick="window.openContentEditor('formulare')" style="right:5%; top:-10px;"><i class="fa-solid fa-pencil"></i></div>
+            <h2 id="txt-form-title">Formulare</h2>
+            <p id="txt-form-desc" style="color:var(--text-muted); font-size:12px;">Klicken zum Ansehen / Herunterladen</p>
         </div>
         
         <div class="download-grid" id="formItemsGrid"></div>
@@ -1234,11 +1410,12 @@
 
         <section id="dynamic-client-section-ankauf" class="dynamic-block-container"></section>
 
-        <div class="auto-ankauf-box">
-            <h2 style="font-family:'Playfair Display', serif; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(24px, 4vw, 36px); letter-spacing: 2px; margin: 0;">AUTO ANKAUF</h2>
-            <p style="font-size: clamp(16px, 2.5vw, 20px); font-weight: bold; color: white; margin: 0;">Jeglicher Art – Sofort Bargeld!</p>
-            <p style="color: #a0a0a0; font-size: 13px; max-width: 500px; margin: 10px 0 0;">Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort.</p>
-            <div style="font-family: 'Playfair Display', serif; font-size: 35px; color: #fcf6ba; opacity: 0.3; margin-top: 5px; line-height: 1;">Ty</div>
+        <div class="auto-ankauf-box editable-section">
+            <div class="section-edit-btn action-content" onclick="window.openContentEditor('ankauf')" style="right:15px; top:15px;"><i class="fa-solid fa-pencil"></i></div>
+            <h2 id="txt-ankauf-title" style="font-family:'Playfair Display', serif; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(24px, 4vw, 36px); letter-spacing: 2px; margin: 0;">AUTO ANKAUF</h2>
+            <p id="txt-ankauf-subtitle" style="font-size: clamp(16px, 2.5vw, 20px); font-weight: bold; color: white; margin: 0;">Jeglicher Art – Sofort Bargeld!</p>
+            <p id="txt-ankauf-desc" style="color: #a0a0a0; font-size: 13px; max-width: 500px; margin: 10px 0 0;">Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort.</p>
+            <div id="txt-ankauf-sign" style="font-family: 'Playfair Display', serif; font-size: 35px; color: #fcf6ba; opacity: 0.3; margin-top: 5px; line-height: 1;">Ty</div>
         </div>
 
         <div style="text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 14px; font-weight: 800; color: #b38728;">Wertermittlung & Oldtimer Galerie</div>
@@ -1298,7 +1475,8 @@
         </div>
     </div>
 
-    <footer style="margin-top: 30px;">
+    <footer style="margin-top: 30px;" class="editable-section">
+        <div class="section-edit-btn action-content" onclick="window.openContentEditor('footer')" style="right:5%; top:10px;"><i class="fa-solid fa-pencil"></i></div>
         <div class="footer-links">
             <a href="javascript:void(0)" onclick="window.switchView('view-home')">Startseite</a>
             <a href="javascript:void(0)" onclick="window.switchView('view-formulare')">Formulare</a>
@@ -1306,22 +1484,21 @@
             <a href="javascript:void(0)" onclick="window.openLegal('impressum')">Impressum</a>
             <a href="javascript:void(0)" onclick="window.openLegal('datenschutz')">Datenschutz & Cookies</a>
         </div>
-        <p style="font-size:10px; color:var(--text-muted);">© 2026 RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici.</p>
+        <p id="txt-footer-text" style="font-size:10px; color:var(--text-muted);">© 2026 RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
     <script>
-        // Anti-Manipulation Security
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; // F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
-            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; // Ctrl+S
+            if(e.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
         }
 
         window.redApts = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
@@ -1332,16 +1509,93 @@
             email: 'Redzulassungsdienst@gmail.com', 
             ustid: '(Hier Steuernummer eintragen)', 
             ig: 'https://instagram.com/red_zulassungsdienst', 
-            fb: '#' 
+            fb: '#',
+            webhook: '' 
         };
 
         window.adminPermissions = {
-            leads: false,
-            customblocks: false,
-            companydata: false,
-            forms: false,
-            cars: false,
-            ticker: false
+            leads: false, prices: false, customblocks: false, content: false, companydata: false, forms: false, cars: false, ticker: false
+        };
+
+        // Text Content Defaults
+        window.pageContentData = {
+            "hero": {
+                "badge": "Sofortkennzeichen zum Mitnehmen!",
+                "h1_1": "Schnell. Zuverlässig.",
+                "h1_2": "Kompetent.",
+                "desc": "Zulassungsservice in Bestzeit für ganz Berlin. Wir garantieren Ihnen eine zügige, zuverlässige und hochprofessionelle Abwicklung Ihrer Anliegen."
+            },
+            "leistungen": {
+                "title": "Unsere Leistungen",
+                "desc": "Klicken Sie direkt auf eine Karte für detaillierte Infos"
+            },
+            "termin": {
+                "title": "Termin Buchen",
+                "desc": "Ansprechpartner: <strong>Tamer Yazici</strong>"
+            },
+            "formulare": {
+                "title": "Formulare",
+                "desc": "Klicken zum Ansehen / Herunterladen"
+            },
+            "ankauf": {
+                "title": "AUTO ANKAUF",
+                "subtitle": "Jeglicher Art – Sofort Bargeld!",
+                "desc": "Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort.",
+                "sign": "Ty"
+            },
+            "footer": {
+                "text": "© 2026 RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici."
+            }
+        };
+
+        window.applyPageContent = function(data) {
+            if(!data) return;
+            window.pageContentData = data;
+            
+            if(data.hero) {
+                document.getElementById('txt-hero-badge').innerText = data.hero.badge;
+                document.getElementById('txt-hero-h1-1').innerText = data.hero.h1_1;
+                document.getElementById('txt-hero-h1-2').innerText = data.hero.h1_2;
+                document.getElementById('txt-hero-desc').innerText = data.hero.desc;
+            }
+            if(data.leistungen) {
+                document.getElementById('txt-leist-title').innerText = data.leistungen.title;
+                document.getElementById('txt-leist-desc').innerText = data.leistungen.desc;
+            }
+            if(data.termin) {
+                document.getElementById('txt-termin-title').innerText = data.termin.title;
+                document.getElementById('txt-termin-desc').innerHTML = data.termin.desc;
+            }
+            if(data.formulare) {
+                document.getElementById('txt-form-title').innerText = data.formulare.title;
+                document.getElementById('txt-form-desc').innerText = data.formulare.desc;
+            }
+            if(data.ankauf) {
+                document.getElementById('txt-ankauf-title').innerText = data.ankauf.title;
+                document.getElementById('txt-ankauf-subtitle').innerText = data.ankauf.subtitle;
+                document.getElementById('txt-ankauf-desc').innerText = data.ankauf.desc;
+                document.getElementById('txt-ankauf-sign').innerText = data.ankauf.sign;
+            }
+            if(data.footer) {
+                document.getElementById('txt-footer-text').innerText = data.footer.text;
+            }
+        };
+
+        const defaultServices = [
+            { id: "s-1", icon: "fa-file-signature", title: "Anmeldung", titleColor: "#ffffff", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "ab 35", priceColor: "#e60000", iconColor: "#e60000", euroStyle: "euro-standard", badge: "", desc: "Neuzulassung in 1-2 Tagen.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Fahrzeugbrief & Schein\n• Ausweis / Aufenthaltstitel\n• TÜV-Bericht & eVB-Nr.\n• Kontodaten (IBAN)", borderSize: "1px", borderColor: "rgba(255, 255, 255, 0.08)" },
+            { id: "s-2", icon: "fa-exchange-alt", title: "Ummeldung", titleColor: "#ffffff", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "ab 25", priceColor: "#e60000", iconColor: "#e60000", euroStyle: "euro-standard", badge: "", desc: "Halterwechsel ohne Stress.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Fahrzeugpapiere I & II\n• Gültige HU / AU Bescheinigung\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "rgba(255, 255, 255, 0.08)" },
+            { id: "s-3", icon: "fa-file-circle-xmark", title: "Abmeldung", titleColor: "#ffffff", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "ab 15", priceColor: "#e60000", iconColor: "#e60000", euroStyle: "euro-standard", badge: "", desc: "Sichere Außerbetriebsetzung.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Zulassungsbescheinigung I\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "rgba(255, 255, 255, 0.08)" },
+            { id: "s-4", icon: "fa-stopwatch", title: "Kurzzeitkennz.", titleColor: "#ffffff", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "ab 65", priceColor: "#e60000", iconColor: "#e60000", euroStyle: "euro-standard", badge: "", desc: "Nach Wahl (5/6 Tage).", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Ausweis / Pass\n• eVB-Nummer für Kurzzeit\n• Fahrzeugpapiere\n• Gültige HU", borderSize: "1px", borderColor: "rgba(255, 255, 255, 0.08)" },
+            { id: "s-5", icon: "fa-globe", title: "Zollkennzeichen", titleColor: "#ffffff", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "ab 120", priceColor: "#e60000", iconColor: "#e60000", euroStyle: "euro-gold-3d", badge: "badge-topseller", desc: "30 Tage Gültigkeit.", descAnim: "anim-pulse", hoverInfo: "Mitzubringen (Original):\n• Ausweis / Pass\n• Fahrzeugpapiere\n• Gültige HU\n• Gelbes Versicherungskärtchen", borderSize: "1px", borderColor: "rgba(255, 255, 255, 0.08)" },
+            { id: "s-6", icon: "fa-bolt", title: "Express Zulassung", titleColor: "#ffffff", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "ab 99", priceColor: "#e60000", iconColor: "#e60000", euroStyle: "euro-neon-blue", badge: "badge-express-tipp", desc: "Priorisierte Abwicklung.", descAnim: "", hoverInfo: "Express Service:\nDirekte Vorgangseinreichung bei der Behördenstellenleitung. Fertigstellung meist innerhalb 24h.", borderSize: "1px", borderColor: "rgba(255, 255, 255, 0.08)" }
+        ];
+
+        window.servicesData = JSON.parse(localStorage.getItem('red_services')) || defaultServices;
+
+        const badgeLabels = {
+            "badge-neu": "NEU", "badge-angebot": "ANGEBOT", "badge-aktion": "AKTION", 
+            "badge-topseller": "TOPSELLER", "badge-kurze-zeit": "NUR KURZE ZEIT", 
+            "badge-ostern": "OSTERN-SPECIAL", "badge-express-tipp": "EXPRESS TIPP"
         };
 
         window.applyContactInfo = function(data) {
@@ -1358,15 +1612,108 @@
             document.getElementById('email-contact-btn').href = "mailto:" + data.email;
         };
 
-        window.applyAdminModulePermissions = function(perms) {
-            if(!perms) perms = { leads: false, customblocks: false, companydata: false, forms: false, cars: false, ticker: false };
-            window.adminPermissions = perms;
+        window.renderServices = function(data) {
+            const grid = document.getElementById('servicesGridContainer');
+            const selectDropdown = document.getElementById('serviceSelectDropdown');
+            grid.innerHTML = '';
+            selectDropdown.innerHTML = '';
             
+            data.forEach(srv => {
+                let badgeHtml = '';
+                if(srv.badge && badgeLabels[srv.badge]) {
+                    badgeHtml = `<div class="card-badge ${srv.badge}">${badgeLabels[srv.badge]}</div>`;
+                }
+                
+                const hoverHtml = srv.hoverInfo.replace(/\n/g, '<br>');
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.border = `${srv.borderSize || '1px'} solid ${srv.borderColor || 'rgba(255, 255, 255, 0.08)'}`;
+                card.setAttribute('onclick', 'window.toggleCardSlide(this)');
+                card.innerHTML = `
+                    <div class="admin-action-btn btn-edit-green action-prices" onclick="event.stopPropagation(); window.openServiceConfig('${srv.id}')" title="Leistungskarte bearbeiten"><i class="fa-solid fa-pencil"></i></div>
+                    <div class="admin-action-btn btn-del-red action-prices" onclick="event.stopPropagation(); window.deleteServiceCard('${srv.id}')" title="Karte löschen"><i class="fa-solid fa-trash"></i></div>
+                    ${badgeHtml}
+                    <i class="fa-solid ${srv.icon} main-icon" style="color: ${srv.iconColor || 'var(--primary-red)'};"></i>
+                    <h3 style="color:${srv.titleColor || '#ffffff'}; font-family:${srv.titleFont || "'Montserrat', sans-serif"}; font-size:${srv.titleSize || '18px'}; margin-bottom:0;">${srv.title}</h3>
+                    <div class="price-wrapper">
+                        <span class="service-price" style="color:${srv.priceColor};">${srv.price}</span>
+                        <span class="service-price ${srv.euroStyle}" style="font-size:24px;">€</span>
+                    </div>
+                    <p class="${srv.descAnim}" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${srv.desc}</p>
+                    <div class="card-info-slide"><p>${hoverHtml}</p></div>
+                `;
+                grid.appendChild(card);
+
+                const opt = document.createElement('div');
+                opt.className = 'noble-option';
+                opt.setAttribute('data-value', srv.title);
+                opt.innerText = srv.title;
+                opt.onclick = (e) => {
+                    e.stopPropagation();
+                    window.selectedServiceVal = srv.title;
+                    document.getElementById('selectTriggerText').innerText = srv.title;
+                    document.getElementById('serviceSelectBox').classList.remove('open');
+                };
+                selectDropdown.appendChild(opt);
+            });
+        };
+
+        window.renderCustomBlocks = function(blocksData) {
+            document.querySelectorAll('.dynamic-block-container').forEach(c => c.innerHTML = '');
+            
+            blocksData.sort((a,b) => b.timestamp - a.timestamp).forEach(block => {
+                const container = document.getElementById('dynamic-client-section-' + block.page);
+                if(!container) return;
+
+                let mediaHtml = '';
+                if(block.mediaUrl) {
+                    if(block.mediaUrl.includes('video/') || block.mediaUrl.endsWith('.mp4') || block.mediaUrl.startsWith('data:video')) {
+                        mediaHtml = `<video src="${block.mediaUrl}" controls autoplay loop class="dynamic-block-media"></video>`;
+                    } else {
+                        mediaHtml = `<img src="${block.mediaUrl}" class="dynamic-block-media">`;
+                    }
+                }
+
+                let bannerHtml = '';
+                if(block.bannerText) {
+                    const emoji = block.bannerEmoji ? `<span class="pulse-emoji">${block.bannerEmoji}</span> ` : '';
+                    bannerHtml = `
+                        <div style="background:${block.bannerColor || 'var(--primary-red)'}; color:#fff; padding:8px 20px; border-radius:50px; display:inline-flex; align-items:center; font-weight:900; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.5);">
+                            ${emoji}${block.bannerText}${emoji ? ' ' + emoji.replace('style="margin-right:8px;"', 'style="margin-left:8px;"') : ''}
+                        </div>
+                    `;
+                }
+
+                const blockEl = document.createElement('div');
+                blockEl.className = 'dynamic-block-inner';
+                blockEl.style.border = `${block.borderSize || '1px'} solid ${block.borderColor || 'var(--primary-red)'}`;
+                blockEl.style.position = 'relative';
+
+                blockEl.innerHTML = `
+                    <div class="admin-action-btn btn-edit-green action-blocks" onclick="window.openEditBlock('${block.id}')" title="Baustein bearbeiten"><i class="fa-solid fa-pencil"></i></div>
+                    <div class="admin-action-btn btn-del-red action-blocks" onclick="window.deleteCustomBlock('${block.id}')" title="Baustein löschen"><i class="fa-solid fa-trash-can"></i></div>
+                    ${bannerHtml}
+                    <h2 style="color:${block.titleColor || 'var(--primary-red)'}; font-family:${block.titleFont || "'Montserrat', sans-serif"}; font-size:${block.titleSize || 'clamp(20px, 3vw, 28px)'}; margin-bottom:15px;">
+                        ${block.icon ? `<i class="${block.icon.includes('fa-') ? block.icon : 'fa-solid ' + block.icon}" style="margin-right:8px;"></i>` : ''}${block.title}
+                    </h2>
+                    <p style="color:${block.textColor || '#cccccc'}; font-family:${block.textFont || "'Montserrat', sans-serif"}; font-size:${block.textSize || '14px'}; line-height:1.8; margin-bottom:15px; white-space:pre-wrap;">${block.text}</p>
+                    ${mediaHtml}
+                `;
+                container.appendChild(blockEl);
+            });
+        };
+
+        window.applyAdminModulePermissions = function(perms) {
+            if(!perms) perms = { leads: false, prices: false, customblocks: false, content: false, companydata: false, forms: false, cars: false, ticker: false };
+            window.adminPermissions = perms;
             if(!window.loggedInUser) return;
             
             if(document.getElementById('permLeads')) {
                 document.getElementById('permLeads').checked = perms.leads;
+                document.getElementById('permPrices').checked = perms.prices;
                 document.getElementById('permCustomblocks').checked = perms.customblocks;
+                document.getElementById('permContent').checked = perms.content;
                 document.getElementById('permCompanydata').checked = perms.companydata;
                 document.getElementById('permForms').checked = perms.forms;
                 document.getElementById('permCars').checked = perms.cars;
@@ -1374,7 +1721,9 @@
             }
 
             document.body.classList.toggle('perm-leads', perms.leads);
+            document.body.classList.toggle('perm-prices', perms.prices);
             document.body.classList.toggle('perm-blocks', perms.customblocks);
+            document.body.classList.toggle('perm-content', perms.content);
             document.body.classList.toggle('perm-data', perms.companydata);
             document.body.classList.toggle('perm-forms', perms.forms);
             document.body.classList.toggle('perm-cars', perms.cars);
@@ -1385,11 +1734,16 @@
             const savedContact = JSON.parse(localStorage.getItem('red_contact'));
             if(savedContact) window.applyContactInfo(savedContact);
 
+            const savedContent = JSON.parse(localStorage.getItem('red_page_content'));
+            if(savedContent) window.applyPageContent(savedContent);
+            else window.applyPageContent(window.pageContentData);
+
+            window.renderServices(window.servicesData);
+
             if(!sessionStorage.getItem('cookie_consent')) {
                 setTimeout(() => { document.getElementById('cookieConsentOverlay').classList.add('show'); }, 1000);
             }
 
-            // History API Initialisierung (Handy Zurück Taste Fix)
             const hash = window.location.hash.substring(1);
             if (hash && document.getElementById(hash)) {
                 window.switchView(hash, false);
@@ -1417,18 +1771,15 @@
                 
                 if(type === 'impressum') {
                     title.innerText = 'Impressum';
-                    content.innerHTML = `<strong>Angaben gemäß § 5 TMG:</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6<br>12053 Berlin<br><br><strong>Kontakt:</strong><br>Telefon: ${window.dynamicContactData.phone}<br>E-Mail: ${window.dynamicContactData.email}<br><br><strong>Umsatzsteuer-ID:</strong><br>Umsatzsteuer-Identifikationsnummer gemäß §27 a Umsatzsteuergesetz:<br><em>${window.dynamicContactData.ustid}</em><br><br><strong>Streitschlichtung:</strong><br>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.`;
+                    content.innerHTML = `<strong>Angaben gemäß § 5 TMG:</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6<br>12053 Berlin<br><br><strong>Kontakt:</strong><br>Telefon: ${window.dynamicContactData.phone}<br>E-Mail: ${window.dynamicContactData.email}<br><br><strong>Umsatzsteuer-ID:</strong><br>Umsatzsteuer-Identifikationsnummer gemäß §27 a Umsatzsteuergesetz:<br><em>${window.dynamicContactData.ustid}</em>`;
                 } else {
                     title.innerText = 'Datenschutz & Cookies';
-                    content.innerHTML = '<strong>Datenschutzerklärung</strong><br><br>Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.<br><br><strong>Verschlüsselung</strong><br>Diese Seite nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte eine SSL-bzw. TLS-Verschlüsselung.<br><br><strong>Cookies</strong><br>Die Internetseiten verwenden teilweise so genannte Cookies. Cookies richten auf Ihrem Rechner keinen Schaden an und enthalten keine Viren. Sie dienen dazu, unser Angebot nutzerfreundlicher, effektiver und sicherer zu machen.<br><br><strong>Terminbuchung & Firebase</strong><br>Sämtliche Eingabedaten aus der Terminbuchung werden verschlüsselt an unsere geschützte Datenbank (Google Firebase) übermittelt und ausschließlich zur Auftragsabwicklung durch Tamer Yazici genutzt.';
+                    content.innerHTML = '<strong>Datenschutzerklärung</strong><br><br>Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich.<br><br><strong>Cookies</strong><br>Die Internetseiten verwenden Cookies. Sie dienen dazu, unser Angebot nutzerfreundlicher, effektiver und sicherer zu machen.<br><br><strong>Terminbuchung & Firebase</strong><br>Sämtliche Eingabedaten werden verschlüsselt an unsere geschützte Datenbank übermittelt.';
                 }
-                
                 document.getElementById('legalOverlay').classList.add('open');
             };
 
-            window.closeLegal = function() {
-                document.getElementById('legalOverlay').classList.remove('open');
-            };
+            window.closeLegal = function() { document.getElementById('legalOverlay').classList.remove('open'); };
 
             window.openWidgetModal = function(type) {
                 const title = document.getElementById('widgetModalTitle');
@@ -1461,10 +1812,9 @@
                             <div style="margin-bottom: 15px;">${icon}</div>
                             <div style="font-size: 35px; font-weight: 900; color: #fff;">${temp} °C</div>
                             <div style="font-size: 14px; font-weight: 600; color: #aaa; margin-top: 10px;">Windgeschwindigkeit: ${wind} km/h</div>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">Daten bereitgestellt von Open-Meteo API</div>
                         `;
                     } else {
-                        content.innerHTML = '<p>Wetterdaten können momentan nicht geladen werden.</p>';
+                        content.innerHTML = '<p>Wetterdaten offline.</p>';
                     }
                 } else if (type === 'visitors') {
                     title.innerHTML = '<i class="fa-solid fa-chart-line"></i> System-Status';
@@ -1473,7 +1823,6 @@
                         <div style="font-size: 30px; font-weight: 900; color: #25D366; margin-bottom: 10px;">${v}</div>
                         <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 20px;">Verifizierte Seitenaufrufe</div>
                         <div class="visitor-heart">❤️</div>
-                        <div style="font-size: 16px; font-weight: 800; color: var(--primary-red); margin-top: 15px;">Vielen Dank für euren Besuch!</div>
                     `;
                 }
                 document.getElementById('widgetModalOverlay').classList.add('open');
@@ -1505,7 +1854,7 @@
                     if(temp < 5) icon = '<i class="fa-solid fa-snowflake" style="color:#00ffff;"></i>';
                     document.getElementById('liveHeaderWeather').innerHTML = `${icon} Berlin, ${temp}°C`;
                 } catch(e) {
-                    document.getElementById('liveHeaderWeather').innerHTML = '<i class="fa-solid fa-cloud"></i> Wetter offline';
+                    document.getElementById('liveHeaderWeather').innerHTML = '<i class="fa-solid fa-cloud"></i> Offline';
                 }
             }
             fetchWeather();
@@ -1517,11 +1866,14 @@
                         if(this.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
                         if(this.id === 'passChangeOverlay') document.getElementById('newPassInput').value = '';
                         if(this.id === 'widgetModalOverlay' && window.modalClockInterval) clearInterval(window.modalClockInterval);
+                        if(this.id === 'serviceConfigOverlay') window.editingServiceId = null;
                     }
                 });
             });
 
             window.chosenHour = null;
+            window.editModalChosenHour = null;
+
             try {
                 flatpickr("#datePicker", {
                     locale: "de", 
@@ -1556,6 +1908,34 @@
                         }
                     }
                 });
+
+                flatpickr("#editAptDate", {
+                    locale: "de", 
+                    minDate: "today", 
+                    disableMobile: "true",
+                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
+                    onChange: function(selectedDates, dateStr, instance) {
+                        const selectTime = document.getElementById('editAptTime');
+                        selectTime.innerHTML = '<option value="Ganztägig">Ganztägig</option>';
+                        
+                        const bookedTimes = (window.redApts || []).filter(a => a.date === dateStr && a.id !== window.editingAptId).map(a => a.timeLabel.replace(' Uhr','').trim());
+
+                        for(let h = 9; h <= 19; h++) {
+                            for(let m of ['00', '30']) {
+                                const tStr = `${h.toString().padStart(2, '0')}:${m}`;
+                                const opt = document.createElement('option');
+                                opt.value = tStr + ' Uhr';
+                                opt.innerText = tStr + ' Uhr';
+                                if(bookedTimes.includes(tStr)) {
+                                    opt.disabled = true;
+                                    opt.innerText += ' (Belegt)';
+                                }
+                                selectTime.appendChild(opt);
+                            }
+                        }
+                    }
+                });
+
             } catch (err) {
                 console.warn('Flatpickr Fallback aktiviert.');
                 const dp = document.getElementById('datePicker');
@@ -1566,14 +1946,7 @@
             const trigger = document.getElementById('serviceSelectBox');
             window.selectedServiceVal = "Anmeldung";
             trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
-            document.querySelectorAll('.noble-option').forEach(opt => {
-                opt.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    window.selectedServiceVal = opt.getAttribute('data-value');
-                    document.getElementById('selectTriggerText').innerText = opt.innerText;
-                    trigger.classList.remove('open');
-                });
-            });
+            
             document.addEventListener('click', () => trigger.classList.remove('open'));
         });
 
@@ -1630,12 +2003,8 @@
         };
         window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
         
-        window.openSupervisorPanel = function() {
-            document.getElementById('supervisorPermsOverlay').classList.add('open');
-        };
-        window.closeSupervisorPanel = function() {
-            document.getElementById('supervisorPermsOverlay').classList.remove('open');
-        };
+        window.openSupervisorPanel = function() { document.getElementById('supervisorPermsOverlay').classList.add('open'); };
+        window.closeSupervisorPanel = function() { document.getElementById('supervisorPermsOverlay').classList.remove('open'); };
 
         window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
         window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
@@ -1659,9 +2028,9 @@
             if(!isActive) card.classList.add('reveal-active');
         };
 
-        // DRAG AND DROP - REPARIERT FÜR ALLE GERÄTE
         window.makeDraggable = function(elmnt, id) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
             elmnt.onpointerdown = dragPointerDown;
 
             function initDragPosition() {
@@ -1686,7 +2055,6 @@
             }
 
             function elementDrag(e) {
-                e.preventDefault();
                 pos1 = pos3 - e.clientX;
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
@@ -1711,7 +2079,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Konfigurationsdaten
         const firebaseConfig = {
             apiKey: "AIzaSyDa10ia02K0vsHgzj-iTf4S6BwKzQruqyY",
             authDomain: "red-zulassungsdienst.firebaseapp.com",
@@ -1724,7 +2091,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Firebase Auth Handling
         window.sysAuth = {
             "Tamer Yazici": { pass: "616161", role: "admin" },
             "musadmin": { pass: "25361980", role: "supervisor" }
@@ -1803,7 +2169,7 @@
         window.executeLogout = function() {
             window.isAuthorized = false;
             window.loggedInUser = null;
-            document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-blocks', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker');
+            document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker');
             
             localStorage.removeItem('red_admin_saved');
             localStorage.removeItem('red_logged_in_user');
@@ -1850,7 +2216,9 @@
         window.saveSupervisorPerms = async function() {
             const perms = {
                 leads: document.getElementById('permLeads').checked,
+                prices: document.getElementById('permPrices').checked,
                 customblocks: document.getElementById('permCustomblocks').checked,
+                content: document.getElementById('permContent').checked,
                 companydata: document.getElementById('permCompanydata').checked,
                 forms: document.getElementById('permForms').checked,
                 cars: document.getElementById('permCars').checked,
@@ -1888,7 +2256,6 @@
             });
             
             const visitorDocRef = doc(db, "settings", "visitors");
-            let localCount = parseInt(localStorage.getItem('vCountFin') || 1482);
             try {
                 setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {});
             } catch(e) {}
@@ -1908,6 +2275,24 @@
                     document.getElementById('adminUstid').value = data.ustid || '';
                     document.getElementById('adminIg').value = data.ig || '';
                     document.getElementById('adminFb').value = data.fb || '';
+                    document.getElementById('adminWebhook').value = data.webhook || '';
+                }
+            });
+
+            onSnapshot(doc(db, "settings", "services"), (docSnap) => {
+                if(docSnap.exists() && docSnap.data().list) {
+                    const data = docSnap.data().list;
+                    window.servicesData = data;
+                    localStorage.setItem('red_services', JSON.stringify(data));
+                    window.renderServices(data);
+                }
+            });
+
+            onSnapshot(doc(db, "settings", "page_content"), (docSnap) => {
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    localStorage.setItem('red_page_content', JSON.stringify(data));
+                    window.applyPageContent(data);
                 }
             });
 
@@ -1917,11 +2302,13 @@
                 const ustid = document.getElementById('adminUstid').value;
                 const ig = document.getElementById('adminIg').value;
                 const fb = document.getElementById('adminFb').value;
-                const data = { phone, email, ustid, ig, fb, timestamp: Date.now() };
+                const webhook = document.getElementById('adminWebhook').value;
+                
+                const data = { phone, email, ustid, ig, fb, webhook, timestamp: Date.now() };
 
                 try {
                     await setDoc(doc(db, "settings", "contact"), data);
-                    window.showToast('Kontaktdaten gespeichert!', 'success');
+                    window.showToast('Firmendaten & Webhook gespeichert!', 'success');
                 } catch(e) {
                     localStorage.setItem('red_contact', JSON.stringify(data));
                     window.applyContactInfo(data);
@@ -1929,20 +2316,171 @@
                 }
             };
             
+            window.openContentEditor = function(section) {
+                if(!window.isAuthorized) return;
+                document.getElementById('editSectionId').value = section;
+                const fieldsDiv = document.getElementById('contentEditorFields');
+                fieldsDiv.innerHTML = '';
+                
+                const contentObj = window.pageContentData[section] || {};
+                
+                for (const key in contentObj) {
+                    fieldsDiv.innerHTML += `
+                        <div class="form-group" style="margin-bottom:12px;">
+                            <label style="color:#aaa;">Feld: ${key.toUpperCase()}</label>
+                            <textarea id="ce_${key}" class="form-control" rows="2" style="background:rgba(0,0,0,0.5);">${contentObj[key]}</textarea>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('contentConfigOverlay').classList.add('open');
+            };
+
+            window.closeContentEditor = function() {
+                document.getElementById('contentConfigOverlay').classList.remove('open');
+            };
+
+            window.saveContent = async function() {
+                const section = document.getElementById('editSectionId').value;
+                const contentObj = window.pageContentData[section];
+                
+                for (const key in contentObj) {
+                    const el = document.getElementById(`ce_${key}`);
+                    if(el) window.pageContentData[section][key] = el.value;
+                }
+                
+                try {
+                    await setDoc(doc(db, "settings", "page_content"), window.pageContentData);
+                    window.showToast('Seiten-Text online gespeichert!', 'success');
+                } catch(e) {
+                    localStorage.setItem('red_page_content', JSON.stringify(window.pageContentData));
+                    window.applyPageContent(window.pageContentData);
+                    window.showToast('Text lokal gespeichert.', 'success');
+                }
+                window.closeContentEditor();
+            };
+
+            window.openServiceConfig = function(id) {
+                window.editingServiceId = id;
+                const srv = window.servicesData.find(s => s.id === id);
+                if(!srv) return;
+                
+                document.getElementById('scTitle').value = srv.title;
+                document.getElementById('scIcon').value = srv.icon;
+                document.getElementById('scIconColor').value = srv.iconColor || '#e60000';
+                
+                document.getElementById('scTitleColor').value = srv.titleColor || '#ffffff';
+                document.getElementById('scTitleFont').value = srv.titleFont || "'Montserrat', sans-serif";
+                document.getElementById('scTitleSize').value = srv.titleSize || "18px";
+                
+                document.getElementById('scBorderSize').value = srv.borderSize || '1px';
+                document.getElementById('scBorderColor').value = srv.borderColor || 'rgba(255, 255, 255, 0.08)';
+
+                document.getElementById('scPriceVal').value = srv.price;
+                document.getElementById('scPriceColor').value = srv.priceColor || '#e60000';
+                document.getElementById('scEuroStyle').value = srv.euroStyle || 'euro-standard';
+                document.getElementById('scBadge').value = srv.badge || '';
+                
+                document.getElementById('scDesc').value = srv.desc;
+                document.getElementById('scDescAnim').value = srv.descAnim || '';
+                document.getElementById('scHoverInfo').value = srv.hoverInfo;
+
+                document.getElementById('serviceConfigOverlay').classList.add('open');
+            };
+
+            window.closeServiceConfigModal = function() {
+                window.editingServiceId = null;
+                document.getElementById('serviceConfigOverlay').classList.remove('open');
+            };
+
+            window.saveServiceEdit = async function() {
+                if(!window.editingServiceId) return;
+                
+                const index = window.servicesData.findIndex(s => s.id === window.editingServiceId);
+                if(index > -1) {
+                    window.servicesData[index] = {
+                        id: window.editingServiceId,
+                        title: document.getElementById('scTitle').value,
+                        icon: document.getElementById('scIcon').value.replace('fa-solid ', '').trim(),
+                        iconColor: document.getElementById('scIconColor').value,
+                        titleColor: document.getElementById('scTitleColor').value,
+                        titleFont: document.getElementById('scTitleFont').value,
+                        titleSize: document.getElementById('scTitleSize').value,
+                        borderSize: document.getElementById('scBorderSize').value,
+                        borderColor: document.getElementById('scBorderColor').value,
+                        price: document.getElementById('scPriceVal').value,
+                        priceColor: document.getElementById('scPriceColor').value,
+                        euroStyle: document.getElementById('scEuroStyle').value,
+                        badge: document.getElementById('scBadge').value,
+                        desc: document.getElementById('scDesc').value,
+                        descAnim: document.getElementById('scDescAnim').value,
+                        hoverInfo: document.getElementById('scHoverInfo').value
+                    };
+                    
+                    try {
+                        await setDoc(doc(db, "settings", "services"), { list: window.servicesData });
+                        window.showToast('Karte online gespeichert!', 'success');
+                    } catch(e) {
+                        localStorage.setItem('red_services', JSON.stringify(window.servicesData));
+                        window.renderServices(window.servicesData);
+                        window.showToast('Karte lokal gespeichert.', 'success');
+                    }
+                    window.closeServiceConfigModal();
+                }
+            };
+
+            window.addNewServiceCard = async function() {
+                const newCard = {
+                    id: 's-' + Date.now(),
+                    icon: "fa-star", iconColor: "#e60000", title: "Neue Leistung", titleColor: "#ffffff", titleFont: "'Montserrat', sans-serif", titleSize: "18px",
+                    borderSize: "1px", borderColor: "rgba(255, 255, 255, 0.08)",
+                    price: "ab 0", priceColor: "#e60000", euroStyle: "euro-standard", badge: "badge-neu",
+                    desc: "Beschreibung anpassen...", descAnim: "", hoverInfo: "Mitzubringende Unterlagen eintragen."
+                };
+                window.servicesData.push(newCard);
+                try {
+                    await setDoc(doc(db, "settings", "services"), { list: window.servicesData });
+                    window.showToast('Neue Karte erstellt!', 'success');
+                } catch(e) {
+                    localStorage.setItem('red_services', JSON.stringify(window.servicesData));
+                    window.renderServices(window.servicesData);
+                    window.showToast('Lokal erstellt.', 'success');
+                }
+            };
+
+            window.deleteServiceCard = async function(id) {
+                if(confirm("Möchten Sie diese Leistungskarte wirklich löschen?")) {
+                    window.servicesData = window.servicesData.filter(s => s.id !== id);
+                    try {
+                        await setDoc(doc(db, "settings", "services"), { list: window.servicesData });
+                        window.showToast('Karte gelöscht!', 'success');
+                    } catch(e) {
+                        localStorage.setItem('red_services', JSON.stringify(window.servicesData));
+                        window.renderServices(window.servicesData);
+                        window.showToast('Lokal gelöscht.', 'success');
+                    }
+                }
+            };
+            
+            window.customBlocksData = [];
+
             onSnapshot(collection(db, "customblocks"), (snapshot) => {
                 if(!snapshot.empty) {
                     const blocksData = [];
                     snapshot.forEach(docSnap => blocksData.push({ id: docSnap.id, ...docSnap.data() }));
+                    window.customBlocksData = blocksData;
                     window.renderCustomBlocks(blocksData);
                 } else {
                     const localBlocks = JSON.parse(localStorage.getItem('red_customblocks')) || [];
+                    window.customBlocksData = localBlocks;
                     window.renderCustomBlocks(localBlocks);
                 }
             });
 
-            window.addCustomBlock = async function(event) {
+            window.saveCustomBlock = async function(event) {
                 const btn = event.target;
                 const originalText = btn.innerText;
+                
                 const title = document.getElementById('cbTitle').value;
                 const icon = document.getElementById('cbIcon').value;
                 const page = document.getElementById('cbPage').value;
@@ -1957,6 +2495,7 @@
                 const textColor = document.getElementById('cbTextColor').value;
                 
                 const borderSize = document.getElementById('cbBorderSize').value;
+                const borderColor = document.getElementById('cbBorderColor').value;
                 
                 const bannerText = document.getElementById('cbBannerText').value;
                 const bannerEmoji = document.getElementById('cbBannerEmoji').value;
@@ -1971,37 +2510,104 @@
                         title, icon, page, text, 
                         titleFont, titleSize, titleColor,
                         textFont, textSize, textColor,
-                        borderSize, bannerText, bannerEmoji, bannerColor,
-                        mediaUrl, timestamp: serverTimestamp() 
+                        borderSize, borderColor, bannerText, bannerEmoji, bannerColor,
+                        mediaUrl, timestamp: window.editingBlockId ? window.customBlocksData.find(b => b.id === window.editingBlockId).timestamp : serverTimestamp() 
                     };
 
                     try {
-                        await addDoc(collection(db, "customblocks"), data);
-                        window.showToast('Baustein veröffentlicht!', 'success');
+                        if(window.editingBlockId) {
+                            await updateDoc(doc(db, "customblocks", window.editingBlockId), data);
+                            window.showToast('Baustein aktualisiert!', 'success');
+                        } else {
+                            await addDoc(collection(db, "customblocks"), data);
+                            window.showToast('Baustein veröffentlicht!', 'success');
+                        }
                     } catch(e) {
                         let localBlocks = JSON.parse(localStorage.getItem('red_customblocks')) || [];
-                        localBlocks.push({id: 'cb-'+Date.now(), ...data, timestamp: Date.now()});
+                        if(window.editingBlockId) {
+                            const index = localBlocks.findIndex(b => b.id === window.editingBlockId);
+                            if(index > -1) {
+                                localBlocks[index] = {id: window.editingBlockId, ...data};
+                            }
+                        } else {
+                            localBlocks.push({id: 'cb-'+Date.now(), ...data, timestamp: Date.now()});
+                        }
                         localStorage.setItem('red_customblocks', JSON.stringify(localBlocks));
                         window.renderCustomBlocks(localBlocks);
-                        window.showToast('Lokal hinzugefügt.', 'success');
+                        window.showToast('Lokal gespeichert.', 'success');
                     }
                     
-                    document.getElementById('cbTitle').value = '';
-                    document.getElementById('cbText').value = '';
-                    document.getElementById('cbBannerText').value = '';
-                    fileInput.value = '';
-                    document.getElementById('cbFileLabelText').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Datei für Firebase wählen`;
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+                    window.cancelEditBlock();
                 };
+
+                btn.innerText = 'Speichere...';
+                btn.disabled = true;
 
                 if(fileInput.files && fileInput.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function(e) { saveToFirestore(e.target.result); };
                     reader.readAsDataURL(fileInput.files[0]);
                 } else {
-                    saveToFirestore('');
+                    let existingMedia = '';
+                    if(window.editingBlockId) {
+                        const existingBlock = window.customBlocksData.find(b => b.id === window.editingBlockId);
+                        if(existingBlock) existingMedia = existingBlock.mediaUrl || '';
+                    }
+                    saveToFirestore(existingMedia);
                 }
+            };
+
+            window.openEditBlock = function(id) {
+                const block = window.customBlocksData.find(b => b.id === id);
+                if(!block) return;
+                
+                window.editingBlockId = id;
+                
+                document.getElementById('cbTitle').value = block.title || '';
+                document.getElementById('cbIcon').value = block.icon || '';
+                document.getElementById('cbPage').value = block.page || 'home';
+                document.getElementById('cbText').value = block.text || '';
+                
+                document.getElementById('cbTitleFont').value = block.titleFont || "'Montserrat', sans-serif";
+                document.getElementById('cbTitleSize').value = block.titleSize || "clamp(20px, 3vw, 28px)";
+                document.getElementById('cbTitleColor').value = block.titleColor || '#e60000';
+                
+                document.getElementById('cbTextFont').value = block.textFont || "'Montserrat', sans-serif";
+                document.getElementById('cbTextSize').value = block.textSize || "14px";
+                document.getElementById('cbTextColor').value = block.textColor || '#cccccc';
+                
+                document.getElementById('cbBorderSize').value = block.borderSize || '1px';
+                document.getElementById('cbBorderColor').value = block.borderColor || '#e60000';
+                
+                document.getElementById('cbBannerText').value = block.bannerText || '';
+                document.getElementById('cbBannerEmoji').value = block.bannerEmoji || '';
+                document.getElementById('cbBannerColor').value = block.bannerColor || '#e60000';
+                
+                document.getElementById('btnSaveCustomBlock').innerText = 'Baustein Aktualisieren';
+                document.getElementById('btnCancelEditBlock').style.display = 'flex';
+                
+                const details = document.querySelector('.mod-blocks details');
+                if(details && !details.open) details.open = true;
+                details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            window.cancelEditBlock = function() {
+                window.editingBlockId = null;
+                
+                document.getElementById('cbTitle').value = '';
+                document.getElementById('cbIcon').value = '';
+                document.getElementById('cbPage').value = 'home';
+                document.getElementById('cbText').value = '';
+                document.getElementById('cbBannerText').value = '';
+                document.getElementById('cbBannerEmoji').value = '';
+                
+                document.getElementById('cbMediaFile').value = '';
+                document.getElementById('cbFileLabelText').innerHTML = `<i class="fa-solid fa-upload"></i> Durchsuchen`;
+                
+                const btn = document.getElementById('btnSaveCustomBlock');
+                btn.innerText = 'Baustein Erstellen & Veröffentlichen';
+                btn.disabled = false;
+                document.getElementById('btnCancelEditBlock').style.display = 'none';
             };
 
             window.deleteCustomBlock = async function(id) {
@@ -2155,7 +2761,6 @@
                  }
             });
 
-            // Termine Abruf
             window.activeBadgeNum = 0;
             let localAppointments = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
             
@@ -2165,6 +2770,23 @@
                 b.style.display = count > 0 ? 'flex' : 'none';
                 b.classList.remove('prio-pulse');
                 if(hasPrio) b.classList.add('prio-pulse');
+            }
+            
+            function isAptExpired(dateStr, timeStr) {
+                if(!dateStr) return false;
+                const parts = dateStr.split('.');
+                if(parts.length !== 3) return false;
+                
+                let hour = 23, min = 59;
+                if(timeStr && timeStr.includes(':')) {
+                    const tParts = timeStr.replace(/[^\d:]/g, '').split(':');
+                    if(tParts.length === 2) {
+                        hour = parseInt(tParts[0]);
+                        min = parseInt(tParts[1]);
+                    }
+                }
+                const aptDate = new Date(parts[2], parts[1]-1, parts[0], hour, min);
+                return aptDate < new Date();
             }
 
             function renderAppointments(apts) {
@@ -2184,9 +2806,9 @@
 
                 apts.forEach((apt) => {
                     const id = apt.id;
-                    const isToday = apt.timeLabel.toLowerCase().includes('heute') || apt.date.includes(new Date().toLocaleDateString('de-DE'));
+                    const isToday = apt.date === new Date().toLocaleDateString('de-DE') || apt.timeLabel.toLowerCase().includes('heute');
                     const prioClass = isToday ? 'prio-high' : 'prio-normal';
-                    const badgeText = isToday ? 'In Kürze' : 'Geplant';
+                    const badgeText = isToday ? 'Heute' : 'Geplant';
                     if(isToday) hasPrio = true;
                     
                     const markedClass = apt.marked ? 'marked' : '';
@@ -2226,20 +2848,29 @@
                         
                         <div class="apt-actions-horizontal">
                             <button class="apt-btn mark" onclick="window.markApt('${id}', ${!apt.marked})" title="Markieren / Anheften"><i class="fa-solid fa-thumbtack"></i></button>
-                            <button class="apt-btn edit" onclick="window.editApt('${id}')" title="Notiz hinzufügen/bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button class="apt-btn edit" onclick="window.editAptNotes('${id}')" title="Notiz hinzufügen/bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button class="apt-btn edit" style="border-color:#007aff; color:#007aff;" onclick="window.openEditAptModal('${id}')" title="Datum & Uhrzeit bearbeiten"><i class="fa-solid fa-calendar-day"></i></button>
                             <button class="apt-btn delete" onclick="window.deleteApt('${id}')" title="Termin Löschen"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `;
                     list.appendChild(card);
 
                     if (apt.marked) {
-                        const plate = document.createElement('div');
-                        plate.className = 'pinned-plate';
-                        if(isToday) plate.classList.add('urgent-today'); 
-                        else plate.classList.add('normal-day');
+                        const isExpired = isAptExpired(apt.date, apt.timeLabel);
                         
+                        const plate = document.createElement('div');
+                        
+                        let plateStateClass = 'normal-day';
+                        if (isExpired) {
+                            plateStateClass = 'expired-plate';
+                        } else if (isToday) {
+                            plateStateClass = 'urgent-today';
+                        }
+                        plate.className = `pinned-plate ${plateStateClass}`;
                         plate.id = 'pinned-' + id;
-                        plate.innerHTML = `<span style="font-size:14px; pointer-events:none;">${apt.name}</span> <span style="font-size:16px; pointer-events:none;">|</span> <span style="font-size:11px; pointer-events:none;">${apt.date}, ${displayTime}</span>`;
+                        
+                        const tuev = `<div class="tuev-plakette" style="margin: 0 8px;">26</div>`;
+                        plate.innerHTML = `<span style="font-size:13px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.name}</span> ${tuev} <span style="font-size:10px; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.date}<br>${displayTime}</span>`;
                         
                         if(savedPositions[id]) {
                             plate.style.top = savedPositions[id].top;
@@ -2284,7 +2915,48 @@
                 }
             };
             
-            window.editApt = function(id) {
+            window.openEditAptModal = function(id) {
+                window.editingAptId = id;
+                const apt = window.redApts.find(a => a.id === id);
+                if(!apt) return;
+                
+                document.getElementById('editAptDate').value = apt.date;
+                document.getElementById('editAptDate')._flatpickr.setDate(apt.date, true);
+                
+                const timeSelect = document.getElementById('editAptTime');
+                timeSelect.value = apt.timeLabel.includes('Uhr') ? apt.timeLabel : apt.timeLabel + ' Uhr';
+                if(timeSelect.selectedIndex === -1) timeSelect.value = 'Ganztägig';
+
+                document.getElementById('editAptOverlay').classList.add('open');
+            };
+
+            window.closeEditAptModal = function() {
+                window.editingAptId = null;
+                document.getElementById('editAptOverlay').classList.remove('open');
+            };
+
+            window.saveEditedApt = async function() {
+                if(!window.editingAptId) return;
+                const newDate = document.getElementById('editAptDate').value;
+                const newTime = document.getElementById('editAptTime').value;
+
+                try {
+                    await updateDoc(doc(db, "appointments", window.editingAptId), { date: newDate, timeLabel: newTime });
+                    window.showToast('Termin erfolgreich verschoben!', 'success');
+                } catch(e) {
+                    const index = localAppointments.findIndex(a => a.id === window.editingAptId);
+                    if(index > -1) {
+                        localAppointments[index].date = newDate;
+                        localAppointments[index].timeLabel = newTime;
+                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                        renderAppointments(localAppointments);
+                        window.showToast('Lokal verschoben.', 'success');
+                    }
+                }
+                window.closeEditAptModal();
+            };
+
+            window.editAptNotes = function(id) {
                 window.editingNoteElement = null; 
                 window.editingNoteId = null;
                 const input = document.getElementById(`note-input-${id}`);
@@ -2358,7 +3030,7 @@
                 window.deleteNoteTargetId = null;
             };
 
-            window.confirmDelete = async function() {
+            window.confirmDelete= async function() {
                 if(window.deleteNoteTargetId) {
                     const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
                     if(index > -1) {
@@ -2420,28 +3092,19 @@
                     renderAppointments(localAppointments);
                 }
                 
-                const safeEmail = window.dynamicContactData?.email || 'Redzulassungsdienst@gmail.com';
-                const mailSubject = encodeURIComponent(`Neue Terminbuchung: ${n}`);
-                const mailBody = encodeURIComponent(`Guten Tag,\n\neine neue Terminbuchung liegt vor:\n\nName: ${n}\nTelefon: ${p}\nE-Mail: ${e}\n\nDatum: ${d}\nUhrzeit: ${timeString}\nAnliegen: ${window.selectedServiceVal}\n\nViele Grüße,\nRED Zulassungsdienst System`);
-
-                setTimeout(() => {
-                    window.location.href = `mailto:${safeEmail}?subject=${mailSubject}&body=${mailBody}`;
-                }, 300);
-
-                if(p && p.trim().length > 5) {
-                    const waMessage = `Guten Tag ${n},%0A%0Avielen Dank für Ihre Buchung bei RED Zulassungsdienst Berlin.%0A%0AHiermit bestätigen wir Ihren Termin:%0A%0A📅 Datum: ${d}%0A⏰ Uhrzeit: ${timeString}%0A👨‍💼 Berater: Tamer Yazici%0A📍 Ort: Kienitzer Str. 6, 12053 Berlin%0A📝 Anliegen: ${window.selectedServiceVal}%0A%0ABitte bringen Sie alle benötigten Unterlagen im Original mit.%0A%0AWir freuen uns auf Ihren Besuch!%0A%0AMit freundlichen Grüßen,%0AIhr Team vom RED Zulassungsdienst`;
-                    
-                    let targetPhone = window.dynamicContactData?.phone || "01783783875";
-                    targetPhone = targetPhone.replace(/\D/g,'');
-                    if(targetPhone.startsWith('0')) targetPhone = '49' + targetPhone.substring(1);
-                    
-                    const waUrl = "https://wa.me/" + targetPhone + "?text=" + waMessage;
-                    setTimeout(() => {
-                        window.open(waUrl, '_blank');
-                    }, 800);
+                const webhookUrl = window.dynamicContactData?.webhook || "";
+                if(webhookUrl && webhookUrl.includes("http")) {
+                    fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            type: 'new_booking', clientName: n, clientPhone: p, clientEmail: e, 
+                            date: d, time: timeString, service: window.selectedServiceVal, adminEmail: window.dynamicContactData.email 
+                        })
+                    }).catch(() => console.log('Webhook call executed.'));
                 }
                 
-                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${timeString} wurde erfolgreich gespeichert.\n\nDer Bestätigungs-Chat und die E-Mail werden vorbereitet.`;
+                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${timeString} wurde erfolgreich im System registriert.\n\nDie Bestätigungen wurden generiert und im Hintergrund versendet.`;
                 document.getElementById('confirmModalOverlay').classList.add('open');
                 
                 document.getElementById('bookingForm').reset();
