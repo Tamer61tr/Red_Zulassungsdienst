@@ -48,7 +48,7 @@
 
         input, select, textarea { font-size: 16px !important; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; }
 
-        .mod-leads, .mod-blocks, .mod-data, .mod-ticker, .mod-prices { display: none !important; }
+        .mod-leads, .mod-blocks, .mod-data, .mod-ticker, .mod-prices, .mod-crm { display: none !important; }
         .mod-leads-locked { display: none; }
         .action-forms, .action-cars, .action-content { display: none !important; }
 
@@ -57,6 +57,7 @@
         body.is-admin.perm-blocks .mod-blocks { display: block !important; }
         body.is-admin.perm-data .mod-data { display: block !important; }
         body.is-admin.perm-prices .mod-prices { display: block !important; }
+        body.is-admin.perm-crm .mod-crm { display: flex !important; }
         
         body.is-admin.perm-forms .action-forms { display: inline-flex !important; }
         body.is-admin.perm-cars .action-cars { display: flex !important; }
@@ -67,6 +68,7 @@
         body.is-supervisor .mod-blocks,
         body.is-supervisor .mod-data,
         body.is-supervisor .mod-prices { display: block !important; }
+        body.is-supervisor .mod-crm { display: flex !important; }
         body.is-supervisor .mod-ticker { display: flex !important; }
         body.is-supervisor .action-forms { display: inline-flex !important; }
         body.is-supervisor .action-cars { display: flex !important; }
@@ -202,6 +204,16 @@
         .header-widget-item { cursor: pointer; transition: 0.3s; padding: 4px 8px; border-radius: 6px; }
         .header-widget-item:hover { background: rgba(255,255,255,0.05); transform: scale(1.05); }
         
+        /* Neuer KUNDENDATENBANK Button im Header */
+        .mod-crm { display: none !important; }
+        body.is-admin.perm-crm .mod-crm, body.is-supervisor .mod-crm { display: flex !important; }
+        .btn-crm-header {
+            border: 1px solid #00ffff; color: #00ffff; font-size: 11px; font-weight: 800; 
+            padding: 4px 10px; border-radius: 6px; align-items: center; gap: 6px; 
+            background: rgba(0,255,255,0.05); text-transform: uppercase;
+        }
+        .btn-crm-header:hover { background: #00ffff; color: #000; box-shadow: 0 0 15px rgba(0,255,255,0.4); }
+
         .header-clock-date { font-size: 11px; font-weight: 700; color: #ccc; letter-spacing: 0.5px; display:flex; align-items:center; gap:5px; white-space: nowrap; }
         .header-clock-date span { color: var(--primary-red); }
         .header-weather { font-size: 11px; font-weight: 600; color: #aaa; display:flex; align-items:center; gap:5px; white-space: nowrap; }
@@ -239,7 +251,6 @@
             text-align: center; 
         }
 
-        /* Ovale Scrollbars für Modal-Fenster */
         .custom-dialog-window::-webkit-scrollbar { width: 8px; height: 8px; }
         .custom-dialog-window::-webkit-scrollbar-track { background: transparent; margin: 20px 0; border-radius: 100vw; }
         .custom-dialog-window::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 100vw; border: 2px solid #121216; background-clip: padding-box; }
@@ -462,6 +473,7 @@
                 border-top: 1px solid rgba(255,255,255,0.08); width: 100%;
             }
             .header-widget-item { padding: 4px 10px; background: rgba(255,255,255,0.03); }
+            .btn-crm-header { padding: 4px 8px !important; font-size: 10px !important; }
             .header-clock-date, .header-weather { font-size: 10px; }
             .btn-primary { padding: 10px 20px !important; font-size: 10px !important; }
             .quick-menu-btn { padding: 5px 10px !important; font-size: 10px !important; }
@@ -645,6 +657,10 @@
             </div>
             
             <div class="nav-actions">
+                <div class="header-widget-item mod-crm btn-crm-header" onclick="window.openCRM()" title="Unabhängige Kundendatenbank">
+                    <i class="fa-solid fa-database"></i> Kundendatenbank
+                </div>
+
                 <div class="visitor-counter" onclick="window.openWidgetModal('visitors')" title="System Status"><i class="fa-solid fa-users"></i> Besuche: <span id="vCount">0</span></div>
                 
                 <div class="key-ring" onclick="window.openAdmin()" title="Admin Control Center">
@@ -711,7 +727,7 @@
                 <div style="margin-top:15px; display:flex; justify-content:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
                     <button class="btn-primary" style="background:transparent; border:1px solid #b38728; color:#b38728; padding:8px 15px; flex:1;" onclick="window.changePassPrompt()"><i class="fa-solid fa-key"></i> Passwort</button>
                     <button class="btn-primary supervisor-only-inline" style="background:transparent; border:1px solid #ff00ff; color:#ff00ff; padding:8px 15px; flex:1;" onclick="window.openSupervisorPanel()"><i class="fa-solid fa-crown"></i> Rechte</button>
-                    <button class="btn-primary" style="background:transparent; border:1px solid #00ffff; color:#00ffff; padding:8px 15px; flex:1;" onclick="window.openCRM()"><i class="fa-solid fa-users"></i> Kunden</button>
+                    <button class="btn-primary mod-crm" style="background:transparent; border:1px solid #00ffff; color:#00ffff; padding:8px 15px; flex:1;" onclick="window.openCRM()"><i class="fa-solid fa-database"></i> Kunden</button>
                     <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; padding:8px 15px; flex:1;" onclick="window.triggerLogoutConfirm()"><i class="fa-solid fa-right-from-bracket"></i> Abmelden</button>
                 </div>
 
@@ -726,8 +742,8 @@
     <div class="custom-dialog-overlay" id="crmOverlay">
         <div class="custom-dialog-window" style="max-width: 800px; border-top-color: #00ffff; text-align: left;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCRM()"></i>
-            <h3 style="color:#00ffff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-users"></i> Kundenregister (CRM)</h3>
-            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px;">Alle buchenden Kunden werden hier vollautomatisch inklusive einzigartiger RED-ID erfasst.</p>
+            <h3 style="color:#00ffff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-database"></i> Kundendatenbank (Völlig Unabhängig)</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px;">Hier gespeicherte Kundenakten bleiben sicher und dauerhaft erhalten, selbst wenn gebuchte Termine aus der Liste gelöscht oder erledigt werden.</p>
             <input type="text" id="crmSearch" class="form-control" placeholder="Suche nach Name, E-Mail, Telefon oder Kunden-ID..." onkeyup="window.filterCRM()" style="margin-bottom: 20px;">
             
             <div id="crmList" class="admin-list-wrapper" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;"></div>
@@ -778,7 +794,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Notizen / Kunden-Historie</label>
+                <label>Notizen / Kunden-Historie (Bleibt dauerhaft erhalten!)</label>
                 <textarea id="crmEditNotes" class="form-control" rows="4" style="resize:vertical;"></textarea>
             </div>
             
@@ -799,6 +815,10 @@
                 <label class="noble-checkbox-label" style="display:flex; margin-top:0; margin-bottom:10px;">
                     <input type="checkbox" id="permLeads">
                     <span class="noble-checkbox-box"></span> Live-Leads Terminal (Terminliste)
+                </label>
+                <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px; color:#00ffff;">
+                    <input type="checkbox" id="permCrm">
+                    <span class="noble-checkbox-box"></span> Kundendatenbank (Unabhängiges CRM)
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:10px;">
                     <input type="checkbox" id="permPrices">
@@ -1244,7 +1264,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Rahmenfarbe</label>
+                            <label>Rahhmenfarbe</label>
                             <input type="color" id="cbBorderColor" class="form-control" value="#e60000" style="padding: 2px; height: 42px; cursor: pointer;">
                         </div>
                     </div>
@@ -1591,7 +1611,7 @@
         };
 
         window.adminPermissions = {
-            leads: false, prices: false, customblocks: false, content: false, companydata: false, forms: false, cars: false, ticker: false
+            leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true
         };
 
         // Text Content Defaults
@@ -1782,7 +1802,7 @@
         };
 
         window.applyAdminModulePermissions = function(perms) {
-            if(!perms) perms = { leads: false, prices: false, customblocks: false, content: false, companydata: false, forms: false, cars: false, ticker: false };
+            if(!perms) perms = { leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true };
             window.adminPermissions = perms;
             if(!window.loggedInUser) return;
             
@@ -1795,6 +1815,7 @@
                 document.getElementById('permForms').checked = perms.forms;
                 document.getElementById('permCars').checked = perms.cars;
                 document.getElementById('permTicker').checked = perms.ticker;
+                document.getElementById('permCrm').checked = perms.crm;
             }
 
             document.body.classList.toggle('perm-leads', perms.leads);
@@ -1805,9 +1826,10 @@
             document.body.classList.toggle('perm-forms', perms.forms);
             document.body.classList.toggle('perm-cars', perms.cars);
             document.body.classList.toggle('perm-ticker', perms.ticker);
+            document.body.classList.toggle('perm-crm', perms.crm);
         };
 
-        // KUNDENREGISTER / CRM LOGIK
+        // KUNDENREGISTER / CRM LOGIK (Vollständig Entkoppelt!)
         window.openCRM = function() {
             document.getElementById('crmOverlay').classList.add('open');
             window.renderCRM();
@@ -1817,14 +1839,14 @@
             document.getElementById('crmOverlay').classList.remove('open');
         };
 
-        window.openCRMDetail = function(clientId, name, phone, email) {
+        window.openCRMDetail = function(clientId) {
+            const detail = window.crmClientsDetail[clientId] || {};
             document.getElementById('crmEditClientId').value = clientId;
             document.getElementById('crmEditClientIdView').value = clientId !== 'N/A' ? clientId : 'Nicht vergeben';
-            document.getElementById('crmEditName').value = name !== 'undefined' ? name : '';
-            document.getElementById('crmEditPhone').value = phone !== 'undefined' && phone ? phone : '';
-            document.getElementById('crmEditEmail').value = email !== 'undefined' && email ? email : '';
+            document.getElementById('crmEditName').value = detail.name !== 'undefined' ? (detail.name || '') : '';
+            document.getElementById('crmEditPhone').value = detail.phone !== 'undefined' ? (detail.phone || '') : '';
+            document.getElementById('crmEditEmail').value = detail.email !== 'undefined' ? (detail.email || '') : '';
 
-            const detail = window.crmClientsDetail[clientId] || {};
             document.getElementById('crmEditBirthday').value = detail.birthday || '';
             document.getElementById('crmEditAddress').value = detail.address || '';
             document.getElementById('crmEditCity').value = detail.city || '';
@@ -1841,29 +1863,12 @@
             const list = document.getElementById('crmList');
             list.innerHTML = '';
             
-            // Gruppieren der buchenden Kunden anhand von ID/Email
-            let clientsMap = {};
-            (window.redApts || []).forEach(apt => {
-                let key = apt.clientId || apt.email || apt.name;
-                if(!clientsMap[key]) {
-                    clientsMap[key] = {
-                        clientId: apt.clientId || 'N/A',
-                        name: apt.name,
-                        phone: apt.phone,
-                        email: apt.email,
-                        bookings: 1,
-                        latestDate: apt.date,
-                        mapKey: key
-                    };
-                } else {
-                    clientsMap[key].bookings++;
-                }
-            });
+            let clients = Object.values(window.crmClientsDetail || {});
             
-            let clients = Object.values(clientsMap);
+            clients.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
             
             if(clients.length === 0) {
-                list.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Noch keine Kunden im System erfasst.</p>';
+                list.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Noch keine Kunden in der Datenbank erfasst.</p>';
                 return;
             }
             
@@ -1873,9 +1878,9 @@
                     <div class="crm-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                             <div>
-                                <h4 style="color:#fff; font-size:14px; margin-bottom:4px;">${c.name}</h4>
+                                <h4 style="color:#fff; font-size:14px; margin-bottom:4px;">${c.name || 'Unbekannt'}</h4>
                                 <span style="font-family:'Courier New', monospace; font-size:11px; color:#00ffff; font-weight:bold; background:rgba(0,255,255,0.1); padding:2px 6px; border-radius:4px;">${c.clientId}</span>
-                                <span style="font-size:10px; color:var(--text-muted); margin-left:10px;">Buchungen: ${c.bookings}</span>
+                                <span style="font-size:10px; color:var(--text-muted); margin-left:10px;">Buchungen: ${c.bookings || 1}</span>
                             </div>
                             <div style="display:flex; gap:8px;">
                                 ${c.phone ? `
@@ -1884,7 +1889,7 @@
                                 <a href="${waLink}" target="_blank" class="btn-primary" style="padding:6px 10px; background:#25D366; font-size:12px;" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                                 ` : ''}
                                 ${c.email ? `<a href="mailto:${c.email}" class="btn-primary" style="padding:6px 10px; background:#ff3b30; font-size:12px;" title="E-Mail schreiben"><i class="fa-solid fa-envelope"></i></a>` : ''}
-                                <button class="btn-primary" style="padding:6px 10px; background:rgba(0,255,255,0.1); color:#00ffff; border:1px solid #00ffff; font-size:12px;" onclick="window.openCRMDetail('${c.mapKey}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${c.email}')" title="Kunden-Akte öffnen & bearbeiten"><i class="fa-solid fa-user-pen"></i></button>
+                                <button class="btn-primary" style="padding:6px 10px; background:rgba(0,255,255,0.1); color:#00ffff; border:1px solid #00ffff; font-size:12px;" onclick="window.openCRMDetail('${c.clientId}')" title="Kunden-Akte öffnen & bearbeiten"><i class="fa-solid fa-user-pen"></i></button>
                             </div>
                         </div>
                     </div>
@@ -2262,19 +2267,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- NEU: Laden & Verwalten der Kunden-Detaildaten (CRM) ---
         window.crmClientsDetail = JSON.parse(localStorage.getItem('red_crm_details') || '{}');
         
         onSnapshot(doc(db, "settings", "crm_details"), (docSnap) => {
              if(docSnap.exists()) {
                  window.crmClientsDetail = docSnap.data().details || {};
                  localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+                 if(document.getElementById('crmOverlay').classList.contains('open')) {
+                     window.renderCRM();
+                 }
              }
         });
 
         window.saveCRMDetail = async function() {
             const clientId = document.getElementById('crmEditClientId').value;
             const detail = {
+                clientId: clientId,
                 name: document.getElementById('crmEditName').value,
                 phone: document.getElementById('crmEditPhone').value,
                 email: document.getElementById('crmEditEmail').value,
@@ -2282,12 +2290,14 @@
                 address: document.getElementById('crmEditAddress').value,
                 city: document.getElementById('crmEditCity').value,
                 notes: document.getElementById('crmEditNotes').value,
+                bookings: window.crmClientsDetail[clientId] ? window.crmClientsDetail[clientId].bookings : 1,
+                timestamp: window.crmClientsDetail[clientId] ? window.crmClientsDetail[clientId].timestamp : Date.now()
             };
 
             window.crmClientsDetail[clientId] = detail;
             try {
                 await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
-                window.showToast('Kunden-Akte gespeichert!', 'success');
+                window.showToast('Kunden-Akte dauerhaft gespeichert!', 'success');
             } catch(e) {
                 localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
                 window.showToast('Lokal gespeichert.', 'success');
@@ -2298,19 +2308,18 @@
 
         window.deleteCRMClient = async function() {
             const clientId = document.getElementById('crmEditClientId').value;
-            if(confirm('Möchten Sie diese Akte (mitsamt Notizen & Basisdaten) wirklich löschen?')) {
+            if(confirm('Möchten Sie diese Akte (mitsamt aller Notizen & Basisdaten) wirklich löschen?')) {
                 delete window.crmClientsDetail[clientId];
                 try {
                     await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
                 } catch(e) {
                     localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
                 }
-                window.showToast('Kunden-Akte gelöscht.', 'success');
+                window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
                 window.closeCRMDetail();
                 window.renderCRM();
             }
         };
-        // -----------------------------------------------------------
 
         window.sysAuth = {
             "Tamer Yazici": { pass: "616161", role: "admin" },
@@ -2390,7 +2399,7 @@
         window.executeLogout = function() {
             window.isAuthorized = false;
             window.loggedInUser = null;
-            document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker');
+            document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm');
             
             localStorage.removeItem('red_admin_saved');
             localStorage.removeItem('red_logged_in_user');
@@ -2444,6 +2453,7 @@
                 forms: document.getElementById('permForms').checked,
                 cars: document.getElementById('permCars').checked,
                 ticker: document.getElementById('permTicker').checked,
+                crm: document.getElementById('permCrm').checked,
                 timestamp: Date.now()
             };
 
@@ -2732,7 +2742,7 @@
                         titleFont, titleSize, titleColor,
                         textFont, textSize, textColor,
                         borderSize, borderColor, bannerText, bannerEmoji, bannerColor,
-                        mediaUrl, timestamp: window.editingBlockId ? window.customBlocksData.find(b => b.id === window.editingBlockId).timestamp : serverTimestamp() 
+                        mediaUrl, timestamp: window.editingBlockId ? window.customBlocksData.find(b => b.id === window.editingBlockId).timestamp : Date.now() 
                     };
 
                     try {
@@ -2900,7 +2910,7 @@
                 
                 try {
                     await setDoc(doc(db, "settings", "ticker"), {
-                        fullText, blinkWord, speed, color, blinkColor, font, size, symbols, timestamp: serverTimestamp()
+                        fullText, blinkWord, speed, color, blinkColor, font, size, symbols, timestamp: Date.now()
                     });
                     window.showToast('Ticker in Firebase gespeichert!', 'success');
                 } catch(e) {
@@ -2945,7 +2955,7 @@
                     applyTickerLocally(docSnap.data());
                     
                     const data = docSnap.data();
-                    document.getElementById('tickerFullText').value = data.fullText || '';
+                    document.getElementById('tickerFullText').value =data.fullText || '';
                     document.getElementById('tickerBlinkWord').value = data.blinkWord || '';
                     document.getElementById('tickerSpeed').value = data.speed || '15s';
                     document.getElementById('tickerColor').value = data.color || '#ffffff';
@@ -3136,454 +3146,513 @@
                 }
             };
             
-            window.openEditAptModal = function(id) {
-                window.editingAptId = id;
-                const apt = window.redApts.find(a => a.id === id);
-                if(!apt) return;
-                
-                document.getElementById('editAptDate').value = apt.date;
-                document.getElementById('editAptDate')._flatpickr.setDate(apt.date, true);
-                
-                const timeSelect = document.getElementById('editAptTime');
-                timeSelect.value = apt.timeLabel.includes('Uhr') ? apt.timeLabel : apt.timeLabel + ' Uhr';
-                if(timeSelect.selectedIndex === -1) timeSelect.value = 'Ganztägig';
-
-                document.getElementById('editAptOverlay').classList.add('open');
-            };
-
-            window.closeEditAptModal = function() {
-                window.editingAptId = null;
-                document.getElementById('editAptOverlay').classList.remove('open');
-            };
-
-            window.saveEditedApt = async function() {
-                if(!window.editingAptId) return;
-                const newDate = document.getElementById('editAptDate').value;
-                const newTime = document.getElementById('editAptTime').value;
-
-                try {
-                    await updateDoc(doc(db, "appointments", window.editingAptId), { date: newDate, timeLabel: newTime });
-                    window.showToast('Termin erfolgreich verschoben!', 'success');
-                } catch(e) {
-                    const index = localAppointments.findIndex(a => a.id === window.editingAptId);
-                    if(index > -1) {
-                        localAppointments[index].date = newDate;
-                        localAppointments[index].timeLabel = newTime;
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        renderAppointments(localAppointments);
-                        window.showToast('Lokal verschoben.', 'success');
-                    }
-                }
-                window.closeEditAptModal();
-            };
-
-            window.editAptNotes = function(id) {
-                window.editingNoteElement = null; 
-                window.editingNoteId = null;
-                const input = document.getElementById(`note-input-${id}`);
-                input.value = '';
-                input.classList.toggle('active');
-                if(input.classList.contains('active')) input.focus();
-            };
-            
-            window.saveNote = async function(e, inputEl, aptId) {
-                if(e.key === 'Enter') {
-                    e.preventDefault();
-                    const noteText = inputEl.value.trim();
-                    if(noteText === '') return;
+            window.openEditAptModal = function(id) {window.editingAptId = id;
+                    const apt = window.redApts.find(a => a.id === id);
+                    if(!apt) return;
                     
-                    inputEl.classList.remove('active');
-                    const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('editAptDate').value = apt.date;
+                    try { document.getElementById('editAptDate')._flatpickr.setDate(apt.date, true); } catch(e){}
                     
-                    const index = localAppointments.findIndex(a => a.id === aptId);
-                    if(index > -1) {
-                        if(!localAppointments[index].notes) localAppointments[index].notes = [];
-                        
-                        if(window.editingNoteElement) {
-                            const nIndex = localAppointments[index].notes.findIndex(n => n.id === window.editingNoteElement.id.replace('note-',''));
-                            if(nIndex > -1) localAppointments[index].notes[nIndex].text = noteText;
-                            window.editingNoteElement = null;
-                        } else {
-                            localAppointments[index].notes.push({ id: Date.now().toString(), text: noteText, timeStr: `Erstellt: ${timestamp}` });
-                        }
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        
-                        try { await updateDoc(doc(db, "appointments", aptId), { notes: localAppointments[index].notes }); } catch(err){}
-                        
-                        renderAppointments(localAppointments);
-                        window.showToast('Notiz gespeichert.', 'success');
-                    }
-                    inputEl.value = '';
-                }
-            };
+                    const timeSelect = document.getElementById('editAptTime');
+                    timeSelect.value = apt.timeLabel.includes('Uhr') ? apt.timeLabel : apt.timeLabel + ' Uhr';
+                    if(timeSelect.selectedIndex === -1) timeSelect.value = 'Ganztägig';
 
-            window.triggerEditNote = function(noteDOMId, cardId) {
-                const noteRow = document.getElementById(noteDOMId);
-                const text = noteRow.querySelector('.note-text-body').innerText;
-                const input = document.getElementById(`note-input-${cardId}`);
-                
-                window.editingNoteElement = noteRow;
-                input.value = text;
-                input.classList.add('active');
-                input.focus();
-            };
-
-            window.triggerDeleteNote = function(noteDOMId, aptId) {
-                window.deleteNoteTargetId = noteDOMId;
-                const confirmEl = document.getElementById('deleteConfirmOverlay');
-                confirmEl.querySelector('h3').innerText = "Notiz löschen?";
-                confirmEl.querySelector('p').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
-                confirmEl.classList.add('open');
-                window.deleteTargetId = aptId; 
-            };
-
-            window.deleteApt = function(id) {
-                window.deleteTargetId = id;
-                const confirmEl = document.getElementById('deleteConfirmOverlay');
-                confirmEl.querySelector('h3').innerText = "Eintrag löschen?";
-                confirmEl.querySelector('p').innerText = "Möchten Sie diesen Kundentermin wirklich unwiderruflich aus dem System entfernen?";
-                confirmEl.classList.add('open');
-            };
-
-            window.cancelDelete = function() {
-                document.getElementById('deleteConfirmOverlay').classList.remove('open');
-                window.deleteTargetId = null;
-                window.deleteNoteTargetId = null;
-            };
-
-            window.confirmDelete= async function() {
-                if(window.deleteNoteTargetId) {
-                    const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
-                    if(index > -1) {
-                        localAppointments[index].notes = localAppointments[index].notes.filter(n => n.id !== window.deleteNoteTargetId.replace('note-',''));
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        try { await updateDoc(doc(db, "appointments", window.deleteTargetId), { notes: localAppointments[index].notes }); } catch(err){}
-                        renderAppointments(localAppointments);
-                    }
-                    window.showToast('Notiz gelöscht.', 'success');
-                }
-                else if(window.deleteTargetId) {
-                    try {
-                        await deleteDoc(doc(db, "appointments", window.deleteTargetId));
-                        
-                        let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
-                        if(positions[window.deleteTargetId]) {
-                            delete positions[window.deleteTargetId];
-                            localStorage.setItem('pin_positions', JSON.stringify(positions));
-                        }
-                        
-                        window.showToast('Termin online gelöscht.', 'success');
-                    } catch(e) {
-                        localAppointments = localAppointments.filter(a => a.id !== window.deleteTargetId);
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        renderAppointments(localAppointments);
-                        window.showToast('Lokal gelöscht.', 'success');
-                    }
-                }
-                window.cancelDelete();
-            };
-
-            window.executeBooking = async function(event) {
-                event.preventDefault();
-                const n = document.getElementById('formName').value;
-                const p = document.getElementById('formPhone').value;
-                const e = document.getElementById('formEmail').value;
-                const d = document.getElementById('datePicker').value;
-                const btn = document.getElementById('submitBtn');
-
-                btn.innerText = 'Übermittle...';
-                
-                let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
-                if (!timeString.includes("Uhr") && timeString !== "Ganztägig") {
-                    timeString += " Uhr";
-                }
-
-                const appointmentData = {
-                    id: 'local-' + Date.now(),
-                    name: n, phone: p, email: e, date: d, timeLabel: timeString,
-                    service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
+                    document.getElementById('editAptOverlay').classList.add('open');
                 };
 
-                try {
-                    const fbData = {...appointmentData}; delete fbData.id; fbData.timestamp = serverTimestamp();
-                    await addDoc(collection(db, "appointments"), fbData);
-                } catch(err) {
-                    localAppointments.unshift(appointmentData);
-                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                    renderAppointments(localAppointments);
-                }
+                window.closeEditAptModal = function() {
+                    window.editingAptId = null;
+                    document.getElementById('editAptOverlay').classList.remove('open');
+                };
+
+                window.saveEditedApt = async function() {
+                    if(!window.editingAptId) return;
+                    const newDate = document.getElementById('editAptDate').value;
+                    const newTime = document.getElementById('editAptTime').value;
+
+                    try {
+                        await updateDoc(doc(db, "appointments", window.editingAptId), { date: newDate, timeLabel: newTime });
+                        window.showToast('Termin erfolgreich verschoben!', 'success');
+                    } catch(e) {
+                        const index = localAppointments.findIndex(a => a.id === window.editingAptId);
+                        if(index > -1) {
+                            localAppointments[index].date = newDate;
+                            localAppointments[index].timeLabel = newTime;
+                            localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                            renderAppointments(localAppointments);
+                            window.showToast('Lokal verschoben.', 'success');
+                        }
+                    }
+                    window.closeEditAptModal();
+                };
+
+                window.editAptNotes = function(id) {
+                    window.editingNoteElement = null; 
+                    window.editingNoteId = null;
+                    const input = document.getElementById(`note-input-${id}`);
+                    input.value = '';
+                    input.classList.toggle('active');
+                    if(input.classList.contains('active')) input.focus();
+                };
                 
-                const webhookUrl = window.dynamicContactData?.webhook || "";
-                if(webhookUrl && webhookUrl.includes("http")) {
-                    fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            type: 'new_booking', clientName: n, clientPhone: p, clientEmail: e, 
-                            date: d, time: timeString, service: window.selectedServiceVal, adminEmail: window.dynamicContactData.email 
-                        })
-                    }).catch(() => console.log('Webhook call executed.'));
-                }
-                
-                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${timeString} wurde erfolgreich im System registriert.\n\nDie Bestätigungen wurden generiert und im Hintergrund versendet.`;
-                document.getElementById('confirmModalOverlay').classList.add('open');
-                
-                document.getElementById('bookingForm').reset();
-                document.getElementById('timeWrapper').style.display = 'none';
-                btn.disabled = true;
-                btn.innerText = 'Termin absenden';
-                document.getElementById('selectTriggerText').innerText = "Zulassung (Neuanmeldung)";
-                window.selectedServiceVal = "Anmeldung";
-                window.chosenHour = null;
-            };
-
-            const staticForms = [
-                {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
-                {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
-                {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
-                {id: 'static-4', title: 'Antrag auf Steuervergünstigung', url: '#'},
-                {id: 'static-5', title: 'Empfangsbevollmächtigung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f242094-bevollmaechtigung.pdf'}, 
-                {id: 'static-6', title: 'Eidesstattliche Versicherung (EV I)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123018-verlust_zbi.pdf'},
-                {id: 'static-7', title: 'Eidesstattliche Versicherung (EV II)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123019-verlust_zbii.pdf'}, 
-                {id: 'static-8', title: 'EV (Schilder)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f122851-verlust_kennzeichen.pdf'},
-                {id: 'static-9', title: 'Kennzeichenreservierung', url: '#'}, 
-                {id: 'static-10', title: 'Mitteilung für Umsatzsteuerzwecke', url: '#'},
-                {id: 'static-11', title: 'SEPA-Lastschriftmandat', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f394016-sepa_lastschriftmandat_20140327__2_.pdf'}, 
-                {id: 'static-12', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'}
-            ];
-
-            let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
-            if(!localForms || localForms.length === 0) {
-                localForms = staticForms;
-                localStorage.setItem('red_local_forms', JSON.stringify(localForms));
-            }
-
-            function renderFormsList(formsList) {
-                const grid = document.getElementById('formItemsGrid');
-                grid.innerHTML = '';
-                formsList.forEach(form => {
-                    const element = document.createElement('div');
-                    element.className = 'download-item';
-                    element.id = form.id;
-                    element.setAttribute('data-url', form.url);
-                    element.setAttribute('onclick', 'window.selectForm(this)');
-                    
-                    element.innerHTML = `
-                        <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="${form.title}">${form.title}</span></div>
-                        <div class="download-actions">
-                            <i class="fa-solid fa-upload action-forms" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
-                            <i class="fa-solid fa-trash-can action-forms" title="Formular löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
-                            <i class="fa-solid fa-eye user-view" title="Ansehen / Öffnen" onclick="event.stopPropagation(); window.openForm(this)"></i>
-                            <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"></i>
-                        </div>
-                    `;
-                    grid.appendChild(element);
-                });
-            }
-
-            onSnapshot(collection(db, "forms"), (snapshot) => {
-                if(!snapshot.empty) {
-                    const formsData = [];
-                    snapshot.forEach(docSnap => {
-                        formsData.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    renderFormsList([...staticForms, ...formsData]);
-                } else {
-                    renderFormsList(localForms);
-                }
-            });
-
-            window.addNewFormItem = async function() {
-                const title = document.getElementById('newFormTitle').value;
-                const url = document.getElementById('newFormUrl').value || '#';
-                if(!title) { window.showToast('Bitte Formular-Titel eingeben.', 'error'); return; }
-                
-                try {
-                    await addDoc(collection(db, "forms"), { title, url, timestamp: serverTimestamp() });
-                    window.showToast('Formular erfolgreich zu Firebase hinzugefügt.', 'success');
-                    document.getElementById('newFormTitle').value = '';
-                    document.getElementById('newFormUrl').value = '';
-                } catch(e) {
-                    localForms.push({id: 'local-form-'+Date.now(), title, url});
-                    localStorage.setItem('red_local_forms', JSON.stringify(localForms));
-                    renderFormsList(localForms);
-                    window.showToast('Lokal hinzugefügt.', 'error');
-                }
-            };
-
-            window.triggerAdminUpload = function(iconEl, formId) {
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = '.pdf,.doc,.docx';
-                fileInput.onchange = async e => {
-                    if(e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        const reader = new FileReader();
-                        reader.onload = async function(ev) {
-                            try {
-                                await updateDoc(doc(db, "forms", formId), { url: ev.target.result });
-                                window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
-                            } catch(err) {
-                                iconEl.style.color = '#25D366';
-                                const parentItem = document.getElementById(formId);
-                                if(parentItem) parentItem.setAttribute('data-url', ev.target.result);
-                                window.showToast('Lokal in DOM verknüpft.', 'success');
+                window.saveNote = async function(e, inputEl, aptId) {
+                    if(e.key === 'Enter') {
+                        e.preventDefault();
+                        const noteText = inputEl.value.trim();
+                        if(noteText === '') return;
+                        
+                        inputEl.classList.remove('active');
+                        const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        
+                        const index = localAppointments.findIndex(a => a.id === aptId);
+                        if(index > -1) {
+                            if(!localAppointments[index].notes) localAppointments[index].notes = [];
+                            
+                            if(window.editingNoteElement) {
+                                const nIndex = localAppointments[index].notes.findIndex(n => n.id === window.editingNoteElement.id.replace('note-',''));
+                                if(nIndex > -1) localAppointments[index].notes[nIndex].text = noteText;
+                                window.editingNoteElement = null;
+                            } else {
+                                localAppointments[index].notes.push({ id: Date.now().toString(), text: noteText, timeStr: `Erstellt: ${timestamp}` });
                             }
-                        };
-                        reader.readAsDataURL(file);
+                            localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                            
+                            try { await updateDoc(doc(db, "appointments", aptId), { notes: localAppointments[index].notes }); } catch(err){}
+                            
+                            renderAppointments(localAppointments);
+                            window.showToast('Notiz gespeichert.', 'success');
+                        }
+                        inputEl.value = '';
                     }
                 };
-                fileInput.click();
-            };
-            
-            window.adminDeleteForm = async function(formId) {
-                if(confirm('Möchten Sie dieses Formular komplett löschen?')) {
-                    try {
-                        await deleteDoc(doc(db, "forms", formId));
-                        window.showToast('Formular in Firebase gelöscht.', 'success');
-                    } catch(e) {
-                        const item = document.getElementById(formId);
-                        if(item) item.remove();
-                        localForms = localForms.filter(f => f.id !== formId);
-                        localStorage.setItem('red_local_forms', JSON.stringify(localForms));
-                        window.showToast('Lokal gelöscht.', 'success');
-                    }
-                }
-            };
 
-            window.openForm = function(iconEl) {
-                const url = iconEl.closest('.download-item').getAttribute('data-url');
-                if(url && url !== '#') {
-                    window.open(url, '_blank');
-                } else {
-                    window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
-                }
-            };
-
-            window.downloadForm = function(iconEl) { 
-                const url = iconEl.closest('.download-item').getAttribute('data-url');
-                if(url && url !== '#') {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = ''; 
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.showToast('Download gestartet...', 'success');
-                } else {
-                    window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
-                }
-            };
-
-            window.selectForm = function(element) {
-                document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
-                element.classList.add('selected');
-            };
-
-            const staticCarsGallery = [
-                {id: 'car-static-1', title: 'Chevrolet Corvette', mediaUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-3', title: 'Porsche 911 Classic', mediaUrl: 'https://images.unsplash.com/photo-1503375800000-84c4f3460e4d?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-4', title: 'VW Käfer', mediaUrl: 'https://images.unsplash.com/photo-1490902931801-d6f80ca94f0f?auto=format&fit=crop&w=800&q=80'}
-            ];
-
-            let localCarsGallery = JSON.parse(localStorage.getItem('red_local_cars_gallery'));
-            if(!localCarsGallery || localCarsGallery.length === 0) {
-                localCarsGallery = staticCarsGallery;
-                localStorage.setItem('red_local_cars_gallery', JSON.stringify(localCarsGallery));
-            }
-
-            function renderGalleryList(carsList) {
-                const grid = document.getElementById('carsGalleryGrid');
-                grid.innerHTML = '';
-                carsList.forEach(car => {
-                    const card = document.createElement('div');
-                    card.className = 'gallery-card';
-                    card.id = car.id; 
+                window.triggerEditNote = function(noteDOMId, cardId) {
+                    const noteRow = document.getElementById(noteDOMId);
+                    const text = noteRow.querySelector('.note-text-body').innerText;
+                    const input = document.getElementById(`note-input-${cardId}`);
                     
-                    let mediaHtml = '';
-                    if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
-                       mediaHtml = `<video src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
-                       if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || car.mediaUrl.includes('alt=')) {
-                           mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
-                       }
+                    window.editingNoteElement = noteRow;
+                    input.value = text;
+                    input.classList.add('active');
+                    input.focus();
+                };
+
+                window.triggerDeleteNote = function(noteDOMId, aptId) {
+                    window.deleteNoteTargetId = noteDOMId;
+                    const confirmEl = document.getElementById('deleteConfirmOverlay');
+                    confirmEl.querySelector('h3').innerText = "Notiz löschen?";
+                    confirmEl.querySelector('p').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
+                    confirmEl.classList.add('open');
+                    window.deleteTargetId = aptId; 
+                };
+
+                window.deleteApt = function(id) {
+                    window.deleteTargetId = id;
+                    const confirmEl = document.getElementById('deleteConfirmOverlay');
+                    confirmEl.querySelector('h3').innerText = "Eintrag löschen?";
+                    confirmEl.querySelector('p').innerText = "Möchten Sie diesen Kundentermin wirklich unwiderruflich aus dem System entfernen?";
+                    confirmEl.classList.add('open');
+                };
+
+                window.cancelDelete = function() {
+                    document.getElementById('deleteConfirmOverlay').classList.remove('open');
+                    window.deleteTargetId = null;
+                    window.deleteNoteTargetId = null;
+                };
+
+                window.confirmDelete= async function() {
+                    if(window.deleteNoteTargetId) {
+                        const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
+                        if(index > -1) {
+                            localAppointments[index].notes = localAppointments[index].notes.filter(n => n.id !== window.deleteNoteTargetId.replace('note-',''));
+                            localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                            try { await updateDoc(doc(db, "appointments", window.deleteTargetId), { notes: localAppointments[index].notes }); } catch(err){}
+                            renderAppointments(localAppointments);
+                        }
+                        window.showToast('Notiz gelöscht.', 'success');
+                    }
+                    else if(window.deleteTargetId) {
+                        try {
+                            await deleteDoc(doc(db, "appointments", window.deleteTargetId));
+                            
+                            let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+                            if(positions[window.deleteTargetId]) {
+                                delete positions[window.deleteTargetId];
+                                localStorage.setItem('pin_positions', JSON.stringify(positions));
+                            }
+                            
+                            window.showToast('Termin online gelöscht.', 'success');
+                        } catch(e) {
+                            localAppointments = localAppointments.filter(a => a.id !== window.deleteTargetId);
+                            localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                            renderAppointments(localAppointments);
+                            window.showToast('Lokal gelöscht.', 'success');
+                        }
+                    }
+                    window.cancelDelete();
+                };
+
+                // CRM AUTO-INGESTION (Integrierte Logik in die Buchung) - MEGA PATCH: Fortlaufende ID
+                async function addClientToCRM(name, phone, email) {
+                    let existingClientId = null;
+                    let maxIdNumber = 0;
+                    
+                    // 1. Check auf Existenz und Ermitteln der bisher höchsten ID
+                    for (let key in window.crmClientsDetail) {
+                        let client = window.crmClientsDetail[key];
+                        
+                        // Extrahiere Nummer aus RED-000 000 001
+                        if (client.clientId && client.clientId.startsWith('RED-')) {
+                            let numStr = client.clientId.replace(/\D/g, ''); // Entfernt 'RED-' und Leerzeichen
+                            let numVal = parseInt(numStr, 10);
+                            if (!isNaN(numVal) && numVal > maxIdNumber) {
+                                maxIdNumber = numVal;
+                            }
+                        }
+
+                        if ((email && client.email === email) || (phone && client.phone === phone) || (name && client.name.toLowerCase() === name.toLowerCase())) {
+                            existingClientId = key;
+                        }
+                    }
+
+                    if (existingClientId) {
+                        // Kunde existiert -> Update Booking Count
+                        window.crmClientsDetail[existingClientId].bookings = (window.crmClientsDetail[existingClientId].bookings || 1) + 1;
+                        window.crmClientsDetail[existingClientId].timestamp = Date.now();
                     } else {
-                        mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                        // Neuer Kunde -> Generiere fortlaufende RED-ID
+                        maxIdNumber++;
+                        let paddedNum = maxIdNumber.toString().padStart(9, '0'); // z.B. "000000001"
+                        // Füge Leerzeichen ein: "000 000 001"
+                        let formattedNum = paddedNum.replace(/(\d{3})(?=\d)/g, '$1 '); 
+                        const newId = 'RED-' + formattedNum;
+
+                        window.crmClientsDetail[newId] = {
+                            clientId: newId,
+                            name: name,
+                            phone: phone,
+                            email: email,
+                            birthday: '',
+                            address: '',
+                            city: '',
+                            notes: '',
+                            bookings: 1,
+                            timestamp: Date.now()
+                        };
+                    }
+
+                    try {
+                        await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
+                    } catch(e) {
+                        localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+                    }
+                    if(document.getElementById('crmOverlay').classList.contains('open')) window.renderCRM();
+                }
+
+                window.executeBooking = async function(event) {
+                    event.preventDefault();
+                    const n = document.getElementById('formName').value;
+                    const p = document.getElementById('formPhone').value;
+                    const e = document.getElementById('formEmail').value;
+                    const d = document.getElementById('datePicker').value;
+                    const btn = document.getElementById('submitBtn');
+
+                    btn.innerText = 'Übermittle...';
+                    
+                    let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
+                    if (!timeString.includes("Uhr") && timeString !== "Ganztägig") {
+                        timeString += " Uhr";
+                    }
+
+                    const appointmentData = {
+                        id: 'local-' + Date.now(),
+                        name: n, phone: p, email: e, date: d, timeLabel: timeString,
+                        service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
+                    };
+
+                    // Push to CRM mit fortlaufender ID
+                    addClientToCRM(n, p, e);
+
+                    try {
+                        const fbData = {...appointmentData}; delete fbData.id; 
+                        await addDoc(collection(db, "appointments"), fbData);
+                    } catch(err) {
+                        localAppointments.unshift(appointmentData);
+                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                        renderAppointments(localAppointments);
                     }
                     
-                    card.innerHTML = `
-                        <div class="admin-del-img-btn action-cars" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
-                        ${mediaHtml}
-                        <span onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')">${car.title}</span>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-
-            onSnapshot(collection(db, "cars"), (snapshot) => {
-                if(!snapshot.empty) {
-                    const carsData = [];
-                    snapshot.forEach(docSnap => {
-                        carsData.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    renderGalleryList(carsData);
-                } else {
-                    renderGalleryList(localCarsGallery);
-                }
-            }, (error) => {
-                renderGalleryList(localCarsGallery);
-            });
-
-            window.uploadNewCarMedia = async function(event) {
-                const title = document.getElementById('newCarTitle').value;
-                const fileInput = document.getElementById('newCarFile');
-                if(!title || !fileInput.files[0]) { window.showToast('Bitte Modellnamen und Datei angeben.', 'error'); return; }
-                
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    const mediaUrl = e.target.result; 
-                    try {
-                        await addDoc(collection(db, "cars"), { title, mediaUrl, timestamp: serverTimestamp() });
-                        window.showToast('Fahrzeug erfolgreich veröffentlicht.', 'success');
-                    } catch(err) {
-                        let localCarsList = JSON.parse(localStorage.getItem('red_local_cars_gallery')) || [];
-                        localCarsList.unshift({id: 'local-car-'+Date.now(), title, mediaUrl});
-                        localStorage.setItem('red_local_cars_gallery', JSON.stringify(localCarsList));
-                        
-                        const eventObj = new CustomEvent('localCarsUpdated', {detail: localCarsList});
-                        window.dispatchEvent(eventObj);
-                        
-                        window.showToast('Rechte-Fehler. Lokal hinzugefügt.', 'error');
+                    const webhookUrl = window.dynamicContactData?.webhook || "";
+                    if(webhookUrl && webhookUrl.includes("http")) {
+                        fetch(webhookUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                type: 'new_booking', clientName: n, clientPhone: p, clientEmail: e, 
+                                date: d, time: timeString, service: window.selectedServiceVal, adminEmail: window.dynamicContactData.email 
+                            })
+                        }).catch(() => console.log('Webhook call executed.'));
                     }
-                    document.getElementById('newCarTitle').value = '';
-                    fileInput.value = '';
-                    document.getElementById('fileLabelText').innerHTML = `<i class="fa-solid fa-folder-open"></i> Datei auswählen`;
+                    
+                    document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${timeString} wurde erfolgreich im System registriert.\n\nDie Bestätigungen wurden generiert und im Hintergrund versendet.`;
+                    document.getElementById('confirmModalOverlay').classList.add('open');
+                    
+                    document.getElementById('bookingForm').reset();
+                    document.getElementById('timeWrapper').style.display = 'none';
+                    btn.disabled = true;
+                    btn.innerText = 'Termin absenden';
+                    document.getElementById('selectTriggerText').innerText = "Zulassung (Neuanmeldung)";
+                    window.selectedServiceVal = "Anmeldung";
+                    window.chosenHour = null;
                 };
-                reader.readAsDataURL(file);
-            };
-            
-            window.addEventListener('localCarsUpdated', (e) => {
-                renderGalleryList(e.detail);
-            });
-            
-            window.deleteGalleryImage = async function(cardId) {
-                if(confirm('Möchten Sie dieses Fahrzeug dauerhaft entfernen?')) {
-                    try {
-                        await deleteDoc(doc(db, "cars", cardId));
-                        window.showToast('Fahrzeug entfernt.', 'success');
-                    } catch(err) {
-                        const el = document.getElementById(cardId);
-                        if(el) el.remove();
-                        
-                        let localCarsList = JSON.parse(localStorage.getItem('red_local_cars_gallery')) || [];
-                        localCarsList = localCarsList.filter(c => c.id !== cardId);
-                        localStorage.setItem('red_local_cars_gallery', JSON.stringify(localCarsList));
-                        window.showToast('Erfolgreich entfernt.', 'success');
-                    }
+
+                const staticForms = [
+                    {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
+                    {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
+                    {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
+                    {id: 'static-4', title: 'Antrag auf Steuervergünstigung', url: '#'},
+                    {id: 'static-5', title: 'Empfangsbevollmächtigung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f242094-bevollmaechtigung.pdf'}, 
+                    {id: 'static-6', title: 'Eidesstattliche Versicherung (EV I)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123018-verlust_zbi.pdf'},
+                    {id: 'static-7', title: 'Eidesstattliche Versicherung (EV II)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123019-verlust_zbii.pdf'}, 
+                    {id: 'static-8', title: 'EV (Schilder)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f122851-verlust_kennzeichen.pdf'},
+                    {id: 'static-9', title: 'Kennzeichenreservierung', url: '#'}, 
+                    {id: 'static-10', title: 'Mitteilung für Umsatzsteuerzwecke', url: '#'},
+                    {id: 'static-11', title: 'SEPA-Lastschriftmandat', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f394016-sepa_lastschriftmandat_20140327__2_.pdf'}, 
+                    {id: 'static-12', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'}
+                ];
+
+                let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
+                if(!localForms || localForms.length === 0) {
+                    localForms = staticForms;
+                    localStorage.setItem('red_local_forms', JSON.stringify(localForms));
                 }
-            };
-        } 
-    </script>
-</body>
-</html>
+
+                function renderFormsList(formsList) {
+                    const grid = document.getElementById('formItemsGrid');
+                    grid.innerHTML = '';
+                    formsList.forEach(form => {
+                        const element = document.createElement('div');
+                        element.className = 'download-item';
+                        element.id = form.id;
+                        element.setAttribute('data-url', form.url);
+                        element.setAttribute('onclick', 'window.selectForm(this)');
+                        
+                        element.innerHTML = `
+                            <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="${form.title}">${form.title}</span></div>
+                            <div class="download-actions">
+                                <i class="fa-solid fa-upload action-forms" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
+                                <i class="fa-solid fa-trash-can action-forms" title="Formular löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
+                                <i class="fa-solid fa-eye user-view" title="Ansehen / Öffnen" onclick="event.stopPropagation(); window.openForm(this)"></i>
+                                <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"></i>
+                            </div>
+                        `;
+                        grid.appendChild(element);
+                    });
+                }
+
+                onSnapshot(collection(db, "forms"), (snapshot) => {
+                    if(!snapshot.empty) {
+                        const formsData = [];
+                        snapshot.forEach(docSnap => {
+                            formsData.push({ id: docSnap.id, ...docSnap.data() });
+                        });
+                        renderFormsList([...staticForms, ...formsData]);
+                    } else {
+                        renderFormsList(localForms);
+                    }
+                });
+
+                window.addNewFormItem = async function() {
+                    const title = document.getElementById('newFormTitle').value;
+                    const url = document.getElementById('newFormUrl').value || '#';
+                    if(!title) { window.showToast('Bitte Formular-Titel eingeben.', 'error'); return; }
+                    
+                    try {
+                        await addDoc(collection(db, "forms"), { title, url, timestamp: serverTimestamp() });
+                        window.showToast('Formular erfolgreich zu Firebase hinzugefügt.', 'success');
+                        document.getElementById('newFormTitle').value = '';
+                        document.getElementById('newFormUrl').value = '';
+                    } catch(e) {
+                        localForms.push({id: 'local-form-'+Date.now(), title, url});
+                        localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+                        renderFormsList(localForms);
+                        window.showToast('Lokal hinzugefügt.', 'error');
+                    }
+                };
+
+                window.triggerAdminUpload = function(iconEl, formId) {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = '.pdf,.doc,.docx';
+                    fileInput.onchange = async e => {
+                        if(e.target.files.length > 0) {
+                            const file = e.target.files[0];
+                            const reader = new FileReader();
+                            reader.onload = async function(ev) {
+                                try {
+                                    await updateDoc(doc(db, "forms", formId), { url: ev.target.result });
+                                    window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
+                                } catch(err) {
+                                    iconEl.style.color = '#25D366';
+                                    const parentItem = document.getElementById(formId);
+                                    if(parentItem) parentItem.setAttribute('data-url', ev.target.result);
+                                    window.showToast('Lokal in DOM verknüpft.', 'success');
+                                }
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+                    fileInput.click();
+                };
+                
+                window.adminDeleteForm = async function(formId) {
+                    if(confirm('Möchten Sie dieses Formular komplett löschen?')) {
+                        try {
+                            await deleteDoc(doc(db, "forms", formId));
+                            window.showToast('Formular in Firebase gelöscht.', 'success');
+                        } catch(e) {
+                            const item = document.getElementById(formId);
+                            if(item) item.remove();
+                            localForms = localForms.filter(f => f.id !== formId);
+                            localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+                            window.showToast('Lokal gelöscht.', 'success');
+                        }
+                    }
+                };
+
+                window.openForm = function(iconEl) {
+                    const url = iconEl.closest('.download-item').getAttribute('data-url');
+                    if(url && url !== '#') {
+                        window.open(url, '_blank');
+                    } else {
+                        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+                    }
+                };
+
+                window.downloadForm = function(iconEl) { 
+                    const url = iconEl.closest('.download-item').getAttribute('data-url');
+                    if(url && url !== '#') {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = ''; 
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.showToast('Download gestartet...', 'success');
+                    } else {
+                        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+                    }
+                };
+
+                window.selectForm = function(element) {
+                    document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
+                    element.classList.add('selected');
+                };
+
+                const staticCarsGallery = [
+                    {id: 'car-static-1', title: 'Chevrolet Corvette', mediaUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80'},
+                    {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&w=800&q=80'},
+                    {id: 'car-static-3', title: 'Porsche 911 Classic', mediaUrl: 'https://images.unsplash.com/photo-1503375800000-84c4f3460e4d?auto=format&fit=crop&w=800&q=80'},
+                    {id: 'car-static-4', title: 'VW Käfer', mediaUrl: 'https://images.unsplash.com/photo-1490902931801-d6f80ca94f0f?auto=format&fit=crop&w=800&q=80'}
+                ];
+
+                let localCarsGallery = JSON.parse(localStorage.getItem('red_local_cars_gallery'));
+                if(!localCarsGallery || localCarsGallery.length === 0) {
+                    localCarsGallery = staticCarsGallery;
+                    localStorage.setItem('red_local_cars_gallery', JSON.stringify(localCarsGallery));
+                }
+
+                function renderGalleryList(carsList) {
+                    const grid = document.getElementById('carsGalleryGrid');
+                    grid.innerHTML = '';
+                    carsList.forEach(car => {
+                        const card = document.createElement('div');
+                        card.className = 'gallery-card';
+                        card.id = car.id; 
+                        
+                        let mediaHtml = '';
+                        if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
+                           mediaHtml = `<video src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
+                           if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || car.mediaUrl.includes('alt=')) {
+                               mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                           }
+                        } else {
+                            mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                        }
+                        
+                        card.innerHTML = `
+                            <div class="admin-del-img-btn action-cars" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
+                            ${mediaHtml}
+                            <span onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')">${car.title}</span>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+
+                onSnapshot(collection(db, "cars"), (snapshot) => {
+                    if(!snapshot.empty) {
+                        const carsData = [];
+                        snapshot.forEach(docSnap => {
+                            carsData.push({ id: docSnap.id, ...docSnap.data() });
+                        });
+                        renderGalleryList(carsData);
+                    } else {
+                        renderGalleryList(localCarsGallery);
+                    }
+                }, (error) => {
+                    renderGalleryList(localCarsGallery);
+                });
+
+                window.uploadNewCarMedia = async function(event) {
+                    const title = document.getElementById('newCarTitle').value;
+                    const fileInput = document.getElementById('newCarFile');
+                    if(!title || !fileInput.files[0]) { window.showToast('Bitte Modellnamen und Datei angeben.', 'error'); return; }
+                    
+                    const file = fileInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const mediaUrl = e.target.result; 
+                        try {
+                            await addDoc(collection(db, "cars"), { title, mediaUrl, timestamp: serverTimestamp() });
+                            window.showToast('Fahrzeug erfolgreich veröffentlicht.', 'success');
+                        } catch(err) {
+                            let localCarsList = JSON.parse(localStorage.getItem('red_local_cars_gallery')) || [];
+                            localCarsList.unshift({id: 'local-car-'+Date.now(), title, mediaUrl});
+                            localStorage.setItem('red_local_cars_gallery', JSON.stringify(localCarsList));
+                            
+                            const eventObj = new CustomEvent('localCarsUpdated', {detail: localCarsList});
+                            window.dispatchEvent(eventObj);
+                            
+                            window.showToast('Rechte-Fehler. Lokal hinzugefügt.', 'error');
+                        }
+                        document.getElementById('newCarTitle').value = '';
+                        fileInput.value = '';
+                        document.getElementById('fileLabelText').innerHTML = `<i class="fa-solid fa-folder-open"></i> Datei auswählen`;
+                    };
+                    reader.readAsDataURL(file);
+                };
+                
+                window.addEventListener('localCarsUpdated', (e) => {
+                    renderGalleryList(e.detail);
+                });
+                
+                window.deleteGalleryImage = async function(cardId) {
+                    if(confirm('Möchten Sie dieses Fahrzeug dauerhaft entfernen?')) {
+                        try {
+                            await deleteDoc(doc(db, "cars", cardId));
+                            window.showToast('Fahrzeug entfernt.', 'success');
+                        } catch(err) {
+                            const el = document.getElementById(cardId);
+                            if(el) el.remove();
+                            
+                            let localCarsList = JSON.parse(localStorage.getItem('red_local_cars_gallery')) || [];
+                            localCarsList = localCarsList.filter(c => c.id !== cardId);
+                            localStorage.setItem('red_local_cars_gallery', JSON.stringify(localCarsList));
+                            window.showToast('Erfolgreich entfernt.', 'success');
+                        }
+                    }
+                };
+            } 
+        </script>
+    </body>
+    </html>
