@@ -64,29 +64,30 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* MEGA FIX FINAL: Absoluter Lockdown auf 100% ohne Kompromisse */
-        html, body { 
+        /* SAUBERER MOBILE FIX - Ohne Rendering Bugs */
+        html { 
             overscroll-behavior-y: none; 
             -webkit-text-size-adjust: 100%;
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden !important;
-            margin: 0;
-            padding: 0;
         }
         
         body { 
             position: relative; 
             -webkit-overflow-scrolling: touch; 
-            font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
-            line-height: 1.6; padding-top: 90px; 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-light); 
+            line-height: 1.6; 
+            padding-top: 90px; 
             -webkit-font-smoothing: antialiased; 
             -moz-osx-font-smoothing: grayscale; 
             transition: background-color 0.4s ease, color 0.4s ease;
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
-        .view-section { overflow-x: hidden !important; width: 100%; max-width: 100%; }
+        .view-section { width: 100%; max-width: 100%; overflow-x: hidden; }
 
         /* Callouts blockieren auf Mobile */
         input, select, textarea { font-size: 16px !important; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; }
@@ -129,18 +130,17 @@
         ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 100px; border: 2px solid var(--bg-dark); background-clip: padding-box; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary-red); filter: brightness(1.2); }
 
-        /* MEGA FIX: contain: paint verhindert Ausbrüche der Elemente in die Screen-Breite */
-        .plate-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: -1; overflow: hidden; contain: paint; }
+        .plate-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: -1; overflow: hidden; }
         .plate { position: absolute; background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 5px 15px; border-radius: 5px; border: 2px solid #000; opacity: 0.12; display: flex; align-items: center; gap: 10px; animation: float 22s linear infinite; }
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
 
         #intro-preloader { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99999; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; contain: paint;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;
             animation: hidePreloader 0.5s ease 3.5s forwards;
         }
-        @keyframes hidePreloader { 100% { opacity: 0; visibility: hidden; z-index: -100; pointer-events: none; display: none; } }
+        @keyframes hidePreloader { 100% { opacity: 0; visibility: hidden; z-index: -100; pointer-events: none; } }
         
         .intro-track { width: 280px; height: 4px; background: rgba(128,128,128,0.2); position: relative; margin-top: 40px; border-radius: 2px; }
         .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); animation: driveCar 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards; }
@@ -185,7 +185,7 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.9); } }
 
-        /* MEGA FIX: Strikte Kontrolle über Header Breite */
+        /* HEADER */
         #header-wrapper { position: fixed; top: 0; left: 0; right: 0; width: 100%; max-width: 100%; z-index: 1000; box-sizing: border-box; }
         nav { width: 100%; box-sizing: border-box; padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.3); flex-wrap: wrap; backdrop-filter: blur(10px); z-index: 1001; position: relative;}
         
@@ -261,11 +261,11 @@
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
         .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; border: none; outline: none; text-decoration: none; }
 
-        /* MEGA FIX: Ticker voll isoliert via contain: paint */
+        /* TICKER OHNE CONTAIN PAINT */
         #ticker-container { 
             background: var(--bg-dark); border-bottom: 1px solid var(--glass-border); 
-            height: 32px; overflow: hidden !important; position: relative; display: block; 
-            width: 100%; box-sizing: border-box; contain: paint;
+            height: 32px; overflow: hidden; position: relative; display: block; 
+            width: 100%; box-sizing: border-box;
         }
         .ticker-text-wrapper { 
             display: inline-block; padding-left: 100%; animation: tickerAnim 15s linear infinite; box-sizing: border-box; white-space: nowrap; 
@@ -2671,17 +2671,6 @@
     </script>
 
     <script type="module">
-        // 🚨 BIG MEGA FIX: INJECTION 🚨
-        // Behebt den Android-Blowout direkt beim Laden (kein CSS-Suchen mehr nötig!)
-        const androidFix = document.createElement('style');
-        androidFix.innerHTML = `
-            html, body { width: 100% !important; max-width: 100% !important; overflow-x: hidden !important; overscroll-behavior-y: none; }
-            #ticker-container { position: relative !important; display: block !important; overflow: hidden !important; width: 100% !important; box-sizing: border-box !important; }
-            .ticker-text-wrapper { position: absolute !important; left: 100% !important; top: 0 !important; height: 100% !important; display: flex !important; align-items: center !important; white-space: nowrap !important; transform: none !important; animation-name: tickerMobileFix !important; }
-            @keyframes tickerMobileFix { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        `;
-        document.head.appendChild(androidFix);
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -3445,623 +3434,6 @@
                  }
             });
 
-            window.activeBadgeNum = 0;
-            let localAppointments = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
-            
-            function updateBadgeDisplay(hasPrio, count) {
-                const b = document.getElementById('notif-badge');
-                b.innerText = count;
-                b.style.display = count > 0 ? 'flex' : 'none';
-                b.classList.remove('prio-pulse');
-                if(hasPrio) b.classList.add('prio-pulse');
-            }
-            
-            function isAptExpired(dateStr, timeStr) {
-                if(!dateStr) return false;
-                const parts = dateStr.split('.');
-                if(parts.length !== 3) return false;
-                
-                let hour = 23, min = 59;
-                if(timeStr && timeStr.includes(':')) {
-                    const tParts = timeStr.replace(/[^\d:]/g, '').split(':');
-                    if(tParts.length === 2) {
-                        hour = parseInt(tParts[0]);
-                        min = parseInt(tParts[1]);
-                    }
-                }
-                const aptDate = new Date(parts[2], parts[1]-1, parts[0], hour, min);
-                return aptDate < new Date();
-            }
-
-            window.renderAppointments = function(apts) {
-                window.redApts = apts; 
-                const list = document.getElementById('admin-list');
-                list.innerHTML = '';
-                document.getElementById('pinned-container').innerHTML = '';
-                let hasPrio = false;
-
-                if (apts.length === 0) {
-                    list.innerHTML = '<p style="font-size:12px; color:var(--text-muted); text-align:center; margin-top:20px;">Keine Termine im System.</p>';
-                    updateBadgeDisplay(false, 0);
-                    return;
-                }
-
-                let savedPositions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
-
-                apts.forEach((apt) => {
-                    const id = apt.id;
-                    const isToday = apt.date === new Date().toLocaleDateString('de-DE') || apt.timeLabel.toLowerCase().includes('heute');
-                    const prioClass = isToday ? 'prio-high' : 'prio-normal';
-                    const badgeText = isToday ? 'Heute' : 'Geplant';
-                    if(isToday) hasPrio = true;
-                    
-                    const markedClass = apt.marked ? 'marked' : '';
-
-                    const card = document.createElement('div');
-                    card.className = `admin-apt-card ${prioClass} ${markedClass}`;
-                    card.id = id;
-                    
-                    let notesHtml = '';
-                    if(apt.notes && apt.notes.length > 0) {
-                        apt.notes.forEach(note => {
-                            notesHtml += `
-                                <div class="saved-note-row" id="note-${note.id}">
-                                    <div style="flex:1;">
-                                        <span class="note-text-body">${note.text}</span>
-                                        <span class="note-meta">${note.timeStr}</span>
-                                    </div>
-                                    <div class="note-row-actions">
-                                        <button class="note-row-btn" onclick="window.triggerEditNote('${note.id}', '${id}')" title="Notiz bearbeiten"><i class="fa-solid fa-pencil"></i></button>
-                                        <button class="note-row-btn del" onclick="window.triggerDeleteNote('${note.id}', '${id}')" title="Notiz löschen"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-
-                    const displayTime = apt.timeLabel === "Ganztägig" ? "Ganztägig" : apt.timeLabel.includes("Uhr") ? apt.timeLabel : apt.timeLabel + " Uhr";
-
-                    card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div class="prio-badge">${badgeText}</div>
-                            <div class="apt-actions-horizontal">
-                                <button class="apt-btn mark" onclick="window.markApt('${id}', ${!apt.marked})" title="Markieren / Anheften"><i class="fa-solid fa-thumbtack"></i></button>
-                                <button class="apt-btn edit" onclick="window.editAptNotes('${id}')" title="Notiz hinzufügen/bearbeiten"><i class="fa-solid fa-pen"></i></button>
-                                <button class="apt-btn edit" style="border-color:#007aff; color:#007aff;" onclick="window.openEditAptModal('${id}')" title="Datum & Uhrzeit bearbeiten"><i class="fa-solid fa-calendar-day"></i></button>
-                                <button class="apt-btn delete" onclick="window.deleteApt('${id}')" title="Termin Löschen"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
-                        </div>
-                        
-                        <h4 style="font-size:16px; margin-top:5px; color:var(--text-light); text-transform:uppercase; font-weight:800;">${apt.service}</h4>
-                        
-                        <div class="apt-grid-info">
-                            <div><i class="fa-solid fa-user"></i> ${apt.name}</div>
-                            <div><i class="fa-solid fa-clock"></i> ${apt.date} (${displayTime})</div>
-                            <div><i class="fa-solid fa-envelope"></i> ${apt.email}</div>
-                            <div><i class="fa-solid fa-phone"></i> ${apt.phone}</div>
-                        </div>
-                        
-                        <div class="notes-list-box" id="notes-container-${id}">${notesHtml}</div>
-                        <input type="text" class="admin-note-input" id="note-input-${id}" placeholder="Notiz eingeben und Enter drücken..." onkeypress="window.saveNote(event, this, '${id}')">
-                    `;
-                    list.appendChild(card);
-
-                    if (apt.marked) {
-                        const isExpired = isAptExpired(apt.date, apt.timeLabel);
-                        
-                        const plate = document.createElement('div');
-                        
-                        let plateStateClass = 'normal-day';
-                        if (isExpired) {
-                            plateStateClass = 'expired-plate';
-                        } else if (isToday) {
-                            plateStateClass = 'urgent-today';
-                        }
-                        plate.className = `pinned-plate ${plateStateClass}`;
-                        plate.id = 'pinned-' + id;
-                        
-                        const tuev = `<div class="tuev-plakette" style="margin: 0 8px;">26</div>`;
-                        plate.innerHTML = `<span style="font-size:13px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.name}</span> ${tuev} <span style="font-size:10px; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.date}<br>${displayTime}</span>`;
-                        
-                        if(savedPositions[id]) {
-                            plate.style.top = savedPositions[id].top;
-                            plate.style.left = savedPositions[id].left;
-                        } else {
-                            const offset = document.querySelectorAll('.pinned-plate').length * 55;
-                            plate.style.bottom = (20 + offset) + 'px';
-                            plate.style.right = '20px';
-                        }
-
-                        document.getElementById('pinned-container').appendChild(plate);
-                        window.makeDraggable(plate, id);
-                    }
-                });
-                updateBadgeDisplay(hasPrio, apts.length);
-            };
-
-            onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
-                if (!snapshot.empty) {
-                    const fbApts = [];
-                    snapshot.forEach((docSnap) => fbApts.push({ id: docSnap.id, ...docSnap.data() }));
-                    localStorage.setItem('red_local_apts', JSON.stringify(fbApts));
-                    window.renderAppointments(fbApts);
-                } else {
-                    window.renderAppointments([]);
-                }
-            }, (error) => {
-                window.renderAppointments(localAppointments);
-            });
-
-            window.markApt = async function(id, newState) {
-                try { 
-                    await updateDoc(doc(db, "appointments", id), { marked: newState }); 
-                } catch(e) { 
-                    const index = localAppointments.findIndex(a => a.id === id);
-                    if(index > -1) {
-                        localAppointments[index].marked = newState;
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        window.renderAppointments(localAppointments);
-                        window.showToast('Lokal markiert.', 'success');
-                    }
-                }
-            };
-            
-            window.openEditAptModal = function(id) {
-                window.editingAptId = id;
-                const apt = window.redApts.find(a => a.id === id);
-                if(!apt) return;
-                
-                document.getElementById('editAptDate').value = apt.date;
-                try { document.getElementById('editAptDate')._flatpickr.setDate(apt.date, true); } catch(e){}
-                
-                const timeSelect = document.getElementById('editAptTime');
-                timeSelect.value = apt.timeLabel.includes('Uhr') ? apt.timeLabel : apt.timeLabel + ' Uhr';
-                if(timeSelect.selectedIndex === -1) timeSelect.value = 'Ganztägig';
-
-                document.getElementById('editAptOverlay').classList.add('open');
-            };
-
-            window.closeEditAptModal = function() {
-                window.editingAptId = null;
-                document.getElementById('editAptOverlay').classList.remove('open');
-            };
-
-            window.saveEditedApt = async function() {
-                if(!window.editingAptId) return;
-                const newDate = document.getElementById('editAptDate').value;
-                const newTime = document.getElementById('editAptTime').value;
-
-                try {
-                    await updateDoc(doc(db, "appointments", window.editingAptId), { date: newDate, timeLabel: newTime });
-                    window.showToast('Termin erfolgreich verschoben!', 'success');
-                } catch(e) {
-                    const index = localAppointments.findIndex(a => a.id === window.editingAptId);
-                    if(index > -1) {
-                        localAppointments[index].date = newDate;
-                        localAppointments[index].timeLabel = newTime;
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        window.renderAppointments(localAppointments);
-                        window.showToast('Lokal verschoben.', 'success');
-                    }
-                }
-                window.closeEditAptModal();
-            };
-
-            window.editAptNotes = function(id) {
-                window.editingNoteElement = null; 
-                window.editingNoteId = null;
-                const input = document.getElementById(`note-input-${id}`);
-                input.value = '';
-                input.classList.toggle('active');
-                if(input.classList.contains('active')) input.focus();
-            };
-            
-            window.saveNote = async function(e, inputEl, aptId) {
-                if(e.key === 'Enter') {
-                    e.preventDefault();
-                    const noteText = inputEl.value.trim();
-                    if(noteText === '') return;
-                    
-                    inputEl.classList.remove('active');
-                    const timestamp = new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    
-                    const index = localAppointments.findIndex(a => a.id === aptId);
-                    if(index > -1) {
-                        if(!localAppointments[index].notes) localAppointments[index].notes = [];
-                        
-                        if(window.editingNoteElement) {
-                            const nIndex = localAppointments[index].notes.findIndex(n => n.id === window.editingNoteElement.id.replace('note-',''));
-                            if(nIndex > -1) localAppointments[index].notes[nIndex].text = noteText;
-                            window.editingNoteElement = null;
-                        } else {
-                            localAppointments[index].notes.push({ id: Date.now().toString(), text: noteText, timeStr: `Erstellt: ${timestamp}` });
-                        }
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        
-                        try { await updateDoc(doc(db, "appointments", aptId), { notes: localAppointments[index].notes }); } catch(err){}
-                        
-                        window.renderAppointments(localAppointments);
-                        window.showToast('Notiz gespeichert.', 'success');
-                    }
-                    inputEl.value = '';
-                }
-            };
-
-            window.triggerEditNote = function(noteDOMId, cardId) {
-                const noteRow = document.getElementById(noteDOMId);
-                const text = noteRow.querySelector('.note-text-body').innerText;
-                const input = document.getElementById(`note-input-${cardId}`);
-                
-                window.editingNoteElement = noteRow;
-                input.value = text;
-                input.classList.add('active');
-                input.focus();
-            };
-
-            window.triggerDeleteNote = function(noteDOMId, aptId) {
-                window.deleteNoteTargetId = noteDOMId;
-                const confirmEl = document.getElementById('deleteConfirmOverlay');
-                confirmEl.querySelector('h3').innerText = "Notiz löschen?";
-                confirmEl.querySelector('p').innerText = "Möchten Sie diese Notiz dauerhaft entfernen?";
-                confirmEl.classList.add('open');
-                window.deleteTargetId = aptId; 
-            };
-
-            window.deleteApt = function(id) {
-                window.deleteTargetId = id;
-                const confirmEl = document.getElementById('deleteConfirmOverlay');
-                confirmEl.querySelector('h3').innerText = "Eintrag löschen?";
-                confirmEl.querySelector('p').innerText = "Möchten Sie diesen Kundentermin wirklich unwiderruflich aus dem System entfernen?";
-                confirmEl.classList.add('open');
-            };
-
-            window.cancelDelete = function() {
-                document.getElementById('deleteConfirmOverlay').classList.remove('open');
-                window.deleteTargetId = null;
-                window.deleteNoteTargetId = null;
-            };
-
-            window.confirmDelete= async function() {
-                if(window.deleteNoteTargetId) {
-                    const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
-                    if(index > -1) {
-                        localAppointments[index].notes = localAppointments[index].notes.filter(n => n.id !== window.deleteNoteTargetId.replace('note-',''));
-                        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                        try { await updateDoc(doc(db, "appointments", window.deleteTargetId), { notes: localAppointments[index].notes }); } catch(err){}
-                        window.renderAppointments(localAppointments);
-                    }
-                    window.showToast('Notiz gelöscht.', 'success');
-                }
-                else if(window.deleteTargetId) {
-                    const cardElement = document.getElementById(window.deleteTargetId);
-                    const pinnedElement = document.getElementById('pinned-' + window.deleteTargetId);
-                    if(cardElement) cardElement.remove();
-                    if(pinnedElement) pinnedElement.remove();
-
-                    try {
-                        await deleteDoc(doc(db, "appointments", window.deleteTargetId));
-                        
-                        let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
-                        if(positions[window.deleteTargetId]) {
-                            delete positions[window.deleteTargetId];
-                            localStorage.setItem('pin_positions', JSON.stringify(positions));
-                        }
-                        window.showToast('Termin gelöscht.', 'success');
-                    } catch(e) {
-                        window.showToast('Lokal gelöscht.', 'success');
-                    }
-                    
-                    localAppointments = localAppointments.filter(a => a.id !== window.deleteTargetId);
-                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                    window.renderAppointments(localAppointments);
-                }
-                window.cancelDelete();
-            };
-
-            async function addClientToCRM(name, phone, email) {
-                let existingClientId = null;
-                let maxIdNumber = 0;
-                
-                for (let key in window.crmClientsDetail) {
-                    let client = window.crmClientsDetail[key];
-                    
-                    if (client.clientId && client.clientId.startsWith('RED-')) {
-                        let numStr = client.clientId.replace(/\D/g, ''); 
-                        let numVal = parseInt(numStr, 10);
-                        if (!isNaN(numVal) && numVal > maxIdNumber) {
-                            maxIdNumber = numVal;
-                        }
-                    }
-
-                    if ((email && client.email === email) || (phone && client.phone === phone) || (name && client.name.toLowerCase() === name.toLowerCase())) {
-                        existingClientId = key;
-                    }
-                }
-
-                if (existingClientId) {
-                    window.crmClientsDetail[existingClientId].bookings = (window.crmClientsDetail[existingClientId].bookings || 1) + 1;
-                    window.crmClientsDetail[existingClientId].timestamp = Date.now();
-                } else {
-                    maxIdNumber++;
-                    let paddedNum = maxIdNumber.toString().padStart(9, '0'); 
-                    let formattedNum = paddedNum.replace(/(\d{3})(?=\d)/g, '$1 '); 
-                    const newId = 'RED-' + formattedNum;
-
-                    window.crmClientsDetail[newId] = {
-                        clientId: newId,
-                        name: name,
-                        phone: phone,
-                        email: email,
-                        birthday: '',
-                        address: '',
-                        city: '',
-                        notes: '',
-                        bookings: 1,
-                        timestamp: Date.now()
-                    };
-                }
-
-                try {
-                    await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
-                } catch(e) {
-                    localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
-                }
-                if(document.getElementById('crmOverlay').classList.contains('open')) window.renderCRM();
-            }
-
-            window.executeBooking = async function(event) {
-                event.preventDefault();
-                const n = document.getElementById('formName').value;
-                const p = document.getElementById('formPhone').value;
-                const e = document.getElementById('formEmail').value;
-                const d = document.getElementById('datePicker').value;
-                const btn = document.getElementById('submitBtn');
-
-                btn.innerText = 'Übermittle...';
-                
-                let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
-                if (!timeString.includes("Uhr") && timeString !== "Ganztägig") {
-                    timeString += " Uhr";
-                }
-
-                const appointmentData = {
-                    id: 'local-' + Date.now(),
-                    name: n, phone: p, email: e, date: d, timeLabel: timeString,
-                    service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
-                };
-
-                addClientToCRM(n, p, e);
-
-                try {
-                    const fbData = {...appointmentData}; delete fbData.id; 
-                    await addDoc(collection(db, "appointments"), fbData);
-                } catch(err) {
-                    localAppointments.unshift(appointmentData);
-                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                    window.renderAppointments(localAppointments);
-                }
-                
-                const webhookUrl = window.dynamicContactData?.webhook || "";
-                if(webhookUrl && webhookUrl.includes("http")) {
-                    fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            type: 'new_booking', clientName: n, clientPhone: p, clientEmail: e, 
-                            date: d, time: timeString, service: window.selectedServiceVal, adminEmail: window.dynamicContactData.email 
-                        })
-                    }).catch(() => console.log('Webhook call executed.'));
-                }
-                
-                document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${timeString} wurde erfolgreich im System registriert.\n\nDie Bestätigungen wurden generiert und im Hintergrund versendet.`;
-                document.getElementById('confirmModalOverlay').classList.add('open');
-                
-                document.getElementById('bookingForm').reset();
-                document.getElementById('timeWrapper').style.display = 'none';
-                btn.disabled = true;
-                btn.innerText = 'Termin absenden';
-                document.getElementById('selectTriggerText').innerText = "Zulassung (Neuanmeldung)";
-                window.selectedServiceVal = "Anmeldung";
-                window.chosenHour = null;
-            };
-
-            const staticForms = [
-                {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
-                {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
-                {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
-                {id: 'static-4', title: 'Antrag auf Steuervergünstigung', url: '#'},
-                {id: 'static-5', title: 'Empfangsbevollmächtigung', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f242094-bevollmaechtigung.pdf'}, 
-                {id: 'static-6', title: 'Eidesstattliche Versicherung (EV I)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123018-verlust_zbi.pdf'},
-                {id: 'static-7', title: 'Eidesstattliche Versicherung (EV II)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f123019-verlust_zbii.pdf'}, 
-                {id: 'static-8', title: 'EV (Schilder)', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f122851-verlust_kennzeichen.pdf'},
-                {id: 'static-9', title: 'Kennzeichenreservierung', url: '#'}, 
-                {id: 'static-10', title: 'Mitteilung für Umsatzsteuerzwecke', url: '#'},
-                {id: 'static-11', title: 'SEPA-Lastschriftmandat', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f394016-sepa_lastschriftmandat_20140327__2_.pdf'}, 
-                {id: 'static-12', title: 'Zulassungsantrag', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f46485-3573_zulassungsantrag_internet.pdf'}
-            ];
-
-            let localForms = JSON.parse(localStorage.getItem('red_local_forms'));
-            if(!localForms || localForms.length === 0) {
-                localForms = staticForms;
-                localStorage.setItem('red_local_forms', JSON.stringify(localForms));
-            }
-
-            function renderFormsList(formsList) {
-                const grid = document.getElementById('formItemsGrid');
-                grid.innerHTML = '';
-                formsList.forEach(form => {
-                    const element = document.createElement('div');
-                    element.className = 'download-item';
-                    element.id = form.id;
-                    element.setAttribute('data-url', form.url);
-                    element.setAttribute('onclick', 'window.selectForm(this)');
-                    
-                    element.innerHTML = `
-                        <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="${form.title}">${form.title}</span></div>
-                        <div class="download-actions">
-                            <i class="fa-solid fa-upload action-forms" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
-                            <i class="fa-solid fa-trash-can action-forms" title="Formular löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
-                            <i class="fa-solid fa-eye user-view" title="Ansehen / Öffnen" onclick="event.stopPropagation(); window.openForm(this)"></i>
-                            <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"></i>
-                        </div>
-                    `;
-                    grid.appendChild(element);
-                });
-            }
-
-            onSnapshot(collection(db, "forms"), (snapshot) => {
-                if(!snapshot.empty) {
-                    const formsData = [];
-                    snapshot.forEach(docSnap => {
-                        formsData.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    renderFormsList([...staticForms, ...formsData]);
-                } else {
-                    renderFormsList(localForms);
-                }
-            });
-
-            window.addNewFormItem = async function() {
-                const title = document.getElementById('newFormTitle').value;
-                const url = document.getElementById('newFormUrl').value || '#';
-                if(!title) { window.showToast('Bitte Formular-Titel eingeben.', 'error'); return; }
-                
-                try {
-                    await addDoc(collection(db, "forms"), { title, url, timestamp: serverTimestamp() });
-                    window.showToast('Formular erfolgreich zu Firebase hinzugefügt.', 'success');
-                    document.getElementById('newFormTitle').value = '';
-                    document.getElementById('newFormUrl').value = '';
-                } catch(e) {
-                    localForms.push({id: 'local-form-'+Date.now(), title, url});
-                    localStorage.setItem('red_local_forms', JSON.stringify(localForms));
-                    renderFormsList(localForms);
-                    window.showToast('Lokal hinzugefügt.', 'error');
-                }
-            };
-
-            window.triggerAdminUpload = function(iconEl, formId) {
-                const fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.accept = '.pdf,.doc,.docx';
-                fileInput.onchange = async e => {
-                    if(e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        const reader = new FileReader();
-                        reader.onload = async function(ev) {
-                            try {
-                                await updateDoc(doc(db, "forms", formId), { url: ev.target.result });
-                                window.showToast('Datei erfolgreich in Firebase verknüpft!', 'success');
-                            } catch(err) {
-                                iconEl.style.color = '#25D366';
-                                const parentItem = document.getElementById(formId);
-                                if(parentItem) parentItem.setAttribute('data-url', ev.target.result);
-                                window.showToast('Lokal in DOM verknüpft.', 'success');
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-                fileInput.click();
-            };
-            
-            window.adminDeleteForm = async function(formId) {
-                if(confirm('Möchten Sie dieses Formular komplett löschen?')) {
-                    try {
-                        await deleteDoc(doc(db, "forms", formId));
-                        window.showToast('Formular in Firebase gelöscht.', 'success');
-                    } catch(e) {
-                        const item = document.getElementById(formId);
-                        if(item) item.remove();
-                        localForms = localForms.filter(f => f.id !== formId);
-                        localStorage.setItem('red_local_forms', JSON.stringify(localForms));
-                        window.showToast('Lokal gelöscht.', 'success');
-                    }
-                }
-            };
-
-            window.openForm = function(iconEl) {
-                const url = iconEl.closest('.download-item').getAttribute('data-url');
-                if(url && url !== '#') {
-                    window.open(url, '_blank');
-                } else {
-                    window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
-                }
-            };
-
-            window.downloadForm = function(iconEl) { 
-                const url = iconEl.closest('.download-item').getAttribute('data-url');
-                if(url && url !== '#') {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = ''; 
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.showToast('Download gestartet...', 'success');
-                } else {
-                    window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
-                }
-            };
-
-            window.selectForm = function(element) {
-                document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
-                element.classList.add('selected');
-            };
-
-            const staticCarsGallery = [
-                {id: 'car-static-1', title: 'Chevrolet Corvette', mediaUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-2', title: 'Ford Mustang 1965', mediaUrl: 'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-3', title: 'Porsche 911 Classic', mediaUrl: 'https://images.unsplash.com/photo-1503375800000-84c4f3460e4d?auto=format&fit=crop&w=800&q=80'},
-                {id: 'car-static-4', title: 'VW Käfer', mediaUrl: 'https://images.unsplash.com/photo-1490902931801-d6f80ca94f0f?auto=format&fit=crop&w=800&q=80'}
-            ];
-
-            let localCarsGallery = JSON.parse(localStorage.getItem('red_local_cars_gallery'));
-            if(!localCarsGallery || localCarsGallery.length === 0) {
-                localCarsGallery = staticCarsGallery;
-                localStorage.setItem('red_local_cars_gallery', JSON.stringify(localCarsGallery));
-            }
-
-            function renderGalleryList(carsList) {
-                const grid = document.getElementById('carsGalleryGrid');
-                grid.innerHTML = '';
-                carsList.forEach(car => {
-                    const card = document.createElement('div');
-                    card.className = 'gallery-card';
-                    card.id = car.id; 
-                    
-                    let mediaHtml = '';
-                    if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
-                       mediaHtml = `<video src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
-                       if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp)/) || car.mediaUrl.includes('alt=')) {
-                           mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
-                       }
-                    } else {
-                        mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
-                    }
-                    
-                    card.innerHTML = `
-                        <div class="admin-del-img-btn action-cars" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
-                        ${mediaHtml}
-                        <span onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')">${car.title}</span>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-
-            onSnapshot(collection(db, "cars"), (snapshot) => {
-                if(!snapshot.empty) {
-                    const carsData = [];
-                    snapshot.forEach(docSnap => {
-                        carsData.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    renderGalleryList(carsData);
-                } else {
-                    renderGalleryList(localCarsGallery);
-                }
-            }, (error) => {
-                renderGalleryList(localCarsGallery);
-            });
-
             window.uploadNewCarMedia = async function(event) {
                 const title = document.getElementById('newCarTitle').value;
                 const fileInput = document.getElementById('newCarFile');
@@ -4112,6 +3484,6 @@
                 }
             };
         } 
-    </script>
+</script>
 </body>
 </html>
