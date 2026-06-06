@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
     <style>
+        /* THEMES ENGINE - ERWEITERT UM 5 NEUE HELLE THEMES */
         :root {
             /* 1. Dark (Standard) */
             --primary-red: #e60000;
@@ -62,27 +63,20 @@
         body[data-theme="stealth"] { --primary-red: #ffffff; --bg-dark: #000000; --bg-card: #0a0a0a; --bg-input: #141414; --text-light: #ffffff; --text-muted: #666666; --glass-bg: rgba(10, 10, 10, 0.95); --glass-border: rgba(255, 255, 255, 0.15); --border-hover: var(--primary-red); }
         body[data-theme="cherry"] { --primary-red: #f06292; --bg-dark: #1a0f14; --bg-card: #2e1a23; --bg-input: #3d232e; --text-light: #fce4ec; --text-muted: #f48fb1; --glass-bg: rgba(46, 26, 35, 0.92); --glass-border: rgba(240, 98, 146, 0.2); --border-hover: var(--primary-red); }
 
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        /* FIX FÜR MOBILE OVERFLOWS UND TEXT-SCALING */
-        html, body { 
-            overscroll-behavior-y: none; 
-            max-width: 100%; 
-            overflow-x: hidden; 
-            -webkit-text-size-adjust: 100%;
-        }
+        html, body { overscroll-behavior-y: none; }
         
         body { 
             font-family: 'Montserrat', sans-serif; background-color: var(--bg-dark); color: var(--text-light); 
-            line-height: 1.6; padding-top: 90px; 
+            line-height: 1.6; overflow-x: hidden; padding-top: 90px; 
             -webkit-font-smoothing: antialiased; 
             -moz-osx-font-smoothing: grayscale; 
             touch-action: pan-y; transition: background-color 0.4s ease, color 0.4s ease;
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
-            -webkit-touch-callout: none;
         }
 
-        input, select, textarea { font-size: 16px !important; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; -webkit-touch-callout: default; }
+        input, select, textarea { font-size: 16px !important; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; }
 
         /* Module Permissions */
         .mod-leads, .mod-blocks, .mod-data, .mod-ticker, .mod-prices, .mod-crm, .mod-pages, .mod-theme { display: none !important; }
@@ -103,13 +97,22 @@
         body.is-admin.perm-ticker .mod-ticker { display: flex !important; }
         body.is-admin.perm-content .action-content { display: flex !important; }
 
-        body.is-supervisor .mod-leads, body.is-supervisor .mod-blocks, body.is-supervisor .mod-data, body.is-supervisor .mod-prices { display: block !important; }
-        body.is-supervisor .mod-crm, body.is-supervisor .mod-ticker, body.is-supervisor .mod-pages, body.is-supervisor .action-cars, body.is-supervisor .action-content { display: flex !important; }
+        body.is-supervisor .mod-leads,
+        body.is-supervisor .mod-blocks,
+        body.is-supervisor .mod-data,
+        body.is-supervisor .mod-prices { display: block !important; }
+        body.is-supervisor .mod-crm { display: flex !important; }
+        body.is-supervisor .mod-ticker { display: flex !important; }
+        body.is-supervisor .mod-pages { display: flex !important; }
         body.is-supervisor .mod-theme { display: inline-block !important; }
         body.is-supervisor .action-forms { display: inline-flex !important; }
+        body.is-supervisor .action-cars { display: flex !important; }
+        body.is-supervisor .action-content { display: flex !important; }
         body.is-supervisor .mod-leads-locked { display: none !important; }
 
-        .admin-only-block, .admin-only-flex, .admin-only-inline { display: none !important; }
+        .admin-only-block { display: none !important; }
+        .admin-only-flex { display: none !important; }
+        .admin-only-inline { display: none !important; }
         body.is-admin .admin-only-block { display: block !important; }
         body.is-admin .admin-only-flex { display: flex !important; }
         body.is-admin .admin-only-inline { display: inline-flex !important; }
@@ -117,18 +120,19 @@
         .supervisor-only-inline { display: none !important; }
         body.is-supervisor .supervisor-only-inline { display: inline-flex !important; }
 
+        /* Globale ovale und eingelassene Scrollbars */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; margin: 10px 0; border-radius: 100vw; }
         ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 100vw; border: 2px solid var(--bg-dark); background-clip: padding-box; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary-red); filter: brightness(1.2); }
 
-        .plate-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; pointer-events: none; z-index: -1; overflow: hidden; }
+        .plate-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: -1; overflow: hidden; }
         .plate { position: absolute; background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 5px 15px; border-radius: 5px; border: 2px solid #000; opacity: 0.12; display: flex; align-items: center; gap: 10px; animation: float 22s linear infinite; }
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-50px) rotate(-10deg); } 100% { transform: translateY(-20vh) translateX(50px) rotate(10deg); } }
 
         #intro-preloader { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--bg-dark); z-index: 99999; 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-dark); z-index: 99999; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; 
             animation: hidePreloader 0.5s ease 3.5s forwards; 
         }
@@ -145,10 +149,9 @@
         .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 80%; opacity: 0; transform: translateY(20px); animation: fadeText 0.5s ease 1.2s forwards; color: var(--text-light); }
         @keyframes fadeText { 100% { transform: translateY(0); opacity: 1; } }
 
-        /* FIX: Width 100% anstatt 100vw verhindert den horizontalen Scrollbug auf Handys */
         .cookie-overlay {
-            position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: var(--glass-bg); backdrop-filter: blur(10px);
-            border-top: 2px solid var(--primary-red); z-index: 9999999; box-sizing: border-box;
+            position: fixed; bottom: 0; left: 0; width: 100vw; background: var(--glass-bg); backdrop-filter: blur(10px);
+            border-top: 2px solid var(--primary-red); z-index: 9999999;
             transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
             display: flex; justify-content: center; padding: 25px 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
         }
@@ -169,8 +172,8 @@
         .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-light); }
         .btn-outline:hover { background: var(--glass-border); border-color: var(--text-light); }
 
-        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 400px; }
-        .toast-msg { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: var(--text-light); padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; width: 100%; justify-content: center; }
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast-msg { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--primary-red); color: var(--text-light); padding: 12px 25px; border-radius: 50px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, toastOut 0.4s ease 3.5s forwards; }
         .toast-success { border-color: #25D366; box-shadow: 0 10px 30px rgba(37,211,102,0.2); }
         .toast-success i { color: #25D366; font-size: 16px; }
         .toast-error { border-color: #ff3b30; box-shadow: 0 10px 30px rgba(255,59,48,0.2); }
@@ -186,6 +189,7 @@
         .logo-text .red-part { color: var(--primary-red); }
         .logo-text .white-part { color: var(--text-light); }
         
+        /* SPEECH BUBBLE FIX */
         .speech-bubble { 
             position: absolute; top: 120%; left: 10%; background: var(--primary-red); color: #fff; 
             padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; white-space: nowrap; 
@@ -260,15 +264,14 @@
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
-        /* FIX: 100% width on overlays instead of 100vw to prevent horizontal scroll bugs */
-        .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--glass-bg); backdrop-filter: blur(15px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; box-sizing: border-box; }
+        .fullscreen-menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--glass-bg); backdrop-filter: blur(15px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
         .fullscreen-menu.active { opacity: 1; pointer-events: all; }
         .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: var(--text-light); cursor: pointer; transition: 0.3s; }
         .close-menu:hover { color: var(--primary-red); transform: rotate(90deg); }
         .fullscreen-menu a { color: var(--text-light); font-size: 24px; font-weight: 800; text-transform: uppercase; text-decoration: none; margin: 12px 0; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
         .fullscreen-menu a:hover { color: var(--primary-red); transform: translateX(10px); }
 
-        .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; box-sizing: border-box; }
+        .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .custom-dialog-overlay.open { opacity: 1; pointer-events: all; }
         
         .custom-dialog-window { 
@@ -817,8 +820,6 @@
             </div>
             
             <button class="btn-primary" style="background:#00ffff; color:#000; width:100%; justify-content:center; margin-top:20px;" onclick="window.saveCustomTheme()">Eigenes Design anwenden & Speichern</button>
-            
-            <button class="btn-primary" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-light); width:100%; justify-content:center; margin-top:10px;" onclick="window.resetCustomTheme()"><i class="fa-solid fa-rotate-left"></i> Auf Standard zurücksetzen</button>
         </div>
     </div>
 
@@ -1819,15 +1820,6 @@
             document.getElementById('themeSelector').value = 'custom';
             window.changeTheme('custom');
             window.showToast('Eigenes Design erfolgreich angewendet!', 'success');
-            window.closeThemeEditor();
-        };
-
-        window.resetCustomTheme = function() {
-            localStorage.removeItem('red_custom_theme');
-            document.documentElement.style.cssText = '';
-            document.getElementById('themeSelector').value = 'dark';
-            window.changeTheme('dark');
-            window.showToast('Auf Standard-Design (Dark) zurückgesetzt!', 'success');
             window.closeThemeEditor();
         };
 
@@ -2917,7 +2909,8 @@
             
             const visitorDocRef = doc(db, "settings", "visitors");
             try {
-                setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {});} catch(e) {}
+                setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {});
+            } catch(e) {}
             onSnapshot(visitorDocRef, (docSnap) => {
                 if(docSnap.exists()) {
                     const count = docSnap.data().count || 0;
