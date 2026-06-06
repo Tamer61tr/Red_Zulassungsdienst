@@ -680,16 +680,40 @@
             #crmSearch { display: none !important; }
         }
 
-        /* Verhindert das Flackern beim ersten Laden */
-body {
-    visibility: hidden; 
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-body.is-ready {
-    visibility: visible;
-    opacity: 1;
-}
+    /* ... (Deine Variablen bleiben) ... */
+
+    /* 1. GPU-ENTLASTUNG FÜR MOBILE */
+    @media (max-width: 768px) {
+        /* Backdrop-Filter ist der Haupt-Flicker-Verursacher auf Android */
+        * {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+        /* Verhindere, dass Schatten die GPU überlasten */
+        .card, .booking-wrapper, .admin-apt-card {
+            box-shadow: none !important; /* Entferne komplexe Schatten auf Handy */
+        }
+    }
+
+    /* 2. Layer-Stabilisierung: Verhindere wildes "Z-Index"-Springen */
+    /* Füge das deinem #header-wrapper und Overlays hinzu */
+    #header-wrapper, .custom-dialog-overlay, .fullscreen-menu {
+        transform: translateZ(0); /* Zwingt Browser zur Layer-Stabilisierung */
+        backface-visibility: hidden;
+    }
+
+    /* 3.will-change entfernen! */
+    /* Suche in deinem ganzen CSS nach 'will-change'. Wenn es da ist: LÖSCHEN. */
+    /* Es zwingt den Browser Layer zu erstellen, die er auf Android nicht halten kann. */
+
+    /* 4. Das "Verschwinden" verhindern */
+    /* Wenn Elemente verschwinden, liegt das oft an einer fehlenden Breite/Höhe */
+    .view-section {
+        backface-visibility: hidden;
+        perspective: 1000px; /* Hilft Android beim Rendern der Layer */
+    }
+
 
     </style>
 
@@ -1898,15 +1922,10 @@ body.is-ready {
         window.changeTheme(savedTheme);
 
         document.addEventListener('DOMContentLoaded', () => {
-    // 1. Theme sofort aus localStorage lesen
-    const savedTheme = localStorage.getItem('red_theme') || 'dark';
-    window.changeTheme(savedTheme);
-    
-    // 2. Body einblenden, erst wenn Theme gesetzt ist
-    document.body.classList.add('is-ready');
-    
-    // ... Rest deines Codes ...
-});
+            if(document.getElementById('themeSelector')) {
+                document.getElementById('themeSelector').value = savedTheme;
+            }
+        });
 
         
 
@@ -2724,12 +2743,6 @@ body.is-ready {
                 localStorage.setItem('pin_positions', JSON.stringify(positions));
             }
         };
-
-        // Verhindert, dass JS-Prozesse das Scrollen auf Mobile blockieren
-document.addEventListener('touchmove', (e) => {
-    // Hier nichts blockieren, nur Passiv-Event nutzen
-}, { passive: true });
-
     </script>
 
     <script type="module">
@@ -2766,22 +2779,7 @@ document.addEventListener('touchmove', (e) => {
                  }
              }
         });
-
-        // Variable um doppelte Ausführung zu verhindern
-let isThemeInitialized = false;
-
-onSnapshot(doc(db, "settings", "global_theme"), (docSnap) => {
-    if (docSnap.exists()) {
-        const theme = docSnap.data().activeTheme;
         
-        // Theme nur anwenden, wenn es sich wirklich ändert
-        if (localStorage.getItem('red_theme') !== theme || !isThemeInitialized) {
-            window.changeTheme(theme);
-            document.getElementById('themeSelector').value = theme;
-            isThemeInitialized = true;
-        }
-    }
-});
 
         onSnapshot(collection(db, "custom_pages"), (snapshot) => {
             if (!snapshot.empty) {
