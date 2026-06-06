@@ -80,6 +80,18 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
+        /* MOBIL-BREAKPOINT 769px (ANDROID / TABLET) */
+        @media (max-width: 769px) {
+            body { padding-top: 80px; }
+            nav { padding: 10px 3%; }
+            .logo-text { font-size: 14px; }
+            .grid-container { grid-template-columns: 1fr; } /* Volle Breite auf Handys */
+            .booking-wrapper { padding: 20px; border-radius: 15px; }
+            .form-row { flex-direction: column; gap: 10px; }
+            .hero-content { padding: 20px; }
+            .ticker-text { font-size: 11px; }
+        }
+
         .view-section { width: 100%; max-width: 100vw; }
 
         input, select, textarea { font-size: 16px !important; }
