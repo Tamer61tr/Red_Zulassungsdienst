@@ -64,13 +64,26 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        html, body { 
-    overscroll-behavior-y: none; 
+        html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
     background-color: var(--bg-dark);
-    color: var(--text-light);
-    font-family: 'Montserrat', sans-serif;
-    padding-top: 90px;
+    overscroll-behavior-y: none; /* Verhindert das Rausspringen/Ruckeln beim Scrollen */
+    touch-action: pan-y; /* Erlaubt vertikales Scrollen, blockt horizontales Wackeln */
+    width: 100%;
 }
+        
+        body { 
+            position: relative; 
+            -webkit-overflow-scrolling: touch; 
+            font-family: 'Montserrat', sans-serif; color: var(--text-light); 
+            line-height: 1.6; padding-top: 90px; 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale; 
+            transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+        }
 
         .view-section { overflow-x: hidden !important; width: 100%; max-width: 100%; }
 
@@ -244,15 +257,14 @@
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
         .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; border: none; outline: none; text-decoration: none; }
 
-#ticker-container { 
+        #ticker-container { 
     background: var(--bg-dark); 
     border-bottom: 1px solid var(--glass-border); 
     padding: 5px 0; 
     overflow: hidden; 
     white-space: nowrap; 
     position: relative; 
-    display: flex; /* Muss flex sein für die Ausrichtung */
-    align-items: center; 
+    display: flex; /* Flex ist okay, solange die Kinder keine feste Breite erzwingen */
     width: 100%; 
 }
         .ticker-text-wrapper { display: inline-block; padding-left: 100%; animation: tickerAnim 15s linear infinite; }
@@ -2652,28 +2664,6 @@
     </script>
 
      <script type="module">
-
-        // 🚨 BIG MEGA FIX: INJECTION 🚨
-
-        // Behebt den Android-Blowout direkt beim Laden (kein CSS-Suchen mehr nötig!)
-
-        const androidFix = document.createElement('style');
-
-        androidFix.innerHTML = `
-
-            html, body { width: 100% !important; max-width: 100% !important; overflow-x: hidden !important; }
-
-            #ticker-container { position: relative !important; display: block !important; overflow: hidden !important; width: 100% !important; box-sizing: border-box !important; }
-
-            .ticker-text-wrapper { position: absolute !important; left: 100% !important; top: 0 !important; height: 100% !important; display: flex !important; align-items: center !important; white-space: nowrap !important; transform: none !important; animation-name: tickerMobileFix !important; }
-
-            @keyframes tickerMobileFix { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
-        `;
-
-        document.head.appendChild(androidFix);
-
-
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
