@@ -2708,6 +2708,12 @@
                 localStorage.setItem('pin_positions', JSON.stringify(positions));
             }
         };
+
+        // Verhindert, dass JS-Prozesse das Scrollen auf Mobile blockieren
+document.addEventListener('touchmove', (e) => {
+    // Hier nichts blockieren, nur Passiv-Event nutzen
+}, { passive: true });
+
     </script>
 
     <script type="module">
