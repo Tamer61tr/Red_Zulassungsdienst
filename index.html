@@ -267,7 +267,12 @@
     display: block;         /* <-- WICHTIG */
     width: 100%; 
 }
-        .ticker-text-wrapper { display: inline-block; padding-left: 100%; animation: tickerAnim 15s linear infinite; }
+       .ticker-text-wrapper { 
+    display: flex; 
+    white-space: nowrap;
+    animation: tickerAnim 15s linear infinite; 
+    width: max-content; /* Passt sich dem Text an */
+}
         @keyframes tickerAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; color: var(--text-light); }
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
@@ -652,6 +657,24 @@
             .close-dialog-btn, .btn-primary, .crm-action-cell { display: none !important; }
             #crmSearch { display: none !important; }
         }
+
+        /* Globale Sperre gegen horizontales Scrollen */
+* {
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+}
+
+body, html {
+    overflow-x: hidden !important;
+    position: relative;
+    width: 100% !important;
+}
+
+#ticker-container { 
+    width: 100% !important;
+    overflow: hidden !important;
+    padding: 5px 0 !important; /* Nur vertikal, horizontal 0 */
+}
     </style>
 </head>
 <body>
