@@ -433,7 +433,56 @@
         .view-section.active { display: block; }
         @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        .booking-wrapper { max-width: 750px; margin: 0 auto; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-sizing: border-box; }
+        /* --- EDLER LOOK OHNE RUCKLER --- */
+
+    /* 1. Booking-Wrapper: Statt Blur geben wir ihm jetzt einen subtilen "Border-Glow" */
+    .booking-wrapper { 
+        max-width: 750px; 
+        margin: 0 auto; 
+        background: #0f0f12; /* Dunkler, satter */
+        border: 1px solid rgba(255, 255, 255, 0.05); /* Feine Linie statt Blur */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+        padding: 40px; 
+        border-radius: 20px;
+    }
+
+    /* 2. Input-Felder: Professioneller Fokus-Effekt */
+    .form-control { 
+        width: 100%; 
+        padding: 14px 18px; 
+        background: #1a1a1f; /* Etwas heller als Hintergrund für Tiefe */
+        border: 1px solid rgba(255,255,255,0.1); 
+        border-radius: 12px; 
+        color: #fff; 
+        outline: none; 
+        transition: all 0.3s ease;
+    }
+    .form-control:focus { 
+        border: 1px solid var(--primary-red); 
+        box-shadow: 0 0 0 1px var(--primary-red); /* "Glow" statt unsauberem Schatten */
+    }
+
+    /* 3. Karten: Edle Bordüre statt Blur */
+    .card { 
+        background: #0e0e11; 
+        padding: 35px 20px; 
+        border-radius: 18px; 
+        border: 1px solid rgba(255, 255, 255, 0.05); /* Kontrast-Linie */
+        transition: all 0.3s ease;
+        height: 190px;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
+    .card:hover { 
+        border-color: var(--primary-red); 
+        background: #14141a; /* Subtiler Hover-Effekt */
+    }
+
+    /* 4. Header: Professionelle Trennung */
+    #header-wrapper { 
+        position: fixed; top: 0; width: 100%; z-index: 1000;
+        background: #050507; /* Kein Blur mehr, solid */
+        border-bottom: 2px solid var(--primary-red); /* Klare Kante ist edler */
+    }
         .form-row { display: flex; gap: 15px; position: relative; }
         @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
         
