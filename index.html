@@ -74,29 +74,30 @@
         /* 🚨 DER FIX: SAUBERES SCROLLING OHNE VIEWPORT/LOCK-BUGS! */
         /* Nur diese EINE Deklaration für html und body. Keine Duplikate mehr! */
         html {
-            width: 100%;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            position: relative;
-            margin: 0;
-            padding: 0;
-            padding-top: 90px;
-            width: 100%;
-            overflow-x: hidden;
-            background-color: var(--bg-dark);
-            font-family: 'Montserrat', sans-serif;
-            color: var(--text-light);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
+        width: 100%;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+    }
 
-        .view-section { width: 100%; display: none; animation: viewFadeIn 0.4s ease forwards; padding-top: 30px; min-height: 100vh; }
-        .view-section.active { display: block; }
+    body {
+        margin: 0;
+        padding-top: 90px; /* Header-Höhe */
+        width: 100%;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto; /* Erlaubt vertikales Scrollen */
+        background-color: var(--bg-dark);
+        font-family: 'Montserrat', sans-serif;
+        color: var(--text-light);
+    }
+
+    /* WICHTIG: Keine height: 100vh für die Views! */
+    .view-section { 
+        width: 100%; 
+        display: none; 
+        padding-bottom: 50px; 
+    }
+    .view-section.active { display: block; }
         @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
         input, select, textarea { font-size: 16px !important; }
@@ -280,6 +281,11 @@
             display: block; 
             box-sizing: border-box;
         }
+    
+    @media (max-width: 768px) {
+        body { padding-top: 130px; }
+    }
+
         .ticker-text-wrapper { 
             display: inline-block; 
             white-space: nowrap; 
@@ -1761,7 +1767,7 @@
         <p id="txt-footer-text" style="font-size:10px; color:var(--text-muted); margin-bottom: 10px;">© 2026 RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici.</p>
         
         <div class="theme-selector-container mod-theme">
-            <select id="themeSelector" class="theme-selector" onchange="window.changeTheme(this.value)">
+           <select id="themeSelector" class="theme-selector" onchange="window.changeTheme(this.value, true)">
                 <option value="dark">🌙 Dark Mode</option>
                 <option value="light">☀️ Light Mode</option>
                 <option value="light-yellow">🟨 Hellgelb</option>
@@ -1802,12 +1808,19 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
     <script>
-        window.changeTheme = function(themeName) {
-            document.body.setAttribute('data-theme', themeName);
-            localStorage.setItem('red_theme', themeName);
-            
-            document.documentElement.style.cssText = '';
-            
+        window.changeTheme = async function(themeName, saveToFirebase = false) {
+    document.body.setAttribute('data-theme', themeName);
+    localStorage.setItem('red_theme', themeName);
+    
+    // Theme online speichern, wenn der Supervisor es ändert
+    if (saveToFirebase && window.isAuthorized) {
+        try {
+            await setDoc(doc(db, "settings", "global_theme"), { activeTheme: themeName });
+            window.showToast('Theme global für alle gespeichert!', 'success');
+        } catch (e) {
+            window.showToast('Konnte Theme online nicht speichern.', 'error');
+        }
+    }        
             if (themeName === 'custom') {
                 const customTheme = JSON.parse(localStorage.getItem('red_custom_theme'));
                 if (customTheme) {
@@ -1878,6 +1891,8 @@
                 document.getElementById('themeSelector').value = savedTheme;
             }
         });
+
+        
 
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
@@ -2729,6 +2744,14 @@
                  }
              }
         });
+
+        onSnapshot(doc(db, "settings", "global_theme"), (docSnap) => {
+    if (docSnap.exists()) {
+        const theme = docSnap.data().activeTheme;
+        window.changeTheme(theme);
+        document.getElementById('themeSelector').value = theme;
+    }
+});
 
         onSnapshot(collection(db, "custom_pages"), (snapshot) => {
             if (!snapshot.empty) {
