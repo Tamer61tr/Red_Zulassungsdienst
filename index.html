@@ -19,8 +19,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
-    <style>
+<style>
         :root {
+            /* 1. Dark (Standard) */
             --primary-red: #e60000;
             --bg-dark: #050507;
             --bg-card: #0e0e11;
@@ -36,7 +37,9 @@
             --neon-green: #39ff14;
         }
 
-        /* THEMES */
+        /* ---------------------------------- */
+        /* THEMES (Bestehende +  NEUE)      */
+        /* ---------------------------------- */
         body[data-theme="light"] { --primary-red: #e60000; --bg-dark: #f2f2f7; --bg-card: #ffffff; --bg-input: #ffffff; --text-light: #1c1c1e; --text-muted: #6c6c70; --glass-bg: rgba(255, 255, 255, 0.95); --glass-border: rgba(0, 0, 0, 0.1); --border-hover: var(--primary-red); }
         body[data-theme="light-yellow"] { --primary-red: #fbc02d; --bg-dark: #fffde7; --bg-card: #fff9c4; --bg-input: #fff59d; --text-light: #2c2c2c; --text-muted: #795548; --glass-bg: rgba(255, 253, 231, 0.95); --glass-border: rgba(0, 0, 0, 0.12); --border-hover: var(--primary-red); }
         body[data-theme="light-gray"] { --primary-red: #d32f2f; --bg-dark: #f5f5f5; --bg-card: #eeeeee; --bg-input: #e0e0e0; --text-light: #111111; --text-muted: #666666; --glass-bg: rgba(245, 245, 245, 0.95); --glass-border: rgba(0, 0, 0, 0.15); --border-hover: var(--primary-red); }
@@ -56,35 +59,45 @@
         body[data-theme="royal"] { --primary-red: #ea80fc; --bg-dark: #160a1f; --bg-card: #261136; --bg-input: #35184d; --text-light: #f3e5f5; --text-muted: #b39ddb; --glass-bg: rgba(38, 17, 54, 0.92); --glass-border: rgba(234, 128, 252, 0.2); --border-hover: var(--primary-red); }
         body[data-theme="stealth"] { --primary-red: #ffffff; --bg-dark: #000000; --bg-card: #0a0a0a; --bg-input: #141414; --text-light: #ffffff; --text-muted: #666666; --glass-bg: rgba(10, 10, 10, 0.95); --glass-border: rgba(255, 255, 255, 0.15); --border-hover: var(--primary-red); }
         body[data-theme="cherry"] { --primary-red: #f06292; --bg-dark: #1a0f14; --bg-card: #2e1a23; --bg-input: #3d232e; --text-light: #fce4ec; --text-muted: #f48fb1; --glass-bg: rgba(46, 26, 35, 0.92); --glass-border: rgba(240, 98, 146, 0.2); --border-hover: var(--primary-red); }
+        body[data-theme="neon-purple"] { --primary-red: #d500f9; --bg-dark: #12001c; --bg-card: #210036; --bg-input: #310052; --text-light: #f3e5f5; --text-muted: #ce93d8; --glass-bg: rgba(33, 0, 54, 0.92); --glass-border: rgba(213, 0, 249, 0.2); --border-hover: var(--primary-red); }
+        body[data-theme="coffee"] { --primary-red: #d7ccc8; --bg-dark: #2d2420; --bg-card: #3e322c; --bg-input: #4f4039; --text-light: #efebe9; --text-muted: #a1887f; --glass-bg: rgba(62, 50, 44, 0.92); --glass-border: rgba(215, 204, 200, 0.2); --border-hover: #bcaaa4; }
+        body[data-theme="arctic"] { --primary-red: #00b4d8; --bg-dark: #f0f8ff; --bg-card: #e0f2fe; --bg-input: #bae6fd; --text-light: #0369a1; --text-muted: #0284c7; --glass-bg: rgba(224, 242, 254, 0.95); --glass-border: rgba(0, 180, 216, 0.2); --border-hover: var(--primary-red); }
+        body[data-theme="volcano"] { --primary-red: #ff3d00; --bg-dark: #1a0000; --bg-card: #2d0000; --bg-input: #420000; --text-light: #ffccbc; --text-muted: #ff8a65; --glass-bg: rgba(45, 0, 0, 0.92); --glass-border: rgba(255, 61, 0, 0.2); --border-hover: var(--primary-red); }
+        body[data-theme="hacker"] { --primary-red: #00ff00; --bg-dark: #000000; --bg-card: #080808; --bg-input: #121212; --text-light: #00ff00; --text-muted: #009900; --glass-bg: rgba(8, 8, 8, 0.95); --glass-border: rgba(0, 255, 0, 0.3); --border-hover: var(--primary-red); }
+        body[data-theme="lavender"] { --primary-red: #b39ddb; --bg-dark: #2e2836; --bg-card: #3d3547; --bg-input: #4d445a; --text-light: #ede7f6; --text-muted: #d1c4e9; --glass-bg: rgba(61, 53, 71, 0.92); --glass-border: rgba(179, 157, 219, 0.2); --border-hover: var(--primary-red); }
+        body[data-theme="sandstone"] { --primary-red: #ffb74d; --bg-dark: #2b2b2b; --bg-card: #383838; --bg-input: #4a4a4a; --text-light: #fff3e0; --text-muted: #ffcc80; --glass-bg: rgba(56, 56, 56, 0.92); --glass-border: rgba(255, 183, 77, 0.2); --border-hover: var(--primary-red); }
+        body[data-theme="synthwave"] { --primary-red: #f72585; --bg-dark: #10002b; --bg-card: #240046; --bg-input: #3c096c; --text-light: #4cc9f0; --text-muted: #7209b7; --glass-bg: rgba(36, 0, 70, 0.92); --glass-border: rgba(247, 37, 133, 0.2); --border-hover: #4cc9f0; }
+        body[data-theme="toxic"] { --primary-red: #c6ff00; --bg-dark: #1e1e1e; --bg-card: #2a2a2a; --bg-input: #3a3a3a; --text-light: #f4ff81; --text-muted: #eeff41; --glass-bg: rgba(42, 42, 42, 0.92); --glass-border: rgba(198, 255, 0, 0.2); --border-hover: var(--primary-red); }
+        body[data-theme="abyss"] { --primary-red: #4fc3f7; --bg-dark: #000c18; --bg-card: #001830; --bg-input: #00284d; --text-light: #e1f5fe; --text-muted: #81d4fa; --glass-bg: rgba(0, 24, 48, 0.92); --glass-border: rgba(79, 195, 247, 0.2); --border-hover: var(--primary-red); }
+
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* 🔥 DIE LÖSUNG FÜR CHROME/EDGE ANDROID 🔥
-           - KEIN height: 100% mehr (zerstört natives Scrollen)
-           - KEIN overflow-y: auto mehr auf Body (erzwingt falsches Modal-Scrolling)
-           - KEIN 100vw mehr (Android verrechnet sich hierbei mit der Scrollbar)
-        */
+        /* 🚨 DER FIX: SAUBERES SCROLLING OHNE VIEWPORT/LOCK-BUGS! */
         html {
+            width: 100%;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
         
         body {
             position: relative;
+            margin: 0;
+            padding: 0;
+            padding-top: 90px;
             width: 100%;
+            min-height: 100vh;
             overflow-x: hidden;
             background-color: var(--bg-dark);
             font-family: 'Montserrat', sans-serif;
             color: var(--text-light);
             line-height: 1.6;
-            padding-top: 90px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* View-Sections sauber auf 100% ohne 100vw Bug */
-        .view-section { width: 100%; padding-bottom: 30px; display: none; animation: viewFadeIn 0.4s ease forwards; min-height: calc(100vh - 90px); }
+        .view-section { width: 100%; display: none; animation: viewFadeIn 0.4s ease forwards; padding-top: 30px; min-height: 100vh; }
         .view-section.active { display: block; }
         @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -183,7 +196,7 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.9); } }
 
-        #header-wrapper { position: fixed; top: 0; left: 0; right: 0; width: 100%; max-width: 100vw; z-index: 1000; box-sizing: border-box; }
+        #header-wrapper { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; box-sizing: border-box; }
         nav { width: 100%; box-sizing: border-box; padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); border-bottom: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.3); flex-wrap: wrap; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 1001; position: relative;}
         
         .logo-container { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; position: relative; max-width: 50%; overflow: visible; }
@@ -258,7 +271,6 @@
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
         .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; border: none; outline: none; text-decoration: none; }
 
-       /* TICKER BEREICH - Sauber ohne 100vw Blowout */
         #ticker-container { 
             background: var(--bg-dark); 
             border-bottom: 1px solid var(--glass-border); 
@@ -282,7 +294,7 @@
         .ticker-text { font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; color: var(--text-light); }
         .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
         @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-        
+
         .fullscreen-menu { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; box-sizing: border-box; }
         .fullscreen-menu.active { opacity: 1; pointer-events: all; }
         .close-menu { position: absolute; top: 20px; right: 5%; font-size: 35px; color: var(--text-light); cursor: pointer; transition: 0.3s; }
