@@ -2667,32 +2667,7 @@
 
         // 🚨 BIG MEGA FIX: INJECTION 🚨
 
-        // Behebt den Android-Blowout direkt beim Laden (kein CSS-Suchen mehr nötig!)
-
-        const androidFix = document.createElement('style');
-
-        androidFix.innerHTML = `
-
-            html, body { width: 100% !important; max-width: 100% !important; overflow-x: hidden !important; }
-
-            #ticker-container { position: relative !important; display: block !important; overflow: hidden !important; width: 100% !important; box-sizing: border-box !important; }
-
-            .ticker-text-wrapper { position: absolute !important; left: 100% !important; top: 0 !important; height: 100% !important; display: flex !important; align-items: center !important; white-space: nowrap !important; transform: none !important; animation-name: tickerMobileFix !important; }
-
-            @keyframes tickerMobileFix { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
-        `;
-
-        document.head.appendChild(androidFix);
-
-
-
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
-
+        
         const firebaseConfig = {
 
             apiKey: "AIzaSyDa10ia02K0vsHgzj-iTf4S6BwKzQruqyY",
