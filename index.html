@@ -21,7 +21,6 @@
     
 <style>
         :root {
-            /* 1. Dark (Standard) */
             --primary-red: #e60000;
             --bg-dark: #050507;
             --bg-card: #0e0e11;
@@ -38,7 +37,7 @@
         }
 
         /* ---------------------------------- */
-        /* THEMES (Bestehende +  NEUE)      */
+        /* THEMES (Bestehende + 10 NEUE)      */
         /* ---------------------------------- */
         body[data-theme="light"] { --primary-red: #e60000; --bg-dark: #f2f2f7; --bg-card: #ffffff; --bg-input: #ffffff; --text-light: #1c1c1e; --text-muted: #6c6c70; --glass-bg: rgba(255, 255, 255, 0.95); --glass-border: rgba(0, 0, 0, 0.1); --border-hover: var(--primary-red); }
         body[data-theme="light-yellow"] { --primary-red: #fbc02d; --bg-dark: #fffde7; --bg-card: #fff9c4; --bg-input: #fff59d; --text-light: #2c2c2c; --text-muted: #795548; --glass-bg: rgba(255, 253, 231, 0.95); --glass-border: rgba(0, 0, 0, 0.12); --border-hover: var(--primary-red); }
@@ -70,10 +69,10 @@
         body[data-theme="toxic"] { --primary-red: #c6ff00; --bg-dark: #1e1e1e; --bg-card: #2a2a2a; --bg-input: #3a3a3a; --text-light: #f4ff81; --text-muted: #eeff41; --glass-bg: rgba(42, 42, 42, 0.92); --glass-border: rgba(198, 255, 0, 0.2); --border-hover: var(--primary-red); }
         body[data-theme="abyss"] { --primary-red: #4fc3f7; --bg-dark: #000c18; --bg-card: #001830; --bg-input: #00284d; --text-light: #e1f5fe; --text-muted: #81d4fa; --glass-bg: rgba(0, 24, 48, 0.92); --glass-border: rgba(79, 195, 247, 0.2); --border-hover: var(--primary-red); }
 
-
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         /* 🚨 DER FIX: SAUBERES SCROLLING OHNE VIEWPORT/LOCK-BUGS! */
+        /* Nur diese EINE Deklaration für html und body. Keine Duplikate mehr! */
         html {
             width: 100%;
             overflow-x: hidden;
@@ -86,7 +85,6 @@
             padding: 0;
             padding-top: 90px;
             width: 100%;
-            min-height: 100vh;
             overflow-x: hidden;
             background-color: var(--bg-dark);
             font-family: 'Montserrat', sans-serif;
@@ -271,6 +269,7 @@
         @keyframes gentleHeartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } 60% { transform: scale(1.2); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
         .visitor-heart { font-size: 50px; animation: gentleHeartbeat 1.5s infinite; transform-origin: center; display: inline-block; margin: 15px 0; border: none; outline: none; text-decoration: none; }
 
+        /* TICKER BEREICH - Sauber ohne 100vw Blowout */
         #ticker-container { 
             background: var(--bg-dark); 
             border-bottom: 1px solid var(--glass-border); 
@@ -676,6 +675,7 @@
         }
 
     </style>
+
 </head>
 <body>
 
@@ -1749,7 +1749,7 @@
         </div>
     </div>
 
-    <footer class="editable-section">
+<footer class="editable-section">
         <div class="section-edit-btn action-content" onclick="window.openContentEditor('footer')" style="right:5%; top:10px;"><i class="fa-solid fa-pencil"></i></div>
         <div class="footer-links" id="dynamicFooterLinks">
             <a href="javascript:void(0)" onclick="window.switchView('view-home')">Startseite</a>
@@ -1782,6 +1782,16 @@
                 <option value="royal">👑 Royal</option>
                 <option value="stealth">🥷 Stealth</option>
                 <option value="cherry">🌸 Cherry</option>
+                <option value="neon-purple">🔮 Neon Purple</option>
+                <option value="coffee">☕ Coffee</option>
+                <option value="arctic">❄️ Arctic</option>
+                <option value="volcano">🌋 Volcano</option>
+                <option value="hacker">💻 Hacker</option>
+                <option value="lavender">🪻 Lavender</option>
+                <option value="sandstone">🏜️ Sandstone</option>
+                <option value="synthwave">📼 Synthwave</option>
+                <option value="toxic">☣️ Toxic</option>
+                <option value="abyss">🌌 Abyss</option>
                 <option value="custom">🛠️ Custom (Eigenes Design)</option>
             </select>
             <button class="btn-primary" style="padding: 6px 12px; font-size:10px;" onclick="window.openThemeEditor()">🎨 Design anpassen</button>
