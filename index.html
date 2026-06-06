@@ -680,6 +680,17 @@
             #crmSearch { display: none !important; }
         }
 
+        /* Verhindert das Flackern beim ersten Laden */
+body {
+    visibility: hidden; 
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+body.is-ready {
+    visibility: visible;
+    opacity: 1;
+}
+
     </style>
 
 </head>
@@ -1887,10 +1898,15 @@
         window.changeTheme(savedTheme);
 
         document.addEventListener('DOMContentLoaded', () => {
-            if(document.getElementById('themeSelector')) {
-                document.getElementById('themeSelector').value = savedTheme;
-            }
-        });
+    // 1. Theme sofort aus localStorage lesen
+    const savedTheme = localStorage.getItem('red_theme') || 'dark';
+    window.changeTheme(savedTheme);
+    
+    // 2. Body einblenden, erst wenn Theme gesetzt ist
+    document.body.classList.add('is-ready');
+    
+    // ... Rest deines Codes ...
+});
 
         
 
@@ -2751,11 +2767,19 @@ document.addEventListener('touchmove', (e) => {
              }
         });
 
-        onSnapshot(doc(db, "settings", "global_theme"), (docSnap) => {
+        // Variable um doppelte Ausführung zu verhindern
+let isThemeInitialized = false;
+
+onSnapshot(doc(db, "settings", "global_theme"), (docSnap) => {
     if (docSnap.exists()) {
         const theme = docSnap.data().activeTheme;
-        window.changeTheme(theme);
-        document.getElementById('themeSelector').value = theme;
+        
+        // Theme nur anwenden, wenn es sich wirklich ändert
+        if (localStorage.getItem('red_theme') !== theme || !isThemeInitialized) {
+            window.changeTheme(theme);
+            document.getElementById('themeSelector').value = theme;
+            isThemeInitialized = true;
+        }
     }
 });
 
