@@ -596,6 +596,40 @@
         .theme-selector-container { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; position: relative;}
         .theme-selector { background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--glass-border); padding: 8px 15px; border-radius: 8px; font-size: 12px; outline: none; cursor: pointer; font-family: 'Montserrat', sans-serif;}
 
+        /* Mobile CRM Optimierung: Alles auf eine Zeile erzwingen */
+    @media (max-width: 768px) {
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            /* Verhindert Ruckeln und ermöglicht "Finger-Scroll" */
+            -webkit-overflow-scrolling: touch; 
+        }
+        
+        .crm-table {
+            font-size: 9px !important; /* Schrift extrem verkleinern */
+            width: 100%;
+        }
+
+        .crm-table th, 
+        .crm-table td {
+            padding: 4px 3px !important; /* Minimale Abstände */
+            white-space: nowrap !important; /* Verhindert Umbruch -> alles auf einer Zeile */
+            text-overflow: ellipsis;
+        }
+
+        .crm-action-cell {
+            padding: 4px 2px !important;
+        }
+
+        /* Buttons im CRM auf Handy kleiner machen, damit sie nicht alles sprengen */
+        .crm-action-cell .btn-primary {
+            padding: 2px 4px !important;
+            font-size: 8px !important;
+        }
+    }
+
     </style>
 </head>
 <body>
