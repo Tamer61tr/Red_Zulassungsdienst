@@ -1676,7 +1676,7 @@
             <div class="grid-container" id="servicesGridContainer"></div>
         </section>
 
-        <section id="termin" style="background: var(--glass-border); border-top:1px solid var(--glass-border); padding: 60px 5%;" class="editable-section">
+        <section id="termin" style="background: var(--glass-border); border-top:1px solid var(--glass-border); padding: 60px 5%; margin-top: 50px;" class="editable-section">
             <div class="section-edit-btn action-content" onclick="window.openContentEditor('termin')" style="right:5%; top:20px;"><i class="fa-solid fa-pencil"></i></div>
             <div class="section-header">
                 <h2 id="txt-termin-title">Termin Buchen</h2>
@@ -1884,27 +1884,35 @@
                 <option value="abyss">🌌 Abyss</option>
                 <option value="custom">🛠️ Custom (Eigenes Design)</option>
             </select>
-            <button class="btn-primary" style="padding: 6px 12px; font-size:10px;" onclick="window.openThemeEditor()">🎨 Design anpassen</button>
-        </div>
+            <button class="btn-primary" style="padding: 6px 12px; font-size:10px;" onclick="window.applySelectedTheme()">✔️ Anwenden</button>
+            <button class="btn-primary" style="padding: 6px 12px; font-size:10px; background: transparent; border: 1px solid var(--text-muted); color: var(--text-light);" onclick="window.resetCustomTheme()">Standard</button>
+            <button class="btn-primary" style="padding: 6px 12px; font-size:10px;" onclick="window.openThemeEditor()">🎨 Design anpassen</button> </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
     <script>
+        // Verhindert, dass JS-Prozesse das Scrollen auf Mobile blockieren
+        document.addEventListener('touchmove', (e) => { }, { passive: true });
+        document.addEventListener('touchstart', (e) => { }, { passive: true });
+
         window.changeTheme = async function(themeName, saveToFirebase = false) {
-    document.body.setAttribute('data-theme', themeName);
-    localStorage.setItem('red_theme', themeName);
-    
-    // Theme online speichern, wenn der Supervisor es ändert
-    if (saveToFirebase && window.isAuthorized) {
-        try {
-            await setDoc(doc(db, "settings", "global_theme"), { activeTheme: themeName });
-            window.showToast('Theme global für alle gespeichert!', 'success');
-        } catch (e) {
-            window.showToast('Konnte Theme online nicht speichern.', 'error');
-        }
-    }        
+            document.body.setAttribute('data-theme', themeName);
+            localStorage.setItem('red_theme', themeName);
+            
+            // Theme online speichern, wenn der Supervisor es ändert und es gewünscht ist
+            if (saveToFirebase && window.isAuthorized && window.firebaseSetDoc && window.firebaseDb) {
+                try {
+                    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "global_theme"), { activeTheme: themeName }, { merge: true });
+                    window.showToast('Theme global für alle gespeichert!', 'success');
+                } catch (e) {
+                    window.showToast('Konnte Theme online nicht speichern. (Fehlende Rechte?)', 'error');
+                }
+            }
+            
+            document.documentElement.style.cssText = '';
+            
             if (themeName === 'custom') {
                 const customTheme = JSON.parse(localStorage.getItem('red_custom_theme'));
                 if (customTheme) {
@@ -1912,6 +1920,13 @@
                         document.documentElement.style.setProperty(key, value);
                     }
                 }
+            }
+        };
+
+        window.applySelectedTheme = function() {
+            const selector = document.getElementById('themeSelector');
+            if(selector) {
+                window.changeTheme(selector.value, true);
             }
         };
 
@@ -1953,7 +1968,7 @@
 
             localStorage.setItem('red_custom_theme', JSON.stringify(customTheme));
             document.getElementById('themeSelector').value = 'custom';
-            window.changeTheme('custom');
+            window.changeTheme('custom', true);
             window.showToast('Eigenes Design erfolgreich angewendet!', 'success');
             window.closeThemeEditor();
         };
@@ -1962,21 +1977,19 @@
             localStorage.removeItem('red_custom_theme');
             document.documentElement.style.cssText = '';
             document.getElementById('themeSelector').value = 'dark';
-            window.changeTheme('dark');
+            window.changeTheme('dark', true);
             window.showToast('Auf Standard-Design (Dark) zurückgesetzt!', 'success');
             window.closeThemeEditor();
         };
 
         const savedTheme = localStorage.getItem('red_theme') || 'dark';
-        window.changeTheme(savedTheme);
+        window.changeTheme(savedTheme, false);
 
         document.addEventListener('DOMContentLoaded', () => {
             if(document.getElementById('themeSelector')) {
                 document.getElementById('themeSelector').value = savedTheme;
             }
         });
-
-        
 
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.onkeydown = function(e) {
@@ -2276,12 +2289,13 @@
             clients.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
             
             if(clients.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color:var(--text-muted);">Noch keine Kunden in der Datenbank erfasst.</td></tr>';
+                list.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color:var(--text-muted);">Noch keine Kunden in der Datenbank erfasst.</td></tr>';
                 return;
             }
             
             clients.forEach(c => {
                 let waLink = c.phone ? `https://wa.me/${c.phone.replace(/\D/g,'').replace(/^0/,'49')}` : '#';
+                let regDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString('de-DE') : '-';
                 
                 list.innerHTML += `
                     <tr>
@@ -2289,6 +2303,7 @@
                         <td style="font-weight:700;">${c.name || 'Unbekannt'}</td>
                         <td>${c.phone || '-'}</td>
                         <td>${c.email || '-'}</td>
+                        <td>${regDate}</td>
                         <td style="text-align:center;">${c.bookings || 1}</td>
                         <td class="crm-action-cell" style="white-space:nowrap;">
                             ${c.phone ? `
@@ -2298,6 +2313,46 @@
                             <button class="btn-primary" style="padding:4px 8px; background:transparent; border:1px solid #00ffff; color:#00ffff; font-size:11px;" onclick="window.openCRMDetail('${c.clientId}')" title="Akte bearbeiten"><i class="fa-solid fa-pen"></i></button>
                             <button class="btn-primary" style="padding:4px 8px; background:var(--primary-red); font-size:11px;" onclick="window.rebookClient('${c.clientId}')" title="Neuen Termin für diesen Kunden buchen"><i class="fa-solid fa-calendar-plus"></i></button>
                         </td>
+                    </tr>
+                `;
+            });
+        };
+
+        window.openCRMViewAll = function() {
+            document.getElementById('crmViewAllOverlay').classList.add('open');
+            window.renderCRMViewAll();
+        };
+
+        window.closeCRMViewAll = function() {
+            document.getElementById('crmViewAllOverlay').classList.remove('open');
+        };
+
+        window.renderCRMViewAll = function() {
+            const list = document.getElementById('crmViewAllList');
+            list.innerHTML = '';
+            
+            let clients = Object.values(window.crmClientsDetail || {});
+            clients.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+            
+            if(clients.length === 0) {
+                list.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 20px; color:var(--text-muted);">Noch keine Kunden erfasst.</td></tr>';
+                return;
+            }
+            
+            clients.forEach(c => {
+                let regDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString('de-DE') : '-';
+                list.innerHTML += `
+                    <tr>
+                        <td><span class="crm-badge">${c.clientId}</span></td>
+                        <td style="font-weight:700;">${c.name || '-'}</td>
+                        <td>${c.phone || '-'}</td>
+                        <td>${c.email || '-'}</td>
+                        <td>${c.birthday || '-'}</td>
+                        <td>${c.address || '-'}</td>
+                        <td>${c.city || '-'}</td>
+                        <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis;" title="${c.notes || ''}">${c.notes || '-'}</td>
+                        <td>${regDate}</td>
+                        <td style="text-align:center;">${c.bookings || 1}</td>
                     </tr>
                 `;
             });
@@ -2586,6 +2641,7 @@
                         if(this.id === 'serviceConfigOverlay') window.editingServiceId = null;
                         if(this.id === 'pageManagerOverlay') window.closePageManager();
                         if(this.id === 'themeEditorOverlay') window.closeThemeEditor();
+                        if(this.id === 'crmViewAllOverlay') window.closeCRMViewAll();
                     }
                 });
             });
@@ -2816,9 +2872,22 @@
         window.firebaseAddDoc = addDoc;
         window.firebaseUpdateDoc = updateDoc;
         window.firebaseDeleteDoc = deleteDoc;
+        window.firebaseSetDoc = setDoc;
 
         window.crmClientsDetail = JSON.parse(localStorage.getItem('red_crm_details') || '{}');
         
+        onSnapshot(doc(db, "settings", "global_theme"), (docSnap) => {
+            if (docSnap.exists()) {
+                const theme = docSnap.data().activeTheme;
+                if (localStorage.getItem('red_theme') !== theme) {
+                    window.changeTheme(theme, false);
+                    if (document.getElementById('themeSelector')) {
+                        document.getElementById('themeSelector').value = theme;
+                    }
+                }
+            }
+        });
+
         onSnapshot(doc(db, "settings", "crm_details"), (docSnap) => {
              if(docSnap.exists()) {
                  window.crmClientsDetail = docSnap.data().details || {};
@@ -2826,9 +2895,11 @@
                  if(document.getElementById('crmOverlay').classList.contains('open')) {
                      window.renderCRM();
                  }
+                 if(document.getElementById('crmViewAllOverlay').classList.contains('open')) {
+                     window.renderCRMViewAll();
+                 }
              }
         });
-        
 
         onSnapshot(collection(db, "custom_pages"), (snapshot) => {
             if (!snapshot.empty) {
@@ -2869,6 +2940,7 @@
             }
             window.closeCRMDetail();
             window.renderCRM();
+            if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
         };
 
         window.deleteCRMClient = async function() {
@@ -2883,6 +2955,7 @@
                 window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
                 window.closeCRMDetail();
                 window.renderCRM();
+                if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
             }
         };
 
@@ -3922,6 +3995,7 @@
                 localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
             }
             if(document.getElementById('crmOverlay').classList.contains('open')) window.renderCRM();
+            if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
         }
 
         window.executeBooking = async function(event) {
