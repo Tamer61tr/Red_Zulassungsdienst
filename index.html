@@ -3955,7 +3955,7 @@
                 service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
             };
 
-            addClientToCRM(n, p, e);
+            // Die abstürzende Zeile "addClientToCRM" wurde hier entfernt!
 
             try {
                 await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "appointments"), appointmentData);
@@ -3966,6 +3966,7 @@
             const webhookUrl = window.dynamicContactData?.webhook || "";
             if(webhookUrl.startsWith('https://')) {
                 try {
+                    // Sende die Daten an Make.com
                     await fetch(webhookUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -3975,7 +3976,7 @@
                         })
                     });
                 } catch(err) {
-                    console.error("Webhook konnte nicht erreicht werden.");
+                    console.error("Webhook konnte nicht erreicht werden.", err);
                 }
             }
             
