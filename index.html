@@ -1201,13 +1201,19 @@
     </div>
 
     <div class="custom-dialog-overlay" id="confirmModalOverlay">
-        <div class="custom-dialog-window">
-            <i class="fa-solid fa-circle-check" style="font-size:45px; color:#25D366; margin-bottom:15px;"></i>
-            <h3 style="color:var(--text-light); font-weight:900;" id="confirmModalTitle">Termin Reserviert!</h3>
-            <p style="color:var(--text-muted); font-size:13px; margin:10px 0 20px;" id="confirmModalText"></p>
-            <button class="btn-primary" style="background:#25D366; width:100%; justify-content:center;" onclick="window.closeCustomConfirm()">Schließen</button>
-        </div>
+    <div class="custom-dialog-window">
+        <i class="fa-solid fa-circle-check" style="font-size:45px; color:#25D366; margin-bottom:15px;"></i>
+        <h3 style="color:var(--text-light); font-weight:900;" id="confirmModalTitle">Termin Reserviert!</h3>
+        <p style="color:var(--text-muted); font-size:13px; margin:10px 0 20px;" id="confirmModalText"></p>
+        
+        <!-- HIER DEN HINWEIS EINFÜGEN -->
+        <p style="color:var(--text-muted); font-size: 11px; margin-bottom: 20px; font-style: italic;">
+            Tipp: Sollte unsere Bestätigungs-E-Mail nicht innerhalb von 5 Minuten erscheinen, prüfen Sie bitte Ihren Spam-Ordner und markieren Sie diese als "Kein Spam".
+        </p>
+
+        <button class="btn-primary" style="background:#25D366; width:100%; justify-content:center;" onclick="window.closeCustomConfirm()">Schließen</button>
     </div>
+</div>
 
     <div class="custom-dialog-overlay" id="deleteConfirmOverlay">
         <div class="custom-dialog-window">
@@ -1615,8 +1621,12 @@
                         <div class="time-slots" id="timeSlots"></div>
                     </div>
                     
-                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 25px; justify-content: center;" id="submitBtn" disabled>Termin absenden</button>
-                </form>
+                   <button type="submit" class="btn-primary" style="width: 100%; margin-top: 25px; justify-content: center;" id="submitBtn" disabled>Termin absenden</button>
+<!-- HINWEIS HIERUNTER -->
+<p style="color:var(--text-muted); font-size: 10px; margin-top: 10px; text-align: center;">
+    Hinweis: Bitte prüfen Sie bei Erhalt den Spam-Ordner.
+</p>
+  </form>
             </div>
         </section>
     </div>
@@ -3847,42 +3857,45 @@
             window.deleteNoteTargetId = null;
         };
 
-        window.confirmDelete= async function() {
-            if(window.deleteNoteTargetId) {
-                const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
-                if(index > -1) {
-                    localAppointments[index].notes = localAppointments[index].notes.filter(n => n.id !== window.deleteNoteTargetId.replace('note-',''));
-                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                    try { await updateDoc(doc(db, "appointments", window.deleteTargetId), { notes: localAppointments[index].notes }); } catch(err){}
-                    renderAppointments(localAppointments);
-                }
-                window.showToast('Notiz gelöscht.', 'success');
-            }
-            else if(window.deleteTargetId) {
-                const cardElement = document.getElementById(window.deleteTargetId);
-                const pinnedElement = document.getElementById('pinned-' + window.deleteTargetId);
-                if(cardElement) cardElement.remove();
-                if(pinnedElement) pinnedElement.remove();
+        window.confirmDelete = async function() {
+    if(window.deleteNoteTargetId) {
+        // Notiz-Lösch-Logik (unverändert)
+        const index = localAppointments.findIndex(a => a.id === window.deleteTargetId);
+        if(index > -1) {
+            localAppointments[index].notes = localAppointments[index].notes.filter(n => n.id !== window.deleteNoteTargetId.replace('note-',''));
+            localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+            try { await updateDoc(doc(db, "appointments", window.deleteTargetId), { notes: localAppointments[index].notes }); } catch(err){}
+            renderAppointments(localAppointments);
+        }
+        window.showToast('Notiz gelöscht.', 'success');
+    }
+    else if(window.deleteTargetId) {
+        // UI-FIX: Element sofort entfernen, ohne die ganze Liste zu zerschießen
+        const cardElement = document.getElementById(window.deleteTargetId);
+        const pinnedElement = document.getElementById('pinned-' + window.deleteTargetId);
+        if(cardElement) cardElement.remove();
+        if(pinnedElement) pinnedElement.remove();
 
-                try {
-                    await deleteDoc(doc(db, "appointments", window.deleteTargetId));
-                    
-                    let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
-                    if(positions[window.deleteTargetId]) {
-                        delete positions[window.deleteTargetId];
-                        localStorage.setItem('pin_positions', JSON.stringify(positions));
-                    }
-                    window.showToast('Termin gelöscht.', 'success');
-                } catch(e) {
-                    window.showToast('Lokal gelöscht.', 'success');
-                }
-                
-                localAppointments = localAppointments.filter(a => a.id !== window.deleteTargetId);
-                localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                renderAppointments(localAppointments);
+        try {
+            await deleteDoc(doc(db, "appointments", window.deleteTargetId));
+            
+            let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+            if(positions[window.deleteTargetId]) {
+                delete positions[window.deleteTargetId];
+                localStorage.setItem('pin_positions', JSON.stringify(positions));
             }
-            window.cancelDelete();
-        };
+            window.showToast('Termin gelöscht.', 'success');
+        } catch(e) {
+            window.showToast('Lokal gelöscht.', 'success');
+        }
+        
+        localAppointments = localAppointments.filter(a => a.id !== window.deleteTargetId);
+        localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+        // Wir rufen hier NICHT mehr renderAppointments(localAppointments) auf, 
+        // weil wir das Element ja schon manuell mit .remove() gelöscht haben!
+    }
+    window.cancelDelete();
+};
 
         async function addClientToCRM(name, phone, email) {
             let existingClientId = null;
