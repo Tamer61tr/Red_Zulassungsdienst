@@ -1913,7 +1913,17 @@
             leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true
         };
 
+        // --- NEU: Header anpassbar gemacht ---
         window.pageContentData = {
+            "header": {
+                "title_red": "RED",
+                "title_sub": "ZULASSUNGSDIENST",
+                "icon_car": "fa-car-side",
+                "txt_crm": "RED KUNDEN",
+                "icon_crm": "fa-database",
+                "txt_visitors": "Besuche:",
+                "icon_visitors": "fa-users"
+            },
             "hero": {
                 "badge": "Sofortkennzeichen zum Mitnehmen!",
                 "h1_1": "Schnell. Zuverlässig.",
@@ -1945,8 +1955,17 @@
 
         window.applyPageContent = function(data) {
             if(!data) return;
-            window.pageContentData = data;
+            window.pageContentData = Object.assign(window.pageContentData, data);
             
+            if(data.header) {
+                if(document.getElementById('txt-header-title-red')) document.getElementById('txt-header-title-red').innerText = data.header.title_red;
+                if(document.getElementById('txt-header-title-sub')) document.getElementById('txt-header-title-sub').innerText = data.header.title_sub;
+                if(document.getElementById('icon-header-car')) document.getElementById('icon-header-car').className = "fa-solid logo-car-svg " + data.header.icon_car;
+                if(document.getElementById('txt-header-crm')) document.getElementById('txt-header-crm').innerText = data.header.txt_crm;
+                if(document.getElementById('icon-header-crm')) document.getElementById('icon-header-crm').className = "fa-solid " + data.header.icon_crm;
+                if(document.getElementById('txt-header-visitors')) document.getElementById('txt-header-visitors').innerText = data.header.txt_visitors + " ";
+                if(document.getElementById('icon-header-visitors')) document.getElementById('icon-header-visitors').className = "fa-solid " + data.header.icon_visitors;
+            }
             if(data.hero) {
                 document.getElementById('txt-hero-badge').innerText = data.hero.badge;
                 document.getElementById('txt-hero-h1-1').innerText = data.hero.h1_1;
@@ -2624,11 +2643,10 @@
         window.showToast = function(msg, type='success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>';
             toast.className = `toast-msg toast-${type}`;
-            toast.innerHTML = `${icon} <span>${msg}</span>`;
+            toast.innerHTML = (type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>') + ` <span>${msg}</span>`;
             container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3800);
+            setTimeout(() => toast.remove(), 4000);
         };
 
         window.triggerLogoBubble = function(e) {
@@ -2843,20 +2861,31 @@
         };
 
         window.deleteCRMClient = async function() {
-            const clientId = document.getElementById('crmEditClientId').value;
-            if(confirm('Möchten Sie diese Akte (mitsamt aller Notizen & Basisdaten) wirklich löschen?')) {
-                delete window.crmClientsDetail[clientId];
-                try {
-                    await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
-                } catch(e) {
-                    localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
-                }
-                window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
-                window.closeCRMDetail();
-                window.renderCRM();
-                if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
+    const clientId = document.getElementById('crmEditClientId').value;
+    if(confirm('Möchten Sie diese Akte (mitsamt aller Notizen & Basisdaten) wirklich löschen?')) {
+        
+        // 1. Sofortiges visuelles Feedback (Optimistic UI Update)
+        delete window.crmClientsDetail[clientId];
+        
+        // 2. Datenbank Update
+        try {
+            await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
+        } catch(e) {
+            localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+        }
+
+        window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
+        window.closeCRMDetail();
+        
+        // 3. Kontrolliertes, verzögertes Rendern
+        setTimeout(() => {
+            window.renderCRM();
+            if(document.getElementById('crmViewAllOverlay').classList.contains('open')) {
+                window.renderCRMViewAll();
             }
-        };
+        }, 100); // 100ms Puffer für sauberes UI Rendering
+    }
+};
 
         window.sysAuth = {
             "Tamer Yazici": { pass: "616161", role: "admin" },
@@ -3672,6 +3701,18 @@
             if (!snapshot.empty) {
                 const fbApts = [];
                 snapshot.forEach((docSnap) => fbApts.push({ id: docSnap.id, ...docSnap.data() }));
+                
+                if (!isFirstLoadApts && window.isAuthorized) {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const newBooking = change.doc.data();
+                            window.showToast(`Neue Buchung: ${newBooking.name} (${newBooking.service})`, 'success');
+                            document.getElementById('adminKeyBtn').classList.add('new-alert');
+                        }
+                    });
+                }
+                isFirstLoadApts = false;
+
                 localStorage.setItem('red_local_apts', JSON.stringify(fbApts));
                 renderAppointments(fbApts);
             } else {
@@ -3681,7 +3722,7 @@
             renderAppointments(localAppointments);
         });
 
-        window.markApt = async function(id, newState) {
+                window.markApt = async function(id, newState) {
             try { 
                 await updateDoc(doc(db, "appointments", id), { marked: newState }); 
             } catch(e) { 
@@ -3898,6 +3939,7 @@
             if(document.getElementById('crmOverlay').classList.contains('open')) window.renderCRM();
         }
 
+        // --- BUCHUNGS-LOGIK MIT WEBHOOK FIX ---
         window.executeBooking = async function(event) {
             event.preventDefault();
             const n = document.getElementById('formName').value;
@@ -3906,15 +3948,13 @@
             const d = document.getElementById('datePicker').value;
             const btn = document.getElementById('submitBtn');
 
-            btn.innerText = 'Übermittle...';
-            
+            btn.innerText = 'Sende...';
+            btn.disabled = true;
+
             let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
-            if (!timeString.includes("Uhr") && timeString !== "Ganztägig") {
-                timeString += " Uhr";
-            }
+            if (!timeString.includes("Uhr")) timeString += " Uhr";
 
             const appointmentData = {
-                id: 'local-' + Date.now(),
                 name: n, phone: p, email: e, date: d, timeLabel: timeString,
                 service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
             };
@@ -3922,24 +3962,25 @@
             addClientToCRM(n, p, e);
 
             try {
-                const fbData = {...appointmentData}; delete fbData.id; 
-                await addDoc(collection(db, "appointments"), fbData);
+                await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "appointments"), appointmentData);
             } catch(err) {
-                localAppointments.unshift(appointmentData);
-                localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                renderAppointments(localAppointments);
+                console.error("Firebase Sync fehlgeschlagen, speichere lokal");
             }
-            
+
             const webhookUrl = window.dynamicContactData?.webhook || "";
-            if(webhookUrl && webhookUrl.includes("http")) {
-                fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        type: 'new_booking', clientName: n, clientPhone: p, clientEmail: e, 
-                        date: d, time: timeString, service: window.selectedServiceVal, adminEmail: window.dynamicContactData.email 
-                    })
-                }).catch(() => console.log('Webhook call executed.'));
+            if(webhookUrl.startsWith('https://')) {
+                try {
+                    await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            clientName: n, clientPhone: p, clientEmail: e, 
+                            date: d, time: timeString, service: window.selectedServiceVal
+                        })
+                    });
+                } catch(err) {
+                    console.error("Webhook konnte nicht erreicht werden.");
+                }
             }
             
             document.getElementById('confirmModalText').innerText = `Hallo ${n}, Ihr Termin am ${d} um ${timeString} wurde erfolgreich im System registriert.\n\nDie Bestätigungen wurden generiert und im Hintergrund versendet.`;
@@ -3947,14 +3988,11 @@
             
             document.getElementById('bookingForm').reset();
             document.getElementById('timeWrapper').style.display = 'none';
-            btn.disabled = true;
             btn.innerText = 'Termin absenden';
-            document.getElementById('selectTriggerText').innerText = "Zulassung (Neuanmeldung)";
-            window.selectedServiceVal = "Anmeldung";
-            window.chosenHour = null;
+            btn.disabled = false;
         };
 
-        const staticForms = [
+                const staticForms = [
             {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
             {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
             {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f350325-antrag_kurzzeitkennzeichen_2015.pdf'}, 
@@ -4200,6 +4238,33 @@
                 }
             }
         };
+
+        // --- GEFUNDEN UND HINZUGEFÜGT: TERMIN-LÖSCHFUNKTION ---
+        window.deleteAppointment = async function(id) {
+            if (confirm('Möchten Sie diesen Termin wirklich unwiderruflich aus dem System löschen?')) {
+                try {
+                    // 1. Aus Firebase Firestore löschen
+                    // Da onSnapshot aktiv ist, merkt das System das Löschen sofort 
+                    // und aktualisiert die Liste auf Handy & PC vollautomatisch ohne Flackern!
+                    await deleteDoc(doc(db, "appointments", id));
+                    window.showToast('Termin erfolgreich gelöscht!', 'success');
+                } catch (err) {
+                    console.error("Fehler beim Online-Löschen:", err);
+                    
+                    // 2. Lokaler Fallback (falls offline)
+                    let localApts = JSON.parse(localStorage.getItem('red_local_apts')) || [];
+                    localApts = localApts.filter(a => a.id !== id);
+                    localStorage.setItem('red_local_apts', JSON.stringify(localApts));
+                    
+                    // Nur im Offline-Fall müssen wir das UI manuell anstoßen
+                    if (typeof renderAppointments === "function") {
+                        renderAppointments(localApts);
+                    }
+                    window.showToast('Termin lokal entfernt.', 'success');
+                }
+            }
+        };
+        
     </script>
 </body>
 </html>
