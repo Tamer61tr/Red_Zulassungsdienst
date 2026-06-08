@@ -2861,31 +2861,27 @@
         };
 
         window.deleteCRMClient = async function() {
-    const clientId = document.getElementById('crmEditClientId').value;
-    if(confirm('Möchten Sie diese Akte (mitsamt aller Notizen & Basisdaten) wirklich löschen?')) {
-        
-        // 1. Sofortiges visuelles Feedback (Optimistic UI Update)
-        delete window.crmClientsDetail[clientId];
-        
-        // 2. Datenbank Update
-        try {
-            await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
-        } catch(e) {
-            localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
-        }
-
-        window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
-        window.closeCRMDetail();
-        
-        // 3. Kontrolliertes, verzögertes Rendern
-        setTimeout(() => {
-            window.renderCRM();
-            if(document.getElementById('crmViewAllOverlay').classList.contains('open')) {
-                window.renderCRMViewAll();
+            const clientId = document.getElementById('crmEditClientId').value;
+            if(confirm('Möchten Sie diese Akte (mitsamt aller Notizen & Basisdaten) wirklich löschen?')) {
+                
+                // 1. Kunde lokal aus der Liste werfen
+                delete window.crmClientsDetail[clientId];
+                
+                try {
+                    // 2. WICHTIG: Kein {merge: true} mehr! 
+                    // Überschreibt die alte Datenbank-Liste radikal mit der neuen, bereinigten Liste.
+                    await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail });
+                    window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
+                } catch(e) {
+                    localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+                    window.showToast('Nur lokal gelöscht (Verbindungsfehler).', 'success');
+                }
+                
+                window.closeCRMDetail();
+                window.renderCRM();
+                if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
             }
-        }, 100); // 100ms Puffer für sauberes UI Rendering
-    }
-};
+        };
 
         window.sysAuth = {
             "Tamer Yazici": { pass: "616161", role: "admin" },
@@ -4264,7 +4260,7 @@
                 }
             }
         };
-        
+
     </script>
 </body>
 </html>
