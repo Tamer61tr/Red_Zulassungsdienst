@@ -4119,29 +4119,71 @@
             }
         };
 
-        window.openForm = function(iconEl) {
-            const url = iconEl.closest('.download-item').getAttribute('data-url');
-            if(url && url !== '#') {
-                window.open(url, '_blank');
-            } else {
-                window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
-            }
-        };
+        // --- HILFSFUNKTION: Base64 Text wieder in eine echte Datei (Blob) umwandeln ---
+function dataURItoBlob(dataURI) {
+    var byteString = atob(dataURI.split(',')[1]);
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], {type: mimeString});
+}
 
-        window.downloadForm = function(iconEl) { 
-            const url = iconEl.closest('.download-item').getAttribute('data-url');
-            if(url && url !== '#') {
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = ''; 
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.showToast('Download gestartet...', 'success');
-            } else {
-                window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+// --- GEFIXTE ANSEHEN-FUNKTION ---
+window.openForm = function(iconEl) {
+    const url = iconEl.closest('.download-item').getAttribute('data-url');
+    if(url && url !== '#') {
+        if (url.startsWith('data:')) {
+            // Wenn es ein hochgeladenes Base64 Dokument ist
+            const blob = dataURItoBlob(url);
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank');
+        } else {
+            // Wenn es ein normaler https:// Link ist (wie bei den Standard-Formularen)
+            window.open(url, '_blank');
+        }
+    } else {
+        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+    }
+};
+
+// --- GEFIXTE DOWNLOAD-FUNKTION ---
+window.downloadForm = function(iconEl) { 
+    const url = iconEl.closest('.download-item').getAttribute('data-url');
+    const title = iconEl.closest('.download-item').querySelector('span').innerText || 'Formular';
+    
+    if(url && url !== '#') {
+        let downloadUrl = url;
+        let extension = '.pdf'; // Standardmäßig PDF
+        
+        if (url.startsWith('data:')) {
+            // Base64 in echtes Datei-Objekt wandeln
+            const blob = dataURItoBlob(url);
+            downloadUrl = URL.createObjectURL(blob);
+            
+            // Checken ob es ein Word-Dokument ist
+            if(url.includes('application/msword') || url.includes('wordprocessingml')) {
+                extension = '.docx';
             }
-        };
+        } else {
+            if(url.endsWith('.doc')) extension = '.doc';
+            if(url.endsWith('.docx')) extension = '.docx';
+        }
+
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        // Dateiname aus dem Titel generieren (Leerzeichen durch Unterstriche ersetzen)
+        a.download = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + extension; 
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.showToast('Download gestartet...', 'success');
+    } else {
+        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+    }
+};
 
         window.selectForm = function(element) {
             document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
