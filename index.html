@@ -4125,8 +4125,8 @@ function dataURItoBlob(dataURI) {
     var byteString = atob(dataURI.split(',')[1]);
     var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
     
-    // Wenn der Browser den Typ nicht erkennt, zwingen wir ihn, es als PDF zu behandeln
-    if (!mimeString || mimeString === 'application/octet-stream' || mimeString === '') {
+    // Zwingend als PDF behandeln, wenn der Browser unsicher ist
+    if (!mimeString || mimeString.includes('octet-stream') || mimeString === '') {
         mimeString = 'application/pdf';
     }
     
@@ -4138,7 +4138,7 @@ function dataURItoBlob(dataURI) {
     return new Blob([ab], {type: mimeString});
 }
 
-// --- GEFIXTE ANSEHEN-FUNKTION (Mit Iframe-Trick gegen Zwangs-Downloads) ---
+// --- GEFIXTE ANSEHEN-FUNKTION (Mit <embed> und document.close() für echte Vorschau) ---
 window.openForm = function(iconEl) {
     const url = iconEl.closest('.download-item').getAttribute('data-url');
     if(url && url !== '#') {
@@ -4151,13 +4151,21 @@ window.openForm = function(iconEl) {
             const blob = dataURItoBlob(url);
             const blobUrl = URL.createObjectURL(blob);
             
-            // Iframe erzwingt den PDF-Viewer im neuen Tab, anstatt die Datei herunterzuladen
             const newWin = window.open('', '_blank');
             if (newWin) {
-                newWin.document.write(`<html style="margin:0;padding:0;"><body style="margin:0;padding:0;overflow:hidden;"><iframe src="${blobUrl}" width="100%" height="100%" style="border:none;"></iframe></body></html>`);
-                newWin.document.title = "Dokument ansehen";
+                // Nutzung von <embed> erzwingt in den meisten Browsern den internen PDF-Viewer
+                newWin.document.write(`
+                    <html style="margin:0;padding:0;height:100%;">
+                        <head><title>Dokument Vorschau</title></head>
+                        <body style="margin:0;padding:0;height:100%;overflow:hidden;background-color:#333;">
+                            <embed src="${blobUrl}" type="application/pdf" width="100%" height="100%" style="border:none;">
+                        </body>
+                    </html>
+                `);
+                // WICHTIG: Dokument schließen, damit der Browser aufhört zu laden und das PDF anzeigt!
+                newWin.document.close(); 
             } else {
-                window.open(blobUrl, '_blank'); // Fallback für Popup-Blocker
+                window.open(blobUrl, '_blank');
             }
         } else {
             window.open(url, '_blank');
@@ -4167,7 +4175,7 @@ window.openForm = function(iconEl) {
     }
 };
 
-// --- GEFIXTE DOWNLOAD-FUNKTION (Mit sauberer Dateiendung) ---
+// --- DOWNLOAD-FUNKTION (Unverändert, da sie funktioniert) ---
 window.downloadForm = function(iconEl) { 
     const url = iconEl.closest('.download-item').getAttribute('data-url');
     const title = iconEl.closest('.download-item').querySelector('span').innerText || 'Formular';
