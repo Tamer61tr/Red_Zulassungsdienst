@@ -4034,11 +4034,11 @@
                 element.className = 'download-item';
                 element.id = form.id;
                 element.setAttribute('data-url', form.url);
-                element.setAttribute('onclick', 'window.selectForm(this)');
                 
                 element.innerHTML = `
                     <div class="download-info"><i class="fa-solid fa-file-pdf"></i><span title="${form.title}">${form.title}</span></div>
                     <div class="download-actions">
+                        <i class="fa-solid fa-link action-forms" title="Externen Link einfügen" onclick="event.stopPropagation(); window.triggerAdminLinkUpdate(this, '${form.id}')"></i>
                         <i class="fa-solid fa-upload action-forms" title="Datei hochladen/ersetzen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
                         <i class="fa-solid fa-trash-can action-forms" title="Formular löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
                         <i class="fa-solid fa-eye user-view" title="Ansehen / Öffnen" onclick="event.stopPropagation(); window.openForm(this)"></i>
@@ -4119,118 +4119,137 @@
             }
         };
 
-        // --- HILFSFUNKTION: Base64 Text wieder in eine echte Datei (Blob) umwandeln ---
 // --- 1. HILFSFUNKTION: Base64 zu echtem PDF-Dokument (Blob) ---
-function dataURItoBlob(dataURI) {
-    const splitData = dataURI.split(',');
-    const byteString = atob(splitData[1]);
-    
-    // Garantiert 'application/pdf', damit Desktop-Browser den PDF-Viewer mit Formular-Funktion starten!
-    let mimeString = splitData[0].split(':')[1].split(';')[0];
-    if (!mimeString || mimeString === '' || mimeString.includes('octet-stream')) {
-        mimeString = 'application/pdf';
-    }
-    
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], {type: mimeString});
-}
-
-// --- 2. GEFIXTE ANSEHEN-FUNKTION (Für digitale Beschriftung & Drucken im Browser) ---
-window.openForm = function(iconEl) {
-    const item = iconEl.closest('.download-item');
-    const url = item.getAttribute('data-url');
-    
-    if (!url || url === '#') {
-        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
-        return;
-    }
-
-    if (url.includes('msword') || url.includes('wordprocessingml') || url.endsWith('.docx') || url.endsWith('.doc')) {
-        window.showToast('Word-Dokumente bitte über den Download-Button herunterladen.', 'error');
-        return;
-    }
-    
-    try {
-        let viewUrl = url;
-        
-        // Wenn es eine von Ihnen hochgeladene Datei (Base64) ist
-        if (url.startsWith('data:')) {
-            const blob = dataURItoBlob(url);
-            viewUrl = URL.createObjectURL(blob);
-        }
-
-        // Öffnet die PDF im nativen Browser-Viewer (erlaubt digitales Ausfüllen & Drucken)
-        const newTab = window.open(viewUrl, '_blank');
-        
-        if (!newTab) {
-            window.showToast('Pop-ups blockiert! Bitte erlauben, um die Vorschau zu sehen.', 'error');
-        } else {
-            window.showToast('Dokument geöffnet. Sie können es jetzt ausfüllen und drucken!', 'success');
-        }
-    } catch (error) {
-        console.error("Vorschau Fehler:", error);
-        window.showToast('Fehler bei der Vorschau. Bitte stattdessen herunterladen.', 'error');
-    }
-};
-
-// --- 3. SEPARATE DOWNLOAD-FUNKTION (Erzwingt reinen, unabhängigen Download) ---
-window.downloadForm = function(iconEl) { 
-    const item = iconEl.closest('.download-item');
-    const url = item.getAttribute('data-url');
-    const title = item.querySelector('span').innerText || 'RED_Formular';
-    
-    if (!url || url === '#') {
-        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
-        return;
-    }
-
-    try {
-        let downloadUrl = url;
-        let extension = '.pdf';
-        
-        if (url.startsWith('data:')) {
-            const blob = dataURItoBlob(url);
+        function dataURItoBlob(dataURI) {
+            const splitData = dataURI.split(',');
+            const byteString = atob(splitData[1]);
             
-            // WICHTIGER FIX: Für den reinen Download zwingen wir den Browser auf "octet-stream". 
-            // So weiß der Browser: "Nicht öffnen, sondern direkt als Datei speichern!"
-            const downloadBlob = new Blob([blob], {type: "application/octet-stream"});
-            downloadUrl = URL.createObjectURL(downloadBlob);
-            
-            if (url.includes('msword') || url.includes('wordprocessingml')) {
-                extension = '.docx';
+            let mimeString = splitData[0].split(':')[1].split(';')[0];
+            if (!mimeString || mimeString === '' || mimeString.includes('octet-stream')) {
+                mimeString = 'application/pdf';
             }
-        } else {
-            if (url.endsWith('.doc')) extension = '.doc';
-            if (url.endsWith('.docx')) extension = '.docx';
+            
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], {type: mimeString});
         }
 
-        // Unsichtbares Element erstellen, um den Download anzustoßen
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = downloadUrl;
-        
-        // Säubert den Dateinamen (ersetzt Leerzeichen durch Unterstriche)
-        a.download = title.replace(/[^a-z0-9äöüß]/gi, '_').toLowerCase() + extension; 
-        
-        document.body.appendChild(a);
-        a.click();
-        
-        // Speicher nach dem Download direkt wieder freigeben (sehr wichtig für Performance)
-        setTimeout(() => {
-            document.body.removeChild(a);
-            if (downloadUrl.startsWith('blob:')) URL.revokeObjectURL(downloadUrl);
-        }, 100);
-        
-        window.showToast('Download erfolgreich gestartet!', 'success');
-    } catch (error) {
-        console.error("Download Fehler:", error);
-        window.showToast('Fehler beim Download.', 'error');
-    }
-};
+        // --- 2. ANSEHEN-FUNKTION (Auge / Vorschau) ---
+        window.openForm = function(iconEl) {
+            const item = iconEl.closest('.download-item');
+            const url = item.getAttribute('data-url');
+            
+            if (!url || url === '#') {
+                window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+                return;
+            }
+
+            if (url.includes('msword') || url.includes('wordprocessingml') || url.endsWith('.docx') || url.endsWith('.doc')) {
+                window.showToast('Word-Dokumente bitte über den Download-Button herunterladen.', 'error');
+                return;
+            }
+            
+            try {
+                let viewUrl = url;
+                
+                if (url.startsWith('data:')) {
+                    const blob = dataURItoBlob(url);
+                    viewUrl = URL.createObjectURL(blob);
+                }
+
+                const newTab = window.open(viewUrl, '_blank');
+                
+                if (!newTab) {
+                    window.showToast('Pop-ups blockiert! Bitte erlauben.', 'error');
+                } else {
+                    window.showToast('Dokument geöffnet.', 'success');
+                }
+            } catch (error) {
+                window.showToast('Fehler bei der Vorschau.', 'error');
+            }
+        };
+
+        // --- 3. DOWNLOAD-FUNKTION (Pfeil nach unten) ---
+        window.downloadForm = function(iconEl) { 
+            const item = iconEl.closest('.download-item');
+            const url = item.getAttribute('data-url');
+            const title = item.querySelector('span').innerText || 'RED_Formular';
+            
+            if (!url || url === '#') {
+                window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+                return;
+            }
+
+            try {
+                let downloadUrl = url;
+                let extension = '.pdf';
+                
+                if (url.startsWith('data:')) {
+                    const blob = dataURItoBlob(url);
+                    const downloadBlob = new Blob([blob], {type: "application/octet-stream"});
+                    downloadUrl = URL.createObjectURL(downloadBlob);
+                    
+                    if (url.includes('msword') || url.includes('wordprocessingml')) {
+                        extension = '.docx';
+                    }
+                } else {
+                    if (url.endsWith('.doc')) extension = '.doc';
+                    if (url.endsWith('.docx')) extension = '.docx';
+                }
+
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadUrl;
+                a.download = title.replace(/[^a-z0-9äöüß]/gi, '_').toLowerCase() + extension; 
+                
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    if (downloadUrl.startsWith('blob:')) URL.revokeObjectURL(downloadUrl);
+                }, 100);
+                
+                window.showToast('Download erfolgreich gestartet!', 'success');
+            } catch (error) {
+                window.showToast('Fehler beim Download.', 'error');
+            }
+        };
+
+        // --- 4. NEUE FUNKTION: EXTERNEN LINK EINFÜGEN (Link-Symbol) ---
+        window.triggerAdminLinkUpdate = async function(iconEl, formId) {
+            const newUrl = prompt('Bitte den neuen Link für dieses Formular eingeben (z.B. https://...):');
+            
+            if (newUrl !== null && newUrl.trim() !== '') {
+                try {
+                    // Firebase Update
+                    if (window.firebaseDb) {
+                        await window.firebaseUpdateDoc(window.firebaseDoc(window.firebaseDb, "forms", formId), { url: newUrl.trim() });
+                    }
+                    
+                    // DOM Update
+                    const item = document.getElementById(formId);
+                    if(item) item.setAttribute('data-url', newUrl.trim());
+                    
+                    window.showToast('Link erfolgreich aktualisiert!', 'success');
+                } catch (e) {
+                    // Fallback
+                    const item = document.getElementById(formId);
+                    if(item) item.setAttribute('data-url', newUrl.trim());
+                    
+                    let localForms = JSON.parse(localStorage.getItem('red_local_forms')) || [];
+                    const index = localForms.findIndex(f => f.id === formId);
+                    if (index > -1) {
+                        localForms[index].url = newUrl.trim();
+                        localStorage.setItem('red_local_forms', JSON.stringify(localForms));
+                    }
+                    window.showToast('Lokaler Link aktualisiert.', 'success');
+                }
+            }
+        };
 
         window.selectForm = function(element) {
             document.querySelectorAll('.download-item').forEach(el => el.classList.remove('selected'));
