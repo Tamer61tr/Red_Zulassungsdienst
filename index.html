@@ -4120,90 +4120,115 @@
         };
 
         // --- HILFSFUNKTION: Base64 Text wieder in eine echte Datei (Blob) umwandeln ---
-// --- HILFSFUNKTION: Base64 Text wieder in eine echte Datei (Blob) umwandeln ---
+// --- 1. HILFSFUNKTION: Base64 zu echtem PDF-Dokument (Blob) ---
 function dataURItoBlob(dataURI) {
-    var byteString = atob(dataURI.split(',')[1]);
-    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const splitData = dataURI.split(',');
+    const byteString = atob(splitData[1]);
     
-    // Zwingend als PDF behandeln, wenn der Browser unsicher ist (wichtig gegen Auto-Download)
-    if (!mimeString || mimeString.includes('octet-stream') || mimeString === '') {
+    // Garantiert 'application/pdf', damit Desktop-Browser den PDF-Viewer mit Formular-Funktion starten!
+    let mimeString = splitData[0].split(':')[1].split(';')[0];
+    if (!mimeString || mimeString === '' || mimeString.includes('octet-stream')) {
         mimeString = 'application/pdf';
     }
     
-    var ab = new ArrayBuffer(byteString.length);
-    var ia = new Uint8Array(ab);
-    for (var i = 0; i < byteString.length; i++) {
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
         ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ab], {type: mimeString});
 }
 
-// --- GEFIXTE ANSEHEN-FUNKTION (Mit <embed> und document.close() für echte Vorschau) ---
+// --- 2. GEFIXTE ANSEHEN-FUNKTION (Für digitale Beschriftung & Drucken im Browser) ---
 window.openForm = function(iconEl) {
-    const url = iconEl.closest('.download-item').getAttribute('data-url');
-    if(url && url !== '#') {
-        if(url.includes('application/msword') || url.includes('wordprocessingml') || url.endsWith('.docx') || url.endsWith('.doc')) {
-            window.showToast('Word-Dokumente können im Browser nicht angesehen, sondern nur heruntergeladen werden.', 'error');
-            return;
-        }
+    const item = iconEl.closest('.download-item');
+    const url = item.getAttribute('data-url');
+    
+    if (!url || url === '#') {
+        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+        return;
+    }
+
+    if (url.includes('msword') || url.includes('wordprocessingml') || url.endsWith('.docx') || url.endsWith('.doc')) {
+        window.showToast('Word-Dokumente bitte über den Download-Button herunterladen.', 'error');
+        return;
+    }
+    
+    try {
+        let viewUrl = url;
         
+        // Wenn es eine von Ihnen hochgeladene Datei (Base64) ist
         if (url.startsWith('data:')) {
             const blob = dataURItoBlob(url);
-            const blobUrl = URL.createObjectURL(blob);
-            
-            const newWin = window.open('', '_blank');
-            if (newWin) {
-                // Nutzung von <embed> erzwingt in den meisten Browsern den internen PDF-Viewer
-                newWin.document.write(`
-                    <html style="margin:0;padding:0;height:100%;">
-                        <head><title>Dokument Vorschau</title></head>
-                        <body style="margin:0;padding:0;height:100%;overflow:hidden;background-color:#333;">
-                            <embed src="${blobUrl}" type="application/pdf" width="100%" height="100%" style="border:none;">
-                        </body>
-                    </html>
-                `);
-                // WICHTIG: Dokument schließen, damit der Browser aufhört zu laden und das PDF anzeigt!
-                newWin.document.close(); 
-            } else {
-                window.open(blobUrl, '_blank');
-            }
-        } else {
-            window.open(url, '_blank');
+            viewUrl = URL.createObjectURL(blob);
         }
-    } else {
-        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+
+        // Öffnet die PDF im nativen Browser-Viewer (erlaubt digitales Ausfüllen & Drucken)
+        const newTab = window.open(viewUrl, '_blank');
+        
+        if (!newTab) {
+            window.showToast('Pop-ups blockiert! Bitte erlauben, um die Vorschau zu sehen.', 'error');
+        } else {
+            window.showToast('Dokument geöffnet. Sie können es jetzt ausfüllen und drucken!', 'success');
+        }
+    } catch (error) {
+        console.error("Vorschau Fehler:", error);
+        window.showToast('Fehler bei der Vorschau. Bitte stattdessen herunterladen.', 'error');
     }
 };
 
-// --- GEFIXTE DOWNLOAD-FUNKTION ---
+// --- 3. SEPARATE DOWNLOAD-FUNKTION (Erzwingt reinen, unabhängigen Download) ---
 window.downloadForm = function(iconEl) { 
-    const url = iconEl.closest('.download-item').getAttribute('data-url');
-    const title = iconEl.closest('.download-item').querySelector('span').innerText || 'Formular';
+    const item = iconEl.closest('.download-item');
+    const url = item.getAttribute('data-url');
+    const title = item.querySelector('span').innerText || 'RED_Formular';
     
-    if(url && url !== '#') {
+    if (!url || url === '#') {
+        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+        return;
+    }
+
+    try {
         let downloadUrl = url;
         let extension = '.pdf';
         
         if (url.startsWith('data:')) {
             const blob = dataURItoBlob(url);
-            downloadUrl = URL.createObjectURL(blob);
-            if(url.includes('application/msword') || url.includes('wordprocessingml')) {
+            
+            // WICHTIGER FIX: Für den reinen Download zwingen wir den Browser auf "octet-stream". 
+            // So weiß der Browser: "Nicht öffnen, sondern direkt als Datei speichern!"
+            const downloadBlob = new Blob([blob], {type: "application/octet-stream"});
+            downloadUrl = URL.createObjectURL(downloadBlob);
+            
+            if (url.includes('msword') || url.includes('wordprocessingml')) {
                 extension = '.docx';
             }
         } else {
-            if(url.endsWith('.doc')) extension = '.doc';
-            if(url.endsWith('.docx')) extension = '.docx';
+            if (url.endsWith('.doc')) extension = '.doc';
+            if (url.endsWith('.docx')) extension = '.docx';
         }
 
+        // Unsichtbares Element erstellen, um den Download anzustoßen
         const a = document.createElement('a');
+        a.style.display = 'none';
         a.href = downloadUrl;
-        a.download = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + extension; 
+        
+        // Säubert den Dateinamen (ersetzt Leerzeichen durch Unterstriche)
+        a.download = title.replace(/[^a-z0-9äöüß]/gi, '_').toLowerCase() + extension; 
+        
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
-        window.showToast('Download gestartet...', 'success');
-    } else {
-        window.showToast('Dieses Formular ist noch nicht verlinkt.', 'error');
+        
+        // Speicher nach dem Download direkt wieder freigeben (sehr wichtig für Performance)
+        setTimeout(() => {
+            document.body.removeChild(a);
+            if (downloadUrl.startsWith('blob:')) URL.revokeObjectURL(downloadUrl);
+        }, 100);
+        
+        window.showToast('Download erfolgreich gestartet!', 'success');
+    } catch (error) {
+        console.error("Download Fehler:", error);
+        window.showToast('Fehler beim Download.', 'error');
     }
 };
 
