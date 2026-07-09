@@ -3950,6 +3950,7 @@
 
         // --- BUCHUNGS-LOGIK MIT WEBHOOK FIX ---
         // --- BUCHUNGS-LOGIK: FIX FÜR CRM UND WEBHOOK ---
+// --- BUCHUNGS-LOGIK: FIX FÜR CRM UND GOOGLE APPS SCRIPT WEBHOOK ---
         window.executeBooking = async function(event) {
             event.preventDefault();
             const n = document.getElementById('formName').value;
@@ -3961,7 +3962,7 @@
             btn.innerText = 'Sende...';
             btn.disabled = true;
 
-            // 1. WICHTIG: Kunden hier wieder in die RED-Kundendatenbank aufnehmen!
+            // 1. Kunde in die RED-Kundendatenbank aufnehmen
             await addClientToCRM(n, p, e);
 
             let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
@@ -3976,23 +3977,32 @@
             try {
                 await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "appointments"), appointmentData);
             } catch(err) {
-                console.error("Firebase Sync fehlgeschlagen, speichere lokal");
+                console.error("Firebase Sync fehlgeschlagen.");
             }
 
-            // 3. Webhook an Make.com senden
+            // 3. Webhook an Google Apps Script senden (GEFIXT FÜR GOOGLE)
             const webhookUrl = window.dynamicContactData?.webhook || "";
-            if(webhookUrl.startsWith('https://')) {
+            if(webhookUrl.startsWith('https://script.google.com') || webhookUrl.startsWith('https://')) {
                 try {
                     await fetch(webhookUrl, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        mode: 'no-cors', // WICHTIG: Verhindert den CORS-Crash bei Google
+                        headers: { 
+                            'Content-Type': 'text/plain;charset=utf-8' // WICHTIG: Google mag kein application/json von fremden Quellen
+                        },
                         body: JSON.stringify({
-                            clientName: n, clientPhone: p, clientEmail: e, 
-                            date: d, time: timeString, service: window.selectedServiceVal
+                            type: 'new_booking',
+                            clientName: n, 
+                            clientPhone: p, 
+                            clientEmail: e, 
+                            date: d, 
+                            time: timeString, 
+                            service: window.selectedServiceVal,
+                            adminEmail: window.dynamicContactData?.email || "Redzulassungsdienst@gmail.com"
                         })
                     });
                 } catch(err) {
-                    console.error("Webhook konnte nicht erreicht werden.", err);
+                    console.error("Webhook Fehler:", err);
                 }
             }
             
