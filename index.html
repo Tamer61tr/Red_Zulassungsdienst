@@ -2478,52 +2478,86 @@
 
             window.closeLegal = function() { document.getElementById('legalOverlay').classList.remove('open'); };
 
-            window.openWidgetModal = function(type) {
-                const title = document.getElementById('widgetModalTitle');
-                const content = document.getElementById('widgetModalContent');
-                
-                if(type === 'time') {
-                    title.innerHTML = '<i class="fa-regular fa-clock"></i> Datum & Uhrzeit';
-                    const renderTimeModal = () => {
-                        const now = new Date();
-                        const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        const dateStr = now.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-                        content.innerHTML = `
-                            <div style="font-size: 40px; font-weight: 900; color: var(--primary-red); margin-bottom: 10px;">${timeStr}</div>
-                            <div style="font-size: 16px; font-weight: 600; color: var(--text-light);">${dateStr}</div>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">Zeitzone: Mitteleuropäische Zeit (Berlin)</div>
-                        `;
-                    };
-                    renderTimeModal();
-                    window.modalClockInterval = setInterval(renderTimeModal, 1000); 
-                } else if (type === 'weather') {
-                    title.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> Live Wetter Berlin';
-                    if(window.currentWeatherData) {
-                        const temp = Math.round(window.currentWeatherData.temperature);
-                        const wind = window.currentWeatherData.windspeed;
-                        let icon = '<i class="fa-solid fa-cloud-sun" style="font-size:50px; color:#ccc;"></i>';
-                        if(temp > 22) icon = '<i class="fa-solid fa-sun" style="font-size:50px; color:#ffcc00;"></i>';
-                        if(temp < 5) icon = '<i class="fa-solid fa-snowflake" style="font-size:50px; color:#00ffff;"></i>';
-                        
-                        content.innerHTML = `
-                            <div style="margin-bottom: 15px;">${icon}</div>
-                            <div style="font-size: 35px; font-weight: 900; color: var(--text-light);">${temp} °C</div>
-                            <div style="font-size: 14px; font-weight: 600; color: var(--text-muted); margin-top: 10px;">Windgeschwindigkeit: ${wind} km/h</div>
-                        `;
-                    } else {
-                        content.innerHTML = '<p>Wetterdaten offline.</p>';
-                    }
-                } else if (type === 'visitors') {
-                    title.innerHTML = '<i class="fa-solid fa-chart-line"></i> System-Status';
-                    const v = document.getElementById('vCount').innerText;
+           window.openWidgetModal = function(type) {
+            const title = document.getElementById('widgetModalTitle');
+            const content = document.getElementById('widgetModalContent');
+            
+            if(type === 'time') {
+                title.innerHTML = '<i class="fa-regular fa-clock"></i> Datum & Uhrzeit';
+                const renderTimeModal = () => {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    const dateStr = now.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
                     content.innerHTML = `
-                        <div style="font-size: 30px; font-weight: 900; color: #25D366; margin-bottom: 10px;">${v}</div>
-                        <div style="font-size: 14px; font-weight: 600; color: var(--text-light); margin-bottom: 20px;">Verifizierte Seitenaufrufe</div>
-                        <div class="visitor-heart">❤️</div>
+                        <div style="font-size: 40px; font-weight: 900; color: var(--primary-red); margin-bottom: 10px;">${timeStr}</div>
+                        <div style="font-size: 16px; font-weight: 600; color: var(--text-light);">${dateStr}</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">Zeitzone: Mitteleuropäische Zeit (Berlin)</div>
+                    `;
+                };
+                renderTimeModal();
+                window.modalClockInterval = setInterval(renderTimeModal, 1000); 
+            } else if (type === 'weather') {
+                title.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> Live Wetter Berlin';
+                if(window.currentWeatherData) {
+                    const temp = Math.round(window.currentWeatherData.temperature);
+                    const wind = window.currentWeatherData.windspeed;
+                    let icon = '<i class="fa-solid fa-cloud-sun" style="font-size:50px; color:#ccc;"></i>';
+                    if(temp > 22) icon = '<i class="fa-solid fa-sun" style="font-size:50px; color:#ffcc00;"></i>';
+                    if(temp < 5) icon = '<i class="fa-solid fa-snowflake" style="font-size:50px; color:#00ffff;"></i>';
+                    
+                    content.innerHTML = `
+                        <div style="margin-bottom: 15px;">${icon}</div>
+                        <div style="font-size: 35px; font-weight: 900; color: var(--text-light);">${temp} °C</div>
+                        <div style="font-size: 14px; font-weight: 600; color: var(--text-muted); margin-top: 10px;">Windgeschwindigkeit: ${wind} km/h</div>
+                    `;
+                } else {
+                    content.innerHTML = '<p>Wetterdaten offline.</p>';
+                }
+            } else if (type === 'visitors') {
+                title.innerHTML = '<i class="fa-solid fa-chart-line"></i> System-Status';
+                const v = document.getElementById('vCount').innerText;
+                
+                // NEU: Der geheime Admin-Button, um den Zähler direkt zu korrigieren
+                let adminBtnHtml = '';
+                if(window.isAuthorized) {
+                    adminBtnHtml = `
+                        <div style="border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 20px;">
+                            <button class="btn-primary" style="background:#ff9500; color:#000; width:100%; justify-content:center;" onclick="window.setCustomVisitorCount()"><i class="fa-solid fa-pen"></i> Zählerstand korrigieren</button>
+                        </div>
                     `;
                 }
-                document.getElementById('widgetModalOverlay').classList.add('open');
-            };
+
+                content.innerHTML = `
+                    <div style="font-size: 30px; font-weight: 900; color: #25D366; margin-bottom: 10px;">${v}</div>
+                    <div style="font-size: 14px; font-weight: 600; color: var(--text-light); margin-bottom: 20px;">Verifizierte Seitenaufrufe</div>
+                    <div class="visitor-heart">❤️</div>
+                    ${adminBtnHtml}
+                `;
+            }
+            document.getElementById('widgetModalOverlay').classList.add('open');
+        };
+
+        // --- NEUE FUNKTION: Überschreibt den Zähler absolut sicher über das Skript ---
+        window.setCustomVisitorCount = async function() {
+            const newCount = prompt("Bitte den neuen Zählerstand eingeben (z.B. 744):");
+            
+            if(newCount !== null && newCount.trim() !== "" && !isNaN(newCount)) {
+                const parsedCount = parseInt(newCount, 10);
+                
+                if(window.firebaseDb) {
+                    try {
+                        // Sendet die korrekte, garantierte Zahl (Type: Number) an Firebase
+                        await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "visitors"), { count: parsedCount });
+                        window.showToast("Zählerstand erfolgreich auf " + parsedCount + " korrigiert!", "success");
+                        window.closeWidgetModal();
+                    } catch(e) {
+                        window.showToast("Fehler beim Speichern in der Datenbank.", "error");
+                    }
+                }
+            } else {
+                window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
+            }
+        };
 
             window.closeWidgetModal = function() {
                 if(window.modalClockInterval) clearInterval(window.modalClockInterval);
