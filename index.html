@@ -2517,12 +2517,16 @@
                 title.innerHTML = '<i class="fa-solid fa-chart-line"></i> System-Status';
                 const v = document.getElementById('vCount').innerText;
                 
-                // HIER FEHLTE DER BUTTON! Jetzt ist er für Admins sichtbar.
+                // NEU: Ein modernes, sauberes Eingabefeld direkt im Modal (nur für Admins)
                 let adminBtnHtml = '';
                 if(window.isAuthorized) {
                     adminBtnHtml = `
                         <div style="border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 20px;">
-                            <button class="btn-primary" style="background:#ff9500; color:#000; width:100%; justify-content:center;" onclick="window.setCustomVisitorCount()"><i class="fa-solid fa-pen"></i> Zählerstand korrigieren</button>
+                            <label style="font-size: 10px; color: var(--primary-red); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px;">Zählerstand korrigieren</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="adminNewCountInput" class="form-control" style="flex: 1; text-align: center; font-weight: bold;" placeholder="Zahl (z.B. 744)">
+                                <button class="btn-primary" style="background:#ff9500; color:#000; padding: 0 20px;" onclick="window.setCustomVisitorCount()"><i class="fa-solid fa-check"></i></button>
+                            </div>
                         </div>
                     `;
                 }
@@ -2535,6 +2539,37 @@
                 `;
             }
             document.getElementById('widgetModalOverlay').classList.add('open');
+        };
+
+        // Die neue Funktion greift direkt auf das schöne Eingabefeld zu
+        window.setCustomVisitorCount = async function() {
+            const inputEl = document.getElementById('adminNewCountInput');
+            if(!inputEl || inputEl.value.trim() === "") {
+                window.showToast("Bitte eine Zahl eingeben.", "error");
+                return;
+            }
+
+            // Zwingt die Eingabe in eine ganz klare, saubere Zahl (Integer)
+            const parsedCount = parseInt(inputEl.value.trim(), 10);
+            
+            if(!isNaN(parsedCount) && parsedCount >= 0) {
+                if(window.firebaseDb) {
+                    try {
+                        // Überschreibt den Wert gnadenlos und verhindert Typen-Konflikte
+                        await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "visitors"), { count: parsedCount });
+                        
+                        // Setzt den Session-Speicher, damit beim direkten Neuladen nicht wieder +1 gerechnet wird
+                        sessionStorage.setItem('red_visited_counted', 'true');
+                        
+                        window.showToast("Erfolgreich gespeichert!", "success");
+                        window.closeWidgetModal();
+                    } catch(e) {
+                        window.showToast("Fehler beim Speichern in der Datenbank.", "error");
+                    }
+                }
+            } else {
+                window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
+            }
         };
 
         // Überschreibt den Wert zwingend online in Firebase
@@ -3114,27 +3149,31 @@
             });
             
 // Visitor Logic
-        // Visitor Logic
         const visitorDocRef = doc(db, "settings", "visitors");
         
-        // Zählt pro Sitzung nur 1x hoch (schützt die DB vor Spam beim Neuladen)
+        // Zählt pro Sitzung nur 1x hoch.
         if (!sessionStorage.getItem('red_visited_counted')) {
-            setDoc(visitorDocRef, { count: increment(1) }, { merge: true })
+            // UpdateDoc versucht nur hochzuzählen. Wenn es fehlschlägt (z.B. Feld fehlt), macht es GAR NICHTS, anstatt es auf 1 zurückzusetzen!
+            updateDoc(visitorDocRef, { count: increment(1) })
             .then(() => {
                 sessionStorage.setItem('red_visited_counted', 'true');
             })
-            .catch(() => {
-                // Falls die DB komplett leer oder kaputt war: Hart auf 1 setzen
-                setDoc(visitorDocRef, { count: 1 });
-                sessionStorage.setItem('red_visited_counted', 'true');
+            .catch(async () => {
+                // Nur wenn das Dokument wirklich zu 100% gelöscht wurde, erstellen wir es sicher neu
+                try {
+                    await setDoc(visitorDocRef, { count: 1 }, { merge: true });
+                    sessionStorage.setItem('red_visited_counted', 'true');
+                } catch(e) {}
             });
         }
         
-        // Live Anzeige aus der Datenbank laden
+        // Live-Anzeige aktualisieren
         onSnapshot(visitorDocRef, (docSnap) => {
             if (docSnap.exists()) {
-                // Zwingt die ausgelesene Zahl ins korrekte Format
-                const count = Number(docSnap.data().count) || 0;
+                // Liest den Wert aus, erzwingt ihn als Zahl
+                let count = parseInt(docSnap.data().count, 10);
+                if (isNaN(count)) count = 0; // Fallback, falls die Datenbank komplett kaputt war
+                
                 document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
             }
         });
