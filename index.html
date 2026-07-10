@@ -2538,16 +2538,18 @@
         };
 
         // --- NEUE FUNKTION: Überschreibt den Zähler absolut sicher über das Skript ---
+// --- NEUE FUNKTION: Überschreibt den Zähler absolut sicher über das Skript ---
         window.setCustomVisitorCount = async function() {
             const newCount = prompt("Bitte den neuen Zählerstand eingeben (z.B. 744):");
             
             if(newCount !== null && newCount.trim() !== "" && !isNaN(newCount)) {
-                const parsedCount = parseInt(newCount, 10);
+                // Zwingt die Eingabe strikt in eine reine System-Zahl (Number)
+                const parsedCount = Number(newCount.trim());
                 
                 if(window.firebaseDb) {
                     try {
-                        // Sendet die korrekte, garantierte Zahl (Type: Number) an Firebase
-                        await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "visitors"), { count: parsedCount });
+                        // merge: true verhindert, dass das gesamte Dokument gelöscht wird
+                        await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "visitors"), { count: parsedCount }, { merge: true });
                         window.showToast("Zählerstand erfolgreich auf " + parsedCount + " korrigiert!", "success");
                         window.closeWidgetModal();
                     } catch(e) {
@@ -3094,13 +3096,27 @@
                 }
             });
             
-            const visitorDocRef = doc(db, "settings", "visitors");
-            try {
-                setDoc(visitorDocRef, { count: increment(1) }, { merge: true }).catch(() => {});
-            } catch(e) {}
+const visitorDocRef = doc(db, "settings", "visitors");
+            
+            // 1. Zähler nur 1x pro Sitzung erhöhen (verhindert ständiges Überschreiben beim Neuladen)
+            if (!sessionStorage.getItem('red_visited_counted')) {
+                try {
+                    // UpdateDoc statt SetDoc schützt das bestehende Zahlenformat besser
+                    updateDoc(visitorDocRef, { count: increment(1) }).then(() => {
+                        sessionStorage.setItem('red_visited_counted', 'true');
+                    }).catch(async () => {
+                        // Falls das Dokument noch gar nicht existiert, lege es neu an
+                        await setDoc(visitorDocRef, { count: 1 }, { merge: true });
+                        sessionStorage.setItem('red_visited_counted', 'true');
+                    });
+                } catch(e) {}
+            }
+            
+            // 2. Live-Anzeige aktualisieren
             onSnapshot(visitorDocRef, (docSnap) => {
                 if(docSnap.exists()) {
-                    const count = docSnap.data().count || 0;
+                    // Zwinge den abgerufenen Wert strikt in eine Zahl, um Fehler zu vermeiden
+                    const count = Number(docSnap.data().count) || 0;
                     document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
                 }
             });
