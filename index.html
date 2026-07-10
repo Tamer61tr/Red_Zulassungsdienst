@@ -2517,7 +2517,7 @@
                 title.innerHTML = '<i class="fa-solid fa-chart-line"></i> System-Status';
                 const v = document.getElementById('vCount').innerText;
                 
-                // NEU: Der geheime Admin-Button, um den Zähler direkt zu korrigieren
+                // HIER FEHLTE DER BUTTON! Jetzt ist er für Admins sichtbar.
                 let adminBtnHtml = '';
                 if(window.isAuthorized) {
                     adminBtnHtml = `
@@ -2535,6 +2535,26 @@
                 `;
             }
             document.getElementById('widgetModalOverlay').classList.add('open');
+        };
+
+        // Überschreibt den Wert zwingend online in Firebase
+        window.setCustomVisitorCount = async function() {
+            const newCountStr = prompt("Bitte den neuen Zählerstand eingeben (z.B. 744):");
+            if(newCountStr !== null && newCountStr.trim() !== "") {
+                const parsedCount = Number(newCountStr.trim());
+                if(!isNaN(parsedCount) && window.firebaseSetDoc && window.firebaseDb) {
+                    try {
+                        // KEIN merge: true! So wird die Datenbank zwingend auf eine reine Zahl (Number) überschrieben.
+                        await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "visitors"), { count: parsedCount });
+                        window.showToast("Zählerstand erfolgreich online auf " + parsedCount + " korrigiert!", "success");
+                        window.closeWidgetModal();
+                    } catch(e) {
+                        window.showToast("Fehler beim Online-Speichern. (Regeln blockieren)", "error");
+                    }
+                } else {
+                    window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
+                }
+            }
         };
 
 // --- NEUE FUNKTION: Überschreibt den Zähler absolut sicher über das Skript ---
@@ -3094,24 +3114,26 @@
             });
             
 // Visitor Logic
+        // Visitor Logic
         const visitorDocRef = doc(db, "settings", "visitors");
         
-        // Zählt pro Benutzer-Session nur exakt 1x hoch!
+        // Zählt pro Sitzung nur 1x hoch (schützt die DB vor Spam beim Neuladen)
         if (!sessionStorage.getItem('red_visited_counted')) {
-            updateDoc(visitorDocRef, { count: increment(1) })
+            setDoc(visitorDocRef, { count: increment(1) }, { merge: true })
             .then(() => {
                 sessionStorage.setItem('red_visited_counted', 'true');
             })
-            .catch(async (e) => {
-                // Notfall-Rettung: Nur wenn das Feld komplett fehlt
-                await setDoc(visitorDocRef, { count: 1 }, { merge: true });
+            .catch(() => {
+                // Falls die DB komplett leer oder kaputt war: Hart auf 1 setzen
+                setDoc(visitorDocRef, { count: 1 });
                 sessionStorage.setItem('red_visited_counted', 'true');
             });
         }
         
-        // Live-Anzeige
+        // Live Anzeige aus der Datenbank laden
         onSnapshot(visitorDocRef, (docSnap) => {
             if (docSnap.exists()) {
+                // Zwingt die ausgelesene Zahl ins korrekte Format
                 const count = Number(docSnap.data().count) || 0;
                 document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
             }
