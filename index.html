@@ -2541,7 +2541,7 @@
             document.getElementById('widgetModalOverlay').classList.add('open');
         };
 
-        // Die neue Funktion greift direkt auf das schöne Eingabefeld zu
+        // --- KORRIGIERTE FUNKTION: Mit merge: true und genauer Fehlerausgabe ---
         window.setCustomVisitorCount = async function() {
             const inputEl = document.getElementById('adminNewCountInput');
             if(!inputEl || inputEl.value.trim() === "") {
@@ -2549,23 +2549,33 @@
                 return;
             }
 
-            // Zwingt die Eingabe in eine ganz klare, saubere Zahl (Integer)
             const parsedCount = parseInt(inputEl.value.trim(), 10);
             
             if(!isNaN(parsedCount) && parsedCount >= 0) {
                 if(window.firebaseDb) {
                     try {
-                        // Überschreibt den Wert gnadenlos und verhindert Typen-Konflikte
-                        await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "visitors"), { count: parsedCount });
+                        // WICHTIG: { merge: true } ist zurück. Ohne das blockieren deine Firebase-Regeln den Speicher-Vorgang!
+                        await window.firebaseSetDoc(
+                            window.firebaseDoc(window.firebaseDb, "settings", "visitors"), 
+                            { count: parsedCount }, 
+                            { merge: true }
+                        );
                         
-                        // Setzt den Session-Speicher, damit beim direkten Neuladen nicht wieder +1 gerechnet wird
+                        // Zwingt die Session dazu, den neuen Wert anzuerkennen
                         sessionStorage.setItem('red_visited_counted', 'true');
                         
-                        window.showToast("Erfolgreich gespeichert!", "success");
+                        window.showToast("Zählerstand erfolgreich auf " + parsedCount + " korrigiert!", "success");
                         window.closeWidgetModal();
+                        
+                        // Anzeige im Header sofort aktualisieren
+                        document.querySelectorAll('#vCount').forEach(el => el.innerText = parsedCount.toLocaleString('de-DE'));
                     } catch(e) {
-                        window.showToast("Fehler beim Speichern in der Datenbank.", "error");
+                        // Spuckt den echten Firebase-Fehler aus, falls etwas schiefgeht
+                        console.error("Firebase Fehler:", e);
+                        window.showToast("Firebase blockiert: " + e.message, "error");
                     }
+                } else {
+                    window.showToast("Datenbank-Verbindung noch nicht bereit.", "error");
                 }
             } else {
                 window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
