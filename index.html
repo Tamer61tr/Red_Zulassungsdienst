@@ -2539,24 +2539,22 @@
 
 // --- NEUE FUNKTION: Überschreibt den Zähler absolut sicher über das Skript ---
         window.setCustomVisitorCount = async function() {
-            const newCount = prompt("Bitte den neuen Zählerstand eingeben (z.B. 744):");
-            
-            if(newCount !== null && newCount.trim() !== "" && !isNaN(newCount)) {
-                // Zwingt die Eingabe strikt in eine reine System-Zahl (Number)
-                const parsedCount = Number(newCount.trim());
-                
-                if(window.firebaseDb) {
+            const newCountStr = prompt("Bitte den neuen Zählerstand eingeben (z.B. 744):");
+            if(newCountStr !== null && newCountStr.trim() !== "") {
+                const parsedCount = Number(newCountStr.trim()); // WICHTIG: Number() erzwingt korrekten Datentyp
+                if(!isNaN(parsedCount) && window.firebaseSetDoc && window.firebaseDb) {
                     try {
-                        // OHNE merge: true! So werden fehlerhafte Datentypen in Firebase gnadenlos mit der richtigen Zahl überschrieben.
+                        // OHNE { merge: true } -> Überschreibt alle kaputten Firebase-Datentypen!
                         await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "visitors"), { count: parsedCount });
                         window.showToast("Zählerstand erfolgreich auf " + parsedCount + " korrigiert!", "success");
                         window.closeWidgetModal();
+                        document.querySelectorAll('#vCount').forEach(el => el.innerText = parsedCount.toLocaleString('de-DE'));
                     } catch(e) {
                         window.showToast("Fehler beim Speichern in der Datenbank.", "error");
                     }
+                } else {
+                    window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
                 }
-            } else {
-                window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
             }
         };
 
@@ -3095,28 +3093,29 @@
                 }
             });
             
-const visitorDocRef = doc(db, "settings", "visitors");
-            
-            // 1. Zähler nur 1x pro Sitzung erhöhen (verhindert ständiges Ausführen beim Neuladen)
-            if (!sessionStorage.getItem('red_visited_counted')) {
-                // Wir nutzen setDoc mit increment und merge. Der gefährliche Fallback auf {count: 1} wurde gelöscht!
-                setDoc(visitorDocRef, { count: increment(1) }, { merge: true })
-                .then(() => {
-                    sessionStorage.setItem('red_visited_counted', 'true');
-                })
-                .catch((e) => {
-                    console.error("Zähler Fehler ignoriert:", e);
-                });
-            }
-            
-            // 2. Live-Anzeige aktualisieren
-            onSnapshot(visitorDocRef, (docSnap) => {
-                if(docSnap.exists()) {
-                    // Zwinge den abgerufenen Wert strikt in eine Zahl, um Anzeige-Fehler zu vermeiden
-                    const count = Number(docSnap.data().count) || 0;
-                    document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
-                }
+// Visitor Logic
+        const visitorDocRef = doc(db, "settings", "visitors");
+        
+        // Zählt pro Benutzer-Session nur exakt 1x hoch!
+        if (!sessionStorage.getItem('red_visited_counted')) {
+            updateDoc(visitorDocRef, { count: increment(1) })
+            .then(() => {
+                sessionStorage.setItem('red_visited_counted', 'true');
+            })
+            .catch(async (e) => {
+                // Notfall-Rettung: Nur wenn das Feld komplett fehlt
+                await setDoc(visitorDocRef, { count: 1 }, { merge: true });
+                sessionStorage.setItem('red_visited_counted', 'true');
             });
+        }
+        
+        // Live-Anzeige
+        onSnapshot(visitorDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const count = Number(docSnap.data().count) || 0;
+                document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
+            }
+        });
             
             onSnapshot(doc(db, "settings", "contact"), (docSnap) => {
                 if(docSnap.exists()) {
