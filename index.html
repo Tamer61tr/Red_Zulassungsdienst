@@ -2478,7 +2478,7 @@
 
             window.closeLegal = function() { document.getElementById('legalOverlay').classList.remove('open'); };
 
-           window.openWidgetModal = function(type) {
+          window.openWidgetModal = function(type) {
             const title = document.getElementById('widgetModalTitle');
             const content = document.getElementById('widgetModalContent');
             
@@ -2517,7 +2517,6 @@
                 title.innerHTML = '<i class="fa-solid fa-chart-line"></i> System-Status';
                 const v = document.getElementById('vCount').innerText;
                 
-                // NEU: Ein modernes, sauberes Eingabefeld direkt im Modal (nur für Admins)
                 let adminBtnHtml = '';
                 if(window.isAuthorized) {
                     adminBtnHtml = `
@@ -2541,6 +2540,11 @@
             document.getElementById('widgetModalOverlay').classList.add('open');
         };
 
+        window.closeWidgetModal = function() {
+            if(window.modalClockInterval) clearInterval(window.modalClockInterval);
+            document.getElementById('widgetModalOverlay').classList.remove('open');
+        };
+
         // --- KORRIGIERTE FUNKTION: Mit merge: true und genauer Fehlerausgabe ---
         window.setCustomVisitorCount = async function() {
             const inputEl = document.getElementById('adminNewCountInput');
@@ -2549,36 +2553,27 @@
                 return;
             }
 
-            const parsedCount = parseInt(inputEl.value.trim(), 10);
+            const parsedCount = Number(inputEl.value.trim());
             
             if(!isNaN(parsedCount) && parsedCount >= 0) {
                 if(window.firebaseDb) {
                     try {
-                        // WICHTIG: { merge: true } ist zurück. Ohne das blockieren deine Firebase-Regeln den Speicher-Vorgang!
-                        await window.firebaseSetDoc(
+                        // updateDoc wird von Firebase-Sicherheitsregeln eher akzeptiert als setDoc
+                        await window.firebaseUpdateDoc(
                             window.firebaseDoc(window.firebaseDb, "settings", "visitors"), 
-                            { count: parsedCount }, 
-                            { merge: true }
+                            { count: parsedCount }
                         );
                         
-                        // Zwingt die Session dazu, den neuen Wert anzuerkennen
                         sessionStorage.setItem('red_visited_counted', 'true');
-                        
-                        window.showToast("Zählerstand erfolgreich auf " + parsedCount + " korrigiert!", "success");
+                        window.showToast("Zählerstand korrigiert!", "success");
                         window.closeWidgetModal();
-                        
-                        // Anzeige im Header sofort aktualisieren
-                        document.querySelectorAll('#vCount').forEach(el => el.innerText = parsedCount.toLocaleString('de-DE'));
                     } catch(e) {
-                        // Spuckt den echten Firebase-Fehler aus, falls etwas schiefgeht
-                        console.error("Firebase Fehler:", e);
-                        window.showToast("Firebase blockiert: " + e.message, "error");
+                        console.error(e);
+                        window.showToast("Firebase blockiert: Berechtigung fehlt.", "error");
                     }
-                } else {
-                    window.showToast("Datenbank-Verbindung noch nicht bereit.", "error");
                 }
             } else {
-                window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
+                window.showToast("Ungültige Zahl.", "error");
             }
         };
 
@@ -3180,17 +3175,15 @@
             });
             
 // Visitor Logic
+// Visitor Logic
         const visitorDocRef = doc(db, "settings", "visitors");
         
-        // Zählt pro Sitzung nur 1x hoch.
         if (!sessionStorage.getItem('red_visited_counted')) {
-            // UpdateDoc versucht nur hochzuzählen. Wenn es fehlschlägt (z.B. Feld fehlt), macht es GAR NICHTS, anstatt es auf 1 zurückzusetzen!
             updateDoc(visitorDocRef, { count: increment(1) })
             .then(() => {
                 sessionStorage.setItem('red_visited_counted', 'true');
             })
             .catch(async () => {
-                // Nur wenn das Dokument wirklich zu 100% gelöscht wurde, erstellen wir es sicher neu
                 try {
                     await setDoc(visitorDocRef, { count: 1 }, { merge: true });
                     sessionStorage.setItem('red_visited_counted', 'true');
@@ -3198,13 +3191,9 @@
             });
         }
         
-        // Live-Anzeige aktualisieren
         onSnapshot(visitorDocRef, (docSnap) => {
             if (docSnap.exists()) {
-                // Liest den Wert aus, erzwingt ihn als Zahl
-                let count = parseInt(docSnap.data().count, 10);
-                if (isNaN(count)) count = 0; // Fallback, falls die Datenbank komplett kaputt war
-                
+                const count = Number(docSnap.data().count) || 0;
                 document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
             }
         });
@@ -4535,5 +4524,6 @@
         };
 
     </script>
+
 </body>
 </html>
