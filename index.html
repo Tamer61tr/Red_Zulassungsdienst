@@ -3175,26 +3175,32 @@
             });
             
 // Visitor Logic
-// Visitor Logic
         const visitorDocRef = doc(db, "settings", "visitors");
         
+        // Zählt pro Sitzung nur 1x hoch.
         if (!sessionStorage.getItem('red_visited_counted')) {
+            // updateDoc macht NUR +1. Wenn es fehlschlägt, macht es GAR NICHTS!
+            // Der gefährliche "Fallback auf 1" wurde komplett gelöscht.
             updateDoc(visitorDocRef, { count: increment(1) })
             .then(() => {
                 sessionStorage.setItem('red_visited_counted', 'true');
             })
-            .catch(async () => {
-                try {
-                    await setDoc(visitorDocRef, { count: 1 }, { merge: true });
-                    sessionStorage.setItem('red_visited_counted', 'true');
-                } catch(e) {}
+            .catch((error) => {
+                console.warn("Zähler nicht erhöht (Dokument fehlt oder Berechtigung fehlt).");
+                // Wir speichern trotzdem die Session, damit er nicht bei jedem Neuladen spammt
+                sessionStorage.setItem('red_visited_counted', 'true');
             });
         }
         
+        // Live-Anzeige aktualisieren
         onSnapshot(visitorDocRef, (docSnap) => {
             if (docSnap.exists()) {
+                // Holt den Wert und stellt sicher, dass es eine Zahl ist
                 const count = Number(docSnap.data().count) || 0;
                 document.querySelectorAll('#vCount').forEach(el => el.innerText = count.toLocaleString('de-DE'));
+            } else {
+                // Wenn die Datenbank komplett leer ist, zeige 0 an, aber überschreibe nichts!
+                document.querySelectorAll('#vCount').forEach(el => el.innerText = '0');
             }
         });
             
