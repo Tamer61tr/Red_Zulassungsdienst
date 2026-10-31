@@ -149,15 +149,18 @@
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 12px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-40px) rotate(-8deg); } 100% { transform: translateY(-20vh) translateX(40px) rotate(8deg); } }
 
-        /* Preloader */
-        #intro-preloader { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; animation: hidePreloader 0.5s ease 2.8s forwards; }
+        /* Preloader mit 3D Jahreswechsel-Animation (2026 -> 2027+) */
+        #intro-preloader { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; animation: hidePreloader 0.5s ease 3.1s forwards; }
         @keyframes hidePreloader { 100% { opacity: 0; visibility: hidden; z-index: -100; pointer-events: none; } }
         .intro-track { width: 280px; height: 4px; background: rgba(128,128,128,0.2); position: relative; margin-top: 40px; border-radius: 2px; }
-        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); animation: driveCar 1.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s forwards; }
+        .intro-car { position: absolute; top: -22px; left: -50px; color: var(--primary-red); font-size: 24px; filter: drop-shadow(0 0 10px var(--primary-red)); animation: driveCar 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s forwards; }
         @keyframes driveCar { 100% { transform: translateX(380px); } }
-        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(230,0,0,0.3); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; animation: popPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s forwards; }
+        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 3px solid #000; font-size: 24px; box-shadow: 0 0 30px rgba(230,0,0,0.3); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 10px; animation: popPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s forwards; perspective: 400px; }
         .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 14px; border-radius: 3px; }
         @keyframes popPlate { 100% { transform: scale(1); opacity: 1; } }
+        .year-flip-badge { display: inline-block; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.4s; transform-style: preserve-3d; }
+        .year-flip-badge.flipping { animation: yearFlip3D 0.7s ease forwards; color: var(--primary-red); }
+        @keyframes yearFlip3D { 0% { transform: rotateX(0deg); } 50% { transform: rotateX(90deg) scale(1.15); } 100% { transform: rotateX(0deg); } }
         .intro-text { margin-top: 30px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; max-width: 85%; opacity: 0; transform: translateY(20px); animation: fadeText 0.5s ease 0.9s forwards; color: var(--text-light); }
         @keyframes fadeText { 100% { transform: translateY(0); opacity: 1; } }
 
@@ -281,7 +284,6 @@
         .btn-del-red { color: #ff3b30; border: 1px solid #ff3b30; top: 15px; right: 15px; }
         .btn-del-red:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        /* Inline Admin Mini-Buttons (für Schnellkalkulator & Listen) */
         .mini-admin-btn { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; transition: 0.2s; background: var(--bg-card); border: 1px solid var(--glass-border); }
         .mini-admin-btn.edit { color: #25D366; border-color: rgba(37,211,102,0.5); }
         .mini-admin-btn.edit:hover { background: #25D366; color: #000; }
@@ -315,6 +317,8 @@
         #themeEditorOverlay .custom-dialog-window { max-width: 520px; border-top-color: #00ffff; text-align: left; }
         #calcItemEditOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; text-align: left; }
         #formEditModalOverlay .custom-dialog-window { max-width: 460px; border-top-color: #ff9500; text-align: left; }
+        #digitalVollmachtOverlay .custom-dialog-window { max-width: 620px; border-top-color: #25D366; text-align: left; }
+        #viralShareOverlay .custom-dialog-window { max-width: 430px; border-top-color: var(--primary-red); }
         
         #serviceConfigOverlay .custom-dialog-window { max-width: 650px; border-top-color: #25D366; text-align: left; }
         .service-config-section { background: var(--glass-border); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
@@ -351,7 +355,13 @@
         .apt-btn.edit:hover { background: #007aff; color: #fff; border-color: #007aff; }
         .apt-btn.wa-confirm:hover { background: #25D366; color: #fff; border-color: #25D366; }
         .apt-btn.delete:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
-        
+
+        /* Admin Status Stepper inside Lead Card */
+        .apt-status-bar { display: flex; gap: 5px; flex-wrap: wrap; background: var(--bg-input); padding: 8px; border-radius: 10px; border: 1px solid var(--glass-border); }
+        .status-pill-btn { flex: 1; min-width: 105px; font-size: 10px !important; font-weight: 800; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; transition: 0.2s; text-align: center; }
+        .status-pill-btn.active { background: var(--primary-red); color: #fff; border-color: var(--primary-red); box-shadow: 0 0 10px rgba(230,0,0,0.4); }
+        .status-pill-btn.done-ready.active { background: #25D366; color: #000; border-color: #25D366; box-shadow: 0 0 12px rgba(37,211,102,0.5); }
+
         .admin-note-input { width: 100%; background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-light); font-size: 13px; padding: 10px 14px; border-radius: 10px; outline: none; display: none; margin-top: 5px; box-sizing: border-box; }
         .admin-note-input.active { display: block; animation: viewFadeIn 0.3s ease; }
         .notes-list-box { display: flex; flex-direction: column; gap: 8px; }
@@ -534,6 +544,22 @@
         .calc-item.selected { background: rgba(230, 0, 0, 0.14); border-color: var(--primary-red); }
         .calc-total-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--glass-border); border-radius: 12px; margin-top: 15px; border: 1px solid var(--primary-red); flex-wrap: wrap; gap: 10px; }
 
+        /* NEU: LIVE AUFTRAGS-STATUS TRACKER & URGENCY BAR */
+        .urgency-bar { display: inline-flex; align-items: center; gap: 10px; background: rgba(230, 0, 0, 0.1); border: 1px solid rgba(230, 0, 0, 0.35); padding: 8px 18px; border-radius: 50px; font-size: 11px; font-weight: 700; color: var(--text-light); margin-bottom: 18px; flex-wrap: wrap; justify-content: center; }
+        .urgency-dot { width: 9px; height: 9px; background: #25D366; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #25D366; animation: pulseAnim 1s infinite alternate; }
+        
+        .tracker-steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .tracker-step-box { background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 6px; text-align: center; opacity: 0.4; transition: 0.3s; }
+        .tracker-step-box.active { opacity: 1; border-color: var(--primary-red); background: rgba(230, 0, 0, 0.12); transform: translateY(-2px); }
+        .tracker-step-box.completed { opacity: 1; border-color: #25D366; background: rgba(37, 211, 102, 0.1); }
+        .tracker-step-box i { font-size: 18px; margin-bottom: 5px; display: block; color: var(--primary-red); }
+        .tracker-step-box.completed i { color: #25D366; }
+        .tracker-step-box span { font-size: 10px; font-weight: 800; display: block; line-height: 1.2; }
+
+        /* NEU: FINGER-UNTERSCHRIFT PAD (DIGITALES VOLLMACHT CANVAS) */
+        .signature-pad-wrapper { background: #fff; border: 2px dashed var(--primary-red); border-radius: 14px; overflow: hidden; position: relative; height: 170px; width: 100%; touch-action: none; margin-top: 6px; }
+        #vollmachtSignatureCanvas { width: 100%; height: 100%; cursor: crosshair; touch-action: none; display: block; }
+
         .faq-wrapper { max-width: 1100px; margin: 45px auto 0; padding: 0 5%; display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 25px; }
         .checklist-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; cursor: pointer; font-size: 12px; transition: 0.2s; }
         .checklist-row.done { border-color: #25D366; background: rgba(37, 211, 102, 0.08); }
@@ -546,6 +572,8 @@
         .fab-wa:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5); }
         .fab-book { background: var(--primary-red); font-size: 18px; }
         .fab-book:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 25px rgba(230, 0, 0, 0.5); }
+        .fab-share { background: #007aff; font-size: 18px; }
+        .fab-share:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 25px rgba(0, 122, 255, 0.5); }
 
         .admin-details { background: var(--glass-border); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
         .admin-details summary { padding: 15px 20px; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; color: var(--text-light); }
@@ -561,7 +589,7 @@
         .hero { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 5%; margin-top: 15px; }
         .hero-content { background: var(--bg-card); padding: clamp(30px, 6vw, 55px) 30px; border-radius: 30px; border: 1px solid var(--glass-border); width: 100%; max-width: 840px; position: relative; box-sizing: border-box; box-shadow: var(--card-shadow); }
         
-        .sofort-badge { background: linear-gradient(45deg, var(--primary-red), #b30000); color: white; font-size: clamp(13px, 2.8vw, 20px); font-weight: 900; padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 28px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 8px 25px rgba(230,0,0,0.35); }
+        .sofort-badge { background: linear-gradient(45deg, var(--primary-red), #b30000); color: white; font-size: clamp(13px, 2.8vw, 20px); font-weight: 900; padding: 12px 28px; border-radius: 50px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 8px 25px rgba(230,0,0,0.35); }
         .sofort-badge i { animation: pulse-icon 1.5s infinite alternate ease-in-out; }
         
         .trust-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 25px; }
@@ -682,6 +710,7 @@
             .apt-grid-info { grid-template-columns: 1fr; }
             .symbol-grid { grid-template-columns: repeat(2, 1fr) !important; }
             .admin-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .tracker-steps-grid { grid-template-columns: repeat(2, 1fr); }
             .time-slots { grid-template-columns: repeat(2, 1fr); }
             .crm-table { font-size: 9px !important; width: 100%; }
             .crm-table th, .crm-table td { padding: 4px 3px !important; white-space: nowrap !important; text-overflow: ellipsis; }
@@ -692,20 +721,25 @@
         }
     </style>
 </head>
+
 <body>
 
     <div id="toast-container"></div>
     
-    <!-- SCHNELL-AKTIONEN FLOATING BAR -->
+    <!-- SCHNELL-AKTIONEN FLOATING BAR (INKL. VIRAL SHARE / QR) -->
     <div class="floating-quick-bar">
         <a href="https://wa.me/491783783875" id="fab-wa-link" target="_blank" rel="noopener noreferrer" class="fab-btn fab-wa" title="Direkt per WhatsApp schreiben"><i class="fa-brands fa-whatsapp"></i></a>
         <button class="fab-btn fab-book" onclick="window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});" title="Schnell-Termin buchen"><i class="fa-solid fa-calendar-check"></i></button>
+        <button class="fab-btn fab-share" onclick="window.openViralShareModal()" title="Weiterempfehlen & QR-Visitenkarte"><i class="fa-solid fa-qrcode"></i></button>
     </div>
 
     <div id="pinned-container" class="admin-only-flex" style="flex-direction: column; gap: 12px; position: fixed; bottom: 20px; right: 20px; z-index: 9000; pointer-events: none;"></div>
 
+    <!-- PRELOADER MIT AUTOMATISCHER JAHRESWECHSEL-ANIMATION (2026 -> 2027+) -->
     <div id="intro-preloader">
-        <div class="intro-plate" id="introPlate">B <span style="color:var(--primary-red);">-</span> RED 2026</div>
+        <div class="intro-plate" id="introPlate">
+            B <span style="color:var(--primary-red);">-</span> RED <span id="introYearBadge" class="year-flip-badge">2026</span>
+        </div>
         <div class="intro-track"><i class="fa-solid fa-car-side intro-car" id="introCar"></i></div>
         <div class="intro-text" id="introText">Herzlich Willkommen zu Ihrem<br><span style="color:var(--primary-red);">Zulassungsdienst RED Berlin</span></div>
     </div>
@@ -793,6 +827,7 @@
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home');"><i class="fa-solid fa-house" style="color:var(--primary-red);"></i> Startseite</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('leistungen').offsetTop, behavior: 'smooth'});"><i class="fa-solid fa-gears" style="color:var(--primary-red);"></i> Leistungen</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop, behavior: 'smooth'});"><i class="fa-solid fa-calculator" style="color:var(--primary-red);"></i> Kennzeichen & Kalkulator</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openDigitalVollmachtModal();"><i class="fa-solid fa-signature" style="color:var(--primary-red);"></i> Digitale Vollmacht</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-formulare');"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Formulare</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-ankauf');"><i class="fa-solid fa-car" style="color:var(--primary-red);"></i> Auto Ankauf</a>
         
@@ -869,6 +904,68 @@
         </div>
     </div>
 
+    <!-- NEU: DIGITALE VOLLMACHT MIT FINGER-UNTERSCHRIFT (TOUCH-PAD) -->
+    <div class="custom-dialog-overlay" id="digitalVollmachtOverlay">
+        <div class="custom-dialog-window">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeDigitalVollmachtModal()"></i>
+            <h3 style="color:#25D366; font-weight:900; margin-bottom:8px; text-align:center;"><i class="fa-solid fa-file-signature"></i> Digitale Vollmacht (Sofort-Generator)</h3>
+            <p style="color:var(--text-muted); font-size:11px; margin-bottom:18px; text-align:center;">Füllen Sie die Felder kurz aus, unterschreiben Sie mit dem Finger oder der Maus und speichern/drucken Sie Ihre fertige Vollmacht für RED Zulassungsdienst Berlin.</p>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Vollständiger Name (Vollmachtgeber)</label>
+                    <input type="text" id="dvName" class="form-control" placeholder="Max Mustermann">
+                </div>
+                <div class="form-group">
+                    <label>Geburtsdatum</label>
+                    <input type="text" id="dvBirth" class="form-control" placeholder="TT.MM.JJJJ">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Anschrift in Berlin / Umland</label>
+                    <input type="text" id="dvAddress" class="form-control" placeholder="Musterstr. 1, 12053 Berlin">
+                </div>
+                <div class="form-group">
+                    <label>Fahrzeug / FIN oder Kennzeichen</label>
+                    <input type="text" id="dvVehicle" class="form-control" placeholder="z.B. B - TY 2027 / WVWZZZ...">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top:5px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label>Hier mit Finger oder Maus unterschreiben:</label>
+                    <button type="button" onclick="window.clearVollmachtSignature()" style="background:none; border:none; color:var(--primary-red); font-size:11px !important; font-weight:800; cursor:pointer;"><i class="fa-solid fa-eraser"></i> Unterschrift löschen</button>
+                </div>
+                <div class="signature-pad-wrapper">
+                    <canvas id="vollmachtSignatureCanvas"></canvas>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;">
+                <button type="button" class="btn-primary" style="background:#25D366; color:#000; flex:1; justify-content:center;" onclick="window.printDigitalVollmacht()"><i class="fa-solid fa-print"></i> Vollmacht als PDF / Drucken</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEU: VIRAL SHARE & QR-CODE VISITENKARTE MODAL -->
+    <div class="custom-dialog-overlay" id="viralShareOverlay">
+        <div class="custom-dialog-window">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeViralShareModal()"></i>
+            <h3 style="color:var(--primary-red); font-weight:900; margin-bottom:8px;"><i class="fa-solid fa-qrcode"></i> Digitale Visitenkarte & Teilen</h3>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:18px;">Lassen Sie Freunde oder Kunden diesen QR-Code scannen oder teilen Sie RED Zulassungsdienst Berlin direkt per WhatsApp!</p>
+            
+            <div style="background:#fff; padding:15px; border-radius:16px; display:inline-block; margin-bottom:18px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+                <img id="viralQrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fwa.me%2F491783783875" alt="RED Berlin QR Code" style="width:170px; height:170px; display:block;">
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button type="button" class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.shareViaWhatsApp()"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Per WhatsApp weiterempfehlen</button>
+                <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); width:100%; justify-content:center; box-shadow:none;" onclick="window.copyWebsiteLink()"><i class="fa-solid fa-copy" style="color:var(--primary-red);"></i> Link in Zwischenablage kopieren</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ERWEITERTER GLOBALER DESIGN & FARB-MANAGER -->
     <div class="custom-dialog-overlay" id="themeEditorOverlay">
         <div class="custom-dialog-window">
@@ -917,7 +1014,7 @@
         </div>
     </div>
 
-    <!-- NEU: KALKULATOR POSITION BEARBEITEN MODAL (STIFT-FUNKTION) -->
+    <!-- KALKULATOR POSITION BEARBEITEN MODAL (STIFT-FUNKTION) -->
     <div class="custom-dialog-overlay" id="calcItemEditOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCalcEditModal()"></i>
@@ -944,7 +1041,7 @@
         </div>
     </div>
 
-    <!-- NEU: FORMULAR BEARBEITEN / HOCHLADEN MODAL (STIFT-FUNKTION) -->
+    <!-- FORMULAR BEARBEITEN / HOCHLADEN MODAL (STIFT-FUNKTION) -->
     <div class="custom-dialog-overlay" id="formEditModalOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeFormEditModal()"></i>
@@ -1721,6 +1818,14 @@
         <div class="hero editable-section">
             <div class="section-edit-btn action-content" onclick="window.openContentEditor('hero')"><i class="fa-solid fa-pencil"></i></div>
             <div class="hero-content">
+                <!-- NEU: LIVE BEHÖRDEN-KURIER COUNTDOWN (FOMO MARKETING BOOSTER) -->
+                <div>
+                    <div class="urgency-bar">
+                        <span class="urgency-dot"></span>
+                        <span id="liveDispatchCountdown">Nächste LABO-Behördenabgabe startet in Kürze...</span>
+                    </div>
+                </div>
+
                 <div class="sofort-badge">
                     <i class="fa-solid fa-bolt" style="margin-right:8px;"></i> 
                     <span id="txt-hero-badge">Sofortkennzeichen zum Mitnehmen!</span> 
@@ -1729,8 +1834,9 @@
                 <h1 style="font-size: clamp(24px, 4.8vw, 44px); line-height: 1.1; margin-bottom: 15px; font-weight: 900;"><span id="txt-hero-h1-1" style="color: var(--text-light);">Schnell. Zuverlässig.</span><br><span id="txt-hero-h1-2" style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
                 <p id="txt-hero-desc" style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 28px; max-width: 650px; margin-left: auto; margin-right: auto;">Zulassungsservice in Bestzeit für ganz Berlin. Wir garantieren Ihnen eine zügige, zuverlässige und hochprofessionelle Abwicklung Ihrer Anliegen.</p>
                 
-                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                     <a href="javascript:void(0)" onclick="window.switchView('view-home'); window.scrollTo({top: document.getElementById('termin').offsetTop, behavior: 'smooth'});" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
+                    <a href="javascript:void(0)" onclick="window.openDigitalVollmachtModal()" class="btn-primary" style="background:var(--bg-input); border:1px solid #25D366; color:#25D366; box-shadow:none;"><i class="fa-solid fa-signature"></i> Digitale Vollmacht</a>
                     <a href="javascript:void(0)" onclick="window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop, behavior: 'smooth'});" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); box-shadow:none;"><i class="fa-solid fa-id-card" style="color:var(--primary-red);"></i> Wunschkennzeichen & Rechner</a>
                 </div>
 
@@ -1738,6 +1844,7 @@
                     <span class="trust-pill"><i class="fa-solid fa-shield-halved"></i> Offizieller Berliner Zulassungsdienst</span>
                     <span class="trust-pill"><i class="fa-solid fa-clock-rotate-left"></i> Express-Abwicklung</span>
                     <span class="trust-pill"><i class="fa-solid fa-award"></i> Inhaber: Tamer Yazici</span>
+                    <span class="trust-pill" style="cursor:pointer; border-color:var(--primary-red); color:var(--text-light);" onclick="window.openViralShareModal()"><i class="fa-solid fa-share-nodes"></i> Weiterempfehlen & QR</span>
                 </div>
             </div>
         </div>
@@ -1770,7 +1877,7 @@
                     <div class="plate-content-area">
                         <span>B</span>
                         <div class="plate-stamps">
-                            <div class="stamp-hu">26</div>
+                            <div class="stamp-hu" id="livePlateHuStamp">26</div>
                             <div class="stamp-berlin">🐻</div>
                         </div>
                         <span id="platePreviewLetters">RED</span>
@@ -1803,7 +1910,6 @@
                 </div>
                 <p id="txt-calc-desc" style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Wählen Sie Ihre gewünschten Leistungen & Zusatzoptionen für Ihren Termin:</p>
                 
-                <!-- Dynamisch gerenderte Kalkulator-Liste (Standardmäßig mit Strich "-") -->
                 <div id="calcOptionsList"></div>
 
                 <div class="calc-total-bar">
@@ -1812,6 +1918,47 @@
                         <strong style="font-size:20px; color:var(--primary-red);" id="calcTotalSum">- €</strong>
                     </div>
                     <button type="button" class="btn-primary" style="padding:10px 18px;" onclick="window.applyCalcToBooking()">Auswahl buchen <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEU: LIVE AUFTRAGS-STATUS TRACKER FÜR KUNDEN -->
+        <section style="max-width:1100px; margin: 25px auto 0; padding: 0 5%;">
+            <div class="tool-box" style="border-top: 2px solid var(--primary-red);">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h3><i class="fa-solid fa-satellite-dish"></i> Live Auftrags- & Zulassungs-Tracker</h3>
+                        <p style="font-size:12px; color:var(--text-muted);">Prüfen Sie hier jederzeit live den Bearbeitungsstatus Ihrer Zulassung (Name oder Telefonnummer eingeben):</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex:1; min-width:260px; max-width:450px;">
+                        <input type="text" id="liveTrackerInput" class="form-control" placeholder="Ihr Name oder Telefonnummer..." onkeypress="if(event.key==='Enter') window.checkLiveOrderStatus()">
+                        <button type="button" class="btn-primary" onclick="window.checkLiveOrderStatus()" style="padding:0 20px; white-space:nowrap;"><i class="fa-solid fa-magnifying-glass"></i> Prüfen</button>
+                    </div>
+                </div>
+
+                <div id="liveTrackerResultBox" style="display:none; margin-top:18px; border-top:1px solid var(--glass-border); padding-top:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                        <strong id="trackerClientTitle" style="font-size:14px; color:var(--text-light);"></strong>
+                        <span id="trackerServiceBadge" class="prio-badge" style="background:rgba(37,211,102,0.15); color:#25D366;"></span>
+                    </div>
+                    <div class="tracker-steps-grid">
+                        <div class="tracker-step-box" id="tStep1">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <span>1. Unterlagen & Termin erfasst</span>
+                        </div>
+                        <div class="tracker-step-box" id="tStep2">
+                            <i class="fa-solid fa-building-columns"></i>
+                            <span>2. In Bearbeitung beim LABO Berlin</span>
+                        </div>
+                        <div class="tracker-step-box" id="tStep3">
+                            <i class="fa-solid fa-id-card"></i>
+                            <span>3. Kennzeichen geprägt & Siegel</span>
+                        </div>
+                        <div class="tracker-step-box" id="tStep4">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>4. Fertig & Abholbereit!</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1826,7 +1973,7 @@
                 <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-2">Gültiger Personalausweis oder Reisepass mit Meldebescheinigung</span></div>
                 <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-3">7-stellige eVB-Nummer Ihrer Kfz-Versicherung</span></div>
                 <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-4">Gültiger TÜV / HU-Bericht & IBAN für das SEPA-Mandat</span></div>
-                <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-5">Unterschriebene Vollmacht (auch direkt vor Ort bei uns ausfüllbar!)</span></div>
+                <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-5">Unterschriebene Vollmacht (auch digital hier oder vor Ort ausfüllbar!)</span></div>
             </div>
 
             <div class="tool-box editable-section">
@@ -1842,7 +1989,7 @@
                 </details>
                 <details class="admin-details" style="margin-bottom:0;">
                     <summary style="padding:12px 15px; font-size:12px;" id="txt-faq-q3">Muss ich die Formulare vorher ausdrucken?</summary>
-                    <div class="admin-details-content" style="font-size:12px; color:var(--text-muted);" id="txt-faq-a3">Nein, nicht zwingend. Sie können sie unter „Formulare“ vorab herunterladen oder ganz entspannt direkt bei uns im Büro unterschreiben.</div>
+                    <div class="admin-details-content" style="font-size:12px; color:var(--text-muted);" id="txt-faq-a3">Nein, nicht zwingend. Sie können unsere digitale Vollmacht direkt am Handy unterschreiben oder ganz entspannt bei uns im Büro ausfüllen.</div>
                 </details>
             </div>
         </section>
@@ -1862,7 +2009,7 @@
                             <input type="text" id="formName" class="form-control" placeholder="Ihr vollständiger Name" required>
                         </div>
                         <div class="form-group">
-                            <label>Telefonnummer (Optional für WhatsApp-Bestätigung)</label>
+                            <label>Telefonnummer (Optional für WhatsApp & Live-Tracker)</label>
                             <input type="tel" id="formPhone" class="form-control" placeholder="Ihre Handynummer">
                         </div>
                     </div>
@@ -1908,10 +2055,11 @@
         </section>
     </div>
 
-    <!-- ANSICHT: FORMULARE (INKL. DIREKTEM DATEI-UPLOAD & STIFT-BEARBEITUNG) -->
+    <!-- ANSICHT: FORMULARE (INKL. DIREKTEM DATEI-UPLOAD, STIFT & DIGITALER VOLLMACHT) -->
     <div id="view-formulare" class="view-section">
-        <div style="display:flex; justify-content:center; margin-bottom: 30px;">
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom: 30px; padding: 0 5%;">
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
+            <button class="btn-primary" style="background:#25D366; color:#000;" onclick="window.openDigitalVollmachtModal()"><i class="fa-solid fa-signature"></i> Vollmacht direkt online ausfüllen & unterschreiben</button>
         </div>
         
         <div id="adminFormSection" class="admin-workspace-box mod-forms" style="max-width:850px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.2); border-radius: 18px; padding: 22px;">
@@ -1938,7 +2086,7 @@
         <div class="download-grid" id="formItemsGrid"></div>
     </div>
 
-    <!-- ANSICHT: AUTO ANKAUF -->
+    <!-- ANSICHT: AUTO ANKAUF (INKL. 30-SEKUNDEN BLITZ-BEWERTUNG PER WHATSAPP) -->
     <div id="view-ankauf" class="view-section">
         <div style="display:flex; justify-content:center; margin-bottom: 30px;">
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
@@ -1966,6 +2114,33 @@
             <p id="txt-ankauf-subtitle" style="font-size: clamp(16px, 2.5vw, 20px); font-weight: bold; color: var(--text-light); margin: 0;">Jeglicher Art – Sofort Bargeld!</p>
             <p id="txt-ankauf-desc" style="color: var(--text-muted); font-size: 13px; max-width: 500px; margin: 10px 0 0;">Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort. Inklusive kostenloser Abmeldung Ihres Fahrzeugs.</p>
             <div id="txt-ankauf-sign" style="font-family: 'Playfair Display', serif; font-size: 35px; color: #fcf6ba; opacity: 0.3; margin-top: 5px; line-height: 1;">Ty</div>
+        </div>
+
+        <!-- NEU: 30-SEKUNDEN AUTO-ANKAUF BLITZ-BEWERTUNG -->
+        <div class="booking-wrapper" style="max-width:700px; margin: 30px auto 0; border-top: 2px solid #b38728;">
+            <h3 style="color:#b38728; font-size:17px; font-weight:900; text-transform:uppercase; margin-bottom:8px; text-align:center;"><i class="fa-solid fa-car-On"></i> 30-Sekunden Blitz-Angebot anfordern</h3>
+            <p style="font-size:12px; color:var(--text-muted); text-align:center; margin-bottom:20px;">Senden Sie uns die Eckdaten Ihres Fahrzeugs direkt per WhatsApp – wir melden uns umgehend mit einem Höchstpreis-Angebot inkl. gratis Abmeldung!</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Marke & Modell</label>
+                    <input type="text" id="ankaufModel" class="form-control" placeholder="z.B. Mercedes C-Klasse / VW Golf">
+                </div>
+                <div class="form-group">
+                    <label>Erstzulassung / Baujahr</label>
+                    <input type="text" id="ankaufYear" class="form-control" placeholder="z.B. 2018">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kilometerstand (ca.)</label>
+                    <input type="text" id="ankaufKm" class="form-control" placeholder="z.B. 125.000 km">
+                </div>
+                <div class="form-group">
+                    <label>Ihre Preisvorstellung / Zustand</label>
+                    <input type="text" id="ankaufPrice" class="form-control" placeholder="z.B. Fahrbereit, TÜV neu...">
+                </div>
+            </div>
+            <button type="button" class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.sendAnkaufWhatsApp()"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Sofort-Angebot per WhatsApp anfordern</button>
         </div>
 
         <div style="text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 14px; font-weight: 800; color: #b38728;">Wertermittlung & Oldtimer Galerie</div>
@@ -2040,6 +2215,7 @@
         <div class="footer-links" id="dynamicFooterLinks">
             <a href="javascript:void(0)" onclick="window.switchView('view-home')">Startseite</a>
             <a href="javascript:void(0)" onclick="window.switchView('view-formulare')">Formulare</a>
+            <a href="javascript:void(0)" onclick="window.openDigitalVollmachtModal()">Digitale Vollmacht</a>
             <a href="javascript:void(0)" onclick="window.switchView('view-ankauf')">Auto Ankauf</a>
             <a href="javascript:void(0)" onclick="window.openLegal('impressum')">Impressum</a>
             <a href="javascript:void(0)" onclick="window.openLegal('datenschutz')">Datenschutz</a>
@@ -2097,16 +2273,72 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
     <script>
-        // Passive Touch-Listener für butterweiches Scrollen auf iOS & Android
+        // Passive Touch-Listener für flüssiges Scrollen auf iOS, Android, HarmonyOS & Windows Touch
         document.addEventListener('touchmove', () => {}, { passive: true });
         document.addEventListener('touchstart', () => {}, { passive: true });
 
-        // --- HINTERGRUND KENNZEICHEN ANIMATION ---
+        // =========================================================================
+        // 1. AUTOMATISCHER JAHRESWECHSEL (2026 -> 2027+ AUTOPILOT & 3D-ANIMATION)
+        // =========================================================================
+        window.getDynamicSystemYear = function() {
+            const now = new Date();
+            return now.getFullYear(); // Schaltet exakt um 00:00 Uhr an Silvester auf 2027, 2028 usw. um!
+        };
+
+        window.initAutomaticYearSystem = function() {
+            const currentYear = window.getDynamicSystemYear();
+            const now = new Date();
+            // Im Dezember (ab Monat 11) oder ab 2027 zeigt die Intro-Animation den 3D-Wechsel!
+            const targetDisplayYear = (now.getMonth() === 11 && currentYear === 2026) ? 2027 : currentYear;
+            const shortYear = String(targetDisplayYear).slice(-2);
+
+            const introBadge = document.getElementById('introYearBadge');
+            if (introBadge) {
+                if (targetDisplayYear > 2026) {
+                    introBadge.innerText = String(targetDisplayYear - 1);
+                    setTimeout(() => {
+                        introBadge.classList.add('flipping');
+                        setTimeout(() => {
+                            introBadge.innerText = String(targetDisplayYear);
+                        }, 320);
+                    }, 1050);
+                } else {
+                    // Dezenter 3D-Glanz-Flip im laufenden Jahr + Vorschau-Impuls
+                    setTimeout(() => {
+                        introBadge.classList.add('flipping');
+                        setTimeout(() => {
+                            introBadge.innerText = String(currentYear);
+                        }, 320);
+                    }, 1050);
+                }
+            }
+
+            // HU-Plakette auf dem Live-Wunschkennzeichen automatisch anpassen (z.B. 26 -> 27)
+            const huStamp = document.getElementById('livePlateHuStamp');
+            if (huStamp) huStamp.innerText = shortYear;
+
+            // Standard-Zahl im Wunschkennzeichen-Konfigurator auf das aktuelle Jahr setzen
+            const wkNum = document.getElementById('wkNumbers');
+            const prevNum = document.getElementById('platePreviewNumbers');
+            if (wkNum && wkNum.value === '2026' && currentYear !== 2026) {
+                wkNum.value = String(currentYear);
+                if (prevNum) prevNum.innerText = String(currentYear);
+            }
+
+            // Footer-Jahreszahl automatisch aktuell halten
+            const footerEl = document.getElementById('txt-footer-text');
+            if (footerEl && currentYear > 2026) {
+                footerEl.innerText = footerEl.innerText.replace('2026', String(currentYear));
+            }
+        };
+
+        // --- HINTERGRUND KENNZEICHEN ANIMATION (MIT AUTOMATISCHEM JAHR) ---
         window.initFloatingPlates = function() {
             const container = document.getElementById('plate-container');
             if(!container) return;
             container.innerHTML = '';
-            const samplePlates = ['B - RED 2026', 'B - TY 61', 'B - KFZ 1', 'B - VIP 999', 'B - EX 24', 'B - BE 2026'];
+            const yr = window.getDynamicSystemYear();
+            const samplePlates = [`B - RED ${yr}`, 'B - TY 61', 'B - KFZ 1', 'B - VIP 999', 'B - EX 24', `B - BE ${yr}`];
             samplePlates.forEach((text, i) => {
                 const p = document.createElement('div');
                 p.className = 'plate';
@@ -2116,6 +2348,241 @@
                 p.style.animationDuration = (20 + (i * 2)) + 's';
                 container.appendChild(p);
             });
+        };
+
+        // =========================================================================
+        // 2. LIVE LABO-BEHÖRDEN-COUNTDOWN (MARKETING & FOMO BOOSTER)
+        // =========================================================================
+        window.updateDispatchCountdown = function() {
+            const el = document.getElementById('liveDispatchCountdown');
+            if (!el) return;
+            const now = new Date();
+            const day = now.getDay(); // 0 = So, 6 = Sa
+            const h = now.getHours();
+            const m = now.getMinutes();
+
+            if (day === 0 || day === 6 || h >= 18) {
+                el.innerHTML = `🔥 <strong>Express- Kontingent:</strong> Jetzt Online-Termin für den nächsten Werktag um 09:00 Uhr sichern!`;
+                return;
+            }
+
+            // Zwei tägliche Behörden-Abgabetermine: 11:30 Uhr und 16:00 Uhr
+            let targetH = h < 11 ? 11 : 16;
+            let targetM = h < 11 ? 30 : 0;
+            let diffMins = ((targetH * 60) + targetM) - ((h * 60) + m);
+            if (diffMins <= 0) diffMins = ((18 * 60) - ((h * 60) + m));
+
+            const remH = Math.floor(diffMins / 60);
+            const remM = diffMins % 60;
+            el.innerHTML = `⚡ <strong>Nächste Behörden-Abgabe (LABO Berlin):</strong> in <span style="color:var(--primary-red); font-weight:900;">${remH} Std. ${remM} Min.</span> – Jetzt Unterlagen einreichen!`;
+        };
+        setInterval(window.updateDispatchCountdown, 30000);
+
+        // =========================================================================
+        // 3. DIGITALE VOLLMACHT MIT FINGER-UNTERSCHRIFT (TOUCH-PAD & PDF-DRUCK)
+        // =========================================================================
+        let sigCanvas = null, sigCtx = null, isDrawingSig = false, hasDrawnSig = false;
+
+        window.initSignaturePad = function() {
+            sigCanvas = document.getElementById('vollmachtSignatureCanvas');
+            if (!sigCanvas) return;
+            const rect = sigCanvas.parentElement.getBoundingClientRect();
+            sigCanvas.width = rect.width || 500;
+            sigCanvas.height = rect.height || 170;
+            sigCtx = sigCanvas.getContext('2d');
+            sigCtx.strokeStyle = '#001a66';
+            sigCtx.lineWidth = 2.6;
+            sigCtx.lineCap = 'round';
+            sigCtx.lineJoin = 'round';
+
+            const getPos = (e) => {
+                const r = sigCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - r.left, y: clientY - r.top };
+            };
+
+            const startDraw = (e) => {
+                e.preventDefault();
+                isDrawingSig = true;
+                hasDrawnSig = true;
+                const pos = getPos(e);
+                sigCtx.beginPath();
+                sigCtx.moveTo(pos.x, pos.y);
+            };
+            const moveDraw = (e) => {
+                if (!isDrawingSig) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                sigCtx.lineTo(pos.x, pos.y);
+                sigCtx.stroke();
+            };
+            const endDraw = () => { isDrawingSig = false; };
+
+            sigCanvas.onmousedown = startDraw;
+            sigCanvas.onmousemove = moveDraw;
+            window.addEventListener('mouseup', endDraw);
+            sigCanvas.ontouchstart = startDraw;
+            sigCanvas.ontouchmove = moveDraw;
+            sigCanvas.ontouchend = endDraw;
+        };
+
+        window.openDigitalVollmachtModal = function() {
+            document.getElementById('digitalVollmachtOverlay').classList.add('open');
+            setTimeout(() => window.initSignaturePad(), 150);
+        };
+
+        window.closeDigitalVollmachtModal = function() {
+            document.getElementById('digitalVollmachtOverlay').classList.remove('open');
+        };
+
+        window.clearVollmachtSignature = function() {
+            if (!sigCanvas || !sigCtx) return;
+            sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+            hasDrawnSig = false;
+        };
+
+        window.printDigitalVollmacht = function() {
+            const name = document.getElementById('dvName').value.trim() || '________________________________';
+            const birth = document.getElementById('dvBirth').value.trim() || '________________';
+            const addr = document.getElementById('dvAddress').value.trim() || '________________________________________';
+            const veh = document.getElementById('dvVehicle').value.trim() || '________________________________________';
+            const sigDataUrl = (sigCanvas && hasDrawnSig) ? sigCanvas.toDataURL('image/png') : '';
+            const todayStr = new Date().toLocaleDateString('de-DE');
+
+            const printWin = window.open('', '_blank');
+            if (!printWin) {
+                window.showToast('Bitte Pop-ups erlauben, um die Vollmacht zu drucken.', 'error');
+                return;
+            }
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="de">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Vollmacht - RED Zulassungsdienst Berlin</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 40px; color: #111; line-height: 1.6; max-width: 750px; margin: 0 auto; }
+                        .header { border-bottom: 3px solid #e60000; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+                        h1 { font-size: 22px; margin: 0; color: #e60000; text-transform: uppercase; }
+                        .box { border: 1px solid #ccc; padding: 15px; border-radius: 8px; margin-bottom: 20px; background: #fafafa; }
+                        .sig-box { border-bottom: 2px solid #000; min-height: 90px; display: flex; align-items: flex-end; padding-bottom: 5px; margin-top: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div>
+                            <h1>Vollmacht zur Kfz-Zulassung</h1>
+                            <small>RED Zulassungsdienst Berlin • Inh. Tamer Yazici • Kienitzer Str. 6, 12053 Berlin</small>
+                        </div>
+                        <div style="font-weight:bold; font-size:13px;">Datum: ${todayStr}</div>
+                    </div>
+                    <p>Hiermit bevollmächtige ich den <strong>RED Zulassungsdienst Berlin (Inhaber: Tamer Yazici und Beauftragte)</strong>, mein unten genanntes Fahrzeug bei der zuständigen Kfz-Zulassungsbehörde (LABO Berlin / Brandenburg) an-, um- oder abzumelden sowie sämtliche Fahrzeugpapiere und Kennzeichen entgegenzunehmen.</p>
+                    <div class="box">
+                        <strong>Angaben zum Fahrzeughalter (Vollmachtgeber):</strong><br><br>
+                        Name, Vorname: <strong>${name}</strong><br>
+                        Geburtsdatum: <strong>${birth}</strong><br>
+                        Anschrift: <strong>${addr}</strong><br>
+                        Fahrzeug (FIN / Kennzeichen): <strong>${veh}</strong>
+                    </div>
+                    <p style="font-size:12px;"><strong>Einverständniserklärung:</strong> Ich erkläre mein Einverständnis, dass dem Bevollmächtigten etwaige Kraftfahrzeugsteuerrückstände sowie Gebührenrückstände bekannt gegeben werden dürfen.</p>
+                    <div class="sig-box">
+                        ${sigDataUrl ? `<img src="${sigDataUrl}" style="max-height:85px;">` : ''}
+                    </div>
+                    <small>Berlin, den ${todayStr} – Unterschrift des Fahrzeughalters (${name})</small>
+                    <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 400); };<\/script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        };
+
+        // =========================================================================
+        // 4. VIRAL SHARE & QR-VISITENKARTE + 30s AUTO-ANKAUF WHATSAPP
+        // =========================================================================
+        window.openViralShareModal = function() {
+            const qrImg = document.getElementById('viralQrImage');
+            if (qrImg) {
+                const targetUrl = window.location.href.startsWith('http') ? window.location.href : 'https://wa.me/491783783875';
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}`;
+            }
+            document.getElementById('viralShareOverlay').classList.add('open');
+        };
+
+        window.closeViralShareModal = function() {
+            document.getElementById('viralShareOverlay').classList.remove('open');
+        };
+
+        window.shareViaWhatsApp = function() {
+            const url = window.location.href.startsWith('http') ? window.location.href : 'Kienitzer Str. 6, 12053 Berlin (Tel: 0178 378 38 75)';
+            const text = encodeURIComponent(`🔥 Empfehlung für Kfz-Zulassung & Sofortkennzeichen in Berlin:\nRED Zulassungsdienst Berlin (Tamer Yazici) – Schnell, zuverlässig & ohne Wartezeit!\n👉 ${url}`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        };
+
+        window.copyWebsiteLink = function() {
+            const url = window.location.href.startsWith('http') ? window.location.href : 'RED Zulassungsdienst Berlin - Kienitzer Str. 6, 12053 Berlin - Tel: 0178 378 38 75';
+            navigator.clipboard.writeText(url).then(() => {
+                window.showToast('Link in die Zwischenablage kopiert!', 'success');
+            }).catch(() => {
+                window.showToast('Kopiert!', 'success');
+            });
+        };
+
+        window.sendAnkaufWhatsApp = function() {
+            const model = document.getElementById('ankaufModel').value.trim();
+            const year = document.getElementById('ankaufYear').value.trim();
+            const km = document.getElementById('ankaufKm').value.trim();
+            const price = document.getElementById('ankaufPrice').value.trim();
+
+            if (!model) {
+                window.showToast('Bitte mindestens Marke & Modell eingeben.', 'error');
+                return;
+            }
+            let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
+            if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+
+            const msg = encodeURIComponent(`🚗 *AUTO-ANKAUF BLITZ-ANFRAGE*\n\n• *Fahrzeug:* ${model}\n• *Baujahr/EZ:* ${year || '-'}\n• *Kilometerstand:* ${km || '-'}\n• *Zustand/Preiswunsch:* ${price || '-'}\n\nBitte um ein unverbindliches Ankauf-Angebot!`);
+            window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+        };
+
+        // =========================================================================
+        // 5. LIVE AUFTRAGS-STATUS TRACKER (KUNDEN-SUCHE & ADMIN-STEPPER)
+        // =========================================================================
+        window.checkLiveOrderStatus = function() {
+            const queryStr = (document.getElementById('liveTrackerInput')?.value || '').trim().toLowerCase();
+            if (queryStr.length < 3) {
+                window.showToast('Bitte mindestens 3 Zeichen (Name oder Telefonnummer) eingeben.', 'error');
+                return;
+            }
+
+            const cleanDigits = queryStr.replace(/\D/g, '');
+            const foundApt = (window.redApts || []).find(a => {
+                const nameMatch = (a.name || '').toLowerCase().includes(queryStr);
+                const phoneClean = (a.phone || '').replace(/\D/g, '');
+                const phoneMatch = cleanDigits.length >= 4 && phoneClean.includes(cleanDigits);
+                return nameMatch || phoneMatch;
+            });
+
+            const resBox = document.getElementById('liveTrackerResultBox');
+            if (!foundApt) {
+                if (resBox) resBox.style.display = 'none';
+                window.showToast('Kein aktiver Auftrag unter dieser Angabe gefunden.', 'error');
+                return;
+            }
+
+            resBox.style.display = 'block';
+            const step = Number(foundApt.orderStatus) || 1;
+            document.getElementById('trackerClientTitle').innerText = `Auftrag für: ${foundApt.name} (${foundApt.date})`;
+            document.getElementById('trackerServiceBadge').innerText = foundApt.service || 'Kfz-Zulassung';
+
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById('tStep' + i);
+                if (!stepEl) continue;
+                stepEl.classList.remove('active', 'completed');
+                if (i < step) stepEl.classList.add('completed');
+                else if (i === step) stepEl.classList.add('active');
+            }
+            window.showToast('Auftragsstatus erfolgreich geladen!', 'success');
         };
 
         // --- DATEI-UPLOAD LABEL HELFER ---
@@ -2176,7 +2643,7 @@
             numbersInput.value = cleanNumbers;
 
             document.getElementById('platePreviewLetters').innerText = cleanLetters || 'RED';
-            document.getElementById('platePreviewNumbers').innerText = cleanNumbers || '2026';
+            document.getElementById('platePreviewNumbers').innerText = cleanNumbers || String(window.getDynamicSystemYear());
             document.getElementById('platePreviewSuffix').innerText = typeSelect ? typeSelect.value : '';
         };
 
@@ -2362,7 +2829,7 @@
             if(!apt) { window.showToast('Kein aktueller Termin ausgewählt.', 'error'); return; }
 
             const parts = apt.date.split('.');
-            let y = new Date().getFullYear(), m = '01', d = '01';
+            let y = window.getDynamicSystemYear(), m = '01', d = '01';
             if(parts.length === 3) { d = parts[0].padStart(2,'0'); m = parts[1].padStart(2,'0'); y = parts[2]; }
 
             let startH = '09', startM = '00', endH = '10', endM = '00';
@@ -2505,7 +2972,9 @@
         window.changeTheme(savedTheme, false);
 
         document.addEventListener('DOMContentLoaded', () => {
+            window.initAutomaticYearSystem();
             window.initFloatingPlates();
+            window.updateDispatchCountdown();
             window.renderCalcItems(window.calcItemsData);
             if(localStorage.getItem('red_maps_consent') === 'true') {
                 window.enableGoogleMaps();
@@ -2541,7 +3010,7 @@
             leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true
         };
 
-        // --- ALLE SEITENTEXTE INKL. CHECKLISTE, FAQ, TOOLS & DATENSCHUTZ MIT STIFT BEARBEITBAR ---
+        // --- ALLE SEITENTEXTE MIT STIFT BEARBEITBAR ---
         window.pageContentData = {
             "header": {
                 "title_red": "RED",
@@ -2575,7 +3044,7 @@
                 "item_2": "Gültiger Personalausweis oder Reisepass mit Meldebescheinigung",
                 "item_3": "7-stellige eVB-Nummer Ihrer Kfz-Versicherung",
                 "item_4": "Gültiger TÜV / HU-Bericht & IBAN für das SEPA-Mandat",
-                "item_5": "Unterschriebene Vollmacht (auch direkt vor Ort bei uns ausfüllbar!)"
+                "item_5": "Unterschriebene Vollmacht (auch digital hier oder vor Ort ausfüllbar!)"
             },
             "faq": {
                 "title": "Häufige Fragen (Berlin)",
@@ -2584,7 +3053,7 @@
                 "q2": "Prägt ihr die Schilder direkt vor Ort?",
                 "a2": "Ja! In der Kienitzer Str. 6 (12053 Berlin) prägen wir Ihre neuen Euro-, Kurzzeit- oder Zollkennzeichen sofort zum Mitnehmen.",
                 "q3": "Muss ich die Formulare vorher ausdrucken?",
-                "a3": "Nein, nicht zwingend. Sie können sie unter „Formulare“ vorab herunterladen oder ganz entspannt direkt bei uns im Büro unterschreiben."
+                "a3": "Nein, nicht zwingend. Sie können unsere digitale Vollmacht direkt am Handy unterschreiben oder ganz entspannt bei uns im Büro ausfüllen."
             },
             "termin": {
                 "title": "Termin Buchen",
@@ -2604,7 +3073,7 @@
                 "datenschutz_extra": "Sämtliche Terminbuchungsdaten werden nach DSGVO-Standard verschlüsselt übertragen und ausschließlich zur Durchführung Ihrer Kfz-Zulassung verwendet. Eine Weitergabe an unbefugte Dritte erfolgt nicht."
             },
             "footer": {
-                "text": "© 2026 RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici."
+                "text": `© ${window.getDynamicSystemYear()} RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici.`
             }
         };
 
@@ -2769,7 +3238,7 @@
                 let mediaHtml = '';
                 if(block.mediaUrl) {
                     if(block.mediaUrl.includes('video/') || block.mediaUrl.endsWith('.mp4') || block.mediaUrl.startsWith('data:video')) {
-                        mediaHtml = `<video src="${block.mediaUrl}" controls autoplay loop class="dynamic-block-media"></video>`;
+                        mediaHtml = `<video src="${block.mediaUrl}" controls autoplay loop playsinline class="dynamic-block-media"></video>`;
                     } else {
                         mediaHtml = `<img src="${block.mediaUrl}" class="dynamic-block-media">`;
                     }
@@ -3345,6 +3814,8 @@
                         if(this.id === 'crmViewAllOverlay') window.closeCRMViewAll();
                         if(this.id === 'calcItemEditOverlay') window.closeCalcEditModal();
                         if(this.id === 'formEditModalOverlay') window.closeFormEditModal();
+                        if(this.id === 'digitalVollmachtOverlay') window.closeDigitalVollmachtModal();
+                        if(this.id === 'viralShareOverlay') window.closeViralShareModal();
                     }
                 });
             });
@@ -4390,6 +4861,22 @@
             return aptDate < new Date();
         }
 
+        // Admin-Funktion zum Setzen des Live-Auftrags-Status (1 bis 4)
+        window.setAptOrderStatus = async function(id, step) {
+            try {
+                await updateDoc(doc(db, "appointments", id), { orderStatus: step });
+                window.showToast(`Auftragsstatus auf Stufe ${step} gesetzt!`, 'success');
+            } catch(e) {
+                const idx = localAppointments.findIndex(a => a.id === id);
+                if(idx > -1) {
+                    localAppointments[idx].orderStatus = step;
+                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                    renderAppointments(localAppointments);
+                    window.showToast(`Status lokal auf Stufe ${step} gesetzt.`, 'success');
+                }
+            }
+        };
+
         function renderAppointments(apts) {
             window.redApts = apts; 
             const list = document.getElementById('admin-list');
@@ -4409,6 +4896,7 @@
             }
 
             let savedPositions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+            const shortYear = String(window.getDynamicSystemYear()).slice(-2);
 
             apts.forEach((apt) => {
                 const id = apt.id;
@@ -4419,6 +4907,7 @@
                 if(apt.marked) pinnedCount++;
                 
                 const markedClass = apt.marked ? 'marked' : '';
+                const curStep = Number(apt.orderStatus) || 1;
 
                 const card = document.createElement('div');
                 card.className = `admin-apt-card ${prioClass} ${markedClass}`;
@@ -4471,6 +4960,14 @@
                         <div><i class="fa-solid fa-envelope"></i> ${apt.email}</div>
                         <div><i class="fa-solid fa-phone"></i> ${apt.phone || '-'}</div>
                     </div>
+
+                    <!-- LIVE STATUS STEPPER FÜR DEN KUNDEN-TRACKER -->
+                    <div class="apt-status-bar">
+                        <button type="button" class="status-pill-btn ${curStep===1?'active':''}" onclick="window.setAptOrderStatus('${id}', 1)">1. Erfasst</button>
+                        <button type="button" class="status-pill-btn ${curStep===2?'active':''}" onclick="window.setAptOrderStatus('${id}', 2)">2. Beim LABO</button>
+                        <button type="button" class="status-pill-btn ${curStep===3?'active':''}" onclick="window.setAptOrderStatus('${id}', 3)">3. Schilder geprägt</button>
+                        <button type="button" class="status-pill-btn done-ready ${curStep===4?'active':''}" onclick="window.setAptOrderStatus('${id}', 4)">4. Abholbereit!</button>
+                    </div>
                     
                     <div class="notes-list-box" id="notes-container-${id}">${notesHtml}</div>
                     <input type="text" class="admin-note-input" id="note-input-${id}" placeholder="Notiz eingeben und Enter drücken..." onkeypress="window.saveNote(event, this, '${id}')">
@@ -4490,7 +4987,7 @@
                     plate.className = `pinned-plate ${plateStateClass}`;
                     plate.id = 'pinned-' + id;
                     
-                    const tuev = `<div class="tuev-plakette" style="margin: 0 8px;">26</div>`;
+                    const tuev = `<div class="tuev-plakette" style="margin: 0 8px;">${shortYear}</div>`;
                     plate.innerHTML = `<span style="font-size:13px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.name}</span> ${tuev} <span style="font-size:10px; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.date}<br>${displayTime}</span>`;
                     
                     if(savedPositions[id]) {
@@ -4782,7 +5279,7 @@
 
             const appointmentData = {
                 name: n, phone: p, email: e, date: d, timeLabel: timeString,
-                service: window.selectedServiceVal, marked: false, notes: [], timestamp: Date.now()
+                service: window.selectedServiceVal, marked: false, orderStatus: 1, notes: [], timestamp: Date.now()
             };
 
             try {
@@ -4825,7 +5322,7 @@
             btn.disabled = false;
         };
         
-        // --- FORMULARE & PDF UPLOAD ENGINE (MIT STIFT & DATEI-UPLOAD FÜR ALLE ELEMENTE) ---
+        // --- FORMULARE & PDF UPLOAD ENGINE (MIT STIFT & DATEI-UPLOAD) ---
         const staticForms = [
             {id: 'static-1', title: 'Allgemeine Vollmacht', url: 'https://www.berlin.de/formularverzeichnis/?formular=/labo/kfz-zulassung/_assets/mdb-f313994-vollmacht_zulassung_10_2012.pdf'}, 
             {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: '#'},
@@ -4903,7 +5400,6 @@
             renderFormsList(getActiveFormsList());
         });
 
-        // Neues Formular anlegen (Unterstützt sowohl Link als auch direkten Datei-Upload!)
         window.addNewFormItem = async function() {
             const title = document.getElementById('newFormTitle').value.trim();
             const urlInput = document.getElementById('newFormUrl').value.trim() || '#';
@@ -4940,7 +5436,6 @@
             }
         };
 
-        // Formular mit Stift bearbeiten Modal
         window.openFormEditModal = function(formId) {
             const form = window.allFormsMap[formId] || { id: formId, title: '', url: '#' };
             document.getElementById('editFormIdInput').value = formId;
