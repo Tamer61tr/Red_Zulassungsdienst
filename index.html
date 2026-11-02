@@ -135,7 +135,6 @@
         html { width: 100%; overflow-x: hidden; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
         body { 
             margin: 0; padding: 0;
-            /* DYNAMISCHER ABSTAND: Passt sich automatisch an die echte Header-Höhe auf iPhone, Samsung & Desktop an! */
             padding-top: var(--dynamic-header-h, 118px);
             padding-bottom: var(--safe-bottom);
             width: 100%; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; overflow-y: auto !important; 
@@ -191,13 +190,19 @@
         .action-forms, .action-cars, .action-content, .action-prices { display: none !important; }
 
         body.is-admin.perm-leads .mod-leads { display: block !important; }
+        /* WICHTIGER FIX FÜR DEIN FOTO: DAS MONITORING-RASTER BLEIBT IMMER EIN NEBENEINANDER-GRID (VIERECKE)! */
+        body.is-admin.perm-leads .admin-kpi-grid.mod-leads,
+        body.is-supervisor .admin-kpi-grid.mod-leads {
+            display: grid !important;
+        }
+
         body.is-admin:not(.perm-leads):not(.is-supervisor) .mod-leads-locked { display: block !important; }
         body.is-admin.perm-blocks .mod-blocks { display: block !important; }
         body.is-admin.perm-data .mod-data { display: block !important; }
         body.is-admin.perm-prices .mod-prices { display: block !important; }
-        body.is-admin.perm-crm .mod-crm { display: flex !important; }
-        body.is-admin.perm-pages .mod-pages { display: flex !important; }
-        body.is-admin.perm-theme .mod-theme { display: inline-block !important; }
+        body.is-admin.perm-crm .mod-crm { display: inline-flex !important; }
+        body.is-admin.perm-pages .mod-pages { display: inline-flex !important; }
+        body.is-admin.perm-theme .mod-theme { display: inline-flex !important; }
         body.is-admin.perm-forms .mod-forms { display: block !important; }
         body.is-admin.perm-forms .action-forms { display: inline-flex !important; }
         body.is-admin.perm-cars .mod-cars { display: block !important; }
@@ -207,8 +212,8 @@
         body.is-admin.perm-prices .action-prices { display: inline-flex !important; }
 
         body.is-supervisor .mod-leads, body.is-supervisor .mod-blocks, body.is-supervisor .mod-data, body.is-supervisor .mod-prices, body.is-supervisor .mod-forms, body.is-supervisor .mod-cars { display: block !important; }
-        body.is-supervisor .mod-crm, body.is-supervisor .mod-ticker, body.is-supervisor .mod-pages, body.is-supervisor .action-cars, body.is-supervisor .action-content { display: flex !important; }
-        body.is-supervisor .mod-theme { display: inline-block !important; }
+        body.is-supervisor .mod-crm, body.is-supervisor .mod-ticker, body.is-supervisor .mod-pages, body.is-supervisor .action-cars, body.is-supervisor .action-content { display: inline-flex !important; }
+        body.is-supervisor .mod-theme { display: inline-flex !important; }
         body.is-supervisor .action-forms, body.is-supervisor .action-prices { display: inline-flex !important; }
         body.is-supervisor .mod-leads-locked { display: none !important; }
 
@@ -301,9 +306,9 @@
 
         .nav-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 
-        /* KORREKTUR: KUNDEN HELL-/DUNKELMODUS SYMBOL – EDEL, KLEIN & PERFEKT EINGEORDNET */
+        /* KUNDEN HELL-/DUNKELMODUS SYMBOL – EDEL, KLEIN & PERFEKT EINGEORDNET */
         .customer-theme-toggle {
-            width: 27px; height: 27px; min-width: 27px; border-radius: 50%;
+            width: 26px; height: 26px; min-width: 26px; border-radius: 50%;
             background: var(--bg-input); border: 1px solid var(--glass-border);
             color: var(--text-light); display: inline-flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.25s ease; font-size: 11px !important;
@@ -313,7 +318,7 @@
             border-color: var(--primary-red); color: var(--primary-red); transform: scale(1.08);
         }
 
-        /* KORREKTUR: SCHLÜSSEL & ZÄHLER NOCH KOMPAKTER (AUCH FÜR ADMIN/SUPERVISOR SCHLANK & EDEL) */
+        /* SCHLÜSSEL & ZÄHLER DEZENT */
         .visitor-counter {
             background: transparent; border: 1px solid transparent;
             padding: 2px 5px; border-radius: 10px; font-size: 8.5px; font-weight: 600;
@@ -327,17 +332,17 @@
 
         .key-ring {
             position: relative; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-            width: 21px; height: 21px; min-width: 21px; border-radius: 50%;
+            width: 20px; height: 20px; min-width: 20px; border-radius: 50%;
             background: transparent; border: 1px solid transparent;
             opacity: 0.32; transition: all 0.25s ease; flex-shrink: 0;
         }
         .key-ring:hover { opacity: 0.88; background: var(--bg-input); border-color: var(--glass-border); }
         .key-icon-wrapper { display: flex; align-items: center; justify-content: center; line-height: 1; }
-        .key-icon-wrapper i { color: var(--text-muted); font-size: 9.5px; transition: 0.25s; }
+        .key-icon-wrapper i { color: var(--text-muted); font-size: 9px; transition: 0.25s; }
 
-        /* WENN ADMIN ODER SUPERVISOR EINGELOGGT IST: KOMPAKT (28px), ABER DURCH NEON-FARBE SOFORT SICHTBAR! */
+        /* WENN ADMIN ODER SUPERVISOR EINGELOGGT IST */
         body.is-admin .visitor-counter, body.is-supervisor .visitor-counter {
-            opacity: 1; font-size: 10px; font-weight: 800; padding: 3px 8px;
+            opacity: 1; font-size: 9.5px; font-weight: 800; padding: 3px 7px;
             background: var(--bg-input); border: 1px solid var(--primary-red);
         }
         body.is-admin .visitor-counter span#vCount, body.is-supervisor .visitor-counter span#vCount {
@@ -345,20 +350,20 @@
         }
 
         body.is-admin .key-ring, body.is-supervisor .key-ring {
-            opacity: 1; width: 28px; height: 28px; min-width: 28px;
+            opacity: 1; width: 26px; height: 26px; min-width: 26px;
             background: rgba(37, 211, 102, 0.14); border: 1.5px solid #25D366;
-            box-shadow: 0 0 10px rgba(37, 211, 102, 0.3);
+            box-shadow: 0 0 8px rgba(37, 211, 102, 0.3);
         }
         body.is-supervisor .key-ring {
             background: rgba(255, 0, 255, 0.14); border-color: #ff00ff;
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.35);
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.35);
         }
-        body.is-admin .key-icon-wrapper i { color: #25D366; font-size: 12px; }
-        body.is-supervisor .key-icon-wrapper i { color: #ff00ff; font-size: 12px; }
+        body.is-admin .key-icon-wrapper i { color: #25D366; font-size: 11px; }
+        body.is-supervisor .key-icon-wrapper i { color: #ff00ff; font-size: 11px; }
         .key-ring.new-alert { animation: severePulse 1.5s infinite; background: var(--primary-red) !important; opacity: 1 !important; }
         .key-ring.new-alert i { color: #fff !important; }
 
-        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 8px; font-weight: 900; width: 15px; height: 15px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 6px var(--primary-red); transition: 0.3s; }
+        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 8px; font-weight: 900; width: 14px; height: 14px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 6px var(--primary-red); transition: 0.3s; }
         body.is-admin .notification-badge, body.is-supervisor .notification-badge { display: flex !important; }
         .notification-badge.prio-pulse { animation: badgePulse 1s infinite alternate; }
         @keyframes badgePulse { 0% { transform: scale(1); background: #ff3b30; } 100% { transform: scale(1.18); background: #ff3b30; } }
@@ -372,20 +377,26 @@
         .quick-menu-btn { background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-light); padding: 6px 12px; border-radius: 20px; font-weight: 800; cursor: pointer; font-size: 10.5px !important; text-transform: uppercase; transition: 0.25s; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
         .quick-menu-btn:hover { background: var(--primary-red); color: #fff; border-color: var(--primary-red); }
 
-        .header-widgets-wrapper { display: flex; align-items: center; justify-content: center; gap: 8px; margin-left: auto; margin-right: 10px; width: auto; user-select: none; }
-        .header-widget-item { cursor: pointer; transition: 0.25s; padding: 3px 9px; border-radius: 8px; border: 1px solid transparent; }
-        .header-widget-item:hover { background: var(--glass-border); border-color: var(--glass-border); transform: scale(1.03); }
+        .header-widgets-wrapper { display: flex; align-items: center; justify-content: center; gap: 6px; margin-left: auto; margin-right: 10px; width: auto; user-select: none; flex-wrap: wrap; }
+        .header-widget-item { cursor: pointer; transition: 0.25s; padding: 3px 9px; border-radius: 20px; border: 1px solid var(--glass-border); background: var(--bg-input); }
+        .header-widget-item:hover { border-color: var(--primary-red); transform: translateY(-1px); }
         
-        .header-office-status { font-size: 10.5px; font-weight: 800; color: var(--text-light); display: flex; align-items: center; gap: 5px; white-space: nowrap; background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 20px; padding: 3px 10px; }
+        .header-office-status { font-size: 10.5px; font-weight: 800; color: var(--text-light); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
         .status-led { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .status-led.open { background: #25D366; box-shadow: 0 0 8px #25D366; animation: pulseAnim 1.2s infinite alternate; }
         .status-led.closed { background: #ff9500; box-shadow: 0 0 8px #ff9500; }
 
-        /* NEU: APP-INSTALLIEREN CHIP IM HEADER */
+        /* NEU: HEADER KALENDER- & KW-CHIP + APP-CHIP */
+        .header-calendar-chip {
+            font-size: 10.5px; font-weight: 800; color: var(--text-light);
+            display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+        }
+        .header-calendar-chip i { color: var(--primary-red); }
+
         .header-app-install-chip {
             font-size: 10px; font-weight: 800; color: var(--primary-red);
             background: rgba(230, 0, 0, 0.08); border: 1px solid rgba(230, 0, 0, 0.28);
-            border-radius: 20px; padding: 3px 9px; display: inline-flex; align-items: center; gap: 5px;
+            border-radius: 20px; padding: 3px 9px; display: inline-flex; align-items: center; gap: 4px;
             white-space: nowrap; cursor: pointer; transition: 0.25s;
         }
         .header-app-install-chip:hover { background: var(--primary-red); color: #fff; }
@@ -393,9 +404,18 @@
         .btn-crm-header { border: 1.5px solid var(--primary-red); color: var(--primary-red); font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 20px; align-items: center; gap: 5px; background: rgba(230,0,0,0.08); text-transform: uppercase; white-space: nowrap; }
         .btn-crm-header:hover { background: var(--primary-red); color: #fff; }
 
-        .header-clock-date { font-size: 10.5px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.4px; display:flex; align-items:center; gap:5px; white-space: nowrap; }
-        .header-clock-date span { color: var(--primary-red); }
-        .header-weather { font-size: 10.5px; font-weight: 600; color: var(--text-muted); display:flex; align-items:center; gap:5px; white-space: nowrap; }
+        .header-clock-date { font-size: 10.5px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.3px; display:inline-flex; align-items:center; gap:5px; white-space: nowrap; }
+        .header-clock-date span { color: var(--primary-red); font-weight: 800; }
+        .header-weather { font-size: 10.5px; font-weight: 600; color: var(--text-muted); display:inline-flex; align-items:center; gap:5px; white-space: nowrap; }
+
+        /* INTERAKTIVES KALENDERBLATT IM HEADER-MODAL */
+        .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 12px; text-align: center; }
+        .mini-cal-weekday { font-size: 10px; font-weight: 900; color: var(--primary-red); text-transform: uppercase; padding-bottom: 4px; }
+        .mini-cal-day { padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 700; background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; transition: 0.2s; }
+        .mini-cal-day:hover:not(.weekend):not(.empty) { border-color: var(--primary-red); background: rgba(230,0,0,0.12); transform: scale(1.06); }
+        .mini-cal-day.today { background: var(--primary-red); color: #fff; border-color: var(--primary-red); font-weight: 900; box-shadow: 0 3px 10px rgba(230,0,0,0.35); }
+        .mini-cal-day.weekend { opacity: 0.35; cursor: default; }
+        .mini-cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
 
         @keyframes blinkColon { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .blink-colon { animation: blinkColon 1s steps(1) infinite; }
@@ -449,7 +469,7 @@
         .close-dialog-btn { position: absolute; top: 16px; right: 20px; font-size: 22px; color: var(--text-muted); cursor: pointer; transition: 0.2s; z-index: 10; }
         .close-dialog-btn:hover { color: var(--primary-red); transform: scale(1.15) rotate(90deg); }
 
-        #adminModal .custom-dialog-window { max-width: 780px; padding: 24px 20px; }
+        #adminModal .custom-dialog-window { max-width: 820px; padding: 20px 18px; }
         #crmOverlay .custom-dialog-window { width: 98%; max-width: 1400px; height: 90dvh; border-top-color: var(--primary-red); text-align: left; }
         #crmDetailOverlay .custom-dialog-window { max-width: 620px; border-top-color: var(--primary-red); text-align: left; }
         #crmViewAllOverlay .custom-dialog-window { width: 98%; max-width: 1800px; height: 90dvh; border-top-color: #007aff; text-align: left; }
@@ -480,35 +500,100 @@
         #legalOverlay .custom-dialog-window { max-width: 640px; border-top-color: var(--primary-red); text-align: left; padding: 30px; }
         #legalTitle { color: var(--text-light); font-weight: 900; margin-bottom: 15px; font-size: 20px; }
         #legalContentText { color: var(--text-muted); font-size: 12px; line-height: 1.65; max-height: 62dvh; overflow-y: auto; padding-right: 10px; }
-        #widgetModalOverlay .custom-dialog-window { max-width: 420px; border-top-color: var(--primary-red); }
+        #widgetModalOverlay .custom-dialog-window { max-width: 440px; border-top-color: var(--primary-red); }
         #supervisorPermsOverlay .custom-dialog-window { max-width: 500px; border-top-color: #ff00ff; }
 
-        /* KOMPAKTES LIVE-LEADS MONITORING TERMINAL */
+        /* KORREKTUR ZUM FOTO: 8 KLEINE KOMPAKTE MONITORING-VIERECKE NEBENEINANDER! */
         .admin-kpi-grid {
-            display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 10px 0;
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin: 10px 0;
+        }
+        @media (min-width: 640px) {
+            .admin-kpi-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
         }
         .admin-kpi-box {
-            background: var(--bg-input); border: 1px solid var(--glass-border);
-            border-radius: 10px; padding: 7px 4px; text-align: center; cursor: pointer; transition: 0.2s;
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 54px;
         }
-        .admin-kpi-box:hover { border-color: var(--primary-red); transform: translateY(-1px); }
-        .admin-kpi-val { font-size: 15px; font-weight: 900; color: var(--primary-red); display: block; line-height: 1.1; }
-        .admin-kpi-lbl { font-size: 8px; text-transform: uppercase; color: var(--text-muted); font-weight: 800; display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .admin-kpi-box:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .admin-kpi-val {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--primary-red);
+            display: block;
+            line-height: 1.1;
+        }
+        .admin-kpi-lbl {
+            font-size: 8px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 800;
+            display: block;
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* KOMPAKTE EINZEILIGE ADMIN-BUTTON-LEISTE UNTER DEN VIERECKEN */
+        .admin-quick-toolbar {
+            margin-top: 6px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+        .admin-tool-btn {
+            padding: 6px 12px !important;
+            font-size: 10px !important;
+            font-weight: 800 !important;
+            border-radius: 50px !important;
+            white-space: nowrap !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1 1 auto;
+            box-shadow: none !important;
+        }
 
         .admin-filter-pills {
             display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin: 8px 0;
         }
         .admin-filter-pill {
             background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-muted);
-            padding: 5px 11px; border-radius: 20px; font-size: 10px !important; font-weight: 800;
-            cursor: pointer; transition: 0.2s; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 20px; font-size: 9.5px !important; font-weight: 800;
+            cursor: pointer; transition: 0.2s; text-transform: uppercase; white-space: nowrap;
         }
         .admin-filter-pill.active, .admin-filter-pill:hover {
             background: var(--primary-red); color: #fff; border-color: var(--primary-red);
         }
 
-        .admin-list-wrapper { max-height: 460px; overflow-y: auto; overflow-x: hidden; margin-top: 8px; padding-right: 4px; display: grid; gap: 10px; }
-        .admin-apt-card { background: var(--bg-card); border-radius: 14px; padding: 14px; position: relative; border: 1px solid var(--glass-border); border-left: 5px solid var(--text-muted); text-align: left; transition: 0.25s; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+        .admin-list-wrapper { max-height: 430px; overflow-y: auto; overflow-x: hidden; margin-top: 8px; padding-right: 4px; display: grid; gap: 10px; }
+        .admin-apt-card { background: var(--bg-card); border-radius: 14px; padding: 13px; position: relative; border: 1px solid var(--glass-border); border-left: 5px solid var(--text-muted); text-align: left; transition: 0.25s; display: flex; flex-direction: column; gap: 7px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
         .admin-apt-card:hover { border-color: var(--primary-red); }
         .admin-apt-card.marked { border-left-color: var(--gold-border); background: var(--gold-bg-soft); }
         .admin-apt-card.prio-high { border-left-color: #ff3b30; }
@@ -522,18 +607,18 @@
         .prio-expired .prio-badge { background: rgba(255,149,0,0.18); color: #d97706; }
         .prio-done .prio-badge { background: rgba(37,211,102,0.18); color: var(--green-accent); }
 
-        .apt-grid-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; background: var(--bg-input); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--glass-border); }
-        .apt-grid-info div { font-size: 11.5px; color: var(--text-light); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+        .apt-grid-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; background: var(--bg-input); padding: 9px 11px; border-radius: 10px; border: 1px solid var(--glass-border); }
+        .apt-grid-info div { font-size: 11px; color: var(--text-light); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
         .apt-grid-info i { color: var(--primary-red); width: 14px; text-align: center; font-size: 11px; }
         .apt-actions-horizontal { display: flex; gap: 5px; justify-content: flex-end; background: var(--bg-input); padding: 4px 6px; border-radius: 10px; border: 1px solid var(--glass-border); flex-wrap: wrap; }
-        .apt-btn { background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; font-size: 12px; transition: 0.25s; width: 29px; height: 29px; border-radius: 7px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .apt-btn { background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; font-size: 11.5px; transition: 0.25s; width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
         .apt-btn.mark:hover { background: var(--gold-border); color: #fff; border-color: var(--gold-border); }
         .apt-btn.edit:hover { background: #007aff; color: #fff; border-color: #007aff; }
         .apt-btn.wa-confirm:hover { background: #25D366; color: #fff; border-color: #25D366; }
         .apt-btn.delete:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
 
         .apt-status-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--bg-input); padding: 5px; border-radius: 8px; border: 1px solid var(--glass-border); }
-        .status-pill-btn { font-size: 9.5px !important; font-weight: 800; padding: 5px 4px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; transition: 0.2s; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .status-pill-btn { font-size: 9px !important; font-weight: 800; padding: 5px 4px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; transition: 0.2s; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .status-pill-btn.active { background: var(--primary-red); color: #fff; border-color: var(--primary-red); box-shadow: 0 0 8px rgba(230,0,0,0.3); }
         .status-pill-btn.done-ready.active { background: #25D366; color: #000; border-color: #25D366; box-shadow: 0 0 10px rgba(37,211,102,0.4); }
 
@@ -698,7 +783,7 @@
         .euro-red-glow { color: #ff3b30; text-shadow: 0 0 8px rgba(255,59,48,0.4); }
         @keyframes neonFlicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 
-        /* INTERAKTIVER ZULASSUNGS-KOMPASS */
+        /* INTERAKTIVER ZULASSUNGS-KOMPASS & 3-SCHRITTE-TIMELINE */
         .compass-wrapper { max-width: 1100px; margin: 45px auto 0; padding: 0 5%; box-sizing: border-box; }
         .compass-box { background: var(--bg-card); border: 1px solid var(--glass-border); border-top: 3px solid var(--primary-red); border-radius: var(--global-radius); padding: 32px 25px; box-shadow: var(--card-shadow); }
         .compass-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; justify-content: center; }
@@ -709,6 +794,11 @@
         .compass-doc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .compass-doc-list li { font-size: 12px; color: var(--text-light); display: flex; align-items: flex-start; gap: 8px; font-weight: 600; }
         .compass-doc-list li i { color: var(--green-accent); margin-top: 3px; flex-shrink: 0; }
+
+        .process-steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 18px; }
+        .process-step-card { background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 16px; padding: 18px; text-align: left; position: relative; transition: 0.25s; }
+        .process-step-card:hover { border-color: var(--primary-red); transform: translateY(-3px); }
+        .process-step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-red); color: #fff; font-weight: 900; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
 
         /* INTERAKTIVER WUNSCHKENNZEICHEN-GENERATOR & KALKULATOR */
         .interactive-tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 25px; max-width: 1100px; margin: 45px auto 0; padding: 0 5%; box-sizing: border-box; }
@@ -787,17 +877,14 @@
         .checklist-row.done { border-color: var(--green-border); background: var(--green-bg-soft); }
         .checklist-row.done i { color: var(--green-accent) !important; }
 
-        /* Floating Quick-Action Buttons (inkl. App-Installation) */
-        .floating-quick-bar { position: fixed; bottom: calc(18px + var(--safe-bottom)); left: 16px; z-index: 7500; display: flex; gap: 8px; align-items: center; }
-        .fab-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; text-decoration: none; box-shadow: 0 8px 25px rgba(0,0,0,0.35); transition: 0.3s; border: none; cursor: pointer; }
+        /* KORREKTUR: FLOATING QUICK-ACTION BUTTONS DEZENTER & KLEINER */
+        .floating-quick-bar { position: fixed; bottom: calc(14px + var(--safe-bottom)); left: 14px; z-index: 7500; display: flex; gap: 7px; align-items: center; }
+        .fab-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; text-decoration: none; box-shadow: 0 5px 16px rgba(0,0,0,0.3); transition: 0.25s; border: none; cursor: pointer; opacity: 0.92; }
+        .fab-btn:hover { opacity: 1; transform: scale(1.08) translateY(-2px); }
         .fab-wa { background: #25D366; }
-        .fab-wa:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5); }
-        .fab-book { background: var(--primary-red); font-size: 17px; }
-        .fab-book:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 25px rgba(230, 0, 0, 0.5); }
-        .fab-share { background: #007aff; font-size: 17px; }
-        .fab-share:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 10px 25px rgba(0, 122, 255, 0.5); }
-        .fab-app { background: #141419; border: 1.5px solid var(--primary-red); color: #fff; font-size: 16px; }
-        .fab-app:hover { background: var(--primary-red); transform: scale(1.1) translateY(-3px); }
+        .fab-book { background: var(--primary-red); font-size: 15px; }
+        .fab-share { background: #007aff; font-size: 15px; }
+        .fab-app { background: #141419; border: 1.5px solid var(--primary-red); color: #fff; font-size: 14px; }
 
         .admin-details { background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
         .admin-details summary { padding: 13px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; color: var(--text-light); }
@@ -908,25 +995,25 @@
 
         /* RESPONSIVE OPTIMIERUNG FÜR IPHONE (iOS), SAMSUNG (ANDROID) & TABLETS */
         @media (max-width: 768px) {
-            :root { --dynamic-header-h: 162px; }
-            body { font-size: 12px; padding-top: var(--dynamic-header-h, 162px); } 
+            :root { --dynamic-header-h: 164px; }
+            body { font-size: 12px; padding-top: var(--dynamic-header-h, 164px); } 
             nav { flex-wrap: wrap; padding: 8px 3%; gap: 4px; }
             .logo-container { order: 1; max-width: 50%; gap: 4px; }
             .logo-text { font-size: clamp(10px, 3vw, 13.5px); white-space: nowrap; line-height: 1.1; }
             .logo-car-svg { height: clamp(12px, 3.4vw, 17px); }
             .nav-actions { order: 2; width: auto; margin-left: auto; gap: 4px; align-items: center; }
-            .customer-theme-toggle { width: 24px; height: 24px; min-width: 24px; font-size: 10px !important; }
+            .customer-theme-toggle { width: 23px; height: 23px; min-width: 23px; font-size: 9.5px !important; }
             .visitor-counter { font-size: 8px; padding: 2px 4px; }
             body.is-admin .visitor-counter, body.is-supervisor .visitor-counter { font-size: 9px; padding: 2px 6px; }
             body.is-admin .visitor-counter span#txt-header-visitors, body.is-supervisor .visitor-counter span#txt-header-visitors { display: none; }
-            .key-ring { width: 19px; height: 19px; min-width: 19px; }
-            body.is-admin .key-ring, body.is-supervisor .key-ring { width: 25px; height: 25px; min-width: 25px; }
-            body.is-admin .key-icon-wrapper i, body.is-supervisor .key-icon-wrapper i { font-size: 10.5px; }
+            .key-ring { width: 18px; height: 18px; min-width: 18px; }
+            body.is-admin .key-ring, body.is-supervisor .key-ring { width: 24px; height: 24px; min-width: 24px; }
+            body.is-admin .key-icon-wrapper i, body.is-supervisor .key-icon-wrapper i { font-size: 10px; }
             .btn-crm-header { padding: 3px 6px !important; font-size: 8.5px !important; }
             .quick-menu-btn { padding: 4px 9px !important; font-size: 9.5px !important; }
-            .header-widgets-wrapper { order: 3; width: 100%; display: flex !important; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--glass-border); white-space: normal; margin-right: 0; }
-            .header-widget-item { padding: 3px 7px; background: var(--bg-input); border: 1px solid var(--glass-border); max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-            .header-clock-date, .header-weather, .header-office-status, .header-app-install-chip { font-size: 9.5px; }
+            .header-widgets-wrapper { order: 3; width: 100%; display: flex !important; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--glass-border); white-space: normal; margin-right: 0; }
+            .header-widget-item { padding: 3px 7px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+            .header-clock-date, .header-weather, .header-office-status, .header-calendar-chip, .header-app-install-chip { font-size: 9px; }
             .subpage-nav-bar { margin-top: 12px; margin-bottom: 20px; padding: 10px 4%; gap: 8px; }
             .subpage-nav-bar .btn-primary { flex: 1 1 auto; min-width: 140px; padding: 10px 14px !important; font-size: 10.5px !important; }
             .btn-primary { padding: 11px 18px !important; font-size: 11px !important; }
@@ -938,14 +1025,18 @@
             .booking-wrapper { padding: 24px 15px !important; }
             .booking-type-pills { grid-template-columns: repeat(3, 1fr); gap: 6px; }
             .booking-type-pill { padding: 9px 4px; font-size: 10px !important; }
-            .admin-window, .custom-dialog-window { padding: 24px 14px !important; width: 96% !important; max-width: 96% !important; }
+            .admin-window, .custom-dialog-window { padding: 18px 12px !important; width: 96% !important; max-width: 96% !important; }
             .vintage-gallery { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
             .gallery-card { height: 115px !important; padding: 10px !important; }
             .auto-ankauf-box { padding: 30px 15px !important; border-radius: 15px !important; }
             .apt-actions-horizontal { justify-content: center; }
             .apt-grid-info { grid-template-columns: 1fr; }
             .symbol-grid { grid-template-columns: repeat(2, 1fr) !important; }
-            .admin-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+            /* Auf Mobilgeräten 4 kleine Vierecke pro Reihe (2x4 = 8 Vierecke nebeneinander) */
+            .admin-kpi-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 5px; }
+            .admin-kpi-box { min-height: 48px; padding: 6px 2px; }
+            .admin-kpi-val { font-size: 13px; }
+            .admin-kpi-lbl { font-size: 7.5px; }
             .apt-status-bar { grid-template-columns: repeat(2, 1fr); }
             .tracker-steps-grid { grid-template-columns: repeat(2, 1fr); }
             .time-slots { grid-template-columns: repeat(3, 1fr); }
@@ -953,8 +1044,9 @@
             .crm-table th, .crm-table td { padding: 4px 3px !important; white-space: nowrap !important; text-overflow: ellipsis; }
             .crm-action-cell { padding: 4px 2px !important; }
             .crm-action-cell .btn-primary { padding: 3px 5px !important; font-size: 8px !important; }
-            .floating-quick-bar { bottom: calc(14px + var(--safe-bottom)); left: 12px; gap: 7px; }
-            .fab-btn { width: 41px; height: 41px; font-size: 17px; }
+            /* DIE 4 SCHWEBENDEN SYMBOLE UNTEN LINKS AUF MOBILGERÄTEN DEUTLICH KLEINER (32px) */
+            .floating-quick-bar { bottom: calc(10px + var(--safe-bottom)); left: 10px; gap: 5px; }
+            .fab-btn { width: 32px; height: 32px; font-size: 13.5px; box-shadow: 0 3px 10px rgba(0,0,0,0.25); opacity: 0.86; }
         }
     </style>
 </head>
@@ -963,7 +1055,7 @@
 
     <div id="toast-container"></div>
     
-    <!-- SCHNELL-AKTIONEN FLOATING BAR (INKL. APP-INSTALLATION) -->
+    <!-- SCHNELL-AKTIONEN FLOATING BAR (AUF MOBILGERÄTEN DEZENT VERKLEINERT AUF 32px) -->
     <div class="floating-quick-bar">
         <a href="https://wa.me/491783783875" id="fab-wa-link" target="_blank" rel="noopener noreferrer" class="fab-btn fab-wa" title="Direkt per WhatsApp schreiben"><i class="fa-brands fa-whatsapp"></i></a>
         <button class="fab-btn fab-book" onclick="window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});" title="Schnell-Termin buchen"><i class="fa-solid fa-calendar-check"></i></button>
@@ -1040,7 +1132,7 @@
                     <i class="fa-solid fa-moon" id="customerThemeIcon"></i>
                 </button>
 
-                <!-- DEZENTER BESUCHERZÄHLER & SCHLÜSSEL (KLEIN FÜR KUNDEN, KOMPAKT-LEUCHTEND FÜR ADMIN) -->
+                <!-- DEZENTER BESUCHERZÄHLER & SCHLÜSSEL -->
                 <div class="visitor-counter" onclick="window.openWidgetModal('visitors')" title="System Status"><i class="fa-solid fa-users" id="icon-header-visitors"></i> <span id="txt-header-visitors" style="color:var(--text-muted); font-weight:700;">Besuche: </span><span id="vCount">0</span></div>
                 
                 <div class="key-ring" id="adminKeyBtn" onclick="window.openAdmin()" title="Systemverwaltung">
@@ -1052,14 +1144,21 @@
             </div>
             
             <div class="header-widgets-wrapper">
-                <!-- LIVE BÜRO- & ANNAHME-AMPEL -->
+                <!-- 1. LIVE BÜRO- & ANNAHME-AMPEL -->
                 <div class="header-office-status header-widget-item" id="liveHeaderOfficeStatus" onclick="window.openWidgetModal('office')" title="Öffnungszeiten & Direktannahme-Status">
                     <span class="status-led open" id="officeStatusLed"></span>
                     <span id="officeStatusText">Geöffnet • Sofort-Annahme</span>
                 </div>
+                <!-- 2. NEU: INTERAKTIVER MONATS- & WOCHENKALENDER (KW & TAGE ANSEHEN) -->
+                <div class="header-calendar-chip header-widget-item" id="liveHeaderCalendar" onclick="window.openWidgetModal('calendar')" title="Monatskalender, Kalenderwoche & freie Tage anzeigen">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span id="headerCalendarKwText">Kalender</span>
+                </div>
+                <!-- 3. UHRZEIT & DATUM -->
                 <div class="header-clock-date header-widget-item" id="liveHeaderDate" onclick="window.openWidgetModal('time')" title="Datum & Uhrzeit anzeigen">Lade...</div>
+                <!-- 4. BERLIN LIVE WETTER -->
                 <div class="header-weather header-widget-item" id="liveHeaderWeather" onclick="window.openWidgetModal('weather')" title="Wetter Details anzeigen">Berlin <i class="fa-solid fa-cloud-sun"></i></div>
-                <!-- ALS APP INSTALLIEREN CHIP (FÜR IPHONE & SAMSUNG/ANDROID) -->
+                <!-- 5. ALS APP INSTALLIEREN CHIP (iOS & ANDROID) -->
                 <div class="header-app-install-chip" id="headerAppInstallBtn" onclick="window.triggerAppInstall()" title="RED Berlin als App auf dem Smartphone speichern">
                     <i class="fa-solid fa-download"></i> <span>App</span>
                 </div>
@@ -1077,7 +1176,7 @@
         </div>
     </div>
 
-    <!-- HAUPTMENÜ (INKL. ALS APP INSTALLIEREN) -->
+    <!-- HAUPTMENÜ -->
     <div class="fullscreen-menu" id="quickMenu">
         <i class="fa-solid fa-xmark close-menu" onclick="window.toggleMenu()"></i>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home');"><i class="fa-solid fa-house" style="color:var(--primary-red);"></i> Startseite</a>
@@ -1096,7 +1195,7 @@
         <a href="https://wa.me/491783783875" id="menu-wa-link" target="_blank" rel="noopener noreferrer" onclick="window.toggleMenu()"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> WhatsApp Support</a>
     </div>
 
-    <!-- NEU: SMARTPHONE APP-INSTALLATIONS-ASSISTENT (FÜR IPHONE/iOS & SAMSUNG/ANDROID) -->
+    <!-- SMARTPHONE APP-INSTALLATIONS-ASSISTENT (FÜR IPHONE/iOS & SAMSUNG/ANDROID) -->
     <div class="custom-dialog-overlay" id="pwaInstallOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closePwaInstallModal()"></i>
@@ -1109,14 +1208,12 @@
                 <p style="color:var(--text-muted); font-size:11.5px; margin-top:4px;">Starten Sie unseren Zulassungsservice, Live-Tracker & Formular-Assistenten jederzeit mit 1 Klick direkt von Ihrem Home-Bildschirm!</p>
             </div>
 
-            <!-- Direkt-Button für Android / Samsung / Chrome -->
             <div id="pwaNativeBtnContainer" style="display:none; margin-bottom:15px;">
                 <button type="button" class="btn-primary" style="width:100%; justify-content:center; background:#25D366; color:#000; font-size:13px !important;" onclick="window.executeNativePwaPrompt()">
                     <i class="fa-solid fa-download"></i> Jetzt direkt als App installieren
                 </button>
             </div>
 
-            <!-- Anleitung für Apple iPhone / iPad (iOS) -->
             <div class="service-config-section" style="margin-bottom:12px;">
                 <h4><i class="fa-brands fa-apple"></i> Auf dem iPhone / iPad (Safari):</h4>
                 <ol style="font-size:12px; color:var(--text-light); padding-left:18px; line-height:1.65; margin:0;">
@@ -1126,7 +1223,6 @@
                 </ol>
             </div>
 
-            <!-- Anleitung für Samsung / Android -->
             <div class="service-config-section" style="margin-bottom:15px;">
                 <h4><i class="fa-brands fa-android" style="color:#25D366;"></i> Auf Samsung / Android (Chrome & Samsung Internet):</h4>
                 <ol style="font-size:12px; color:var(--text-light); padding-left:18px; line-height:1.65; margin:0;">
@@ -1139,7 +1235,7 @@
         </div>
     </div>
 
-    <!-- KOMPAKTES ADMIN & LIVE-LEADS MONITORING TERMINAL -->
+    <!-- KORRIGIERTES LIVE-LEADS & MONITORING TERMINAL (8 KLEINE VIERECKE NEBENEINANDER!) -->
     <div class="custom-dialog-overlay" id="adminModal">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeAdmin()"></i>
@@ -1164,11 +1260,11 @@
 
             <div id="dashboardBox" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-right:28px;">
-                    <h3 style="color:var(--primary-red); font-weight:900; font-size:17px; margin:0;"><i class="fa-solid fa-satellite-dish"></i> Live-Leads & Monitoring Terminal</h3>
-                    <span style="font-size:11px; color:var(--text-muted); background:var(--bg-input); padding:4px 10px; border-radius:20px; border:1px solid var(--glass-border);">Aktiv: <strong id="loggedInUser" style="color:var(--text-light);"></strong></span>
+                    <h3 style="color:var(--primary-red); font-weight:900; font-size:16px; margin:0;"><i class="fa-solid fa-satellite-dish"></i> Live-Leads & Monitoring Terminal</h3>
+                    <span style="font-size:10.5px; color:var(--text-muted); background:var(--bg-input); padding:3px 10px; border-radius:20px; border:1px solid var(--glass-border);">Aktiv: <strong id="loggedInUser" style="color:var(--text-light);"></strong></span>
                 </div>
                 
-                <!-- 6 PLATZSPARENDE MONITORING-BLÖCKE NEBENEINANDER -->
+                <!-- 8 KLEINE KOMPAKTE VIERECKE NEBENEINANDER (INKL. KUNDEN & ANGEHEFTET) -->
                 <div class="admin-kpi-grid mod-leads">
                     <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('all')" title="Alle Termine anzeigen">
                         <span class="admin-kpi-val" id="kpiTotalApts">0</span>
@@ -1190,20 +1286,40 @@
                         <span class="admin-kpi-val" id="kpiLaboApts" style="color:#a855f7;">0</span>
                         <span class="admin-kpi-lbl">Beim LABO</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('done')" title="Abgeschlossene / Abholbereite Aufträge">
+                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('done')" title="Abgeschlossene Aufträge">
                         <span class="admin-kpi-val" id="kpiDoneApts" style="color:var(--green-accent);">0</span>
                         <span class="admin-kpi-lbl">Erledigt</span>
                     </div>
+                    <div class="admin-kpi-box" onclick="window.openCRM()" title="RED Kundendatenbank öffnen">
+                        <span class="admin-kpi-val" id="kpiTotalCrm" style="color:#00a8cc;">0</span>
+                        <span class="admin-kpi-lbl">Kunden</span>
+                    </div>
+                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('pinned')" title="Angeheftete Kennzeichen">
+                        <span class="admin-kpi-val" id="kpiPinnedApts" style="color:var(--gold-accent);">0</span>
+                        <span class="admin-kpi-lbl">Angeheftet</span>
+                    </div>
                 </div>
 
-                <!-- KOMPAKTE ADMIN-WERKZEUGLEISTE -->
-                <div style="margin-top:8px; display:flex; justify-content:center; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--glass-border); padding-bottom:10px;">
-                    <button class="btn-primary mod-crm" style="background:rgba(230,0,0,0.1); border:1px solid var(--primary-red); color:var(--primary-red); padding:6px 11px; font-size:10.5px !important; flex:1; box-shadow:none;" onclick="window.openCRM()"><i class="fa-solid fa-database"></i> RED Kunden (<span id="kpiTotalCrm">0</span>)</button>
-                    <button class="btn-primary supervisor-only-inline" style="background:rgba(255,0,255,0.1); border:1px solid #ff00ff; color:#ff00ff; padding:6px 11px; font-size:10.5px !important; flex:1; box-shadow:none;" onclick="window.openSupervisorPanel()"><i class="fa-solid fa-crown"></i> Rechte</button>
-                    <button class="btn-primary mod-theme" style="background:rgba(0,168,204,0.1); border:1px solid #00a8cc; color:#00a8cc; padding:6px 11px; font-size:10.5px !important; flex:1; box-shadow:none;" onclick="window.openThemeEditor()"><i class="fa-solid fa-palette"></i> Design</button>
-                    <button class="btn-primary mod-pages" style="background:rgba(255,149,0,0.1); border:1px solid #ff9500; color:#ff9500; padding:6px 11px; font-size:10.5px !important; flex:1; box-shadow:none;" onclick="window.openPageManager()"><i class="fa-solid fa-file-lines"></i> Seiten</button>
-                    <button class="btn-primary btn-gold-adaptive" style="padding:6px 11px; font-size:10.5px !important; flex:1;" onclick="window.changePassPrompt()"><i class="fa-solid fa-key"></i> Passwort</button>
-                    <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; padding:6px 11px; font-size:10.5px !important; flex:1; box-shadow:none;" onclick="window.triggerLogoutConfirm()"><i class="fa-solid fa-right-from-bracket"></i> Abmelden</button>
+                <!-- EINZEILIGE, SAUBERE WERKZEUGLEISTE DARUNTER (OHNE UMGEBROCHENE KLAMMERN) -->
+                <div class="admin-quick-toolbar">
+                    <button type="button" class="btn-primary admin-tool-btn mod-crm" style="background:rgba(230,0,0,0.08); border:1px solid var(--primary-red); color:var(--primary-red);" onclick="window.openCRM()">
+                        <i class="fa-solid fa-database"></i> <span>RED Kunden</span>
+                    </button>
+                    <button type="button" class="btn-primary admin-tool-btn supervisor-only-inline" style="background:rgba(255,0,255,0.08); border:1px solid #ff00ff; color:#ff00ff;" onclick="window.openSupervisorPanel()">
+                        <i class="fa-solid fa-crown"></i> <span>Rechte</span>
+                    </button>
+                    <button type="button" class="btn-primary admin-tool-btn mod-theme" style="background:rgba(0,168,204,0.08); border:1px solid #00a8cc; color:#00a8cc;" onclick="window.openThemeEditor()">
+                        <i class="fa-solid fa-palette"></i> <span>Design</span>
+                    </button>
+                    <button type="button" class="btn-primary admin-tool-btn mod-pages" style="background:rgba(255,149,0,0.08); border:1px solid #ff9500; color:#ff9500;" onclick="window.openPageManager()">
+                        <i class="fa-solid fa-file-lines"></i> <span>Seiten</span>
+                    </button>
+                    <button type="button" class="btn-primary admin-tool-btn btn-gold-adaptive" onclick="window.changePassPrompt()">
+                        <i class="fa-solid fa-key"></i> <span>Passwort</span>
+                    </button>
+                    <button type="button" class="btn-primary admin-tool-btn" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30;" onclick="window.triggerLogoutConfirm()">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span>Abmelden</span>
+                    </button>
                 </div>
 
                 <!-- 1-KLICK MONITORING FILTER & SUCHE -->
@@ -1215,9 +1331,9 @@
                         <button type="button" class="admin-filter-pill" data-filter="expired" onclick="window.setLeadStatusFilter('expired', this)">⌛ Zeit vorbei</button>
                         <button type="button" class="admin-filter-pill" data-filter="labo" onclick="window.setLeadStatusFilter('labo', this)">🏛️ Beim LABO</button>
                         <button type="button" class="admin-filter-pill" data-filter="done" onclick="window.setLeadStatusFilter('done', this)">✅ Abgeschlossen</button>
-                        <button type="button" class="admin-filter-pill" data-filter="pinned" onclick="window.setLeadStatusFilter('pinned', this)">📌 Angeheftet (<span id="kpiPinnedApts">0</span>)</button>
+                        <button type="button" class="admin-filter-pill" data-filter="pinned" onclick="window.setLeadStatusFilter('pinned', this)">📌 Angeheftet</button>
                     </div>
-                    <input type="text" id="adminLeadSearch" class="form-control" placeholder="🔍 Schnellsuche nach Name, Datum, Leistung, Kennzeichen oder Telefon..." onkeyup="window.filterAdminLeads()" style="padding: 9px 14px; font-size: 12.5px !important;">
+                    <input type="text" id="adminLeadSearch" class="form-control" placeholder="🔍 Schnellsuche nach Name, Datum, Leistung, Kennzeichen oder Telefon..." onkeyup="window.filterAdminLeads()" style="padding: 8px 14px; font-size: 12px !important;">
                 </div>
 
                 <div class="admin-list-wrapper mod-leads" id="admin-module-leads">
@@ -1228,7 +1344,7 @@
         </div>
     </div>
 
-    <!-- ERWEITERTE DIGITALE VOLLMACHT & SEPA-MANDAT (INKL. BLANKO-MODUS WENN LEER) -->
+    <!-- ERWEITERTE DIGITALE VOLLMACHT & SEPA-MANDAT -->
     <div class="custom-dialog-overlay" id="digitalVollmachtOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeDigitalVollmachtModal()"></i>
@@ -1318,7 +1434,7 @@
         </div>
     </div>
 
-    <!-- VOLLSTÄNDIGER PROFI KFZ-KAUFVERTRAG GENERATOR (MIT BLANKO-UNTERSTÜTZUNG) -->
+    <!-- VOLLSTÄNDIGER PROFI KFZ-KAUFVERTRAG GENERATOR -->
     <div class="custom-dialog-overlay" id="kaufvertragOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeKaufvertragModal()"></i>
@@ -2379,7 +2495,7 @@
                 <h1 style="font-size: clamp(24px, 4.8vw, 44px); line-height: 1.1; margin-bottom: 15px; font-weight: 900;"><span id="txt-hero-h1-1" style="color: var(--text-light);">Schnell. Zuverlässig.</span><br><span id="txt-hero-h1-2" style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
                 <p id="txt-hero-desc" style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 28px; max-width: 650px; margin-left: auto; margin-right: auto;">Zulassungsservice in Bestzeit für ganz Berlin. Wir garantieren Ihnen eine zügige, zuverlässige und hochprofessionelle Abwicklung Ihrer Anliegen.</p>
                 
-                <!-- ADAPTIVE BUTTONS (OHNE ZAHL VOR FORMULARE!) -->
+                <!-- ADAPTIVE HAUPT-BUTTONS (OHNE ZAHL VOR FORMULARE!) -->
                 <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                     <a href="javascript:void(0)" onclick="window.switchView('view-home'); window.scrollTo({top: document.getElementById('termin').offsetTop - 110, behavior: 'smooth'});" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
                     <a href="javascript:void(0)" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')" class="btn-primary btn-green-adaptive"><i class="fa-solid fa-signature"></i> Digitale Vollmacht</a>
@@ -2398,6 +2514,7 @@
 
         <section id="dynamic-client-section-home" class="dynamic-block-container"></section>
 
+        <!-- LEISTUNGSKARTEN -->
         <section id="leistungen" style="padding-top: 10px;" class="editable-section">
             <div class="section-edit-btn action-content" onclick="window.openContentEditor('leistungen')" style="right:5%; top:-10px;"><i class="fa-solid fa-pencil"></i></div>
             <div class="section-header">
@@ -2409,8 +2526,35 @@
             <p style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:20px; padding: 0 5%;">* Alle Preisangaben verstehen sich in Euro inkl. gesetzlicher MwSt., zuzüglich anfallender amtlicher Behördengebühren.</p>
         </section>
 
+        <!-- NEU: SO LÄUFT IHRE KFZ-ZULASSUNG IN 3 SCHRITTEN AB -->
+        <section class="compass-wrapper" style="margin-top:35px;">
+            <div class="compass-box" style="padding:26px 22px;">
+                <div style="text-align:center;">
+                    <span style="background:rgba(37,211,102,0.12); color:var(--green-accent); font-weight:800; font-size:10px; padding:5px 14px; border-radius:50px; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-bolt"></i> Einfach & Stressfrei</span>
+                    <h2 style="font-size:clamp(18px, 2.8vw, 25px); font-weight:900; text-transform:uppercase; margin-top:8px; color:var(--text-light);">In 3 Schritten zur fertigen Berliner Kfz-Zulassung</h2>
+                </div>
+                <div class="process-steps-grid">
+                    <div class="process-step-card">
+                        <span class="process-step-num">1</span>
+                        <h4 style="font-size:13.5px; font-weight:900; color:var(--text-light); text-transform:uppercase; margin-bottom:4px;">Wunschtermin oder Foto-Check</h4>
+                        <p style="font-size:11.5px; color:var(--text-muted);">Reservieren Sie online Ihren Wunschtermin oder senden Sie uns Ihre Papiere vorab kurz per WhatsApp zur kostenlosen 60-Sekunden-Prüfung.</p>
+                    </div>
+                    <div class="process-step-card">
+                        <span class="process-step-num">2</span>
+                        <h4 style="font-size:13.5px; font-weight:900; color:var(--text-light); text-transform:uppercase; margin-bottom:4px;">Kurze 5-Minuten-Abgabe</h4>
+                        <p style="font-size:11.5px; color:var(--text-muted);">Geben Sie Ihre Unterlagen ohne Wartezeit in der Kienitzer Str. 6 (12053 Berlin) ab – Vollmacht & SEPA-Mandat erledigen wir gemeinsam vor Ort oder digital.</p>
+                    </div>
+                    <div class="process-step-card">
+                        <span class="process-step-num">3</span>
+                        <h4 style="font-size:13.5px; font-weight:900; color:var(--text-light); text-transform:uppercase; margin-bottom:4px;">Schilder & Papiere abholen</h4>
+                        <p style="font-size:11.5px; color:var(--text-muted);">Wir übernehmen den Behördengang beim LABO Berlin und prägen Ihre neuen Kennzeichen. Sobald im Live-Tracker „Abholbereit“ leuchtet, starten Sie sofort los!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- INTERAKTIVER ZULASSUNGS-KOMPASS -->
-        <section id="zulassungs-kompass" class="compass-wrapper">
+        <section id="zulassungs-kompass" class="compass-wrapper" style="margin-top:30px;">
             <div class="compass-box">
                 <div style="text-align:center;">
                     <span style="background:rgba(230,0,0,0.12); color:var(--primary-red); font-weight:800; font-size:10px; padding:5px 14px; border-radius:50px; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-compass"></i> Interaktiver Ratgeber</span>
@@ -2500,9 +2644,9 @@
                         <option value="10/04">❄️ Winter 10 / 04 (Okt.–April)</option>
                     </select>
                     <select id="wkStyle" class="form-control" onchange="window.updateLivePlatePreview()" style="flex:1; padding: 10px;">
-                        <option value="std">Standard Alu-Prägung</option>
+                        <option value="std">Standard Alu-Prägung (520mm)</option>
                         <option value="carbon">✨ 3D-Carbon Sport-Optik</option>
-                        <option value="short">📏 Kurzes Schild (46cm)</option>
+                        <option value="short">📏 Kurzes Schild (460/420mm)</option>
                     </select>
                 </div>
 
@@ -2531,7 +2675,7 @@
             </div>
         </section>
 
-        <!-- ZEITSPAR-VERGLEICH, 60s FOTO-VORABCHECK & 12 BERLINER BEZIRKE WEGWEISER -->
+        <!-- ZEITSPAR-VERGLEICH, KENNZEICHEN-RATGEBER & 12 BERLINER BEZIRKE WEGWEISER -->
         <section class="interactive-tools-grid" style="margin-top:25px;">
             <div class="tool-box">
                 <h3><i class="fa-solid fa-scale-balanced"></i> Warum über RED Berlin anmelden?</h3>
@@ -2555,19 +2699,21 @@
                     </div>
                 </div>
 
-                <!-- SCHNELLBERATER KENNZEICHEN-ARTEN -->
+                <!-- SCHNELLBERATER KENNZEICHEN-ARTEN & SCHILDER-MASSE -->
                 <div style="margin-top:16px; background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:14px;">
-                    <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--primary-red); margin-bottom:8px;"><i class="fa-solid fa-award"></i> Welches Kennzeichen passt zu Ihnen? (Klicken für Info)</div>
+                    <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--primary-red); margin-bottom:8px;"><i class="fa-solid fa-ruler-combined"></i> Kennzeichen-Arten & Berliner Schildermaße (Klicken für Info)</div>
                     <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                        <button type="button" class="district-pill active" onclick="window.selectPlateGuide('euro', this)">🇪🇺 Euro-Standard</button>
+                        <button type="button" class="district-pill active" onclick="window.selectPlateGuide('euro', this)">🇪🇺 520mm Standard</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurz', this)">📏 460/420mm Kurz</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('elektro', this)">⚡ E-Kennzeichen</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('oldtimer', this)">🏛️ H-Oldtimer</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('saison', this)">☀️ Saison (04/10)</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurzzeit', this)">⏱️ 5-Tage Kurzzeit</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('zoll', this)">🌍 Zoll / Export</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('zweizeilig', this)">🏍️ Motorrad / US</button>
                     </div>
                     <p id="plateGuideInfoText" style="font-size:11.5px; color:var(--text-light); margin-top:10px; line-height:1.45;">
-                        <strong>🇪🇺 Euro-Standardkennzeichen:</strong> Für alle regulären PKW, LKW & Motorräder in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.
+                        <strong>🇪🇺 Euro-Standardkennzeichen (520 × 110 mm):</strong> Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.
                     </p>
                 </div>
             </div>
@@ -2601,7 +2747,7 @@
             </div>
         </section>
 
-        <!-- NEU (ÜBERRASCHUNG): LIVE AUFTRAGS-TRACKER & INTERAKTIVER eVB / IBAN / FIN TIPPFEHLER-PRÜFER -->
+        <!-- LIVE AUFTRAGS-TRACKER & INTERAKTIVER eVB / IBAN / FIN TIPPFEHLER-PRÜFER -->
         <section class="interactive-tools-grid" style="margin-top:25px;">
             <div class="tool-box" style="border-top: 2px solid var(--primary-red);">
                 <h3><i class="fa-solid fa-satellite-dish"></i> Live Auftrags- & Zulassungs-Tracker</h3>
@@ -2637,7 +2783,7 @@
                 </div>
             </div>
 
-            <!-- NEU: 100% LOKALER eVB-, IBAN- & FIN-SCHNELLPRÜFER (SCHÜTZT KUNDEN VOR BEHÖRDEN-ABLEHNUNG) -->
+            <!-- 100% LOKALER eVB-, IBAN- & FIN-SCHNELLPRÜFER -->
             <div class="tool-box" style="border-top: 2px solid var(--green-border);">
                 <h3><i class="fa-solid fa-user-check" style="color:var(--green-accent);"></i> Live eVB-, IBAN- & FIN-Prüfer</h3>
                 <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Häufigster Grund für Verzögerungen beim Amt sind Zahlendreher. Prüfen Sie Ihre Daten hier kostenlos vorab (100 % lokal auf Ihrem Gerät):</p>
@@ -2808,7 +2954,7 @@
         </section>
     </div>
 
-    <!-- ANSICHT: FORMULARE (MIT ÜBERLAPPUNGSFREIER SUBPAGE-NAV-BAR FÜR HANDY & DESKTOP!) -->
+    <!-- ANSICHT: FORMULARE (ÜBERLAPPUNGSFREI FÜR HANDY & DESKTOP!) -->
     <div id="view-formulare" class="view-section">
         <div class="subpage-nav-bar">
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
@@ -2844,7 +2990,7 @@
         <div class="download-grid" id="formItemsGrid"></div>
     </div>
 
-    <!-- ANSICHT: AUTO ANKAUF (MIT ÜBERLAPPUNGSFREIER SUBPAGE-NAV-BAR FÜR HANDY & DESKTOP!) -->
+    <!-- ANSICHT: AUTO ANKAUF (ÜBERLAPPUNGSFREI FÜR HANDY & DESKTOP!) -->
     <div id="view-ankauf" class="view-section">
         <div class="subpage-nav-bar">
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
@@ -2969,7 +3115,7 @@
         </div>
     </div>
 
-    <!-- FOOTER (INKL. APP-INSTALLATION & HELLMODUS ALS STANDARD) -->
+    <!-- FOOTER -->
     <footer class="editable-section">
         <div class="section-edit-btn action-content" onclick="window.openContentEditor('footer')" style="right:5%; top:10px;"><i class="fa-solid fa-pencil"></i></div>
         <div class="footer-links" id="dynamicFooterLinks">
@@ -3062,6 +3208,120 @@
                 ro.observe(headerEl);
             }
         });
+
+        // =========================================================================
+        // 0.4 NEU: KALENDERWOCHE (KW) & INTERAKTIVER MONATSKALENDER IM HEADER
+        // =========================================================================
+        window.getISOWeekNumber = function(d) {
+            const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            const dayNum = date.getUTCDay() || 7;
+            date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+            return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+        };
+
+        window.updateHeaderCalendarChip = function() {
+            const el = document.getElementById('headerCalendarKwText');
+            if (!el) return;
+            const now = new Date();
+            const kw = window.getISOWeekNumber(now);
+            const monthShort = now.toLocaleDateString('de-DE', { month: 'short' });
+            el.innerText = `KW ${kw} • ${monthShort}`;
+        };
+
+        window.calModalYear = new Date().getFullYear();
+        window.calModalMonth = new Date().getMonth();
+
+        window.changeHeaderCalMonth = function(delta) {
+            window.calModalMonth += delta;
+            if (window.calModalMonth > 11) { window.calModalMonth = 0; window.calModalYear++; }
+            if (window.calModalMonth < 0) { window.calModalMonth = 11; window.calModalYear--; }
+            window.renderHeaderInteractiveCalendar();
+        };
+
+        window.renderHeaderInteractiveCalendar = function() {
+            const content = document.getElementById('widgetModalContent');
+            if (!content) return;
+
+            const now = new Date();
+            const yr = window.calModalYear;
+            const mo = window.calModalMonth;
+            const firstDay = new Date(yr, mo, 1);
+            const lastDay = new Date(yr, mo + 1, 0);
+            const daysInMonth = lastDay.getDate();
+
+            // Montag = 0 ... Sonntag = 6
+            let startWeekday = firstDay.getDay() - 1;
+            if (startWeekday < 0) startWeekday = 6;
+
+            const monthTitle = firstDay.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+            const currentKw = window.getISOWeekNumber(now);
+
+            let gridHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:var(--bg-input); padding:8px 12px; border-radius:12px; border:1px solid var(--glass-border);">
+                    <button type="button" onclick="window.changeHeaderCalMonth(-1)" style="background:var(--bg-card); border:1px solid var(--glass-border); color:var(--text-light); width:30px; height:30px; border-radius:8px; cursor:pointer; font-weight:900;">‹</button>
+                    <div>
+                        <strong style="color:var(--primary-red); font-size:14px; text-transform:uppercase; display:block;">${monthTitle}</strong>
+                        <span style="font-size:10px; color:var(--text-muted); font-weight:700;">Aktuell: Kalenderwoche ${currentKw}</span>
+                    </div>
+                    <button type="button" onclick="window.changeHeaderCalMonth(1)" style="background:var(--bg-card); border:1px solid var(--glass-border); color:var(--text-light); width:30px; height:30px; border-radius:8px; cursor:pointer; font-weight:900;">›</button>
+                </div>
+                <div class="mini-cal-grid">
+                    <div class="mini-cal-weekday">Mo</div>
+                    <div class="mini-cal-weekday">Di</div>
+                    <div class="mini-cal-weekday">Mi</div>
+                    <div class="mini-cal-weekday">Do</div>
+                    <div class="mini-cal-weekday">Fr</div>
+                    <div class="mini-cal-weekday" style="color:var(--text-muted);">Sa</div>
+                    <div class="mini-cal-weekday" style="color:var(--text-muted);">So</div>
+            `;
+
+            for (let i = 0; i < startWeekday; i++) {
+                gridHtml += `<div class="mini-cal-day empty"></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const curDate = new Date(yr, mo, d);
+                const wDay = curDate.getDay();
+                const isWeekend = (wDay === 0 || wDay === 6);
+                const isToday = (d === now.getDate() && mo === now.getMonth() && yr === now.getFullYear());
+                const isPast = curDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const formattedDate = `${String(d).padStart(2, '0')}.${String(mo + 1).padStart(2, '0')}.${yr}`;
+
+                let cls = 'mini-cal-day';
+                if (isToday) cls += ' today';
+                if (isWeekend || isPast) cls += ' weekend';
+
+                const clickAttr = (!isWeekend && !isPast)
+                    ? `onclick="window.selectDayFromHeaderCalendar('${formattedDate}')" title="Klicken, um am ${formattedDate} einen Termin zu buchen"`
+                    : `title="${isWeekend ? 'Wochenende (Mo–Fr geöffnet)' : 'Vergangener Tag'}"`;
+
+                gridHtml += `<div class="${cls}" ${clickAttr}>${d}</div>`;
+            }
+
+            gridHtml += `</div>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:12px;">
+                    💡 <strong>Direkt-Auswahl:</strong> Tippen Sie auf einen freien Werktag (Mo–Fr), um dieses Datum direkt im Terminformular zu öffnen!
+                </p>
+            `;
+            content.innerHTML = gridHtml;
+        };
+
+        window.selectDayFromHeaderCalendar = function(dateStr) {
+            window.closeWidgetModal();
+            window.switchView('view-home');
+            setTimeout(() => {
+                const dp = document.getElementById('datePicker');
+                if (dp) {
+                    dp.value = dateStr;
+                    if (dp._flatpickr) {
+                        dp._flatpickr.setDate(dateStr, true);
+                    }
+                }
+                document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
+                window.showToast(`📅 Wunschdatum ${dateStr} ausgewählt – bitte noch Uhrzeit wählen!`, 'success');
+            }, 250);
+        };
 
         // =========================================================================
         // 0.5 PROGRESSIVE WEB APP (PWA) INSTALLATIONS-ENGINE (iOS & ANDROID/SAMSUNG)
@@ -3167,7 +3427,6 @@
             }
 
             if (finEl && finStat) {
-                // In einer echten FIN kommen die Buchstaben I, O und Q niemals vor (Verwechslungsschutz mit 1 und 0)
                 const rawVal = finEl.value.toUpperCase();
                 const hasForbidden = /[IOQ]/.test(rawVal);
                 const cleanVal = rawVal.replace(/[^A-Z0-9]/g, '');
@@ -3458,14 +3717,16 @@
             window.showToast('Fall in das Buchungsformular übernommen!', 'success');
         };
 
-        // --- SCHNELLBERATER KENNZEICHEN-ARTEN ---
+        // --- ERWEITERTER SCHNELLBERATER KENNZEICHEN-ARTEN & SCHILDERMASSE ---
         const plateGuideDetails = {
-            "euro": "<strong>🇪🇺 Euro-Standardkennzeichen:</strong> Für alle regulären PKW, LKW & Motorräder in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.",
+            "euro": "<strong>🇪🇺 Euro-Standardkennzeichen (520 × 110 mm):</strong> Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.",
+            "kurz": "<strong>📏 Kurzes Berliner Kennzeichen (460 mm oder 420 mm × 110 mm):</strong> Besonders beliebt für sportliche Optik bei kurzen Zeichenkombinationen (z.B. B - TY 1). Wir haben alle kurzen Rohlinge direkt vorrätig!",
             "elektro": "<strong>⚡ E-Kennzeichen (Elektro & Plug-In Hybrid):</strong> Mit dem Zusatzbuchstaben „E“ am Ende profitieren Sie von Steuervorteilen und Bevorrechtigungen im Straßenverkehr. Sofort bei uns prägbar!",
             "oldtimer": "<strong>🏛️ H-Kennzeichen (Historische Oldtimer ab 30 Jahren):</strong> Pauschalierter Kfz-Steuersatz und freie Fahrt in allen Umweltzonen ohne grüne Plakette (Oldtimer-Gutachten nach § 23 StVZO erforderlich).",
             "saison": "<strong>☀️ Saisonkennzeichen (z.B. 04/10 oder 03/10):</strong> Ideal für Cabrios, Motorräder, Wohnmobile & Sommerfahrzeuge – Sie zahlen Steuer & Versicherung nur für den gewählten Zulassungszeitraum!",
             "kurzzeit": "<strong>⏱️ Kurzzeitkennzeichen (5 Tage mit gelbem Rand):</strong> Perfekt für Probe-, Überführungs- und TÜV-Fahrten von abgemeldeten Fahrzeugen innerhalb Deutschlands. Sofort zum Mitnehmen!",
-            "zoll": "<strong>🌍 Zoll- / Ausfuhrkennzeichen (Roter Rand, 15–30 Tage):</strong> Für den sicheren Export von Fahrzeugen ins EU- und Nicht-EU-Ausland inklusive internationaler gelber Versicherungskarte."
+            "zoll": "<strong>🌍 Zoll- / Ausfuhrkennzeichen (Roter Rand, 15–30 Tage):</strong> Für den sicheren Export von Fahrzeugen ins EU- und Nicht-EU-Ausland inklusive internationaler gelber Versicherungskarte.",
+            "zweizeilig": "<strong>🏍️ Motorrad- & Zweizeilige Schilder (180×200 mm / 255×130 mm):</strong> Offizielle Kraftrad-, Leichtkraftrad-, Quad- und US-Import-Kennzeichen sofort zum Mitnehmen vor Ort."
         };
 
         window.selectPlateGuide = function(key, btnEl) {
@@ -4406,6 +4667,7 @@
             window.initAutomaticYearSystem();
             window.initFloatingPlates();
             window.updateOfficeStatusBadge();
+            window.updateHeaderCalendarChip();
             window.updateDispatchCountdown();
             window.renderCalcItems(window.calcItemsData);
             if(localStorage.getItem('red_maps_consent') === 'true') {
@@ -4962,7 +5224,7 @@
             }
         };
 
-        // --- PAGE BUILDER (MIT ÜBERLAPPUNGSFREIER SUBPAGE-NAV-BAR) ---
+        // --- PAGE BUILDER ---
         window.customPagesData = [];
         window.openPageManager = function() {
             document.getElementById('pageManagerOverlay').classList.add('open');
@@ -5157,7 +5419,12 @@
                 const title = document.getElementById('widgetModalTitle');
                 const content = document.getElementById('widgetModalContent');
                 
-                if(type === 'office') {
+                if(type === 'calendar') {
+                    title.innerHTML = '<i class="fa-solid fa-calendar-days" style="color:var(--primary-red);"></i> Berliner Monats- & Terminkalender';
+                    window.calModalYear = new Date().getFullYear();
+                    window.calModalMonth = new Date().getMonth();
+                    window.renderHeaderInteractiveCalendar();
+                } else if(type === 'office') {
                     title.innerHTML = '<i class="fa-solid fa-door-open" style="color:var(--primary-red);"></i> Büro- & Annahme-Status';
                     const now = new Date();
                     const isWorkday = (now.getDay() >= 1 && now.getDay() <= 5);
@@ -5183,7 +5450,7 @@
                         content.innerHTML = `
                             <div style="font-size: 40px; font-weight: 900; color: var(--primary-red); margin-bottom: 10px;">${timeStr}</div>
                             <div style="font-size: 16px; font-weight: 600; color: var(--text-light);">${dateStr}</div>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">Zeitzone: Mitteleuropäische Zeit (Berlin)</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">Zeitzone: Mitteleuropäische Zeit (Berlin) • KW ${window.getISOWeekNumber(now)}</div>
                         `;
                     };
                     renderTimeModal();
@@ -5272,7 +5539,7 @@
                 const h = String(now.getHours()).padStart(2, '0');
                 const m = String(now.getMinutes()).padStart(2, '0');
                 const dateStr = now.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
-                document.getElementById('liveHeaderDate').innerHTML = `<i class="fa-regular fa-calendar"></i> ${dateStr} <span style="margin:0 3px;">|</span> <i class="fa-regular fa-clock"></i> <span>${h}<span class="blink-colon">:</span>${m}</span>`;
+                document.getElementById('liveHeaderDate').innerHTML = `<i class="fa-regular fa-clock"></i> ${dateStr} • <span>${h}<span class="blink-colon">:</span>${m}</span>`;
             }
             setInterval(updateHeaderWidgets, 1000);
             updateHeaderWidgets();
@@ -6360,7 +6627,7 @@
         });
 
         // =========================================================================
-        // LIVE-LEADS MONITORING & SEKUNDENGENAUE ZEIT-ÜBERWACHUNG
+        // 8-VIERECKE LIVE-LEADS MONITORING & SEKUNDENGENAUE ZEIT-ÜBERWACHUNG
         // =========================================================================
         let isFirstLoadApts = true; 
         window.activeBadgeNum = 0;
@@ -6375,7 +6642,6 @@
             if(hasPrio) b.classList.add('prio-pulse');
         }
         
-        // Prüft sekundengenau, ob Datum & Uhrzeit eines Termins bereits in der Vergangenheit liegen
         function isAptExpired(dateStr, timeStr) {
             if(!dateStr) return false;
             const parts = dateStr.split('.');
@@ -6600,7 +6866,7 @@
             window.filterAdminLeads();
         }
 
-        // Automatischer Minuten-Check: Schaltet Termine sofort auf "Zeit vorbei", sobald die Uhrzeit verstrichen ist
+        // Automatischer Minuten-Check für "Zeit vorbei"
         setInterval(() => {
             if(window.redApts && window.redApts.length > 0) {
                 renderAppointments(window.redApts);
@@ -6855,6 +7121,9 @@
                 await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
             } catch(e) {
                 localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+            }
+            if(document.getElementById('kpiTotalCrm')) {
+                document.getElementById('kpiTotalCrm').innerText = Object.keys(window.crmClientsDetail).length;
             }
             if(document.getElementById('crmOverlay').classList.contains('open')) window.renderCRM();
         }
@@ -7446,7 +7715,7 @@
                 } catch (err) {
                     let localApts = JSON.parse(localStorage.getItem('red_local_apts')) || [];
                     localApts = localApts.filter(a => a.id !== id);
-                    localStorage.setItem('red_local_apts', JSON.stringify(localApts));
+                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
                     
                     if (typeof renderAppointments === "function") {
                         renderAppointments(localApts);
