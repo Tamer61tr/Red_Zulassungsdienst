@@ -49,6 +49,7 @@
             --glass-border: rgba(255, 255, 255, 0.09);
             --border-hover: var(--primary-red);
             --global-radius: 20px;
+            --btn-radius: 50px;
             
             /* Adaptive Akzentfarben für 100% Lesbarkeit in Dunkel- UND Hellmodus */
             --gold-accent: #f5c542;
@@ -273,7 +274,7 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.9); } }
 
-        /* Header */
+        /* Header & Erweiterte Auto-Animationen */
         #header-wrapper { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; box-sizing: border-box; transform: translateZ(0); backface-visibility: hidden; padding-top: var(--safe-top); background: var(--glass-bg); }
         nav { width: 100%; box-sizing: border-box; padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 2px solid var(--primary-red); box-shadow: 0 8px 30px rgba(0,0,0,0.35); flex-wrap: wrap; z-index: 1001; position: relative;}
         
@@ -287,12 +288,23 @@
         .speech-bubble.show-bubble { opacity: 1; transform: translateY(0); animation: gentleBounce 2s infinite alternate ease-in-out; }
         @keyframes gentleBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-3px); } }
 
-        .logo-car-svg { height: clamp(16px, 3.5vw, 24px); width: auto; flex-shrink: 0; fill: var(--text-light); transition: 0.3s; animation: gentleIdle 3s infinite ease-in-out; }
-        .logo-container:hover .logo-car-svg { fill: var(--primary-red); transform: translateX(4px); filter: drop-shadow(0 0 8px var(--primary-red)); }
-        @keyframes gentleIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+        #headerCarDisplayWrapper { display: inline-flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .logo-car-svg { height: clamp(16px, 3.5vw, 24px); width: auto; flex-shrink: 0; fill: currentColor; transition: 0.3s; }
+        .logo-car-icon { font-size: clamp(16px, 3vw, 22px); transition: 0.3s; }
+        .logo-container:hover #headerCarDisplayWrapper { color: var(--primary-red) !important; transform: translateX(4px); filter: drop-shadow(0 0 8px var(--primary-red)); }
+        
+        /* Wählbare Auto-Animationen für den Header */
+        .car-anim-idle { animation: gentleIdle 3s infinite ease-in-out; }
+        .car-anim-turbo { animation: turboDrive 2.4s infinite ease-in-out; }
+        .car-anim-neon { animation: neonCarPulse 1.5s infinite alternate; }
+        .car-anim-rev { animation: engineRev 0.4s infinite alternate; }
+        @keyframes gentleIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+        @keyframes turboDrive { 0%, 100% { transform: translateX(0) skewX(0deg); } 50% { transform: translateX(7px) skewX(-10deg); filter: drop-shadow(-4px 0 6px var(--primary-red)); } }
+        @keyframes neonCarPulse { 0% { filter: drop-shadow(0 0 2px currentColor); transform: scale(1); } 100% { filter: drop-shadow(0 0 12px currentColor); transform: scale(1.1); } }
+        @keyframes engineRev { 0% { transform: translate(0, 0); } 100% { transform: translate(1px, -1.5px); } }
 
-        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: var(--primary-red); font-size: 14px; background: var(--glass-border); padding: 4px; border-radius: 50%; border: 1px solid var(--primary-red); animation: pulse-badge 1s infinite alternate; cursor: pointer; z-index: 100; transition: 0.3s; }
-        .admin-ticker-edit-icon:hover { transform: scale(1.2); color: #fff; background: var(--primary-red); }
+        .admin-ticker-edit-icon { position: absolute; top: -6px; right: -18px; color: #000; font-size: 13px; background: #25D366; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--bg-card); align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: 0.3s; box-shadow: 0 4px 12px rgba(37,211,102,0.5); }
+        .admin-ticker-edit-icon:hover { transform: scale(1.2) rotate(12deg); color: #fff; background: var(--primary-red); }
 
         .nav-actions { display: flex; align-items: center; gap: 10px; }
         .visitor-counter { background: var(--glass-border); border: 1px solid var(--glass-border); padding: 6px 13px; border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 5px; cursor: pointer; transition: 0.3s; text-decoration: none; outline: none; }
@@ -327,7 +339,7 @@
         .header-widget-item { cursor: pointer; transition: 0.3s; padding: 4px 10px; border-radius: 8px; border: 1px solid transparent; }
         .header-widget-item:hover { background: var(--glass-border); border-color: var(--glass-border); transform: scale(1.04); }
         
-        /* NEU: LIZENZSICHERE LIVE BÜRO- & ANNAHME-AMPEL IM HEADER */
+        /* LIZENZSICHERE LIVE BÜRO- & ANNAHME-AMPEL IM HEADER */
         .header-office-status { font-size: 11px; font-weight: 800; color: var(--text-light); display: flex; align-items: center; gap: 6px; white-space: nowrap; background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px 11px; }
         .status-led { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .status-led.open { background: #25D366; box-shadow: 0 0 8px #25D366; animation: pulseAnim 1.2s infinite alternate; }
@@ -402,12 +414,12 @@
         #confirmModalOverlay .custom-dialog-window { max-width: 440px; border-top-color: #25D366; }
         #deleteConfirmOverlay .custom-dialog-window { max-width: 400px; border-top-color: #ff3b30; }
         #logoutConfirmOverlay .custom-dialog-window { max-width: 400px; }
-        #tickerConfigOverlay .custom-dialog-window { max-width: 520px; border-top-color: #007aff; }
+        #tickerConfigOverlay .custom-dialog-window { max-width: 620px; border-top-color: #007aff; text-align: left; }
         #lightboxOverlay .custom-dialog-window { max-width: 640px; border-top-color: var(--gold-border); padding: 25px; }
         #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } 
         #editAptOverlay .custom-dialog-window { max-width: 400px; border-top-color: #007aff; }
         #pageManagerOverlay .custom-dialog-window { max-width: 700px; border-top-color: #ff9500; }
-        #themeEditorOverlay .custom-dialog-window { max-width: 520px; border-top-color: #00ffff; text-align: left; }
+        #themeEditorOverlay .custom-dialog-window { max-width: 580px; border-top-color: #00ffff; text-align: left; }
         #calcItemEditOverlay .custom-dialog-window { max-width: 420px; border-top-color: #25D366; text-align: left; }
         #formEditModalOverlay .custom-dialog-window { max-width: 460px; border-top-color: #ff9500; text-align: left; }
         #digitalVollmachtOverlay .custom-dialog-window { max-width: 680px; border-top-color: #25D366; text-align: left; }
@@ -415,7 +427,7 @@
         #viralShareOverlay .custom-dialog-window { max-width: 430px; border-top-color: var(--primary-red); }
         
         #serviceConfigOverlay .custom-dialog-window { max-width: 650px; border-top-color: #25D366; text-align: left; }
-        .service-config-section { background: var(--glass-border); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .service-config-section { background: var(--bg-input); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
         .service-config-section h4 { font-size: 11px; text-transform: uppercase; color: var(--primary-red); margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 5px; }
 
         #contentConfigOverlay .custom-dialog-window { max-width: 650px; border-top-color: var(--primary-red); text-align: left; }
@@ -574,7 +586,7 @@
         .time-slot.active { background: var(--primary-red); border-color: var(--primary-red); color: white; box-shadow: 0 0 15px rgba(230,0,0,0.4); }
         .time-slot.booked { opacity: 0.2; text-decoration: line-through; cursor: not-allowed; }
 
-        .btn-primary { background: var(--primary-red); color: white; padding: 13px 28px; font-weight: 800; text-transform: uppercase; border-radius: 50px; border: none; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 20px rgba(230,0,0,0.28); text-decoration: none; outline: none; letter-spacing: 0.5px; }
+        .btn-primary { background: var(--primary-red); color: white; padding: 13px 28px; font-weight: 800; text-transform: uppercase; border-radius: var(--btn-radius); border: none; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; box-shadow: 0 6px 20px rgba(230,0,0,0.28); text-decoration: none; outline: none; letter-spacing: 0.5px; }
         .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: 0 10px 25px rgba(230,0,0,0.4); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
@@ -609,7 +621,7 @@
         .compass-doc-list li { font-size: 12px; color: var(--text-light); display: flex; align-items: flex-start; gap: 8px; font-weight: 600; }
         .compass-doc-list li i { color: var(--green-accent); margin-top: 3px; flex-shrink: 0; }
 
-        /* INTERAKTIVER WUNSCHKENNZEICHEN-GENERATOR & EDITIERBARER KALKULATOR */
+        /* INTERAKTIVER WUNSCHKENNZEICHEN-GENERATOR (INKL. SAISON & CARBON OPTIK) */
         .interactive-tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 25px; max-width: 1100px; margin: 45px auto 0; padding: 0 5%; box-sizing: border-box; }
         .tool-box { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--global-radius); padding: 30px 25px; box-shadow: var(--card-shadow); position: relative; overflow: hidden; transition: 0.3s; }
         .tool-box:hover { border-color: rgba(230, 0, 0, 0.35); }
@@ -618,11 +630,13 @@
         
         .live-german-plate {
             display: flex; align-items: center; background: #ffffff; color: #000000;
-            border: 3.5px solid #111; border-radius: 8px; height: 64px; width: 100%; max-width: 350px;
+            border: 3.5px solid #111; border-radius: 8px; height: 64px; width: 100%; max-width: 360px;
             margin: 18px auto; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.35), inset 0 0 6px rgba(0,0,0,0.15);
             font-family: 'Oswald', 'Courier New', monospace; font-weight: 700; letter-spacing: 2px;
-            user-select: none;
+            user-select: none; transition: all 0.3s ease;
         }
+        .live-german-plate.plate-short { max-width: 285px; }
+        .live-german-plate.plate-carbon .plate-content-area { text-shadow: 1px 1px 0px #555, 2px 2px 3px rgba(0,0,0,0.35); letter-spacing: 2.5px; }
         .euro-blue-strip {
             background: #003399; color: #fff; width: 38px; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
@@ -632,13 +646,15 @@
         .euro-d { font-size: 16px; font-weight: 900; font-family: Arial, sans-serif; line-height: 1; }
         .plate-content-area {
             display: flex; align-items: center; justify-content: space-between;
-            width: 100%; padding: 0 12px; font-size: clamp(22px, 5vw, 31px); color: #000;
+            width: 100%; padding: 0 12px; font-size: clamp(22px, 5vw, 30px); color: #000;
         }
         .plate-stamps {
             display: flex; flex-direction: column; align-items: center; gap: 3px; margin: 0 6px;
         }
         .stamp-hu { width: 18px; height: 18px; border-radius: 50%; background: #ff9500; border: 1px solid #000; font-size: 7px; display: flex; align-items: center; justify-content: center; font-family: sans-serif; font-weight: 900; color: #000; }
         .stamp-berlin { width: 18px; height: 18px; border-radius: 50%; background: #e60000; border: 1px solid #000; font-size: 8px; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .plate-season-fraction { display: none; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; line-height: 1.05; font-family: Arial, sans-serif; font-weight: 900; color: #000; margin-left: 6px; padding-left: 4px; }
+        .plate-season-fraction .season-line { width: 18px; height: 2px; background: #000; margin: 1px 0; }
 
         .plate-input-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
         .plate-input-field { text-transform: uppercase; text-align: center; font-weight: 800; letter-spacing: 1px; }
@@ -671,6 +687,11 @@
         .comp-card.highlight { border-color: var(--green-border); background: var(--green-bg-soft); }
         .comp-list { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-light); }
         .comp-list li { display: flex; align-items: center; gap: 8px; }
+
+        /* NEU: BERLINER BEZIRKS- & EXPRESS-WEGWEISER PILLS */
+        .district-pills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .district-pill { background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-light); padding: 7px 13px; border-radius: 50px; font-size: 11px !important; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .district-pill:hover, .district-pill.active { background: var(--primary-red); color: #fff; border-color: var(--primary-red); }
 
         .faq-wrapper { max-width: 1100px; margin: 45px auto 0; padding: 0 5%; display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 25px; }
         .checklist-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; cursor: pointer; font-size: 12px; transition: 0.2s; color: var(--text-light); }
@@ -893,13 +914,15 @@
                     <span class="red-part" id="txt-header-title-red">RED</span> 
                     <span class="white-part" id="txt-header-title-sub">ZULASSUNGSDIENST</span>
                 </div>
-                <svg class="logo-car-svg" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="currentColor"/>
-                    <path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="currentColor"/>
-                    <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/>
-                </svg>
+                <span id="headerCarDisplayWrapper" class="car-anim-idle" style="color: var(--text-light);">
+                    <svg class="logo-car-svg" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="currentColor"/>
+                        <path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="currentColor"/>
+                        <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/>
+                    </svg>
+                </span>
                 
-                <i class="fa-solid fa-pen admin-ticker-edit-icon mod-ticker" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Ticker bearbeiten"></i>
+                <i class="fa-solid fa-pencil admin-ticker-edit-icon mod-ticker" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Header-Auto, Logo & Ticker bearbeiten"></i>
             </div>
             
             <div class="nav-actions">
@@ -918,7 +941,7 @@
             </div>
             
             <div class="header-widgets-wrapper">
-                <!-- NEU: 100% DSGVO- & LIZENZSICHERE LIVE BÜRO- & ANNAHME-AMPEL -->
+                <!-- 100% DSGVO- & LIZENZSICHERE LIVE BÜRO- & ANNAHME-AMPEL -->
                 <div class="header-office-status header-widget-item" id="liveHeaderOfficeStatus" onclick="window.openWidgetModal('office')" title="Öffnungszeiten & Direktannahme-Status">
                     <span class="status-led open" id="officeStatusLed"></span>
                     <span id="officeStatusText">Geöffnet • Sofort-Annahme</span>
@@ -945,9 +968,9 @@
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('leistungen').offsetTop, behavior: 'smooth'});"><i class="fa-solid fa-gears" style="color:var(--primary-red);"></i> Leistungen</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('zulassungs-kompass').offsetTop, behavior: 'smooth'});"><i class="fa-solid fa-compass" style="color:var(--primary-red);"></i> Zulassungs-Kompass</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop, behavior: 'smooth'});"><i class="fa-solid fa-calculator" style="color:var(--primary-red);"></i> Kennzeichen & Kalkulator</a>
-        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openDigitalVollmachtModal('Allgemeine Vollmacht');"><i class="fa-solid fa-signature" style="color:var(--primary-red);"></i> Digitale Vollmacht</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat');"><i class="fa-solid fa-signature" style="color:var(--primary-red);"></i> Digitale Vollmacht</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openKaufvertragModal();"><i class="fa-solid fa-handshake" style="color:var(--primary-red);"></i> Kfz-Kaufvertrag</a>
-        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-formulare');"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Formulare</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-formulare');"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Formulare (Anträge)</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-ankauf');"><i class="fa-solid fa-car" style="color:var(--primary-red);"></i> Auto Ankauf</a>
         
         <div id="dynamicMenuItemsContainer" style="display:contents;"></div>
@@ -1221,50 +1244,75 @@
         </div>
     </div>
 
-    <!-- ERWEITERTER GLOBALER DESIGN & FARB-MANAGER -->
+    <!-- ERWEITERTER GLOBALER DESIGN-, EFFEKT- & FARB-MANAGER -->
     <div class="custom-dialog-overlay" id="themeEditorOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeThemeEditor()"></i>
-            <h3 style="color:#00a8cc; font-weight:900; margin-bottom:10px; text-align:center;"><i class="fa-solid fa-palette"></i> Erweiterter Design- & Farb-Manager</h3>
-            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px; text-align:center;">Passen Sie Farben, Eingabefelder, Ecken-Rundungen und Schriftarten global für alle Geräte an.</p>
+            <h3 style="color:#00a8cc; font-weight:900; margin-bottom:8px; text-align:center;"><i class="fa-solid fa-palette"></i> Globaler Design-, Effekt- & Farb-Manager</h3>
+            <p style="color:var(--text-muted); font-size:11px; margin-bottom:18px; text-align:center;">Passen Sie Farben, Kontraste, Ecken-Rundungen, Button-Stile und Leuchteffekte global für alle Besucher und Geräte an.</p>
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Hauptfarbe (Akzente, Buttons)</label>
-                    <input type="color" id="tePrimary" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#e60000">
+            <div class="service-config-section">
+                <h4>1. Globale Farbpalette</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Hauptfarbe (Akzente & Buttons)</label>
+                        <input type="color" id="tePrimary" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#e60000">
+                    </div>
+                    <div class="form-group">
+                        <label>Standard Textfarbe</label>
+                        <input type="color" id="teText" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#ffffff">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Standard Textfarbe</label>
-                    <input type="color" id="teText" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#ffffff">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Seiten-Hintergrund</label>
+                        <input type="color" id="teBg" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#050507">
+                    </div>
+                    <div class="form-group">
+                        <label>Karten & Boxen</label>
+                        <input type="color" id="teCard" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#0e0e12">
+                    </div>
+                    <div class="form-group">
+                        <label>Eingabefelder (Inputs)</label>
+                        <input type="color" id="teInput" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#141419">
+                    </div>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Hintergrund (Global)</label>
-                    <input type="color" id="teBg" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#050507">
+
+            <div class="service-config-section">
+                <h4>2. Formen, Button-Design & Argon-Leuchteffekte</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Karten-Rundung (Radius)</label>
+                        <select id="teRadius" class="form-control" style="background:var(--bg-input);">
+                            <option value="8px">Kantig / Sportlich (8px)</option>
+                            <option value="14px">Modern Business (14px)</option>
+                            <option value="20px" selected>Argon Standard (20px)</option>
+                            <option value="28px">Ultra Soft (28px)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Button-Form</label>
+                        <select id="teBtnRadius" class="form-control" style="background:var(--bg-input);">
+                            <option value="50px" selected>Rund / Pill-Style (50px)</option>
+                            <option value="12px">Modern Abgerundet (12px)</option>
+                            <option value="6px">Markant / Eckig (6px)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Karten & Boxen (Elemente)</label>
-                    <input type="color" id="teCard" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#0e0e12">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Eingabefelder (Inputs)</label>
-                    <input type="color" id="teInput" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#141419">
-                </div>
-                <div class="form-group">
-                    <label>Karten-Rundung (Radius)</label>
-                    <select id="teRadius" class="form-control" style="background:var(--bg-input);">
-                        <option value="8px">Kantig / Sportlich (8px)</option>
-                        <option value="14px">Modern (14px)</option>
-                        <option value="20px" selected>Argon Standard (20px)</option>
-                        <option value="28px">Ultra Soft (28px)</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Karten-Leuchteffekt (Glow & Schatten)</label>
+                        <select id="teGlowStyle" class="form-control" style="background:var(--bg-input);">
+                            <option value="0 14px 35px rgba(0, 0, 0, 0.55)">Standard Argon Tiefe</option>
+                            <option value="0 0 28px rgba(230, 0, 0, 0.35)">Intensives Neon-Leuchten</option>
+                            <option value="0 6px 15px rgba(0, 0, 0, 0.15)">Dezent / Minimalistisch</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             
-            <button class="btn-primary" style="background:#00a8cc; color:#fff; width:100%; justify-content:center; margin-top:15px;" onclick="window.saveCustomTheme()"><i class="fa-solid fa-wand-magic-sparkles"></i> Eigenes Design global anwenden & speichern</button>
+            <button class="btn-primary" style="background:#00a8cc; color:#fff; width:100%; justify-content:center; margin-top:5px;" onclick="window.saveCustomTheme()"><i class="fa-solid fa-wand-magic-sparkles"></i> Eigenes Design global anwenden & speichern</button>
             <button class="btn-primary" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-light); width:100%; justify-content:center; margin-top:10px;" onclick="window.resetCustomTheme()"><i class="fa-solid fa-rotate-left"></i> Auf Standard zurücksetzen</button>
         </div>
     </div>
@@ -1307,7 +1355,7 @@
                 <input type="text" id="editFormTitleInput" class="form-control" placeholder="Name des Formulars">
             </div>
             <div class="form-group">
-                <label>Direkter Link / URL (Optional)</label>
+                <label>Direkter Link / URL (Oder leer lassen, falls noch keine Datei aktiv sein soll)</label>
                 <input type="text" id="editFormUrlInput" class="form-control" placeholder="https://...">
             </div>
             <div class="form-group">
@@ -1317,7 +1365,10 @@
                     <span class="noble-file-trigger" id="editFormFileLabel"><i class="fa-solid fa-cloud-arrow-up"></i> PDF / Datei auswählen</span>
                 </label>
             </div>
-            <button class="btn-primary" style="background:#ff9500; color:#000; width:100%; justify-content:center; margin-top:15px;" onclick="window.saveFormEditModal()"><i class="fa-solid fa-floppy-disk"></i> Formular Speichern</button>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; flex:1; justify-content:center;" onclick="window.clearFormFileInModal()" title="Hinterlegte Datei wieder leeren"><i class="fa-solid fa-ban"></i> Inhalt leeren</button>
+                <button class="btn-primary" style="background:#ff9500; color:#000; flex:2; justify-content:center;" onclick="window.saveFormEditModal()"><i class="fa-solid fa-floppy-disk"></i> Formular Speichern</button>
+            </div>
         </div>
     </div>
 
@@ -1516,7 +1567,7 @@
                 </label>
                 <label class="noble-checkbox-label" style="display:flex; margin-bottom:0;">
                     <input type="checkbox" id="permTicker">
-                    <span class="noble-checkbox-box"></span> Ticker & Info-Leiste
+                    <span class="noble-checkbox-box"></span> Header-Auto, Logo & Ticker Studio
                 </label>
             </div>
             
@@ -1755,103 +1806,156 @@
         </div>
     </div>
 
+    <!-- ERWEITERTES HEADER-AUTO, LOGO & TICKER STUDIO (ÜBER DEN STIFT AM AUTO) -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
-            <h3 style="color:#007aff; font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-text-width"></i> Ticker & Info-Leiste</h3>
-            <p style="font-size:11px; color:var(--text-muted); margin-bottom:20px;">Passen Sie den Text, Farben, Schriftart und gleitende Symbole an.</p>
+            <h3 style="color:#007aff; font-weight:900; margin-bottom:8px; text-align:center;"><i class="fa-solid fa-car-on"></i> Header-Auto, Logo & Ticker Studio</h3>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:18px; text-align:center;">Passen Sie hier das Fahrzeug im Header, die Logo-Texte sowie die Laufschrift (Ticker) individuell an.</p>
             
-            <div class="form-group">
-                <label>Gesamter Ticker-Text</label>
-                <input type="text" id="tickerFullText" class="form-control" value="+++ WICHTIG: Die aktuellen Wartezeiten bei den Zulassungsstellen betragen 1-2 Werktage. Sichern Sie sich jetzt Ihren Termin bei RED Berlin! +++">
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Blinkendes Wort (Hervorhebung)</label>
-                    <input type="text" id="tickerBlinkWord" class="form-control" value="jetzt">
+            <div class="service-config-section">
+                <h4>1. Header-Fahrzeug & Logo-Texte</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Logo Hauptwort (Rot)</label>
+                        <input type="text" id="hcLogoRed" class="form-control" value="RED">
+                    </div>
+                    <div class="form-group">
+                        <label>Logo Zusatzwort</label>
+                        <input type="text" id="hcLogoSub" class="form-control" value="ZULASSUNGSDIENST">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Farbe des blinkenden Wortes</label>
-                    <select id="tickerBlinkColor" class="form-control" style="background:var(--bg-input);">
-                        <option value="#e60000" selected>Rot</option>
-                        <option value="#ffcc00">Premium Gold</option>
-                        <option value="#25D366">WhatsApp Grün</option>
-                        <option value="#007aff">Neon Blau</option>
-                        <option value="#ff00ff">Magenta Pink</option>
-                        <option value="#ff9500">Orange</option>
-                        <option value="#00ffff">Cyan</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Header-Fahrzeug Modell wählen</label>
+                        <select id="hcCarType" class="form-control" style="background:var(--bg-input);">
+                            <option value="svg-sport" selected>🏎️ Original Sport-Coupé (Vektor-Silhouette)</option>
+                            <option value="fa-car-side">🚗 Limousine / PKW (Seitenansicht)</option>
+                            <option value="fa-car">🚘 Sport-Limousine (Frontansicht)</option>
+                            <option value="fa-truck-pickup">🛻 SUV / Pickup</option>
+                            <option value="fa-motorcycle">🏍️ Motorrad / Bike</option>
+                            <option value="fa-truck-fast">🚛 Express-Transporter / LKW</option>
+                            <option value="fa-bolt">⚡ Express-Blitz</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fahrzeug-Animation</label>
+                        <select id="hcCarAnim" class="form-control" style="background:var(--bg-input);">
+                            <option value="car-anim-idle" selected>Sanftes Schweben (Standard)</option>
+                            <option value="car-anim-turbo">Turbo-Sprint (Dynamisch)</option>
+                            <option value="car-anim-neon">Pulsierendes Neon-Licht</option>
+                            <option value="car-anim-rev">Sportmotor-Vibration</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="form-group" style="margin-top:10px;">
-                <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
-                <div class="symbol-grid">
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="noble-checkbox-box"></span> 🚛 LKW</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="noble-checkbox-box"></span> ⚡ Blitz</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="noble-checkbox-box"></span> 🏁 Flagge</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Stern</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symKey"><span class="noble-checkbox-box"></span> 🔑 Schlüssel</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symClock"><span class="noble-checkbox-box"></span> ⏱️ Uhr</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFire"><span class="noble-checkbox-box"></span> 🔥 Feuer</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symInfo"><span class="noble-checkbox-box"></span> ℹ️ Info</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCalendar"><span class="noble-checkbox-box"></span> 📅 Kalender</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symPin"><span class="noble-checkbox-box"></span> 📍 Pin</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symHand"><span class="noble-checkbox-box"></span> 🤝 Deal</label>
-                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMedal"><span class="noble-checkbox-box"></span> 🥇 Nr. 1</label>
-                </div>
-            </div>
-            
-            <div class="form-row" style="margin-top:15px;">
-                <div class="form-group">
-                    <label>Lauf-Geschwindigkeit</label>
-                    <select id="tickerSpeed" class="form-control" style="background:var(--bg-input);">
-                        <option value="40s">Sehr Langsam</option>
-                        <option value="25s">Langsam</option>
-                        <option value="15s" selected>Normal</option>
-                        <option value="9s">Schnell</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Standard Textfarbe</label>
-                    <select id="tickerColor" class="form-control" style="background:var(--bg-input);">
-                        <option value="var(--text-light)" selected>Dynamisch (Theme-Farbe)</option>
-                        <option value="#ffffff">Clean Weiß</option>
-                        <option value="#ccc">Muted Grau</option>
-                        <option value="#ffcc00">Gold</option>
-                        <option value="#00ffff">Cyan</option>
-                        <option value="#39ff14">Neon Grün</option>
-                        <option value="#000000">Schwarz</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fahrzeug-Farbe</label>
+                        <select id="hcCarColor" class="form-control" style="background:var(--bg-input);">
+                            <option value="var(--text-light)" selected>Automatisch (Passend zu Hell-/Dunkelmodus)</option>
+                            <option value="var(--primary-red)">RED Marken-Rot</option>
+                            <option value="#f5c542">Premium Gold</option>
+                            <option value="#25D366">Express Grün</option>
+                            <option value="#00a8cc">Neon Cyan / Blau</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="service-config-section">
+                <h4>2. Laufschrift (Ticker) & Symbole</h4>
                 <div class="form-group">
-                    <label>Schriftart</label>
-                    <select id="tickerFont" class="form-control" style="background:var(--bg-input);">
-                        <option value="'Montserrat', sans-serif" selected>Montserrat (Modern)</option>
-                        <option value="'Courier New', monospace">Courier (Kennzeichen Style)</option>
-                        <option value="'Playfair Display', serif">Playfair Display (Nobel)</option>
-                    </select>
+                    <label>Gesamter Ticker-Text</label>
+                    <input type="text" id="tickerFullText" class="form-control" value="+++ WICHTIG: Die aktuellen Wartezeiten bei den Zulassungsstellen betragen 1-2 Werktage. Sichern Sie sich jetzt Ihren Termin bei RED Berlin! +++">
                 </div>
-                <div class="form-group">
-                    <label>Schriftgröße</label>
-                    <select id="tickerSize" class="form-control" style="background:var(--bg-input);">
-                        <option value="11px">Minimal (11px)</option>
-                        <option value="13px" selected>Standard (13px)</option>
-                        <option value="16px">Groß (16px)</option>
-                    </select>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Blinkendes Wort (Hervorhebung)</label>
+                        <input type="text" id="tickerBlinkWord" class="form-control" value="jetzt">
+                    </div>
+                    <div class="form-group">
+                        <label>Farbe des blinkenden Wortes</label>
+                        <select id="tickerBlinkColor" class="form-control" style="background:var(--bg-input);">
+                            <option value="#e60000" selected>Rot</option>
+                            <option value="#ffcc00">Premium Gold</option>
+                            <option value="#25D366">WhatsApp Grün</option>
+                            <option value="#007aff">Neon Blau</option>
+                            <option value="#ff00ff">Magenta Pink</option>
+                            <option value="#ff9500">Orange</option>
+                            <option value="#00ffff">Cyan</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top:8px;">
+                    <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
+                    <div class="symbol-grid">
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symTruck"><span class="noble-checkbox-box"></span> 🚛 LKW</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCard" checked><span class="noble-checkbox-box"></span> 🪪 Schild</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symBolt"><span class="noble-checkbox-box"></span> ⚡ Blitz</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFlag"><span class="noble-checkbox-box"></span> 🏁 Flagge</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symStar"><span class="noble-checkbox-box"></span> ⭐ Stern</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symKey"><span class="noble-checkbox-box"></span> 🔑 Schlüssel</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symClock"><span class="noble-checkbox-box"></span> ⏱️ Uhr</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symFire"><span class="noble-checkbox-box"></span> 🔥 Feuer</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symInfo"><span class="noble-checkbox-box"></span> ℹ️ Info</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCalendar"><span class="noble-checkbox-box"></span> 📅 Kalender</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symPin"><span class="noble-checkbox-box"></span> 📍 Pin</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symHand"><span class="noble-checkbox-box"></span> 🤝 Deal</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMedal"><span class="noble-checkbox-box"></span> 🥇 Nr. 1</label>
+                    </div>
+                </div>
+                
+                <div class="form-row" style="margin-top:12px;">
+                    <div class="form-group">
+                        <label>Lauf-Geschwindigkeit</label>
+                        <select id="tickerSpeed" class="form-control" style="background:var(--bg-input);">
+                            <option value="40s">Sehr Langsam</option>
+                            <option value="25s">Langsam</option>
+                            <option value="15s" selected>Normal</option>
+                            <option value="9s">Schnell</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Standard Textfarbe</label>
+                        <select id="tickerColor" class="form-control" style="background:var(--bg-input);">
+                            <option value="var(--text-light)" selected>Dynamisch (Theme-Farbe)</option>
+                            <option value="#ffffff">Clean Weiß</option>
+                            <option value="#ccc">Muted Grau</option>
+                            <option value="#ffcc00">Gold</option>
+                            <option value="#00ffff">Cyan</option>
+                            <option value="#39ff14">Neon Grün</option>
+                            <option value="#000000">Schwarz</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Schriftart</label>
+                        <select id="tickerFont" class="form-control" style="background:var(--bg-input);">
+                            <option value="'Montserrat', sans-serif" selected>Montserrat (Modern)</option>
+                            <option value="'Courier New', monospace">Courier (Kennzeichen Style)</option>
+                            <option value="'Playfair Display', serif">Playfair Display (Nobel)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Schriftgröße</label>
+                        <select id="tickerSize" class="form-control" style="background:var(--bg-input);">
+                            <option value="11px">Minimal (11px)</option>
+                            <option value="13px" selected>Standard (13px)</option>
+                            <option value="16px">Groß (16px)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             
             <div style="display:flex; gap:10px; margin-top:15px;">
                 <button class="btn-primary" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-light); flex:1; justify-content:center;" onclick="window.toggleTickerDisplay()">Ticker Ein/Aus</button>
-                <button class="btn-primary" style="background:#007aff; flex:1; justify-content:center;" onclick="window.saveTickerConfig()">Speichern</button>
+                <button class="btn-primary" style="background:#007aff; flex:1; justify-content:center;" onclick="window.saveTickerConfig()"><i class="fa-solid fa-floppy-disk"></i> Alles Speichern</button>
             </div>
         </div>
     </div>
@@ -1897,7 +2001,7 @@
 
         <div class="admin-workspace-box mod-prices" style="max-width:800px; margin: 20px auto 0; text-align:center; padding: 0 5%;">
             <button class="btn-primary" style="background:#25D366; color:#000; font-size:13px;" onclick="window.addNewServiceCard()"><i class="fa-solid fa-plus"></i> Neue Leistungskarte hinzufügen</button>
-            <p style="color:var(--text-muted); font-size:11px; margin-top:8px;">Nutzen Sie den grünen Stift auf den Leistungskarten & im Schnell-Kalkulator, um Preise (standardmäßig "-") und Texte jederzeit anzupassen.</p>
+            <p style="color:var(--text-muted); font-size:11px; margin-top:8px;">Nutzen Sie den grünen Stift auf den Leistungskarten, im Header & im Schnell-Kalkulator, um Preise (standardmäßig "-") und Designs jederzeit anzupassen.</p>
         </div>
 
         <div class="admin-workspace-box mod-blocks" style="max-width:800px; margin: 15px auto 0; padding: 0 5%;">
@@ -2093,7 +2197,7 @@
                     <a href="javascript:void(0)" onclick="window.switchView('view-home'); window.scrollTo({top: document.getElementById('termin').offsetTop, behavior: 'smooth'});" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
                     <a href="javascript:void(0)" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')" class="btn-primary btn-green-adaptive"><i class="fa-solid fa-signature"></i> Digitale Vollmacht</a>
                     <a href="javascript:void(0)" onclick="window.openKaufvertragModal()" class="btn-primary btn-gold-adaptive"><i class="fa-solid fa-handshake"></i> Kfz-Kaufvertrag</a>
-                    <a href="javascript:void(0)" onclick="window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop, behavior: 'smooth'});" class="btn-primary" style="background:var(--bg-input); border:1.5px solid var(--glass-border); color:var(--text-light); box-shadow:none;"><i class="fa-solid fa-id-card" style="color:var(--primary-red);"></i> Wunschkennzeichen</a>
+                    <a href="javascript:void(0)" onclick="window.switchView('view-formulare')" class="btn-primary" style="background:var(--bg-input); border:1.5px solid var(--glass-border); color:var(--text-light); box-shadow:none;"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Alle Formulare</a>
                 </div>
 
                 <div class="trust-pills">
@@ -2118,7 +2222,7 @@
             <p style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:20px; padding: 0 5%;">* Alle Preisangaben verstehen sich in Euro inkl. gesetzlicher MwSt., zuzüglich anfallender amtlicher Behördengebühren.</p>
         </section>
 
-        <!-- NEU: INTERAKTIVER ZULASSUNGS-KOMPASS (DAMIT KUNDEN JEDEN FALL SOFORT FINDEN) -->
+        <!-- INTERAKTIVER ZULASSUNGS-KOMPASS (DAMIT KUNDEN JEDEN FALL SOFORT FINDEN) -->
         <section id="zulassungs-kompass" class="compass-wrapper">
             <div class="compass-box">
                 <div style="text-align:center;">
@@ -2160,12 +2264,12 @@
             </div>
         </section>
 
-        <!-- WUNSCHKENNZEICHEN-GENERATOR & EDITIERBARER SCHNELL-KALKULATOR -->
+        <!-- WUNSCHKENNZEICHEN-GENERATOR (INKL. SAISON & 3D-OPTIK) & SCHNELL-KALKULATOR -->
         <section id="wunschkennzeichen-section" class="interactive-tools-grid">
             <div class="tool-box editable-section">
                 <div class="section-edit-btn action-content" onclick="window.openContentEditor('tools')" title="Überschriften bearbeiten"><i class="fa-solid fa-pencil"></i></div>
-                <h3><i class="fa-solid fa-id-card"></i> <span id="txt-wk-title">Berliner Wunschkennzeichen</span></h3>
-                <p id="txt-wk-desc" style="font-size:12px; color:var(--text-muted);">Testen Sie Ihre Wunschkombination live auf dem Euro-Kennzeichen und übernehmen Sie diese direkt in Ihren Termin.</p>
+                <h3><i class="fa-solid fa-id-card"></i> <span id="txt-wk-title">Berliner Wunschkennzeichen Studio</span></h3>
+                <p id="txt-wk-desc" style="font-size:12px; color:var(--text-muted);">Testen Sie Ihre Wunschkombination live (inkl. E-Auto, Oldtimer, Saison-Zeiträumen & 3D-Optik) und übernehmen Sie diese direkt in Ihren Termin.</p>
                 
                 <div class="live-german-plate" id="liveGermanPlatePreview">
                     <div class="euro-blue-strip">
@@ -2180,18 +2284,38 @@
                         </div>
                         <span id="platePreviewLetters">RED</span>
                         <span id="platePreviewNumbers">2026</span>
-                        <span id="platePreviewSuffix" style="font-size:20px; color:#003399;"></span>
+                        <span id="platePreviewSuffix" style="font-size:19px; color:#003399;"></span>
+                        <div class="plate-season-fraction" id="plateSeasonBox">
+                            <span id="seasonStartTxt">04</span>
+                            <div class="season-line"></div>
+                            <span id="seasonEndTxt">10</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="plate-input-row">
-                    <input type="text" class="form-control plate-input-field" value="B" readonly style="width: 55px; color: var(--primary-red);">
-                    <input type="text" id="wkLetters" class="form-control plate-input-field" maxlength="2" placeholder="AB" value="TY" oninput="window.updateLivePlatePreview()" style="width: 85px;">
-                    <input type="text" id="wkNumbers" class="form-control plate-input-field" maxlength="4" placeholder="1234" value="2026" oninput="window.updateLivePlatePreview()" style="width: 105px;">
-                    <select id="wkType" class="form-control" onchange="window.updateLivePlatePreview()" style="width: 105px; padding: 10px;">
+                    <input type="text" class="form-control plate-input-field" value="B" readonly style="width: 52px; color: var(--primary-red);">
+                    <input type="text" id="wkLetters" class="form-control plate-input-field" maxlength="2" placeholder="AB" value="TY" oninput="window.updateLivePlatePreview()" style="width: 80px;">
+                    <input type="text" id="wkNumbers" class="form-control plate-input-field" maxlength="4" placeholder="1234" value="2026" oninput="window.updateLivePlatePreview()" style="width: 98px;">
+                    <select id="wkType" class="form-control" onchange="window.updateLivePlatePreview()" style="width: 110px; padding: 10px;">
                         <option value="">Normal</option>
-                        <option value="E">⚡ E-Auto</option>
+                        <option value="E">⚡ E-Kennz.</option>
                         <option value="H">🏛️ H-Oldtimer</option>
+                    </select>
+                </div>
+
+                <div class="plate-input-row" style="margin-top:8px;">
+                    <select id="wkSeason" class="form-control" onchange="window.updateLivePlatePreview()" style="flex:1; padding: 10px;">
+                        <option value="">Ganzjährig (Ohne Saison)</option>
+                        <option value="03/10">☀️ Saison 03 / 10 (März–Okt.)</option>
+                        <option value="04/10">☀️ Saison 04 / 10 (April–Okt.)</option>
+                        <option value="05/09">☀️ Saison 05 / 09 (Mai–Sept.)</option>
+                        <option value="10/04">❄️ Winter 10 / 04 (Okt.–April)</option>
+                    </select>
+                    <select id="wkStyle" class="form-control" onchange="window.updateLivePlatePreview()" style="flex:1; padding: 10px;">
+                        <option value="std">Standard Alu-Prägung</option>
+                        <option value="carbon">✨ 3D-Carbon Sport-Optik</option>
+                        <option value="short">📏 Kurzes Schild (46cm)</option>
                     </select>
                 </div>
 
@@ -2220,7 +2344,7 @@
             </div>
         </section>
 
-        <!-- ZEITSPAR-VERGLEICH & KOSTENLOSER 60-SEKUNDEN WHATSAPP FOTO-VORABCHECK -->
+        <!-- ZEITSPAR-VERGLEICH, 60s FOTO-VORABCHECK & BERLINER BEZIRKS-WEGWEISER -->
         <section class="interactive-tools-grid" style="margin-top:25px;">
             <div class="tool-box">
                 <h3><i class="fa-solid fa-scale-balanced"></i> Warum über RED Berlin anmelden?</h3>
@@ -2248,13 +2372,20 @@
             <div class="tool-box" style="display:flex; flex-direction:column; justify-content:space-between;">
                 <div>
                     <h3><i class="fa-solid fa-camera-retro"></i> Kostenloser 60s Foto-Vorabcheck</h3>
-                    <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Sie sind unsicher, ob Ihre Fahrzeugpapiere (insbesondere bei Import-, Zoll- oder Firmenfahrzeugen) vollständig sind? Senden Sie uns vorab kurz ein Foto per WhatsApp – wir prüfen Ihre Unterlagen kostenlos vor Ihrem Termin!</p>
-                    <div style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:12px; padding:14px; font-size:12px; margin-bottom:15px;">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
-                            <i class="fa-solid fa-shield-heart" style="color:var(--green-accent); font-size:18px;"></i>
-                            <strong style="color:var(--text-light);">100 % Diskret & Unverbindlich</strong>
-                        </div>
-                        <span style="color:var(--text-muted); font-size:11px;">Direkter Draht zu Tamer Yazici – Antwort innerhalb kürzester Zeit während unserer Öffnungszeiten (Mo–Fr 09:00–20:00 Uhr).</span>
+                    <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Unsicher, ob Ihre Fahrzeugpapiere vollständig sind? Senden Sie uns vorab kurz ein Foto per WhatsApp – wir prüfen Ihre Unterlagen kostenlos! Wählen Sie zudem Ihren Bezirk für Ihre Express-Anbindung:</p>
+                    
+                    <!-- NEU: BERLINER BEZIRKS-WEGWEISER -->
+                    <div class="district-pills-wrap">
+                        <button type="button" class="district-pill active" onclick="window.selectBerlinDistrict('neukoelln', this)">📍 Neukölln / Britz</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('kreuzberg', this)">📍 Kreuzberg / Mitte</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('tempelhof', this)">📍 Tempelhof / Schöneberg</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('treptow', this)">📍 Treptow / Köpenick</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('charlottenburg', this)">📍 Charlottenburg / Spandau</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('pankow', this)">📍 Pankow / Lichtenberg</button>
+                    </div>
+                    <div id="districtResultBox" style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:12px; padding:12px; font-size:11.5px; margin:12px 0;">
+                        <strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Direkt vor Ort in Neukölln (Kienitzer Str. 6, 12053 Berlin):</strong><br>
+                        <span style="color:var(--text-light);">Nur 2–8 Minuten Fahrzeit (U8 Boddinstr. / Hermannplatz / Stadtautobahn A100 Ausfahrt Britzer Damm). Sofort-Annahme ohne Wartezeit!</span>
                     </div>
                 </div>
                 <button type="button" class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.startPhotoPreCheckWhatsApp()"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Dokumenten-Foto jetzt per WhatsApp prüfen lassen</button>
@@ -2394,7 +2525,7 @@
         </section>
     </div>
 
-    <!-- ANSICHT: FORMULARE (LEER ZUM EIGENEN HOCHLADEN DURCH DEN ADMIN!) -->
+    <!-- ANSICHT: FORMULARE (ALLE 12 ANTRÄGE ALS KARTEN – INHALTLICH LEER BIS ZUM EIGENEN UPLOAD!) -->
     <div id="view-formulare" class="view-section">
         <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom: 30px; padding: 0 5%;">
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
@@ -2403,25 +2534,25 @@
         </div>
         
         <div id="adminFormSection" class="admin-workspace-box mod-forms" style="max-width:850px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.25); border-radius: 18px; padding: 22px;">
-            <h4 style="color:var(--primary-red); margin-bottom:12px; font-size:14px;"><i class="fa-solid fa-cloud-arrow-up"></i> Admin: Original-Formular (PDF / Word) hochladen oder verlinken</h4>
-            <p style="font-size:11px; color:var(--text-muted); margin-bottom:14px;">Laden Sie hier Ihre eigenen Original-PDF-Formulare hoch. Diese werden sofort für alle Besucher zum direkten Herunterladen und Öffnen bereitgestellt.</p>
+            <h4 style="color:var(--primary-red); margin-bottom:8px; font-size:14px;"><i class="fa-solid fa-cloud-arrow-up"></i> Admin: Weiteres Formular hinzufügen oder unten bei den Formularen per Upload-Symbol (⬆️) Datei hinterlegen</h4>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:14px;">Klicken Sie direkt auf einer der 12 Formular-Karten unten auf das <strong>Upload-Icon (⬆️)</strong> oder den <strong>Stift (✏️)</strong>, um Ihre Original-PDF für den jeweiligen Antrag hochzuladen.</p>
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; align-items:center;">
-                <input type="text" id="newFormTitle" class="form-control" placeholder="Formular-Titel (z.B. Vollmacht PDF)" style="margin-bottom:0;">
+                <input type="text" id="newFormTitle" class="form-control" placeholder="Neuer Formular-Titel (Optional)" style="margin-bottom:0;">
                 <input type="text" id="newFormUrl" class="form-control" placeholder="Direkt-Link (oder Datei rechts wählen ->)" style="margin-bottom:0;">
                 <label class="noble-file-upload" style="margin-top:0;">
                     <input type="file" id="newFormFile" accept=".pdf,.doc,.docx,application/pdf" onchange="window.updateNewFormFileLabel(this)">
                     <span class="noble-file-trigger" id="newFormFileLabel"><i class="fa-solid fa-file-arrow-up"></i> PDF/Datei vom Gerät wählen</span>
                 </label>
             </div>
-            <button class="btn-primary" style="width:100%; margin-top:12px; justify-content:center;" onclick="window.addNewFormItem()"><i class="fa-solid fa-plus"></i> Formular jetzt hochladen & veröffentlichen</button>
+            <button class="btn-primary" style="width:100%; margin-top:12px; justify-content:center;" onclick="window.addNewFormItem()"><i class="fa-solid fa-plus"></i> Zusätzliches Formular hinzufügen</button>
         </div>
         
         <section id="dynamic-client-section-formulare" class="dynamic-block-container"></section>
 
         <div class="section-header editable-section">
             <div class="section-edit-btn action-content" onclick="window.openContentEditor('formulare')" style="right:5%; top:-10px;"><i class="fa-solid fa-pencil"></i></div>
-            <h2 id="txt-form-title">Formulare & PDF-Downloads</h2>
-            <p id="txt-form-desc" style="color:var(--text-muted); font-size:12px;">Hier finden Sie unsere hinterlegten Original-Dokumente zum direkten Herunterladen sowie unsere interaktive Vollmacht und den Kfz-Kaufvertrag</p>
+            <h2 id="txt-form-title">Formulare & Anträge</h2>
+            <p id="txt-form-desc" style="color:var(--text-muted); font-size:12px;">Alle wichtigen Zulassungsformulare und Anträge in der Übersicht</p>
         </div>
         
         <div class="download-grid" id="formItemsGrid"></div>
@@ -2556,7 +2687,7 @@
         <div class="section-edit-btn action-content" onclick="window.openContentEditor('footer')" style="right:5%; top:10px;"><i class="fa-solid fa-pencil"></i></div>
         <div class="footer-links" id="dynamicFooterLinks">
             <a href="javascript:void(0)" onclick="window.switchView('view-home')">Startseite</a>
-            <a href="javascript:void(0)" onclick="window.switchView('view-formulare')">Formulare</a>
+            <a href="javascript:void(0)" onclick="window.switchView('view-formulare')">Formulare (Anträge)</a>
             <a href="javascript:void(0)" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')">Digitale Vollmacht</a>
             <a href="javascript:void(0)" onclick="window.openKaufvertragModal()">Kfz-Kaufvertrag</a>
             <a href="javascript:void(0)" onclick="window.switchView('view-ankauf')">Auto Ankauf</a>
@@ -2616,6 +2747,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
     <script>
+        // Passive Touch-Listener für verzögerungsfreies Scrollen auf iOS, Android, macOS & Windows
         document.addEventListener('touchmove', () => {}, { passive: true });
         document.addEventListener('touchstart', () => {}, { passive: true });
 
@@ -2741,7 +2873,7 @@
         setInterval(window.updateDispatchCountdown, 30000);
 
         // =========================================================================
-        // 4. INTERAKTIVER ZULASSUNGS-KOMPASS (ALLE KUNDENFÄLLE AUF EINEN BLICK)
+        // 4. INTERAKTIVER ZULASSUNGS-KOMPASS & BERLINER BEZIRKS-WEGWEISER
         // =========================================================================
         const compassData = {
             "privat": {
@@ -2819,7 +2951,7 @@
                     "Bei Verlust Fahrzeugschein (ZB I): Fahrzeugbrief (ZB II) + gültiger TÜV-Bericht",
                     "Bei Verlust Fahrzeugbrief (ZB II): Fahrzeugschein (ZB I) + Versicherung an Eides statt",
                     "Bei Diebstahl von Kennzeichen: Polizeiliche Diebstahlsanzeige + Schein & Brief + TÜV",
-                    "Unterschriebene Vollmacht & Verlusterklärung (direkt bei uns im Formular-Generator verfügbar)"
+                    "Unterschriebene Vollmacht & Verlusterklärung (direkt über Digitale Vollmacht erstellbar)"
                 ]
             }
         };
@@ -2849,8 +2981,81 @@
             window.showToast('Fall in das Buchungsformular übernommen!', 'success');
         };
 
+        const districtDetails = {
+            "neukoelln": "Direkt vor Ort in Neukölln (Kienitzer Str. 6, 12053 Berlin): Nur 2–8 Minuten Fahrzeit (U8 Boddinstr. / Hermannplatz / Stadtautobahn A100 Ausfahrt Britzer Damm). Sofort-Annahme ohne Wartezeit!",
+            "kreuzberg": "Ab Kreuzberg / Mitte: Nur ca. 8–12 Minuten über Hermannplatz oder Urbanstraße direkt zu unserer Annahmestelle in der Kienitzer Str. 6.",
+            "tempelhof": "Ab Tempelhof / Schöneberg: Über den Tempelhofer Damm / Columbiadamm oder die A100 in nur ca. 8–10 Minuten direkt vor Ort.",
+            "treptow": "Ab Treptow / Köpenick: Schnell über die Sonnenallee / Grenzallee (A100) in ca. 10–14 Minuten erreichbar – kostenfreie Vorabprüfung per WhatsApp!",
+            "charlottenburg": "Ab Charlottenburg / Spandau: Direkt über die Stadtautobahn A100 bis Ausfahrt Britzer Damm / Hermannstraße – Ihre Dokumente sind in 5 Minuten abgegeben!",
+            "pankow": "Ab Pankow / Lichtenberg: Direkte Verbindung über Ringbahn / U8 (Station Boddinstraße) oder B96a. Auf Wunsch Express-Vorabcheck per Foto!"
+        };
+
+        window.selectBerlinDistrict = function(districtKey, btnEl) {
+            document.querySelectorAll('.district-pill').forEach(p => p.classList.remove('active'));
+            if(btnEl) btnEl.classList.add('active');
+            const box = document.getElementById('districtResultBox');
+            if(box && districtDetails[districtKey]) {
+                box.innerHTML = `<strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Express-Anbindung (${btnEl.innerText.replace('📍 ','')}):</strong><br><span style="color:var(--text-light);">${districtDetails[districtKey]}</span>`;
+            }
+        };
+
         // =========================================================================
-        // 5. VOLLSTÄNDIGER VOLLMACHT-, SEPA- & KAUFVERTRAG-GENERATOR (INKL. BLANKO)
+        // 5. LIVE WUNSCHKENNZEICHEN STUDIO (MIT SAISON-BRUCHSTRICH & 3D-CARBON)
+        // =========================================================================
+        window.updateLivePlatePreview = function() {
+            const lettersInput = document.getElementById('wkLetters');
+            const numbersInput = document.getElementById('wkNumbers');
+            const typeSelect = document.getElementById('wkType');
+            const seasonSelect = document.getElementById('wkSeason');
+            const styleSelect = document.getElementById('wkStyle');
+            const plateBox = document.getElementById('liveGermanPlatePreview');
+            const seasonBox = document.getElementById('plateSeasonBox');
+            if(!lettersInput || !numbersInput) return;
+
+            const cleanLetters = lettersInput.value.replace(/[^a-zA-ZäöüÄÖÜ]/g, '').toUpperCase().substring(0, 2);
+            const cleanNumbers = numbersInput.value.replace(/\D/g, '').substring(0, 4);
+            lettersInput.value = cleanLetters;
+            numbersInput.value = cleanNumbers;
+
+            document.getElementById('platePreviewLetters').innerText = cleanLetters || 'RED';
+            document.getElementById('platePreviewNumbers').innerText = cleanNumbers || String(window.getDynamicSystemYear());
+            document.getElementById('platePreviewSuffix').innerText = typeSelect ? typeSelect.value : '';
+
+            if(seasonSelect && seasonBox) {
+                if(seasonSelect.value) {
+                    const parts = seasonSelect.value.split('/');
+                    document.getElementById('seasonStartTxt').innerText = parts[0] || '04';
+                    document.getElementById('seasonEndTxt').innerText = parts[1] || '10';
+                    seasonBox.style.display = 'flex';
+                } else {
+                    seasonBox.style.display = 'none';
+                }
+            }
+
+            if(plateBox && styleSelect) {
+                plateBox.classList.remove('plate-short', 'plate-carbon');
+                if(styleSelect.value === 'short') plateBox.classList.add('plate-short');
+                if(styleSelect.value === 'carbon') plateBox.classList.add('plate-carbon');
+            }
+        };
+
+        window.applyPlateToBooking = function() {
+            const l = document.getElementById('platePreviewLetters').innerText;
+            const n = document.getElementById('platePreviewNumbers').innerText;
+            const s = document.getElementById('platePreviewSuffix').innerText;
+            const season = document.getElementById('wkSeason')?.value || '';
+            const style = document.getElementById('wkStyle')?.value || 'std';
+            const styleLabel = style === 'carbon' ? ' [3D-Carbon]' : (style === 'short' ? ' [Kurzes Schild]' : '');
+            const fullPlate = `B - ${l} ${n}${s ? ' ' + s : ''}${season ? ' (Saison ' + season + ')' : ''}${styleLabel}`;
+            
+            window.selectedServiceVal = `Zulassung inkl. Wunschkennzeichen (${fullPlate})`;
+            document.getElementById('selectTriggerText').innerText = window.selectedServiceVal;
+            document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
+            window.showToast(`Kennzeichen "${fullPlate}" in Termin übernommen!`, 'success');
+        };
+
+        // =========================================================================
+        // 6. VOLLSTÄNDIGER VOLLMACHT-, SEPA- & KAUFVERTRAG-GENERATOR (INKL. BLANKO)
         // =========================================================================
         let sigCanvas = null, sigCtx = null, isDrawingSig = false, hasDrawnSig = false;
 
@@ -2939,7 +3144,7 @@
             const todayStr = new Date().toLocaleDateString('de-DE');
 
             let legalBodyText = `<p><strong>1. Vollmacht zur Vorlage bei der Kfz-Zulassungsbehörde (LABO Berlin / Brandenburg):</strong><br>Hiermit bevollmächtige ich den <strong>RED Zulassungsdienst Berlin (Inhaber: Tamer Yazici und Beauftragte, Kienitzer Str. 6, 12053 Berlin)</strong>, das unten bezeichnete Fahrzeug auf meinen Namen / unsere Firma zuzulassen, umzuschreiben oder abzumelden (Vorgang: <strong>${actionType}</strong>) sowie die Fahrzeugpapiere und Kennzeichenschilder entgegenzunehmen.</p>
-            <p style="font-size:12px;"><strong>2. Einverständniserklärung (Steuer- & Gebührenrückstände):</strong><br>Ich erkläre mein Einverständnis, dass dem Bevollmächtigten mitgeteilt wird, ob Kraftfahrzeugsteuerrückstände oder rückständige Gebühren und Auslagen aus vorangegangenen Zulassungsvorgängen bestehen.</p>`;
+            <p style="font-size:12px;"><strong>2. Einverständniserklärung (Steuer- & Gebührenrückstände):</strong><br>Ich erkläre mein ausdrückliches Einverständnis, dass dem Bevollmächtigten mitgeteilt wird, ob Kraftfahrzeugsteuerrückstände oder rückständige Gebühren und Auslagen aus vorangegangenen Zulassungsvorgängen bestehen.</p>`;
 
             if (docType.includes('Verlusterklärung')) {
                 legalBodyText += `<p style="font-size:12px; border:1px solid #111; padding:10px; background:#fff8f8;"><strong>Versicherung an Eides statt bei Verlust (§ 5 FZV / §§ 156, 161 StGB):</strong><br>Ich erkläre hiermit an Eides statt, dass das Fahrzeugdokument / Kennzeichenschild ([ &nbsp; ] ZB Teil I Schein &nbsp; [ &nbsp; ] ZB Teil II Brief &nbsp; [ &nbsp; ] Amtliches Kennzeichen) unauffindbar verloren gegangen ist und nicht verpfändet oder hinterlegt wurde.</p>`;
@@ -3026,7 +3231,6 @@
             document.getElementById('kaufvertragOverlay').classList.remove('open');
         };
 
-        // Vollständiger Profi-Kfz-Kaufvertrag (Funktioniert ausgefüllt UND komplett leer als Blanko-Vertrag!)
         window.printKaufvertrag = function() {
             const seller = document.getElementById('kvSeller')?.value.trim() || '____________________________________________________________';
             const sellerId = document.getElementById('kvSellerId')?.value.trim() || '____________________________________';
@@ -3127,7 +3331,7 @@
                         <h4>4. Sachmängelhaftung, Ummelde-Pflicht & Sondervereinbarungen</h4>
                         <div style="font-size:11.5px;">${notes}</div>
                         <div style="margin-top:6px; font-size:11px; color:#444;">
-                            <strong> Eigentumsvorbehalt:</strong> Das Kraftfahrzeug bleibt bis zur vollständigen Bezahlung des Kaufpreises Eigentum des Verkäufers. Mit der Übergabe gehen alle Gefahren sowie die Haftung auf den Käufer über.
+                            <strong>Eigentumsvorbehalt:</strong> Das Kraftfahrzeug bleibt bis zur vollständigen Bezahlung des Kaufpreises Eigentum des Verkäufers. Mit der Übergabe gehen alle Gefahren sowie die Haftung auf den Käufer über.
                         </div>
                     </div>
 
@@ -3142,7 +3346,7 @@
         };
 
         // =========================================================================
-        // 6. WHATSAPP FOTO-VORABCHECK & VIRAL SHARE
+        // 7. WHATSAPP FOTO-VORABCHECK & VIRAL SHARE
         // =========================================================================
         window.startPhotoPreCheckWhatsApp = function() {
             let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
@@ -3199,7 +3403,7 @@
         };
 
         // =========================================================================
-        // 7. LIVE AUFTRAGS-STATUS TRACKER
+        // 8. LIVE AUFTRAGS-STATUS TRACKER
         // =========================================================================
         window.checkLiveOrderStatus = function() {
             const queryStr = (document.getElementById('liveTrackerInput')?.value || '').trim().toLowerCase();
@@ -3281,35 +3485,6 @@
             if(!container) return;
             localStorage.setItem('red_maps_consent', 'true');
             container.innerHTML = `<iframe src="https://maps.google.com/maps?q=Kienitzer%20Str.%206,%2012053%20Berlin&t=&z=15&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer"></iframe>`;
-        };
-
-        // --- LIVE WUNSCHKENNZEICHEN KONFIGURATOR ---
-        window.updateLivePlatePreview = function() {
-            const lettersInput = document.getElementById('wkLetters');
-            const numbersInput = document.getElementById('wkNumbers');
-            const typeSelect = document.getElementById('wkType');
-            if(!lettersInput || !numbersInput) return;
-
-            const cleanLetters = lettersInput.value.replace(/[^a-zA-ZäöüÄÖÜ]/g, '').toUpperCase().substring(0, 2);
-            const cleanNumbers = numbersInput.value.replace(/\D/g, '').substring(0, 4);
-            lettersInput.value = cleanLetters;
-            numbersInput.value = cleanNumbers;
-
-            document.getElementById('platePreviewLetters').innerText = cleanLetters || 'RED';
-            document.getElementById('platePreviewNumbers').innerText = cleanNumbers || String(window.getDynamicSystemYear());
-            document.getElementById('platePreviewSuffix').innerText = typeSelect ? typeSelect.value : '';
-        };
-
-        window.applyPlateToBooking = function() {
-            const l = document.getElementById('platePreviewLetters').innerText;
-            const n = document.getElementById('platePreviewNumbers').innerText;
-            const s = document.getElementById('platePreviewSuffix').innerText;
-            const fullPlate = `B - ${l} ${n}${s ? ' ' + s : ''}`;
-            
-            window.selectedServiceVal = `Zulassung inkl. Wunschkennzeichen (${fullPlate})`;
-            document.getElementById('selectTriggerText').innerText = window.selectedServiceVal;
-            document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
-            window.showToast(`Kennzeichen "${fullPlate}" in Termin übernommen!`, 'success');
         };
 
         // --- SCHNELL-KALKULATOR (STANDARDMÄSSIG MIT STRICH "-" & MIT STIFT BEARBEITBAR) ---
@@ -3529,7 +3704,9 @@
             });
         };
 
-        // --- ERWEITERTE THEME ENGINE ---
+        // =========================================================================
+        // 9. ERWEITERTE THEME- & EFFEKT-ENGINE (100% HELL- & DUNKEL-KOMPATIBEL)
+        // =========================================================================
         window.changeTheme = async function(themeName, saveToFirebase = false) {
             document.body.setAttribute('data-theme', themeName);
             localStorage.setItem('red_theme', themeName);
@@ -3538,9 +3715,9 @@
                 try {
                     const customData = JSON.parse(localStorage.getItem('red_custom_theme') || 'null');
                     await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "global_theme"), { activeTheme: themeName, customVars: customData }, { merge: true });
-                    window.showToast('Theme global für alle Geräte gespeichert!', 'success');
+                    window.showToast('Design global für alle Geräte gespeichert!', 'success');
                 } catch (e) {
-                    window.showToast('Konnte Theme online nicht speichern.', 'error');
+                    window.showToast('Konnte Design online nicht speichern.', 'error');
                 }
             }
             
@@ -3588,6 +3765,8 @@
             const bCard = document.getElementById('teCard').value;
             const bInput = document.getElementById('teInput') ? document.getElementById('teInput').value : bCard;
             const bRadius = document.getElementById('teRadius') ? document.getElementById('teRadius').value : '20px';
+            const btnRadius = document.getElementById('teBtnRadius') ? document.getElementById('teBtnRadius').value : '50px';
+            const glowStyle = document.getElementById('teGlowStyle') ? document.getElementById('teGlowStyle').value : '0 14px 35px rgba(0, 0, 0, 0.55)';
 
             const glassBg = bDark + 'e6'; 
             const glassBorder = tLight + '26';
@@ -3602,13 +3781,15 @@
                 '--glass-bg': glassBg,
                 '--glass-border': glassBorder,
                 '--border-hover': pRed,
-                '--global-radius': bRadius
+                '--global-radius': bRadius,
+                '--btn-radius': btnRadius,
+                '--card-shadow': glowStyle
             };
 
             localStorage.setItem('red_custom_theme', JSON.stringify(customTheme));
             document.getElementById('themeSelector').value = 'custom';
             window.changeTheme('custom', true);
-            window.showToast('Eigenes Design erfolgreich angewendet!', 'success');
+            window.showToast('Eigenes Design & Effekte erfolgreich angewendet!', 'success');
             window.closeThemeEditor();
         };
 
@@ -3669,7 +3850,9 @@
             "header": {
                 "title_red": "RED",
                 "title_sub": "ZULASSUNGSDIENST",
-                "icon_car": "fa-car-side",
+                "icon_car": "svg-sport",
+                "car_anim": "car-anim-idle",
+                "car_color": "var(--text-light)",
                 "txt_crm": "RED KUNDEN",
                 "icon_crm": "fa-database",
                 "txt_visitors": "Besuche:",
@@ -3686,8 +3869,8 @@
                 "desc": "Klicken Sie direkt auf eine Karte für detaillierte Infos & benötigte Unterlagen"
             },
             "tools": {
-                "wk_title": "Berliner Wunschkennzeichen",
-                "wk_desc": "Testen Sie Ihre Wunschkombination live auf dem Euro-Kennzeichen und übernehmen Sie diese direkt in Ihren Termin.",
+                "wk_title": "Berliner Wunschkennzeichen Studio",
+                "wk_desc": "Testen Sie Ihre Wunschkombination live (inkl. E-Auto, Oldtimer, Saison-Zeiträumen & 3D-Optik) und übernehmen Sie diese direkt in Ihren Termin.",
                 "calc_title": "Schnell-Kalkulator & Extras",
                 "calc_desc": "Wählen Sie Ihre gewünschten Leistungen & Zusatzoptionen für Ihren Termin:"
             },
@@ -3714,8 +3897,8 @@
                 "desc": "Ansprechpartner: <strong>Tamer Yazici</strong>"
             },
             "formulare": {
-                "title": "Formulare & PDF-Downloads",
-                "desc": "Hier finden Sie unsere hinterlegten Original-Dokumente zum direkten Herunterladen sowie unsere interaktive Vollmacht und den Kfz-Kaufvertrag"
+                "title": "Formulare & Anträge",
+                "desc": "Alle wichtigen Zulassungsformulare und Anträge in der Übersicht"
             },
             "ankauf": {
                 "title": "AUTO ANKAUF",
@@ -3728,6 +3911,19 @@
             },
             "footer": {
                 "text": `© ${window.getDynamicSystemYear()} RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici.`
+            }
+        };
+
+        window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
+            const wrapper = document.getElementById('headerCarDisplayWrapper');
+            if(!wrapper) return;
+            wrapper.className = carAnim || 'car-anim-idle';
+            wrapper.style.color = carColor || 'var(--text-light)';
+
+            if(!carType || carType === 'svg-sport') {
+                wrapper.innerHTML = `<svg class="logo-car-svg" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="currentColor"/><path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="currentColor"/><path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/></svg>`;
+            } else {
+                wrapper.innerHTML = `<i class="fa-solid ${carType} logo-car-icon"></i>`;
             }
         };
 
@@ -3745,6 +3941,7 @@
                 if(document.getElementById('icon-header-crm')) document.getElementById('icon-header-crm').className = "fa-solid " + d.header.icon_crm;
                 if(document.getElementById('txt-header-visitors')) document.getElementById('txt-header-visitors').innerText = d.header.txt_visitors + " ";
                 if(document.getElementById('icon-header-visitors')) document.getElementById('icon-header-visitors').className = "fa-solid " + d.header.icon_visitors;
+                window.renderHeaderCarIcon(d.header.icon_car, d.header.car_anim, d.header.car_color);
             }
             if(d.hero) {
                 if(document.getElementById('txt-hero-badge')) document.getElementById('txt-hero-badge').innerText = d.hero.badge;
@@ -5367,8 +5564,15 @@
             }
         };
 
+        // --- HEADER-AUTO, LOGO & TICKER STUDIO (ÜBER DEN STIFT AM AUTO) ---
         window.openTickerConfig = function() {
             if(!window.isAuthorized) return;
+            const h = window.pageContentData?.header || {};
+            if(document.getElementById('hcLogoRed')) document.getElementById('hcLogoRed').value = h.title_red || 'RED';
+            if(document.getElementById('hcLogoSub')) document.getElementById('hcLogoSub').value = h.title_sub || 'ZULASSUNGSDIENST';
+            if(document.getElementById('hcCarType')) document.getElementById('hcCarType').value = h.icon_car || 'svg-sport';
+            if(document.getElementById('hcCarAnim')) document.getElementById('hcCarAnim').value = h.car_anim || 'car-anim-idle';
+            if(document.getElementById('hcCarColor')) document.getElementById('hcCarColor').value = h.car_color || 'var(--text-light)';
             document.getElementById('tickerConfigOverlay').classList.add('open');
         };
         window.closeTickerConfig = function() {
@@ -5387,6 +5591,19 @@
         };
         
         window.saveTickerConfig = async function() {
+            // 1. Header-Auto & Logo Einstellungen speichern
+            if(!window.pageContentData.header) window.pageContentData.header = {};
+            window.pageContentData.header.title_red = document.getElementById('hcLogoRed')?.value || 'RED';
+            window.pageContentData.header.title_sub = document.getElementById('hcLogoSub')?.value || 'ZULASSUNGSDIENST';
+            window.pageContentData.header.icon_car = document.getElementById('hcCarType')?.value || 'svg-sport';
+            window.pageContentData.header.car_anim = document.getElementById('hcCarAnim')?.value || 'car-anim-idle';
+            window.pageContentData.header.car_color = document.getElementById('hcCarColor')?.value || 'var(--text-light)';
+            
+            localStorage.setItem('red_page_content', JSON.stringify(window.pageContentData));
+            window.applyPageContent(window.pageContentData);
+            try { await setDoc(doc(db, "settings", "page_content"), window.pageContentData, {merge: true}); } catch(e){}
+
+            // 2. Ticker Einstellungen speichern
             const fullText = document.getElementById('tickerFullText').value;
             const blinkWord = document.getElementById('tickerBlinkWord').value.trim();
             const speed = document.getElementById('tickerSpeed').value;
@@ -5424,10 +5641,10 @@
                 await setDoc(doc(db, "settings", "ticker"), {
                     fullText, blinkWord, speed, color, blinkColor, font, size, symbols, timestamp: Date.now()
                 });
-                window.showToast('Ticker gespeichert!', 'success');
+                window.showToast('Header-Auto, Logo & Ticker gespeichert!', 'success');
             } catch(e) {
                 applyTickerLocally({ fullText, blinkWord, speed, color, blinkColor, font, size, symbols });
-                window.showToast('Ticker lokal aktualisiert.', 'success');
+                window.showToast('Header & Ticker aktualisiert!', 'success');
             }
             window.closeTickerConfig(); 
         };
@@ -5989,21 +6206,46 @@
         };
         
         // =========================================================================
-        // 6. FORMULAR-UPLOAD-SYSTEM (AB WERK LEER – NUR FÜR DEINE ECHTEN PDFs/LINKS)
+        // 6. ALLE 12 ANTRÄGE & FORMULARE (INHALTLICH LEER BIS ZUM EIGENEN UPLOAD!)
         // =========================================================================
-        window.allFormsMap = {};
+        const staticForms = [
+            {id: 'static-1', title: 'Allgemeine Vollmacht', url: ''}, 
+            {id: 'static-2', title: 'Antrag auf Ausnahmegenehmigung', url: ''},
+            {id: 'static-3', title: 'Antrag auf Kurzzeitkennzeichen', url: ''}, 
+            {id: 'static-4', title: 'Antrag auf Steuervergünstigung', url: ''},
+            {id: 'static-5', title: 'Empfangsbevollmächtigung', url: ''}, 
+            {id: 'static-6', title: 'Eidesstattliche Versicherung (EV I)', url: ''},
+            {id: 'static-7', title: 'Eidesstattliche Versicherung (EV II)', url: ''}, 
+            {id: 'static-8', title: 'EV (Schilder)', url: ''},
+            {id: 'static-9', title: 'Kennzeichenreservierung', url: ''}, 
+            {id: 'static-10', title: 'Mitteilung für Umsatzsteuerzwecke', url: ''},
+            {id: 'static-11', title: 'SEPA-Lastschriftmandat', url: ''}, 
+            {id: 'static-12', title: 'Zulassungsantrag', url: ''}
+        ];
 
-        let localForms = JSON.parse(localStorage.getItem('red_uploaded_forms_v1'));
+        // Prüft, ob für ein Formular tatsächlich schon eine echte Datei oder ein eigener Link vom Admin hinterlegt wurde
+        function hasValidUploadedFile(url) {
+            if (!url || typeof url !== 'string') return false;
+            const trimmed = url.trim();
+            if (trimmed === '' || trimmed === '#' || trimmed.startsWith('internal:')) return false;
+            return true;
+        }
+
+        window.allFormsMap = {};
+        staticForms.forEach(f => { window.allFormsMap[f.id] = { ...f }; });
+
+        let localForms = JSON.parse(localStorage.getItem('red_forms_12_clean_v1'));
         if(localForms && Array.isArray(localForms)) {
             localForms.forEach(f => {
-                if (f && f.id && !f.id.startsWith('static-') && f.url && !f.url.startsWith('internal:') && f.url !== '#') {
-                    window.allFormsMap[f.id] = { ...f };
+                if (f && f.id) {
+                    const cleanUrl = hasValidUploadedFile(f.url) ? f.url : '';
+                    window.allFormsMap[f.id] = { ...f, url: cleanUrl };
                 }
             });
         }
 
         function getActiveFormsList() {
-            return Object.values(window.allFormsMap).filter(f => !f.deleted && f.url && !f.url.startsWith('internal:') && f.url !== '#');
+            return Object.values(window.allFormsMap).filter(f => !f.deleted);
         }
 
         function renderFormsList(formsList) {
@@ -6011,46 +6253,30 @@
             if(!grid) return;
             grid.innerHTML = '';
 
-            if(formsList.length === 0) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px dashed var(--glass-border); border-radius: var(--global-radius); padding: 40px 25px; text-align: center; box-shadow: var(--card-shadow);">
-                        <i class="fa-solid fa-folder-open" style="font-size: 40px; color: var(--primary-red); margin-bottom: 12px;"></i>
-                        <h3 style="font-size: 16px; font-weight: 900; color: var(--text-light); margin-bottom: 8px; text-transform: uppercase;">Direkt-Downloads & Digitale Formulare</h3>
-                        <p style="font-size: 12px; color: var(--text-muted); max-width: 550px; margin: 0 auto 20px;">
-                            Nutzen Sie oben direkt unsere interaktive <strong>Digitale Vollmacht (inkl. SEPA-Mandat)</strong> oder den <strong>Kfz-Kaufvertrag</strong>. Sobald weitere PDF-Formulare hinterlegt sind, stehen diese hier zum direkten Download bereit.
-                        </p>
-                        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-                            <button type="button" class="btn-primary btn-green-adaptive" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')"><i class="fa-solid fa-signature"></i> Vollmacht & SEPA öffnen</button>
-                            <button type="button" class="btn-primary btn-gold-adaptive" onclick="window.openKaufvertragModal()"><i class="fa-solid fa-handshake"></i> Kfz-Kaufvertrag öffnen</button>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
             formsList.forEach(form => {
                 const element = document.createElement('div');
                 element.className = 'download-item';
                 element.id = form.id;
-                element.setAttribute('data-url', form.url);
+                const cleanUrl = hasValidUploadedFile(form.url) ? form.url : '';
+                element.setAttribute('data-url', cleanUrl);
                 
-                const isUploadedFile = form.url && form.url.startsWith('data:');
-                const statusBadge = isUploadedFile 
-                    ? `<span style="font-size:10px; color:var(--green-accent); font-weight:800;"><i class="fa-solid fa-file-circle-check"></i> Original-Datei zum Direkt-Download</span>`
-                    : `<span style="font-size:10px; color:var(--text-muted); font-weight:700;"><i class="fa-solid fa-link"></i> Direkt-Dokument hinterlegt</span>`;
+                const statusBadge = cleanUrl !== ''
+                    ? `<span style="font-size:10px; color:var(--green-accent); font-weight:800;"><i class="fa-solid fa-circle-check"></i> Dokument bereit zum Download</span>`
+                    : `<span style="font-size:10px; color:var(--text-muted); font-weight:600;"><i class="fa-regular fa-clock"></i> Noch keine Datei hinterlegt</span>`;
 
                 element.innerHTML = `
-                    <div class="download-info" onclick="window.downloadFormFromCard('${form.id}')">
-                        <i class="fa-solid fa-file-pdf"></i>
+                    <div class="download-info" onclick="window.openFormFromCard('${form.id}')">
+                        <i class="fa-solid fa-file-pdf" style="opacity:${cleanUrl !== '' ? '1' : '0.45'};"></i>
                         <span title="${form.title}">${form.title}</span>
                         ${statusBadge}
                     </div>
                     <div class="download-actions">
-                        <i class="fa-solid fa-pen action-forms" title="Titel bearbeiten oder neue PDF hochladen" onclick="event.stopPropagation(); window.openFormEditModal('${form.id}')"></i>
-                        <i class="fa-solid fa-upload action-forms" title="PDF/Datei vom Gerät ersetzen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
-                        <i class="fa-solid fa-trash-can action-forms" title="Formular löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
-                        <i class="fa-solid fa-eye user-view" title="Dokument im Browser ansehen" onclick="event.stopPropagation(); window.openForm(this)"></i>
-                        <i class="fa-solid fa-download user-dl" title="Dokument direkt herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"></i>
+                        <i class="fa-solid fa-pen action-forms" title="Mit Stift bearbeiten / Datei hochladen" onclick="event.stopPropagation(); window.openFormEditModal('${form.id}')"></i>
+                        <i class="fa-solid fa-link action-forms" title="Direkt-Link hinterlegen" onclick="event.stopPropagation(); window.triggerAdminLinkUpdate(this, '${form.id}')"></i>
+                        <i class="fa-solid fa-upload action-forms" title="PDF/Datei vom Gerät hochladen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
+                        <i class="fa-solid fa-trash-can action-forms" title="Formular ausblenden / löschen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
+                        <i class="fa-solid fa-eye user-view" title="Ansehen" onclick="event.stopPropagation(); window.openForm(this)"></i>
+                        <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"></i>
                     </div>
                 `;
                 grid.appendChild(element);
@@ -6058,20 +6284,30 @@
         }
 
         onSnapshot(collection(db, "forms"), (snapshot) => {
-            window.allFormsMap = {};
+            staticForms.forEach(f => {
+                if(!window.allFormsMap[f.id]) window.allFormsMap[f.id] = { ...f };
+            });
             if(!snapshot.empty) {
                 snapshot.forEach(docSnap => {
                     const d = docSnap.data();
-                    // Nur echt vom Admin hochgeladene oder verlinkte Formulare anzeigen (keine alten Platzhalter)
-                    if (!d.deleted && d.url && d.url !== '#' && !d.url.startsWith('internal:') && !docSnap.id.startsWith('static-')) {
-                        window.allFormsMap[docSnap.id] = { id: docSnap.id, ...d };
-                    } else if (!d.deleted && docSnap.id.startsWith('static-') && d.url && d.url.startsWith('data:')) {
-                        window.allFormsMap[docSnap.id] = { id: docSnap.id, ...d };
+                    // Nur echte Admin-Uploads (`data:...`) oder explizit mit `customUploaded: true` gespeicherte Links übernehmen; sonst bleibt das Formular leer!
+                    let validUrl = '';
+                    if (d.url && d.url.startsWith('data:')) {
+                        validUrl = d.url;
+                    } else if (d.customUploaded && hasValidUploadedFile(d.url)) {
+                        validUrl = d.url;
                     }
+                    window.allFormsMap[docSnap.id] = {
+                        id: docSnap.id,
+                        title: d.title || (window.allFormsMap[docSnap.id]?.title || 'Formular'),
+                        url: validUrl,
+                        customUploaded: !!d.customUploaded,
+                        deleted: !!d.deleted
+                    };
                 });
             }
             const activeList = getActiveFormsList();
-            localStorage.setItem('red_uploaded_forms_v1', JSON.stringify(activeList));
+            localStorage.setItem('red_forms_12_clean_v1', JSON.stringify(activeList));
             renderFormsList(activeList);
         }, () => {
             renderFormsList(getActiveFormsList());
@@ -6083,21 +6319,17 @@
             const fileInput = document.getElementById('newFormFile');
             
             if(!title) { window.showToast('Bitte einen Formular-Titel eingeben.', 'error'); return; }
-            if(!urlInput && (!fileInput || !fileInput.files || !fileInput.files[0])) {
-                window.showToast('Bitte eine PDF/Word-Datei vom Gerät auswählen oder einen Link eingeben.', 'error');
-                return;
-            }
 
             const saveFormRecord = async (finalUrl) => {
                 const newId = 'form-' + Date.now();
-                const formData = { id: newId, title, url: finalUrl, deleted: false, timestamp: Date.now() };
+                const formData = { id: newId, title, url: finalUrl || '', customUploaded: true, deleted: false, timestamp: Date.now() };
                 window.allFormsMap[newId] = formData;
-                localStorage.setItem('red_uploaded_forms_v1', JSON.stringify(getActiveFormsList()));
+                localStorage.setItem('red_forms_12_clean_v1', JSON.stringify(getActiveFormsList()));
                 renderFormsList(getActiveFormsList());
 
                 try {
                     await setDoc(doc(db, "forms", newId), formData);
-                    window.showToast('Formular erfolgreich hochgeladen & veröffentlicht!', 'success');
+                    window.showToast('Formular erfolgreich hinzugefügt!', 'success');
                 } catch(e) {
                     window.showToast('Formular lokal gespeichert.', 'success');
                 }
@@ -6133,6 +6365,20 @@
             document.getElementById('formEditModalOverlay').classList.remove('open');
         };
 
+        window.clearFormFileInModal = async function() {
+            const formId = document.getElementById('editFormIdInput').value;
+            if(!formId || !window.allFormsMap[formId]) return;
+            window.allFormsMap[formId].url = '';
+            window.allFormsMap[formId].customUploaded = false;
+            localStorage.setItem('red_forms_12_clean_v1', JSON.stringify(getActiveFormsList()));
+            renderFormsList(getActiveFormsList());
+            try {
+                await setDoc(doc(db, "forms", formId), window.allFormsMap[formId], { merge: true });
+            } catch(e){}
+            window.showToast('Inhalt geleert – Karte ist jetzt wieder ohne Datei.', 'success');
+            window.closeFormEditModal();
+        };
+
         window.saveFormEditModal = async function() {
             const formId = document.getElementById('editFormIdInput').value;
             const newTitle = document.getElementById('editFormTitleInput').value.trim();
@@ -6144,16 +6390,16 @@
             const existing = window.allFormsMap[formId] || {};
 
             const persistUpdate = async (finalUrl) => {
-                const updatedData = { id: formId, title: newTitle, url: finalUrl, deleted: false, timestamp: Date.now() };
+                const updatedData = { id: formId, title: newTitle, url: finalUrl, customUploaded: finalUrl !== '', deleted: false, timestamp: Date.now() };
                 window.allFormsMap[formId] = updatedData;
-                localStorage.setItem('red_uploaded_forms_v1', JSON.stringify(getActiveFormsList()));
+                localStorage.setItem('red_forms_12_clean_v1', JSON.stringify(getActiveFormsList()));
                 renderFormsList(getActiveFormsList());
 
                 try {
                     await setDoc(doc(db, "forms", formId), updatedData, { merge: true });
-                    window.showToast('Formular erfolgreich aktualisiert!', 'success');
+                    window.showToast('Formular erfolgreich gespeichert!', 'success');
                 } catch(e) {
-                    window.showToast('Formular lokal aktualisiert.', 'success');
+                    window.showToast('Formular lokal gespeichert.', 'success');
                 }
                 window.closeFormEditModal();
             };
@@ -6163,11 +6409,7 @@
                 reader.onload = function(ev) { persistUpdate(ev.target.result); };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                const finalUrl = newUrlInput !== '' ? newUrlInput : (existing.url || '');
-                if(!finalUrl) {
-                    window.showToast('Bitte eine Datei hochladen oder einen Link angeben.', 'error');
-                    return;
-                }
+                const finalUrl = newUrlInput !== '' ? newUrlInput : (existing.url && existing.url.startsWith('data:') ? existing.url : '');
                 persistUpdate(finalUrl);
             }
         };
@@ -6182,14 +6424,14 @@
                     const reader = new FileReader();
                     reader.onload = async function(ev) {
                         const existing = window.allFormsMap[formId] || { id: formId, title: file.name };
-                        const updated = { ...existing, url: ev.target.result, deleted: false, timestamp: Date.now() };
+                        const updated = { ...existing, url: ev.target.result, customUploaded: true, deleted: false, timestamp: Date.now() };
                         window.allFormsMap[formId] = updated;
-                        localStorage.setItem('red_uploaded_forms_v1', JSON.stringify(getActiveFormsList()));
+                        localStorage.setItem('red_forms_12_clean_v1', JSON.stringify(getActiveFormsList()));
                         renderFormsList(getActiveFormsList());
 
                         try {
                             await setDoc(doc(db, "forms", formId), updated, { merge: true });
-                            window.showToast('Original-Datei erfolgreich hochgeladen!', 'success');
+                            window.showToast(`Datei für "${existing.title}" erfolgreich hochgeladen!`, 'success');
                         } catch(err) {
                             window.showToast('Datei lokal gespeichert.', 'success');
                         }
@@ -6199,20 +6441,41 @@
             };
             fileInput.click();
         };
-        
-        window.adminDeleteForm = async function(formId) {
-            if(confirm('Möchten Sie dieses Formular wirklich entfernen?')) {
-                if(window.allFormsMap[formId]) {
-                    window.allFormsMap[formId].deleted = true;
-                }
-                localStorage.setItem('red_uploaded_forms_v1', JSON.stringify(getActiveFormsList()));
+
+        window.triggerAdminLinkUpdate = async function(iconEl, formId) {
+            const existing = window.allFormsMap[formId] || { id: formId, title: 'Formular', url: '' };
+            const currentLink = (existing.url && !existing.url.startsWith('data:')) ? existing.url : '';
+            const newUrl = prompt(`Direkt-Link für "${existing.title}" eingeben (oder leer lassen, um die Verknüpfung zu leeren):`, currentLink);
+            
+            if (newUrl !== null) {
+                const clean = newUrl.trim();
+                const updated = { ...existing, url: clean, customUploaded: clean !== '', deleted: false, timestamp: Date.now() };
+                window.allFormsMap[formId] = updated;
+                localStorage.setItem('red_forms_12_clean_v1', JSON.stringify(getActiveFormsList()));
                 renderFormsList(getActiveFormsList());
 
                 try {
-                    await deleteDoc(doc(db, "forms", formId));
-                    window.showToast('Formular gelöscht.', 'success');
+                    await setDoc(doc(db, "forms", formId), updated, { merge: true });
+                    window.showToast(clean ? 'Link gespeichert!' : 'Formular-Inhalt geleert.', 'success');
+                } catch (e) {
+                    window.showToast('Lokal aktualisiert.', 'success');
+                }
+            }
+        };
+        
+        window.adminDeleteForm = async function(formId) {
+            if(confirm('Möchten Sie dieses Formular wirklich aus der Liste ausblenden?')) {
+                if(window.allFormsMap[formId]) {
+                    window.allFormsMap[formId].deleted = true;
+                }
+                localStorage.setItem('red_forms_12_clean_v1', JSON.stringify(getActiveFormsList()));
+                renderFormsList(getActiveFormsList());
+
+                try {
+                    await setDoc(doc(db, "forms", formId), { deleted: true }, { merge: true });
+                    window.showToast('Formular ausgeblendet.', 'success');
                 } catch(e) {
-                    window.showToast('Lokal entfernt.', 'success');
+                    window.showToast('Lokal ausgeblendet.', 'success');
                 }
             }
         };
@@ -6244,17 +6507,22 @@
             document.body.removeChild(a);
         }
 
-        window.downloadFormFromCard = function(formId) {
+        window.openFormFromCard = function(formId) {
             const item = document.getElementById(formId);
             if(!item) return;
-            const dlIcon = item.querySelector('.user-dl');
-            if(dlIcon) window.downloadForm(dlIcon);
+            const eyeIcon = item.querySelector('.user-view');
+            if(eyeIcon) window.openForm(eyeIcon);
         };
 
+        // WICHTIG: Solange nichts hochgeladen ist, öffnet sich KEINE Seite!
         window.openForm = function(iconEl) {
             const item = iconEl.closest('.download-item');
             const url = item.getAttribute('data-url');
-            if (!url) return;
+            
+            if (!hasValidUploadedFile(url)) {
+                window.showToast('Für diesen Antrag ist aktuell noch keine Datei hinterlegt.', 'error');
+                return;
+            }
 
             try {
                 if (url.startsWith('data:')) {
@@ -6266,7 +6534,7 @@
                 }
                 window.showToast('Dokument geöffnet.', 'success');
             } catch (error) {
-                window.downloadForm(iconEl);
+                window.showToast('Dokument konnte nicht geöffnet werden.', 'error');
             }
         };
 
@@ -6274,7 +6542,11 @@
             const item = iconEl.closest('.download-item');
             const url = item.getAttribute('data-url');
             const title = item.querySelector('span')?.innerText || 'RED_Formular';
-            if (!url) return;
+            
+            if (!hasValidUploadedFile(url)) {
+                window.showToast('Für diesen Antrag ist aktuell noch keine Datei zum Herunterladen hinterlegt.', 'error');
+                return;
+            }
 
             try {
                 if (url.startsWith('data:')) {
@@ -6299,7 +6571,7 @@
                     window.showToast('Dokument geöffnet.', 'success');
                 }
             } catch (error) {
-                window.showToast('Bitte Datei erneut prüfen.', 'error');
+                window.showToast('Download nicht möglich.', 'error');
             }
         };
 
