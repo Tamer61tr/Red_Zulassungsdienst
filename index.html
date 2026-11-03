@@ -71,27 +71,27 @@
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
 
-        /* DUNKELMODUS (ARGON DARK) */
+        /* DUNKELMODUS (ARGON DARK - MIT EXTRA KONTRAST FÜR KLEINE SYMBOLE) */
         body[data-theme="dark"] {
             color-scheme: dark;
-            --primary-red: #e60000;
+            --primary-red: #ff1a1a;
             --bg-dark: #050507;
             --bg-card: #0e0e12;
-            --bg-input: #16161d;
+            --bg-input: #171720;
             --text-light: #ffffff;
-            --text-muted: #9494a1;
-            --glass-bg: rgba(14, 14, 18, 0.94);
-            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-muted: #a5a5b5;
+            --glass-bg: rgba(14, 14, 18, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.16);
             --border-hover: var(--primary-red);
-            --gold-accent: #f5c542;
-            --gold-border: #b38728;
-            --gold-bg-soft: rgba(179, 135, 40, 0.14);
+            --gold-accent: #ffd700;
+            --gold-border: #d4af37;
+            --gold-bg-soft: rgba(212, 175, 55, 0.16);
             --green-accent: #25D366;
             --green-border: #25D366;
-            --green-bg-soft: rgba(37, 211, 102, 0.12);
+            --green-bg-soft: rgba(37, 211, 102, 0.15);
             --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            --argon-glow: 0 12px 35px -5px rgba(230, 0, 0, 0.28);
-            --card-shadow: 0 14px 35px rgba(0, 0, 0, 0.55);
+            --argon-glow: 0 12px 35px -5px rgba(255, 26, 26, 0.32);
+            --card-shadow: 0 14px 35px rgba(0, 0, 0, 0.65);
             --neon-blue: #00ffff;
             --neon-green: #39ff14;
         }
@@ -186,7 +186,7 @@
 
         input, select, textarea, button { font-size: 16px !important; font-family: inherit; }
 
-        /* KORREKTUR 5: 100% DESIGN-KOMPATIBILITÄT FÜR ALLE <SELECT>-AUSWAHLFELDER & OPTIONEN */
+        /* 100% DESIGN-KOMPATIBILITÄT FÜR ALLE <SELECT>-AUSWAHLFELDER & OPTIONEN */
         select.form-control, select.theme-selector {
             background-color: var(--bg-input) !important;
             color: var(--text-light) !important;
@@ -269,7 +269,7 @@
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 12px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-40px) rotate(-8deg); } 100% { transform: translateY(-20vh) translateX(40px) rotate(8deg); } }
 
-        /* KORREKTUR 2: EINGANGSANIMATION (PRELOADER) AUF HANDY GARANTIERT 2-ZEILIG (JEDER SATZ IN 1 ZEILE) */
+        /* EINGANGSANIMATION (PRELOADER) AUF HANDY GARANTIERT 2-ZEILIG */
         #intro-preloader { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; padding: 0 12px; animation: hidePreloader 0.5s ease 2.65s forwards; }
         @keyframes hidePreloader { 100% { opacity: 0; visibility: hidden; z-index: -100; pointer-events: none; } }
         .intro-track { width: min(260px, 76vw); height: 4px; background: rgba(128,128,128,0.22); position: relative; margin-top: 32px; border-radius: 2px; }
@@ -325,8 +325,8 @@
         #header-wrapper { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; box-sizing: border-box; transform: translate3d(0,0,0); backface-visibility: hidden; padding-top: var(--safe-top); background: var(--glass-bg); }
         nav { width: 100%; box-sizing: border-box; padding: 10px 4%; display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 2px solid var(--primary-red); box-shadow: 0 6px 25px rgba(0,0,0,0.1); flex-wrap: wrap; z-index: 1001; position: relative;}
         
-        .logo-container { display: flex; align-items: center; gap: 7px; cursor: pointer; text-decoration: none; position: relative; max-width: 54%; overflow: visible; }
-        .logo-text { font-size: clamp(11px, 2.7vw, 18px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; }
+        .logo-container { display: flex; align-items: center; gap: 7px; cursor: pointer; text-decoration: none; position: relative; max-width: 54%; overflow: visible; transition: 0.25s; }
+        .logo-text { font-size: clamp(11px, 2.7vw, 18px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; transition: 0.25s; }
         .logo-text .red-part { color: var(--primary-red); text-shadow: 0 0 15px rgba(230,0,0,0.18); }
         .logo-text .white-part { color: var(--text-light); }
         
@@ -349,7 +349,7 @@
         @keyframes neonCarPulse { 0% { filter: drop-shadow(0 0 2px currentColor); transform: scale(1); } 100% { filter: drop-shadow(0 0 12px currentColor); transform: scale(1.1); } }
         @keyframes engineRev { 0% { transform: translate(0, 0); } 100% { transform: translate(1px, -1.5px); } }
 
-        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -16px; color: #000; font-size: 11px; background: #25D366; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--bg-card); align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: 0.3s; box-shadow: 0 3px 10px rgba(37,211,102,0.45); }
+        .admin-ticker-edit-icon { position: absolute; top: -5px; right: -15px; color: #000; font-size: 10px; background: #25D366; width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--bg-card); align-items: center; justify-content: center; cursor: pointer; z-index: 100; transition: 0.3s; box-shadow: 0 3px 10px rgba(37,211,102,0.45); }
         .admin-ticker-edit-icon:hover { transform: scale(1.18) rotate(12deg); color: #fff; background: var(--primary-red); }
 
         .nav-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
@@ -364,15 +364,21 @@
         .customer-theme-toggle:hover {
             border-color: var(--primary-red); color: var(--primary-red); transform: scale(1.08);
         }
+        /* Im Dunkelmodus leuchtet das Sonnen-Symbol deutlich sichtbar */
+        body[data-theme="dark"] .customer-theme-toggle {
+            border-color: rgba(255, 204, 0, 0.45);
+            background: rgba(255, 204, 0, 0.1);
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.2);
+        }
 
         .visitor-counter {
             background: transparent; border: 1px solid transparent;
             padding: 2px 5px; border-radius: 10px; font-size: 8.5px; font-weight: 600;
-            color: var(--text-muted); opacity: 0.35;
+            color: var(--text-muted); opacity: 0.45;
             display: inline-flex; align-items: center; gap: 3px; cursor: pointer;
             transition: all 0.25s ease; text-decoration: none; outline: none; flex-shrink: 0;
         }
-        .visitor-counter:hover { opacity: 0.85; background: var(--bg-input); }
+        .visitor-counter:hover { opacity: 0.9; background: var(--bg-input); }
         .visitor-counter span#txt-header-visitors { display: none; }
         .visitor-counter span#vCount { color: var(--text-muted); font-weight: 700; }
 
@@ -380,11 +386,16 @@
             position: relative; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
             width: 20px; height: 20px; min-width: 20px; border-radius: 50%;
             background: transparent; border: 1px solid transparent;
-            opacity: 0.32; transition: all 0.25s ease; flex-shrink: 0;
+            opacity: 0.42; transition: all 0.25s ease; flex-shrink: 0;
         }
-        .key-ring:hover { opacity: 0.88; background: var(--bg-input); border-color: var(--glass-border); }
+        .key-ring:hover { opacity: 0.92; background: var(--bg-input); border-color: var(--glass-border); }
         .key-icon-wrapper { display: flex; align-items: center; justify-content: center; line-height: 1; }
         .key-icon-wrapper i { color: var(--text-muted); font-size: 9px; transition: 0.25s; }
+
+        body[data-theme="dark"] .visitor-counter,
+        body[data-theme="dark"] .key-ring {
+            opacity: 0.65;
+        }
 
         body.is-admin .visitor-counter, body.is-supervisor .visitor-counter {
             opacity: 1; font-size: 9.5px; font-weight: 800; padding: 3px 7px;
@@ -395,7 +406,7 @@
         }
 
         body.is-admin .key-ring, body.is-supervisor .key-ring {
-            opacity: 1; width: 26px; height: 26px; min-width: 26px;
+            opacity: 1; width: 25px; height: 25px; min-width: 25px;
             background: rgba(37, 211, 102, 0.14); border: 1.5px solid #25D366;
             box-shadow: 0 0 8px rgba(37, 211, 102, 0.3);
         }
@@ -403,12 +414,12 @@
             background: rgba(255, 0, 255, 0.14); border-color: #ff00ff;
             box-shadow: 0 0 8px rgba(255, 0, 255, 0.35);
         }
-        body.is-admin .key-icon-wrapper i { color: #25D366; font-size: 11px; }
-        body.is-supervisor .key-icon-wrapper i { color: #ff00ff; font-size: 11px; }
+        body.is-admin .key-icon-wrapper i { color: #25D366; font-size: 10.5px; }
+        body.is-supervisor .key-icon-wrapper i { color: #ff00ff; font-size: 10.5px; }
         .key-ring.new-alert { animation: severePulse 1.5s infinite; background: var(--primary-red) !important; opacity: 1 !important; }
         .key-ring.new-alert i { color: #fff !important; }
 
-        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 8px; font-weight: 900; width: 14px; height: 14px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 6px var(--primary-red); transition: 0.3s; }
+        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 7.5px; font-weight: 900; width: 14px; height: 14px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 6px var(--primary-red); transition: 0.3s; }
         body.is-admin .notification-badge, body.is-supervisor .notification-badge { display: flex !important; }
         .notification-badge.prio-pulse { animation: badgePulse 1s infinite alternate; }
         @keyframes badgePulse { 0% { transform: scale(1); background: #ff3b30; } 100% { transform: scale(1.18); background: #ff3b30; } }
@@ -425,6 +436,10 @@
         .header-widgets-wrapper { display: flex; align-items: center; justify-content: center; gap: 6px; margin-left: auto; margin-right: 10px; width: auto; user-select: none; flex-wrap: wrap; }
         .header-widget-item { cursor: pointer; transition: 0.25s; padding: 3px 9px; border-radius: 20px; border: 1px solid var(--glass-border); background: var(--bg-input); }
         .header-widget-item:hover { border-color: var(--primary-red); transform: translateY(-1px); }
+        body[data-theme="dark"] .header-widget-item {
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.05);
+        }
         
         .header-office-status { font-size: 10.5px; font-weight: 800; color: var(--text-light); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
         .status-led { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
@@ -439,20 +454,20 @@
 
         .header-app-install-chip {
             font-size: 10px; font-weight: 800; color: var(--primary-red);
-            background: rgba(230, 0, 0, 0.08); border: 1px solid rgba(230, 0, 0, 0.28);
+            background: rgba(230, 0, 0, 0.08); border: 1px solid rgba(230, 0, 0, 0.35);
             border-radius: 20px; padding: 3px 9px; display: inline-flex; align-items: center; gap: 4px;
             white-space: nowrap; cursor: pointer; transition: 0.25s;
         }
         .header-app-install-chip:hover { background: var(--primary-red); color: #fff; }
 
-        .btn-crm-header { border: 1.5px solid var(--primary-red); color: var(--primary-red); font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 20px; align-items: center; gap: 5px; background: rgba(230,0,0,0.08); text-transform: uppercase; white-space: nowrap; }
+        .btn-crm-header { border: 1.5px solid var(--primary-red); color: var(--primary-red); font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 20px; align-items: center; gap: 5px; background: rgba(230,0,0,0.08); text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
         .btn-crm-header:hover { background: var(--primary-red); color: #fff; }
 
-        .header-clock-date { font-size: 10.5px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.3px; display:inline-flex; align-items:center; gap:5px; white-space: nowrap; }
+        .header-clock-date { font-size: 10.5px; font-weight: 700; color: var(--text-light); letter-spacing: 0.3px; display:inline-flex; align-items:center; gap:5px; white-space: nowrap; }
         .header-clock-date span { color: var(--primary-red); font-weight: 800; }
-        .header-weather { font-size: 10.5px; font-weight: 600; color: var(--text-muted); display:inline-flex; align-items:center; gap:5px; white-space: nowrap; }
+        .header-weather { font-size: 10.5px; font-weight: 700; color: var(--text-light); display:inline-flex; align-items:center; gap:5px; white-space: nowrap; }
 
-        /* KORREKTUR 1: INTERAKTIVES KALENDERBLATT MIT EIGENER KW-SPALTE (8 SPALTEN: KW + MO-SO) */
+        /* INTERAKTIVES KALENDERBLATT MIT EIGENER KW-SPALTE */
         .mini-cal-grid { display: grid; grid-template-columns: 38px repeat(7, 1fr); gap: 4px; margin-top: 12px; text-align: center; align-items: center; }
         .mini-cal-weekday { font-size: 9.5px; font-weight: 900; color: var(--primary-red); text-transform: uppercase; padding-bottom: 4px; }
         .mini-cal-kw-badge { font-size: 9.5px; font-weight: 900; color: var(--primary-red); background: rgba(230,0,0,0.09); border: 1px solid rgba(230,0,0,0.22); border-radius: 6px; padding: 6px 2px; line-height: 1; }
@@ -505,14 +520,13 @@
         .mini-admin-btn.del { color: #ff3b30; border-color: rgba(255,59,48,0.5); }
         .mini-admin-btn.del:hover { background: #ff3b30; color: #fff; }
 
-        /* KORREKTUR 3: OVERLAYS / MODALS – KEINE ÜBERSCHRIFT MEHR UNTER DEM SCHLIESSEN-"X"! */
+        /* OVERLAYS / MODALS – KEINE ÜBERSCHRIFT UNTER DEM SCHLIESSEN-"X" */
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 8000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s, visibility 0.3s; box-sizing: border-box; padding: 15px; }
         .custom-dialog-overlay.open { opacity: 1; visibility: visible; pointer-events: all; }
         
         .custom-dialog-window { background: var(--bg-card); border: 1px solid var(--glass-border); border-top: 3px solid var(--primary-red); width: 100%; max-width: 490px; max-height: 92dvh; overflow-y: auto; overflow-x: hidden; border-radius: var(--global-radius); padding: 28px 22px 24px; position: relative; box-shadow: 0 25px 70px rgba(0,0,0,0.45); transform: scale(0.92) translateZ(0); transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); text-align: center; color: var(--text-light); box-sizing: border-box; backface-visibility: hidden; -webkit-overflow-scrolling: touch; }
         .custom-dialog-overlay.open .custom-dialog-window { transform: scale(1) translateZ(0); }
         
-        /* Runder, sauber abgesetzter X-Button oben rechts */
         .close-dialog-btn {
             position: absolute; top: 12px; right: 12px;
             width: 32px; height: 32px; border-radius: 50%;
@@ -523,7 +537,6 @@
         }
         .close-dialog-btn:hover { background: var(--primary-red); color: #fff; border-color: var(--primary-red); transform: scale(1.08) rotate(90deg); }
 
-        /* Fester Sicherheitsabstand für alle Modal-Überschriften (h3), damit sie NIEMALS unter das X geraten */
         .custom-dialog-window > h3,
         .custom-dialog-window h3#widgetModalTitle,
         .custom-dialog-window h3#legalTitle {
@@ -659,7 +672,7 @@
         .admin-list-wrapper { max-height: 430px; overflow-y: auto; overflow-x: hidden; margin-top: 8px; padding-right: 4px; display: grid; gap: 10px; }
         .admin-apt-card { background: var(--bg-card); border-radius: 14px; padding: 13px; position: relative; border: 1px solid var(--glass-border); border-left: 5px solid var(--text-muted); text-align: left; transition: 0.25s; display: flex; flex-direction: column; gap: 7px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
         .admin-apt-card:hover { border-color: var(--primary-red); }
-        .admin-apt-card.marked { border-left-color: var(--gold-border); background: var(--gold-bg-soft); }
+        .admin-apt-card.marked { border-left-color: #f5c542 !important; border-color: rgba(245, 197, 66, 0.55) !important; background: var(--gold-bg-soft); }
         .admin-apt-card.prio-high { border-left-color: #ff3b30; }
         .admin-apt-card.prio-normal { border-left-color: #007aff; }
         .admin-apt-card.prio-expired { border-left-color: #ff9500; opacity: 0.92; }
@@ -676,7 +689,15 @@
         .apt-grid-info i { color: var(--primary-red); width: 14px; text-align: center; font-size: 11px; }
         .apt-actions-horizontal { display: flex; gap: 5px; justify-content: flex-end; background: var(--bg-input); padding: 4px 6px; border-radius: 10px; border: 1px solid var(--glass-border); flex-wrap: wrap; }
         .apt-btn { background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; font-size: 11.5px; transition: 0.25s; width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-        .apt-btn.mark:hover { background: var(--gold-border); color: #fff; border-color: var(--gold-border); }
+        .apt-btn.mark:hover { background: #f5c542; color: #000; border-color: #f5c542; }
+        /* NEU: WENN GEPINNT, IST AUCH DAS PIN-SYMBOL SELBST LEUCHTEND GELB/GOLD MARKIERT! */
+        .apt-btn.mark.is-pinned {
+            background: #f5c542 !important;
+            color: #000000 !important;
+            border-color: #d4af37 !important;
+            box-shadow: 0 0 12px rgba(245, 197, 66, 0.75) !important;
+            transform: scale(1.06);
+        }
         .apt-btn.edit:hover { background: #007aff; color: #fff; border-color: #007aff; }
         .apt-btn.wa-confirm:hover { background: #25D366; color: #fff; border-color: #25D366; }
         .apt-btn.delete:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
@@ -696,7 +717,7 @@
         .note-row-btn:hover { color: var(--text-light); border-color: var(--text-light); }
         .note-row-btn.del:hover { color: var(--primary-red); border-color: var(--primary-red); }
 
-        /* KORREKTUR 4: PINNWAND-KENNZEICHEN WIEDER BUTTERWEICH FREI BEWEGLICH (TOUCH & MAUS) */
+        /* PINNWAND-KENNZEICHEN FREI BEWEGLICH (TOUCH & MAUS) + GOLDENER PIN-INDIKATOR */
         #pinned-container {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -708,7 +729,7 @@
             position: fixed;
             background: #ffffff;
             color: #000000;
-            border: 2.5px solid #000000;
+            border: 2.5px solid #d4af37;
             border-radius: 7px;
             padding: 4px 8px;
             font-family: 'Courier New', monospace;
@@ -716,8 +737,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 7px;
-            box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+            gap: 6px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.45), 0 0 12px rgba(245, 197, 66, 0.45);
             cursor: grab;
             z-index: 9501;
             user-select: none;
@@ -729,17 +750,18 @@
         }
         .pinned-plate:active {
             cursor: grabbing;
-            box-shadow: 0 16px 38px rgba(230,0,0,0.55);
+            box-shadow: 0 16px 38px rgba(245, 197, 66, 0.75);
             z-index: 9999;
         }
         .pinned-plate.urgent-today { border-color: var(--primary-red) !important; color: var(--primary-red) !important; animation: urgentGlow 2s infinite alternate ease-in-out; }
         .pinned-plate.urgent-today span { color: var(--primary-red) !important; }
         @keyframes urgentGlow { 0% { box-shadow: 0 5px 15px rgba(230,0,0,0.4); } 100% { box-shadow: 0 10px 30px var(--primary-red); } }
-        .pinned-plate.normal-day { border-color: #000 !important; color: #000 !important; }
+        .pinned-plate.normal-day { border-color: #d4af37 !important; color: #000 !important; }
         .pinned-plate.normal-day span { color: #000 !important; }
         .pinned-plate::before { content: 'D'; background: #003399; color: #fff !important; padding: 2px 5px; font-size: 11px; border-radius: 3px; pointer-events: none; }
         .expired-plate { opacity: 0.65 !important; filter: grayscale(90%); border-color: #666 !important; color: #555 !important; }
         .expired-plate:hover { opacity: 1 !important; filter: grayscale(0%); z-index: 9999; }
+        .pin-gold-dot { color: #d4af37 !important; font-size: 11px; pointer-events: none; filter: drop-shadow(0 0 3px rgba(212,175,55,0.6)); }
         .unpin-plate-btn {
             background: #ff3b30; color: #fff !important; border: none; border-radius: 50%;
             width: 18px; height: 18px; font-size: 10px !important; font-weight: 900;
@@ -981,14 +1003,44 @@
         .checklist-row.done { border-color: var(--green-border); background: var(--green-bg-soft); }
         .checklist-row.done i { color: var(--green-accent) !important; }
 
-        /* FLOATING QUICK-ACTION BUTTONS DEZENT & KLEIN */
-        .floating-quick-bar { position: fixed; bottom: calc(14px + var(--safe-bottom)); left: 14px; z-index: 7500; display: flex; gap: 7px; align-items: center; }
-        .fab-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; text-decoration: none; box-shadow: 0 5px 16px rgba(0,0,0,0.3); transition: 0.25s; border: none; cursor: pointer; opacity: 0.92; }
-        .fab-btn:hover { opacity: 1; transform: scale(1.08) translateY(-2px); }
-        .fab-wa { background: #25D366; }
+        /* DIE 5 SCHWEBENDEN SYMBOLE UNTEN LINKS:
+           - AUF DESKTOP (PC): NEBENEINANDER (HORIZONTAL)
+           - AUF MOBIL / APP: ÜBEREINANDER LINKS (VERTIKAL) + IM DUNKELMODUS EXTRA LEUCHTEND! */
+        .floating-quick-bar {
+            position: fixed;
+            bottom: calc(16px + var(--safe-bottom));
+            left: 16px;
+            z-index: 7500;
+            display: flex;
+            flex-direction: row; /* Desktop: Nebeneinander */
+            gap: 8px;
+            align-items: center;
+        }
+        .fab-btn {
+            width: 39px; height: 39px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 16px; text-decoration: none;
+            box-shadow: 0 5px 16px rgba(0,0,0,0.32); transition: 0.25s;
+            border: 1.5px solid rgba(255,255,255,0.22); cursor: pointer; opacity: 0.94;
+        }
+        .fab-btn:hover { opacity: 1; transform: scale(1.1) translateY(-2px); }
+        .fab-wa { background: #25D366; color: #fff; }
         .fab-book { background: var(--primary-red); font-size: 15px; }
+        .fab-cb { background: #ff9500; color: #fff; font-size: 15px; }
         .fab-share { background: #007aff; font-size: 15px; }
-        .fab-app { background: #141419; border: 1.5px solid var(--primary-red); color: #fff; font-size: 14px; }
+        .fab-app { background: #1e1e26; border: 1.5px solid var(--primary-red); color: #fff; font-size: 14px; }
+
+        /* Im Dunkelmodus leuchten die 5 Symbole kristallklar hervor */
+        body[data-theme="dark"] .fab-btn {
+            border-color: rgba(255, 255, 255, 0.55);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.18);
+            opacity: 0.98;
+        }
+        body[data-theme="dark"] .fab-app {
+            background: #252532;
+            border-color: #ff3b30;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 12px rgba(255, 59, 48, 0.45);
+        }
 
         .admin-details { background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
         .admin-details summary { padding: 13px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; color: var(--text-light); }
@@ -1097,27 +1149,81 @@
         .theme-selector-container { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; position: relative;}
         .theme-selector { background: var(--bg-input); color: var(--text-light); border: 1.5px solid var(--glass-border); padding: 8px 36px 8px 15px; border-radius: 8px; font-size: 12px; outline: none; cursor: pointer; font-family: 'Montserrat', sans-serif;}
 
-        /* RESPONSIVE OPTIMIERUNG FÜR IPHONE (iOS), SAMSUNG (ANDROID) & TABLETS */
+        /* RESPONSIVE OPTIMIERUNG FÜR IPHONE (iOS), SAMSUNG (ANDROID) & APP-MODUS */
         @media (max-width: 768px) {
-            :root { --dynamic-header-h: 164px; }
-            body { font-size: 12px; padding-top: var(--dynamic-header-h, 164px); } 
-            nav { flex-wrap: wrap; padding: 8px 3%; gap: 4px; }
-            .logo-container { order: 1; max-width: 50%; gap: 4px; }
-            .logo-text { font-size: clamp(10px, 3vw, 13.5px); white-space: nowrap; line-height: 1.1; }
-            .logo-car-svg { height: clamp(12px, 3.4vw, 17px); }
-            .nav-actions { order: 2; width: auto; margin-left: auto; gap: 4px; align-items: center; }
-            .customer-theme-toggle { width: 23px; height: 23px; min-width: 23px; font-size: 9.5px !important; }
-            .visitor-counter { font-size: 8px; padding: 2px 4px; }
-            body.is-admin .visitor-counter, body.is-supervisor .visitor-counter { font-size: 9px; padding: 2px 6px; }
-            body.is-admin .visitor-counter span#txt-header-visitors, body.is-supervisor .visitor-counter span#txt-header-visitors { display: none; }
+            :root { --dynamic-header-h: 160px; }
+            body { font-size: 12px; padding-top: var(--dynamic-header-h, 160px); } 
+            nav { flex-wrap: wrap; padding: 7px 2.5%; gap: 3px; align-items: center; }
+            .logo-container { order: 1; max-width: 52%; gap: 4px; flex-shrink: 1; min-width: 0; }
+            .logo-text { font-size: clamp(9.5px, 2.9vw, 13px); white-space: nowrap; line-height: 1.1; }
+            .logo-car-svg { height: clamp(11px, 3.2vw, 16px); }
+            .nav-actions { order: 2; width: auto; margin-left: auto; gap: 3.5px; align-items: center; flex-shrink: 0; }
+            .customer-theme-toggle { width: 22px; height: 22px; min-width: 22px; font-size: 9.5px !important; }
+            .visitor-counter { font-size: 7.5px; padding: 2px 3px; }
             .key-ring { width: 18px; height: 18px; min-width: 18px; }
-            body.is-admin .key-ring, body.is-supervisor .key-ring { width: 24px; height: 24px; min-width: 24px; }
-            body.is-admin .key-icon-wrapper i, body.is-supervisor .key-icon-wrapper i { font-size: 10px; }
-            .btn-crm-header { padding: 3px 6px !important; font-size: 8.5px !important; }
-            .quick-menu-btn { padding: 4px 9px !important; font-size: 9.5px !important; }
-            .header-widgets-wrapper { order: 3; width: 100%; display: flex !important; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--glass-border); white-space: normal; margin-right: 0; }
-            .header-widget-item { padding: 3px 7px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-            .header-clock-date, .header-weather, .header-office-status, .header-calendar-chip, .header-app-install-chip { font-size: 9px; }
+            .quick-menu-btn { padding: 4px 8px !important; font-size: 9px !important; }
+
+            /* WICHTIGER FIX 1: WENN ADMIN ODER SUPERVISOR AUF DEM HANDY EINGELOGGT IST:
+               Logo ("RED ZULASSUNGSDIENST"), Auto-Icon und Buttons verkleinern sich leicht,
+               damit ALLES garantiert in 1 einzige oberste Zeile passt und nichts überlappt! */
+            body.is-admin nav .logo-container,
+            body.is-supervisor nav .logo-container {
+                max-width: 43%;
+                gap: 3px;
+            }
+            body.is-admin nav .logo-text,
+            body.is-supervisor nav .logo-text {
+                font-size: clamp(8px, 2.35vw, 10.5px) !important;
+                letter-spacing: 0px !important;
+                gap: 2px !important;
+            }
+            body.is-admin nav .logo-car-svg,
+            body.is-supervisor nav .logo-car-svg {
+                height: clamp(9.5px, 2.5vw, 12.5px) !important;
+            }
+            body.is-admin nav .admin-ticker-edit-icon,
+            body.is-supervisor nav .admin-ticker-edit-icon {
+                width: 15px; height: 15px; font-size: 8px; top: -4px; right: -10px;
+            }
+            body.is-admin nav .nav-actions,
+            body.is-supervisor nav .nav-actions {
+                gap: 2.5px !important;
+            }
+            body.is-admin .btn-crm-header,
+            body.is-supervisor .btn-crm-header {
+                padding: 2px 5px !important;
+                font-size: 7.5px !important;
+                gap: 3px !important;
+            }
+            body.is-admin .visitor-counter,
+            body.is-supervisor .visitor-counter {
+                font-size: 8px !important;
+                padding: 2px 4px !important;
+            }
+            body.is-admin .visitor-counter span#txt-header-visitors,
+            body.is-supervisor .visitor-counter span#txt-header-visitors {
+                display: none !important;
+            }
+            body.is-admin .key-ring,
+            body.is-supervisor .key-ring {
+                width: 21px !important;
+                height: 21px !important;
+                min-width: 21px !important;
+            }
+            body.is-admin .key-icon-wrapper i,
+            body.is-supervisor .key-icon-wrapper i {
+                font-size: 9px !important;
+            }
+            body.is-admin .quick-menu-btn,
+            body.is-supervisor .quick-menu-btn {
+                padding: 3px 6px !important;
+                font-size: 8.5px !important;
+            }
+
+            .header-widgets-wrapper { order: 3; width: 100%; display: flex !important; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--glass-border); white-space: normal; margin-right: 0; }
+            .header-widget-item { padding: 2.5px 6.5px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+            .header-clock-date, .header-weather, .header-office-status, .header-calendar-chip, .header-app-install-chip { font-size: 8.8px; }
+            
             .subpage-nav-bar { margin-top: 12px; margin-bottom: 20px; padding: 10px 4%; gap: 8px; }
             .subpage-nav-bar .btn-primary { flex: 1 1 auto; min-width: 140px; padding: 10px 14px !important; font-size: 10.5px !important; }
             .btn-primary { padding: 11px 18px !important; font-size: 11px !important; }
@@ -1149,8 +1255,21 @@
             .crm-table th, .crm-table td { padding: 4px 3px !important; white-space: nowrap !important; text-overflow: ellipsis; }
             .crm-action-cell { padding: 4px 2px !important; }
             .crm-action-cell .btn-primary { padding: 3px 5px !important; font-size: 8px !important; }
-            .floating-quick-bar { bottom: calc(10px + var(--safe-bottom)); left: 10px; gap: 5px; }
-            .fab-btn { width: 32px; height: 32px; font-size: 13.5px; box-shadow: 0 3px 10px rgba(0,0,0,0.25); opacity: 0.86; }
+
+            /* WICHTIGER FIX 2: AUF MOBILGERÄTEN & IN DER APP STEHEN DIE 5 SYMBOLE LINKS ÜBEREINANDER (VERTIKAL),
+               DAMIT SIE NIEMALS DIE MITTLEREN BUTTONS VERDECKEN! */
+            .floating-quick-bar {
+                flex-direction: column !important;
+                bottom: calc(14px + var(--safe-bottom));
+                left: 8px;
+                gap: 6px;
+            }
+            .fab-btn {
+                width: 31px;
+                height: 31px;
+                font-size: 13px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+            }
         }
     </style>
 </head>
@@ -1159,19 +1278,19 @@
 
     <div id="toast-container"></div>
     
-    <!-- SCHNELL-AKTIONEN FLOATING BAR (AUF MOBILGERÄTEN DEZENT VERKLEINERT AUF 32px) -->
+    <!-- DIE 5 SCHNELL-SYMBOLE: AM PC NEBENEINANDER, AM HANDY/APP LINKS ÜBEREINANDER & IM DARK-MODE LEUCHTEND -->
     <div class="floating-quick-bar">
         <a href="https://wa.me/491783783875" id="fab-wa-link" target="_blank" rel="noopener noreferrer" class="fab-btn fab-wa" title="Direkt per WhatsApp schreiben"><i class="fa-brands fa-whatsapp"></i></a>
         <button class="fab-btn fab-book" onclick="window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});" title="Schnell-Termin buchen"><i class="fa-solid fa-calendar-check"></i></button>
-        <button class="fab-btn" style="background:#ff9500; font-size:15px;" onclick="window.openCallbackModal()" title="Kostenlosen 60s-Rückruf anfordern"><i class="fa-solid fa-phone-volume"></i></button>
+        <button class="fab-btn fab-cb" onclick="window.openCallbackModal()" title="Kostenlosen 60s-Rückruf anfordern"><i class="fa-solid fa-phone-volume"></i></button>
         <button class="fab-btn fab-share" onclick="window.openViralShareModal()" title="Weiterempfehlen & QR-Visitenkarte"><i class="fa-solid fa-qrcode"></i></button>
         <button class="fab-btn fab-app" id="fabAppInstallBtn" onclick="window.triggerAppInstall()" title="Als Smartphone-App installieren"><i class="fa-solid fa-mobile-screen-button"></i></button>
     </div>
 
-    <!-- KORREKTUR 4: FREIER VOLLBILD-PINNWAND-CONTAINER (DAMIT SICH KENNZEICHEN ÜBERALLHIN ZIEHEN LASSEN!) -->
+    <!-- FREIER VOLLBILD-PINNWAND-CONTAINER (DAMIT SICH KENNZEICHEN PER MAUS & FINGER ÜBERALLHIN ZIEHEN LASSEN) -->
     <div id="pinned-container" class="admin-only-block"></div>
 
-    <!-- KORREKTUR 2: PRELOADER AUF HANDY GARANTIERT EXAKT 2-ZEILIG (JEDER SATZ IN EINER ZEILE) -->
+    <!-- EINGANGSANIMATION (PRELOADER) AUF HANDY GARANTIERT EXAKT 2-ZEILIG -->
     <div id="intro-preloader">
         <div class="intro-plate" id="introPlate">
             B <span style="color:var(--primary-red);">-</span> RED <span id="introYearBadge" class="year-flip-badge">2026</span>
@@ -1258,7 +1377,7 @@
                     <span class="status-led open" id="officeStatusLed"></span>
                     <span id="officeStatusText">Geöffnet • Sofort-Annahme</span>
                 </div>
-                <!-- 2. INTERAKTIVER MONATS- & WOCHENKALENDER (MIT DYNAMISCHER KW-BERECHNUNG!) -->
+                <!-- 2. INTERAKTIVER MONATS- & WOCHENKALENDER (MIT DYNAMISCHER KW-BERECHNUNG) -->
                 <div class="header-calendar-chip header-widget-item" id="liveHeaderCalendar" onclick="window.openWidgetModal('calendar')" title="Monatskalender, Kalenderwochen & freie Tage anzeigen">
                     <i class="fa-solid fa-calendar-days"></i>
                     <span id="headerCalendarKwText">Kalender</span>
@@ -1267,7 +1386,7 @@
                 <div class="header-clock-date header-widget-item" id="liveHeaderDate" onclick="window.openWidgetModal('time')" title="Datum & Uhrzeit anzeigen">Lade...</div>
                 <!-- 4. BERLIN LIVE WETTER -->
                 <div class="header-weather header-widget-item" id="liveHeaderWeather" onclick="window.openWidgetModal('weather')" title="Wetter Details anzeigen">Berlin <i class="fa-solid fa-cloud-sun"></i></div>
-                <!-- 5. NEU (ÜBERRASCHUNG 2): 60s RÜCKRUF-CHIP IM HEADER -->
+                <!-- 5. 60s RÜCKRUF-CHIP IM HEADER -->
                 <div class="header-calendar-chip header-widget-item" onclick="window.openCallbackModal()" title="Kostenlosen 60-Sekunden-Rückruf anfordern">
                     <i class="fa-solid fa-phone-volume" style="color:#25D366;"></i>
                     <span>Rückruf</span>
@@ -1310,7 +1429,7 @@
         <a href="https://wa.me/491783783875" id="menu-wa-link" target="_blank" rel="noopener noreferrer" onclick="window.toggleMenu()"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> WhatsApp Support</a>
     </div>
 
-    <!-- NEU (ÜBERRASCHUNG 2): 60-SEKUNDEN RÜCKRUF- & EXPRESS-SLOT-ANFRAGE MODAL -->
+    <!-- 60-SEKUNDEN RÜCKRUF- & EXPRESS-SLOT-ANFRAGE MODAL -->
     <div class="custom-dialog-overlay" id="callbackRequestOverlay">
         <div class="custom-dialog-window" style="max-width:460px; border-top-color:#ff9500; text-align:left;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCallbackModal()"></i>
@@ -1400,7 +1519,7 @@
         </div>
     </div>
 
-    <!-- KORRIGIERTES LIVE-LEADS & MONITORING TERMINAL (8 KLEINE VIERECKE NEBENEINANDER + TAGES-AGENDA & SIGNALTON) -->
+    <!-- LIVE-LEADS & MONITORING TERMINAL (8 KLEINE VIERECKE NEBENEINANDER + TAGES-AGENDA & SIGNALTON) -->
     <div class="custom-dialog-overlay" id="adminModal">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeAdmin()"></i>
@@ -2452,7 +2571,7 @@
         </div>
     </div>
 
-    <!-- RECHTLICHES / IMPRESSUM & DATENSCHUTZ (OHNE X-KOLLISION) -->
+    <!-- RECHTLICHES / IMPRESSUM & DATENSCHUTZ -->
     <div class="custom-dialog-overlay" id="legalOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeLegal()"></i>
@@ -2668,7 +2787,7 @@
                 <h1 style="font-size: clamp(24px, 4.8vw, 44px); line-height: 1.1; margin-bottom: 15px; font-weight: 900;"><span id="txt-hero-h1-1" style="color: var(--text-light);">Schnell. Zuverlässig.</span><br><span id="txt-hero-h1-2" style="background: linear-gradient(45deg, var(--primary-red), #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kompetent.</span></h1>
                 <p id="txt-hero-desc" style="font-size: clamp(12px, 1.8vw, 15px); color: var(--text-muted); margin-bottom: 28px; max-width: 650px; margin-left: auto; margin-right: auto;">Zulassungsservice in Bestzeit für ganz Berlin. Wir garantieren Ihnen eine zügige, zuverlässige und hochprofessionelle Abwicklung Ihrer Anliegen.</p>
                 
-                <!-- ADAPTIVE HAUPT-BUTTONS (OHNE ZAHL VOR FORMULARE!) -->
+                <!-- ADAPTIVE HAUPT-BUTTONS -->
                 <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                     <a href="javascript:void(0)" onclick="window.switchView('view-home'); window.scrollTo({top: document.getElementById('termin').offsetTop - 110, behavior: 'smooth'});" class="btn-primary"><i class="fa-regular fa-calendar-check"></i> Wunschtermin sichern</a>
                     <a href="javascript:void(0)" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')" class="btn-primary btn-green-adaptive"><i class="fa-solid fa-signature"></i> Digitale Vollmacht</a>
@@ -2699,7 +2818,7 @@
             <p style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:20px; padding: 0 5%;">* Alle Preisangaben verstehen sich in Euro inkl. gesetzlicher MwSt., zuzüglich anfallender amtlicher Behördengebühren.</p>
         </section>
 
-        <!-- SO LÄUFT IHRE KFZ-ZULASSUNG IN 3 SCHRITTEN AB -->
+        <!-- SO LÄUFT IHRE KFZ-ZULASSUNG IN 3 SCHRITTEN AB + NEUHEIT 1: LIVE ABHOL-PROGNOSE RECHNER -->
         <section class="compass-wrapper" style="margin-top:35px;">
             <div class="compass-box" style="padding:26px 22px;">
                 <div style="text-align:center;">
@@ -2723,10 +2842,38 @@
                         <p style="font-size:11.5px; color:var(--text-muted);">Wir übernehmen den Behördengang beim LABO Berlin und prägen Ihre neuen Kennzeichen. Sobald im Live-Tracker „Abholbereit“ leuchtet, starten Sie sofort los!</p>
                     </div>
                 </div>
+
+                <!-- NEUHEIT 1: LIVE ABHOL- & FERTIGSTELLUNGS-PROGNOSE RECHNER -->
+                <div style="margin-top:18px; background:var(--bg-input); border:1px solid var(--glass-border); border-left:4px solid var(--primary-red); border-radius:14px; padding:15px 18px; text-align:left;">
+                    <div style="font-size:11px; font-weight:900; text-transform:uppercase; color:var(--primary-red); margin-bottom:10px;"><i class="fa-solid fa-stopwatch"></i> Live Fertigstellungs- & Abhol-Prognose (Wann bin ich startklar?)</div>
+                    <div class="form-row" style="gap:10px;">
+                        <div class="form-group" style="margin-bottom:6px;">
+                            <label>Geplante Unterlagen-Abgabe bei uns:</label>
+                            <select id="pickupDropoffSelect" class="form-control" onchange="window.updatePickupForecast()">
+                                <option value="morning">Heute Vormittag (09:00 – 11:00 Uhr)</option>
+                                <option value="noon">Heute Mittag / Nachmittag (11:00 – 16:00 Uhr)</option>
+                                <option value="evening">Heute Spätnachmittag (16:00 – 20:00 Uhr)</option>
+                                <option value="tomorrow">Morgen früh ab 09:00 Uhr</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:6px;">
+                            <label>Gewünschte Leistungsart:</label>
+                            <select id="pickupServiceSelect" class="form-control" onchange="window.updatePickupForecast()">
+                                <option value="plates_only">🪪 Nur Kennzeichen prägen / Umweltplakette</option>
+                                <option value="kurzzeit">⏱️ 5-Tage Kurzzeit- oder Zollkennzeichen</option>
+                                <option value="express" selected>⚡ Express-Zulassung / Priorisierte Abwicklung</option>
+                                <option value="standard">🚗 Reguläre An-, Um- oder Abmeldung</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="pickupForecastResult" style="margin-top:8px; font-size:12px; color:var(--text-light); background:var(--bg-card); padding:10px 14px; border-radius:10px; border:1px solid var(--glass-border); font-weight:700;">
+                        ⚡ <strong style="color:var(--green-accent);">Voraussichtliche Fertigstellung:</strong> Direkte Einreichung im heutigen Behörden-Lauf – Abholung meist innerhalb von <strong>24 Stunden (oft noch am selben Spätnachmittag)</strong>!
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- INTERAKTIVER ZULASSUNGS-KOMPASS -->
+        <!-- INTERAKTIVER ZULASSUNGS-KOMPASS (INKL. NEUHEIT 2: CHECKLISTE AUFS EIGENE HANDY SENDEN) -->
         <section id="zulassungs-kompass" class="compass-wrapper" style="margin-top:30px;">
             <div class="compass-box">
                 <div style="text-align:center;">
@@ -2758,17 +2905,19 @@
                             <li><i class="fa-solid fa-circle-check"></i> Bei zugelassenem Fahrzeug: Bisherige Kennzeichenschilder</li>
                         </ul>
                     </div>
-                    <div style="background:var(--bg-card); border:1px solid var(--glass-border); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:10px;">
+                    <div style="background:var(--bg-card); border:1px solid var(--glass-border); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:9px;">
                         <div style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;"><i class="fa-solid fa-bolt" style="color:var(--primary-red);"></i> Direkt-Aktionen für diesen Fall:</div>
                         <button type="button" class="btn-primary" style="width:100%; justify-content:center;" onclick="window.applyCompassToBooking()"><i class="fa-regular fa-calendar-check"></i> Diesen Fall jetzt als Termin buchen</button>
                         <button type="button" class="btn-primary btn-green-adaptive" style="width:100%; justify-content:center;" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')"><i class="fa-solid fa-signature"></i> Passende Vollmacht & SEPA öffnen</button>
+                        <!-- NEUHEIT 2: 1-KLICK UNTERLAGEN-MERKZETTEL AUFS EIGENE HANDY SCHICKEN -->
+                        <button type="button" class="btn-primary btn-gold-adaptive" style="width:100%; justify-content:center;" onclick="window.sendCompassDocsToWhatsApp()"><i class="fa-solid fa-mobile-screen"></i> Checkliste als Merkzettel aufs Handy</button>
                         <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); width:100%; justify-content:center; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp()"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Unterlagen-Foto vorab prüfen lassen</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- WUNSCHKENNZEICHEN-GENERATOR (INKL. ÜBERRASCHUNG 3: 1-KLICK IDEEN-GENERATOR) & SCHNELL-KALKULATOR -->
+        <!-- WUNSCHKENNZEICHEN-GENERATOR & SCHNELL-KALKULATOR -->
         <section id="wunschkennzeichen-section" class="interactive-tools-grid">
             <div class="tool-box editable-section">
                 <div class="section-edit-btn action-content" onclick="window.openContentEditor('tools')" title="Überschriften bearbeiten"><i class="fa-solid fa-pencil"></i></div>
@@ -2797,7 +2946,7 @@
                     </div>
                 </div>
 
-                <!-- NEU (ÜBERRASCHUNG 3): 1-KLICK BERLINER WUNSCHKENNZEICHEN-IDEEN-GENERATOR -->
+                <!-- 1-KLICK BERLINER WUNSCHKENNZEICHEN-IDEEN-GENERATOR -->
                 <div style="display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;">
                     <button type="button" class="district-pill" onclick="window.generatePlateIdea('random')" title="Zufällige Kombination"><i class="fa-solid fa-dice" style="color:var(--primary-red);"></i> Zufall</button>
                     <button type="button" class="district-pill" onclick="window.generatePlateIdea('schnaps')" title="Schnapszahl (z.B. 777 / 8888)">🔥 Schnapszahl</button>
@@ -2837,7 +2986,7 @@
                 </div>
             </div>
 
-            <!-- SCHNELL-KALKULATOR (MIT STIFT BEARBEITBAR & STANDARDMÄSSIG "-") -->
+            <!-- SCHNELL-KALKULATOR -->
             <div class="tool-box editable-section">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
                     <h3><i class="fa-solid fa-calculator"></i> <span id="txt-calc-title">Schnell-Kalkulator & Extras</span></h3>
@@ -2905,7 +3054,7 @@
                     <h3><i class="fa-solid fa-map-location-dot"></i> Berliner Bezirks-Wegweiser & 60s Foto-Check</h3>
                     <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Für ganz Berlin im Einsatz! Wählen Sie Ihren Berliner Bezirk für Ihre schnellste Anfahrt zur Kienitzer Str. 6 oder senden Sie uns Ihre Papiere vorab per Foto:</p>
                     
-                    <!-- ALLE 12 BERLINER BEZIRKE INKL. SPANDAU, TEGEL, REINICKENDORF, MARZAHN USW. -->
+                    <!-- ALLE 12 BERLINER BEZIRKE -->
                     <div class="district-pills-wrap">
                         <button type="button" class="district-pill active" onclick="window.selectBerlinDistrict('neukoelln', this)">📍 Neukölln / Britz</button>
                         <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('kreuzberg', this)">📍 Kreuzberg / Mitte</button>
@@ -2929,7 +3078,7 @@
             </div>
         </section>
 
-        <!-- NEU (ÜBERRASCHUNG 1): INTERAKTIVER BERLINER UMWELTPLAKETTEN- & LABO-BEHÖRDENGEBÜHREN-ASSISTENT -->
+        <!-- INTERAKTIVER BERLINER UMWELTPLAKETTEN- & LABO-BEHÖRDENGEBÜHREN-ASSISTENT -->
         <section class="compass-wrapper" style="margin-top:25px;">
             <div class="compass-box" style="padding:26px 22px; border-top-color:var(--green-border);">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
@@ -3047,6 +3196,9 @@
                 <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-3">7-stellige eVB-Nummer Ihrer Kfz-Versicherung</span></div>
                 <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-4">Gültiger TÜV / HU-Bericht & IBAN für das SEPA-Mandat</span></div>
                 <div class="checklist-row" onclick="this.classList.toggle('done')"><i class="fa-regular fa-square-check" style="color:var(--text-muted);"></i> <span id="txt-check-5">Unterschriebene Vollmacht (auch digital hier oder vor Ort ausfüllbar!)</span></div>
+                <button type="button" class="btn-primary btn-green-adaptive" style="width:100%; justify-content:center; margin-top:8px; padding:10px 14px;" onclick="window.sendCompassDocsToWhatsApp()">
+                    <i class="fa-brands fa-whatsapp"></i> Diese Checkliste als Erinnerung auf mein Handy senden
+                </button>
             </div>
 
             <!-- 6 SINNVOLLE BERLINER HÄUFIGE FRAGEN -->
@@ -3179,7 +3331,7 @@
         </section>
     </div>
 
-    <!-- ANSICHT: FORMULARE (ÜBERLAPPUNGSFREI FÜR HANDY & DESKTOP!) -->
+    <!-- ANSICHT: FORMULARE (ÜBERLAPPUNGSFREI FÜR HANDY & DESKTOP) -->
     <div id="view-formulare" class="view-section">
         <div class="subpage-nav-bar">
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
@@ -3215,7 +3367,7 @@
         <div class="download-grid" id="formItemsGrid"></div>
     </div>
 
-    <!-- ANSICHT: AUTO ANKAUF (ÜBERLAPPUNGSFREI FÜR HANDY & DESKTOP!) -->
+    <!-- ANSICHT: AUTO ANKAUF (ÜBERLAPPUNGSFREI FÜR HANDY & DESKTOP) -->
     <div id="view-ankauf" class="view-section">
         <div class="subpage-nav-bar">
             <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
@@ -3308,11 +3460,21 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 15px;">
+            <!-- NEUHEIT 3: ANSCHRIFT INKL. 1-KLICK ROUTEN- & U8-ANFAHRTS-STARTER -->
             <div style="background:var(--bg-card); padding:20px; border-radius:18px; border:1px solid var(--glass-border); box-shadow:var(--card-shadow);">
-                <h3 style="font-size:14px; color: var(--text-light);"><i class="fa-solid fa-location-dot" style="color:var(--primary-red);"></i> Anschrift</h3>
-                <p style="margin-top:8px; font-size:12px; color: var(--text-light);">Kienitzer Str. 6, 12053 Berlin</p>
-                <p style="margin-top:5px; font-size:11px; color:var(--text-muted);"><i class="fa-solid fa-clock"></i> Montag - Freitag 09:00 - 20:00 Uhr</p>
+                <h3 style="font-size:14px; color: var(--text-light);"><i class="fa-solid fa-location-dot" style="color:var(--primary-red);"></i> Anschrift & Schnell-Navigation</h3>
+                <p style="margin-top:8px; font-size:12.5px; font-weight:700; color: var(--text-light);">Kienitzer Str. 6, 12053 Berlin (Neukölln)</p>
+                <p style="margin-top:4px; font-size:11px; color:var(--text-muted);"><i class="fa-solid fa-clock"></i> Montag – Freitag: 09:00 – 20:00 Uhr • <i class="fa-solid fa-train-subway" style="color:#007aff;"></i> U8 Boddinstraße (2 Min.)</p>
+                <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=Kienitzer+Str.+6,+12053+Berlin" target="_blank" rel="noopener noreferrer" class="btn-primary" style="flex:1; justify-content:center; padding:9px 12px; font-size:10.5px !important;">
+                        <i class="fa-solid fa-diamond-turn-right"></i> Route starten
+                    </a>
+                    <button type="button" class="btn-primary" style="flex:1; background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); justify-content:center; padding:9px 12px; font-size:10.5px !important; box-shadow:none;" onclick="window.copyOfficeAddress()">
+                        <i class="fa-regular fa-copy" style="color:var(--primary-red);"></i> Adresse kopieren
+                    </button>
+                </div>
             </div>
+
             <div style="background:var(--bg-card); padding:20px; border-radius:18px; border:1px solid var(--glass-border); box-shadow:var(--card-shadow);">
                 <h3 style="font-size:14px; color: var(--text-light);"><i class="fa-solid fa-phone" style="color:var(--primary-red);"></i> Support-Hotlines & Rückruf</h3>
                 <p style="margin-top:5px; font-size:12px; color: var(--text-light);" class="live-phone">0178 378 38 75</p>
@@ -3409,7 +3571,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
 
-    <!-- TEIL 4.1: HAUPT-FUNKTIONEN, DYNAMISCHER KW-KALENDER & DIE 4 ÜBERRASCHUNGS-MODULE -->
+    <!-- TEIL 4 VON 6: HAUPT-ENGINE, DYNAMISCHER KW-KALENDER, PWA-APP & NEUE KOMFORT-FUNKTIONEN -->
     <script>
         document.addEventListener('touchmove', () => {}, { passive: true });
         document.addEventListener('touchstart', () => {}, { passive: true });
@@ -3439,7 +3601,60 @@
         });
 
         // =========================================================================
-        // KORREKTUR 1: DYNAMISCHE KALENDERWOCHEN (KW) BEIM MONATS- & WOCHENWECHSEL
+        // NEUHEIT 1, 2 & 3: LIVE ABHOL-PROGNOSE, MERKZETTEL AUFS HANDY & ADRESS-KOPIERER
+        // =========================================================================
+        window.updatePickupForecast = function() {
+            const dropoff = document.getElementById('pickupDropoffSelect')?.value || 'morning';
+            const srv = document.getElementById('pickupServiceSelect')?.value || 'express';
+            const resEl = document.getElementById('pickupForecastResult');
+            if (!resEl) return;
+
+            if (srv === 'plates_only') {
+                resEl.innerHTML = `🪪 <strong style="color:var(--green-accent);">Sofort zum Mitnehmen (ca. 3–5 Minuten):</strong> Ihre Kennzeichenschilder (Alu, 3D-Carbon oder Kurzkennzeichen) sowie die grüne Umweltplakette prägen wir direkt bei Ihrem Besuch!`;
+                return;
+            }
+            if (srv === 'kurzzeit') {
+                if (dropoff === 'morning' || dropoff === 'noon') {
+                    resEl.innerHTML = `⏱️ <strong style="color:var(--green-accent);">Gleicher Werktag / Sofort-Service:</strong> Bei Abgabe bis 15:00 Uhr sind Ihre 5-Tage-Kurzzeit- oder Zollkennzeichen inkl. Papieren meist noch <strong>am selben Tag abholbereit</strong>!`;
+                } else {
+                    resEl.innerHTML = `⏱️ <strong style="color:var(--green-accent);">Nächster Werktag:</strong> Ihre Unterlagen gehen direkt in den ersten Morgen-Lauf und sind <strong>am nächsten Werktag ab Mittag abholbereit</strong>!`;
+                }
+                return;
+            }
+            if (srv === 'express') {
+                if (dropoff === 'morning') {
+                    resEl.innerHTML = `⚡ <strong style="color:var(--green-accent);">Express-Priorisierung (Gleicher Tag / 24h):</strong> Direkte Einreichung im ersten Behörden-Lauf – Fertigstellung meist noch <strong>heute am Spätnachmittag oder morgen Vormittag</strong>!`;
+                } else {
+                    resEl.innerHTML = `⚡ <strong style="color:var(--green-accent);">Express-Priorisierung (ca. 24 Stunden):</strong> Priorisierte Einreichung beim LABO Berlin – Ihre fertigen Papiere & Schilder sind in der Regel <strong>innerhalb von 24h abholbereit</strong>!`;
+                }
+                return;
+            }
+            // Standard An-/Ummeldung
+            resEl.innerHTML = `🚗 <strong style="color:var(--primary-red);">Reguläre Bearbeitungszeit (1–2 Werktage):</strong> Wir übernehmen den kompletten Behördengang inkl. Schilderprägung. Sobald im Live-Tracker „Abholbereit“ leuchtet, können Sie alles abholen!`;
+        };
+
+        window.sendCompassDocsToWhatsApp = function() {
+            const caseTitle = document.getElementById('compassCaseTitle')?.innerText || 'Kfz-Zulassung Berlin';
+            const docItems = Array.from(document.querySelectorAll('#compassDocList li')).map(li => '✅ ' + li.innerText.trim());
+            const listText = docItems.length > 0
+                ? docItems.join('\n')
+                : '✅ Fahrzeugschein (ZB I) & Fahrzeugbrief (ZB II)\n✅ Gültiger Ausweis / Reisepass + Meldebescheinigung\n✅ 7-stellige eVB-Nummer\n✅ Gültiger TÜV / HU-Bericht & IBAN';
+
+            const msg = encodeURIComponent(`📋 *MEINE UNTERLAGEN-CHECKLISTE (RED BERLIN)*\n*Vorgang:* ${caseTitle}\n\n${listText}\n\n📍 *Abgabe-Adresse:*\nRED Zulassungsdienst Berlin\nKienitzer Str. 6, 12053 Berlin (U8 Boddinstraße)\n📞 Tel: 0178 378 38 75`);
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+        };
+
+        window.copyOfficeAddress = function() {
+            const addr = 'RED Zulassungsdienst Berlin, Kienitzer Str. 6, 12053 Berlin';
+            navigator.clipboard.writeText(addr).then(() => {
+                window.showToast('📍 Adresse (Kienitzer Str. 6, 12053 Berlin) kopiert!', 'success');
+            }).catch(() => {
+                window.showToast('📍 Kienitzer Str. 6, 12053 Berlin', 'success');
+            });
+        };
+
+        // =========================================================================
+        // DYNAMISCHE KALENDERWOCHEN (KW) BEIM MONATS- & WOCHENWECHSEL
         // =========================================================================
         window.getISOWeekNumber = function(d) {
             const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -3486,12 +3701,10 @@
             const lastDay = new Date(yr, mo + 1, 0);
             const daysInMonth = lastDay.getDate();
 
-            // Berechnet live die exakte Kalenderwochen-Spanne des gewählten Monats!
             const startKw = window.getISOWeekNumber(firstDay);
             const endKw = window.getISOWeekNumber(lastDay);
             const kwSpanText = startKw === endKw ? `KW ${startKw}` : `KW ${startKw} – KW ${endKw}`;
 
-            // Aktualisiert auch den Header-Chip passend zum gewählten Monat
             const headerChip = document.getElementById('headerCalendarKwText');
             if (headerChip) {
                 const mShort = firstDay.toLocaleDateString('de-DE', { month: 'short' });
@@ -3501,7 +3714,7 @@
             }
 
             let startWeekday = firstDay.getDay() - 1;
-            if (startWeekday < 0) startWeekday = 6; // Montag = 0, Sonntag = 6
+            if (startWeekday < 0) startWeekday = 6;
 
             const monthTitle = firstDay.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
 
@@ -3529,7 +3742,6 @@
             `;
 
             let currentCell = 0;
-            // Erste Zeile: KW-Badge für den 1. des Monats
             gridHtml += `<div class="mini-cal-kw-badge">KW ${window.getISOWeekNumber(firstDay)}</div>`;
 
             for (let i = 0; i < startWeekday; i++) {
@@ -3591,7 +3803,7 @@
         };
 
         // =========================================================================
-        // 0.5 PROGRESSIVE WEB APP (PWA) INSTALLATIONS-ENGINE (iOS & ANDROID/SAMSUNG)
+        // PROGRESSIVE WEB APP (PWA) INSTALLATIONS-ENGINE (iOS & ANDROID/SAMSUNG)
         // =========================================================================
         window.deferredPwaPrompt = null;
 
@@ -3667,7 +3879,7 @@
         };
 
         // =========================================================================
-        // 0.8 LIVE eVB-, IBAN- & FIN-PRÜFER (100% LOKAL IM BROWSER)
+        // LIVE eVB-, IBAN- & FIN-PRÜFER (100% LOKAL IM BROWSER)
         // =========================================================================
         window.validateCustomerDocsLive = function() {
             const evbEl = document.getElementById('chkEvbInput');
@@ -3754,7 +3966,7 @@
         };
 
         // =========================================================================
-        // ÜBERRASCHUNG 1: LABO-GEBÜHREN & BERLINER UMWELTPLAKETTEN-RECHNER
+        // LABO-GEBÜHREN & BERLINER UMWELTPLAKETTEN-RECHNER
         // =========================================================================
         window.calculateLaboAndEnvGuide = function() {
             const feeCase = document.getElementById('laboFeeCaseSelect')?.value || 'ummeldung_berlin';
@@ -3791,7 +4003,7 @@
         };
 
         // =========================================================================
-        // ÜBERRASCHUNG 2: 60-SEKUNDEN RÜCKRUF-SERVICE MODAL
+        // 60-SEKUNDEN RÜCKRUF-SERVICE MODAL
         // =========================================================================
         window.openCallbackModal = function() {
             document.getElementById('callbackRequestOverlay').classList.add('open');
@@ -3847,7 +4059,7 @@
         };
 
         // =========================================================================
-        // ÜBERRASCHUNG 3: 1-KLICK BERLINER WUNSCHKENNZEICHEN-IDEEN-GENERATOR
+        // 1-KLICK BERLINER WUNSCHKENNZEICHEN-IDEEN-GENERATOR
         // =========================================================================
         window.generatePlateIdea = function(mode) {
             const lettersEl = document.getElementById('wkLetters');
@@ -3892,7 +4104,7 @@
         };
 
         // =========================================================================
-        // ÜBERRASCHUNG 4: TAGES-AGENDA DRUCKEN & WEB-AUDIO SIGNALTON FÜR ADMIN
+        // TAGES-AGENDA DRUCKEN & WEB-AUDIO SIGNALTON FÜR ADMIN
         // =========================================================================
         window.adminSoundEnabled = localStorage.getItem('red_admin_sound') !== 'false';
 
@@ -3919,8 +4131,8 @@
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.14); // A5
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.14);
                 gain.gain.setValueAtTime(0.15, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
                 osc.connect(gain);
@@ -4006,7 +4218,7 @@
         };
 
         // =========================================================================
-        // 1. AUTOMATISCHER JAHRESWECHSEL (2026 -> 2027+ AUTOPILOT & 3D-ANIMATION)
+        // AUTOMATISCHER JAHRESWECHSEL (2026 -> 2027+ AUTOPILOT & 3D-ANIMATION)
         // =========================================================================
         window.getDynamicSystemYear = function() {
             return new Date().getFullYear();
@@ -4056,7 +4268,6 @@
             }
         };
 
-        // --- HINTERGRUND KENNZEICHEN ANIMATION ---
         window.initFloatingPlates = function() {
             const container = document.getElementById('plate-container');
             if(!container) return;
@@ -4075,7 +4286,7 @@
         };
 
         // =========================================================================
-        // 2. LIVE BÜRO- & ANNAHME-AMPEL IM HEADER & LABO-COUNTDOWN
+        // LIVE BÜRO-AMPEL, LABO-COUNTDOWN, KOMPASS, BEZIRKE & FORMULAR-DRUCK
         // =========================================================================
         window.updateOfficeStatusBadge = function() {
             const led = document.getElementById('officeStatusLed');
@@ -4123,9 +4334,6 @@
         };
         setInterval(window.updateDispatchCountdown, 30000);
 
-        // =========================================================================
-        // 4. INTERAKTIVER ZULASSUNGS-KOMPASS, KENNZEICHEN-BERATER & 12 BEZIRKE
-        // =========================================================================
         const compassData = {
             "privat": {
                 title: "Privatperson: An-, Um- oder Neuanmeldung",
@@ -4233,7 +4441,6 @@
             window.showToast('Fall in das Buchungsformular übernommen!', 'success');
         };
 
-        // --- SCHNELLBERATER KENNZEICHEN-ARTEN & SCHILDERMASSE ---
         const plateGuideDetails = {
             "euro": "<strong>🇪🇺 Euro-Standardkennzeichen (520 × 110 mm):</strong> Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.",
             "kurz": "<strong>📏 Kurzes Berliner Kennzeichen (460 mm oder 420 mm × 110 mm):</strong> Besonders beliebt für sportliche Optik bei kurzen Zeichenkombinationen (z.B. B - TY 1). Wir haben alle kurzen Rohlinge direkt vorrätig!",
@@ -4255,7 +4462,6 @@
             }
         };
 
-        // --- ALLE 12 BERLINER BEZIRKE ---
         const districtDetails = {
             "neukoelln": "Direkt vor Ort in Neukölln / Britz (Kienitzer Str. 6, 12053 Berlin): Nur 2–8 Minuten Fahrzeit (U8 Boddinstr. / Hermannplatz / Stadtautobahn A100 Ausfahrt Britzer Damm). Sofort-Annahme ohne Wartezeit!",
             "kreuzberg": "Ab Kreuzberg / Mitte: Nur ca. 8–12 Minuten über Hermannplatz, Kottbusser Damm oder Urbanstraße direkt zu unserer Annahmestelle in der Kienitzer Str. 6.",
@@ -4281,9 +4487,6 @@
             }
         };
 
-        // =========================================================================
-        // 5. LIVE WUNSCHKENNZEICHEN STUDIO & TERMIN-ZUSAMMENFASSUNG
-        // =========================================================================
         window.updateLivePlatePreview = function() {
             const lettersInput = document.getElementById('wkLetters');
             const numbersInput = document.getElementById('wkNumbers');
@@ -4378,9 +4581,6 @@
             window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
         };
 
-        // =========================================================================
-        // 7. VOLLSTÄNDIGER VOLLMACHT-, SEPA- & KAUFVERTRAG-GENERATOR (INKL. BLANKO)
-        // =========================================================================
         let sigCanvas = null, sigCtx = null, isDrawingSig = false, hasDrawnSig = false;
 
         window.initSignaturePad = function() {
@@ -4648,7 +4848,7 @@
         };
     </script>
     
-<!-- TEIL 4.2: KALKULATOR, CRM, KALENDER & FREI BEWEGLICHE PINNWAND-ENGINE (MAUS & TOUCH) -->
+<!-- TEIL 5 VON 6 (VOLLSTÄNDIGE ARGON-ENGINE): THEMES, KALKULATOR, CRM, PAGE-BUILDER, KALENDER & PINNWAND -->
     <script>
         // =========================================================================
         // 8. WHATSAPP FOTO-VORABCHECK, VIRAL SHARE, TRACKER & KALKULATOR
@@ -4788,7 +4988,7 @@
             container.innerHTML = `<iframe src="https://maps.google.com/maps?q=Kienitzer%20Str.%206,%2012053%20Berlin&t=&z=15&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer"></iframe>`;
         };
 
-        // --- SCHNELL-KALKULATOR ---
+        // --- SCHNELL-KALKULATOR (STANDARDMÄSSIG MIT STRICH "-" & MIT STIFT BEARBEITBAR) ---
         const defaultCalcItems = [
             { id: "c-1", name: "Zulassungsservice Basis (An-/Ummeldung)", price: "-", selected: true },
             { id: "c-2", name: "Wunschkennzeichen & Reservierung", price: "-", selected: false },
@@ -5031,7 +5231,7 @@
         };
 
         // =========================================================================
-        // 9. HELLMODUS ALS STANDARD & KUNDEN-UMSCHALTER IM HEADER
+        // 9. ARGON DESIGN-SYSTEM: HELL-/DUNKELMODUS & KUNDEN-UMSCHALTER IM HEADER
         // =========================================================================
         window.updateCustomerThemeIcon = function(themeName) {
             const icon = document.getElementById('customerThemeIcon');
@@ -5051,7 +5251,7 @@
             const nextTheme = current.startsWith('light') ? 'dark' : 'light';
             sessionStorage.setItem('red_customer_manual_theme', nextTheme);
             window.changeTheme(nextTheme, false);
-            window.showToast(nextTheme === 'light' ? '☀️ Hellmodus aktiviert' : '🌙 Dunkelmodus aktiviert', 'success');
+            window.showToast(nextTheme === 'light' ? '☀️ Hellmodus aktiviert' : '🌙 Argon Dunkelmodus aktiviert', 'success');
         };
 
         window.changeTheme = async function(themeName, saveToFirebase = false) {
@@ -6251,7 +6451,7 @@
         };
 
         // =========================================================================
-        // KORREKTUR 4: UNIVERSELLE DRAG-&-DROP ENGINE FÜR PINNWAND-KENNZEICHEN (MAUS + TOUCH)
+        // UNIVERSELLE DRAG-&-DROP ENGINE FÜR PINNWAND-KENNZEICHEN (MAUS + TOUCH)
         // =========================================================================
         window.makeDraggable = function(elmnt, id) {
             let startX = 0, startY = 0, initialLeft = 0, initialTop = 0, isDragging = false;
@@ -6336,7 +6536,7 @@
         };
     </script>
     
-<!-- TEIL 5: FIREBASE ECHTZEIT-DATENBANK, PINNWAND-SYNCHRONISATION, FORMULARE & GALERIE -->
+<!-- TEIL 6 VON 6: FIREBASE ECHTZEIT-DATENBANK, GELB-GOLDENE PIN-MARKIERUNG, FORMULARE & DATEI-ABSCHLUSS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -6502,7 +6702,7 @@
                 }
                 let localPerms = JSON.parse(localStorage.getItem('red_admin_perms'));
                 if(localPerms) window.applyAdminModulePermissions(localPerms);
-                setTimeout(window.syncHeaderHeight, 100);
+                setTimeout(window.syncHeaderHeight, 80);
             });
         }
 
@@ -6532,7 +6732,7 @@
                 let localPerms = JSON.parse(localStorage.getItem('red_admin_perms'));
                 if(localPerms) window.applyAdminModulePermissions(localPerms);
 
-                setTimeout(window.syncHeaderHeight, 80);
+                setTimeout(window.syncHeaderHeight, 60);
                 window.showToast('Erfolgreich angemeldet.', 'success');
             } else {
                 window.showToast('Zugriff verweigert! Falscher Name oder Passwort.', 'error');
@@ -6555,7 +6755,7 @@
             document.getElementById('authBox').style.display = 'block';
             
             window.cancelLogout();
-            setTimeout(window.syncHeaderHeight, 80);
+            setTimeout(window.syncHeaderHeight, 60);
             window.showToast('Erfolgreich abgemeldet.', 'success');
         };
 
@@ -7169,7 +7369,7 @@
         });
 
         // =========================================================================
-        // 8-VIERECKE LIVE-LEADS MONITORING & FREI VERSCHIEBBARE PINNWAND-KENNZEICHEN
+        // 8-VIERECKE LIVE-LEADS MONITORING & GELB-GOLDENE PIN-MARKIERUNG
         // =========================================================================
         let isFirstLoadApts = true; 
         window.activeBadgeNum = 0;
@@ -7319,6 +7519,7 @@
                 const displayTime = apt.timeLabel === "Ganztägig" ? "Ganztägig" : (apt.timeLabel && apt.timeLabel.includes("Uhr") ? apt.timeLabel : (apt.timeLabel || '') + " Uhr");
                 const categoryTag = apt.category ? `<span style="font-size:9px; background:var(--bg-input); border:1px solid var(--glass-border); padding:2px 7px; border-radius:4px; color:var(--text-muted); font-weight:700;">${apt.category}</span>` : '';
                 const customNoteBanner = apt.customNote ? `<div style="font-size:11px; color:var(--primary-red); background:rgba(230,0,0,0.06); padding:6px 10px; border-radius:8px; font-weight:700;"><i class="fa-solid fa-tag"></i> ${apt.customNote}</div>` : '';
+                const pinnedBadgeIndicator = apt.marked ? `<span style="font-size:9px; background:#f5c542; color:#000; padding:2px 7px; border-radius:4px; font-weight:900;"><i class="fa-solid fa-thumbtack"></i> GEPINNT</span>` : '';
 
                 let waConfirmBtn = '';
                 if(apt.phone) {
@@ -7332,11 +7533,12 @@
                         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                             <div class="prio-badge">${badgeText}</div>
                             ${categoryTag}
+                            ${pinnedBadgeIndicator}
                         </div>
                         <div class="apt-actions-horizontal">
                             ${waConfirmBtn}
                             <button class="apt-btn" style="color:var(--green-accent); border-color:var(--green-border);" onclick="window.setAptOrderStatus('${id}', ${isDone ? 1 : 4})" title="${isDone ? 'Wieder öffnen' : 'Sofort als Abgeschlossen markieren'}"><i class="fa-solid fa-check"></i></button>
-                            <button class="apt-btn mark" onclick="window.markApt('${id}', ${!apt.marked})" title="Auf Bildschirm anheften / abheften"><i class="fa-solid fa-thumbtack"></i></button>
+                            <button class="apt-btn mark ${apt.marked ? 'is-pinned' : ''}" onclick="window.markApt('${id}', ${!apt.marked})" title="${apt.marked ? 'Gepinnt (Gelb markiert) – Klicken zum Abheften' : 'Auf Bildschirm anheften'}"><i class="fa-solid fa-thumbtack"></i></button>
                             <button class="apt-btn edit" onclick="window.editAptNotes('${id}')" title="Notiz hinzufügen"><i class="fa-solid fa-pen"></i></button>
                             <button class="apt-btn edit" style="border-color:#007aff; color:#007aff;" onclick="window.openEditAptModal('${id}')" title="Termin verschieben"><i class="fa-solid fa-calendar-day"></i></button>
                             <button class="apt-btn delete" onclick="window.deleteApt('${id}')" title="Termin löschen"><i class="fa-solid fa-trash-can"></i></button>
@@ -7367,7 +7569,7 @@
                 `;
                 list.appendChild(card);
 
-                // FREI BEWEGLICHES PINNWAND-KENNZEICHEN RENDERN (INKL. DIREKTEM ABHEFT-"×")
+                // FREI BEWEGLICHES PINNWAND-KENNZEICHEN MIT GELB-GOLDENEM PIN-SYMBOL & ABHEFT-"×"
                 if (apt.marked && pinContainer) {
                     const plate = document.createElement('div');
                     let plateStateClass = 'normal-day';
@@ -7382,6 +7584,7 @@
                     
                     const tuev = `<div class="tuev-plakette" style="margin: 0 4px;">${shortYear}</div>`;
                     plate.innerHTML = `
+                        <i class="fa-solid fa-thumbtack pin-gold-dot"></i>
                         <span style="font-size:12.5px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.name}</span>
                         ${tuev}
                         <span style="font-size:9.5px; font-weight:bold; pointer-events:none; white-space:nowrap; line-height:1.15;">${apt.date}<br>${displayTime}</span>
@@ -7394,7 +7597,7 @@
                     } else {
                         const existingPinsCount = pinContainer.querySelectorAll('.pinned-plate').length;
                         const defaultTop = Math.max(90, window.innerHeight - 85 - (existingPinsCount * 54));
-                        const defaultLeft = Math.max(12, window.innerWidth - 255);
+                        const defaultLeft = Math.max(12, window.innerWidth - 260);
                         plate.style.top = defaultTop + 'px';
                         plate.style.left = defaultLeft + 'px';
                     }
@@ -7456,14 +7659,14 @@
         window.markApt = async function(id, newState) {
             try { 
                 await updateDoc(doc(db, "appointments", id), { marked: newState }); 
-                window.showToast(newState ? '📌 Kennzeichen angeheftet (frei verschiebbar)!' : 'Kennzeichen von Pinnwand gelöst.', 'success');
+                window.showToast(newState ? '📌 Kennzeichen gelb markiert & angeheftet (frei verschiebbar)!' : 'Kennzeichen von Pinnwand gelöst.', 'success');
             } catch(e) { 
                 const index = localAppointments.findIndex(a => a.id === id);
                 if(index > -1) {
                     localAppointments[index].marked = newState;
                     localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
                     renderAppointments(localAppointments);
-                    window.showToast(newState ? '📌 Lokal angeheftet!' : 'Abgeheftet.', 'success');
+                    window.showToast(newState ? '📌 Lokal gelb markiert & angeheftet!' : 'Abgeheftet.', 'success');
                 }
             }
         };
@@ -8270,7 +8473,7 @@
                 } catch (err) {
                     let localApts = JSON.parse(localStorage.getItem('red_local_apts')) || [];
                     localApts = localApts.filter(a => a.id !== id);
-                    localStorage.setItem('red_local_apts', JSON.stringify(localApts));
+                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
                     
                     if (typeof renderAppointments === "function") {
                         renderAppointments(localApts);
