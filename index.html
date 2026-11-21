@@ -269,35 +269,108 @@
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 12px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-40px) rotate(-8deg); } 100% { transform: translateY(-20vh) translateX(40px) rotate(8deg); } }
 
-        /* EINGANGSANIMATION (PRELOADER) AUF HANDY GARANTIERT 2-ZEILIG */
-        #intro-preloader { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; padding: 0 12px; animation: hidePreloader 0.5s ease 2.65s forwards; }
-        @keyframes hidePreloader { 100% { opacity: 0; visibility: hidden; z-index: -100; pointer-events: none; } }
-        .intro-track { width: min(260px, 76vw); height: 4px; background: rgba(128,128,128,0.22); position: relative; margin-top: 32px; border-radius: 2px; }
-        .intro-car { position: absolute; top: -20px; left: -40px; color: var(--primary-red); font-size: 22px; filter: drop-shadow(0 0 10px var(--primary-red)); animation: driveCar 1.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s forwards; }
-        @keyframes driveCar { 100% { transform: translateX(min(330px, 85vw)); } }
-        .intro-plate { background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: bold; padding: 7px 18px; border-radius: 6px; border: 3px solid #000; font-size: clamp(18px, 5vw, 24px); box-shadow: 0 0 30px rgba(230,0,0,0.3); transform: scale(0.8); opacity: 0; display: flex; align-items: center; gap: 8px; animation: popPlate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards; perspective: 400px; white-space: nowrap; }
-        .intro-plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 13px; border-radius: 3px; }
-        @keyframes popPlate { 100% { transform: scale(1); opacity: 1; } }
-        .year-flip-badge { display: inline-block; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.4s; transform-style: preserve-3d; }
-        .year-flip-badge.flipping { animation: yearFlip3D 0.7s ease forwards; color: var(--primary-red); }
-        @keyframes yearFlip3D { 0% { transform: rotateX(0deg); } 50% { transform: rotateX(90deg) scale(1.15); } 100% { transform: rotateX(0deg); } }
-        .intro-text {
-            margin-top: 24px;
-            font-size: clamp(11px, 3.25vw, 19px);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: clamp(0.5px, 0.3vw, 1.8px);
-            text-align: center;
-            width: 100%;
-            max-width: 96vw;
-            line-height: 1.5;
-            white-space: nowrap;
-            opacity: 0;
-            transform: translateY(16px);
-            animation: fadeText 0.5s ease 0.75s forwards;
-            color: var(--text-light);
+        /* PROFESSIONELLE SHOWROOM-EINGANGSANIMATION (HANDY GARANTIERT 2-ZEILIG) */
+        #intro-preloader {
+            position: fixed; inset: 0; z-index: 99999;
+            background: radial-gradient(circle at 50% 42%, #1a0608 0%, #09090d 55%, #040406 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            overflow: hidden; padding: 0 14px;
+            animation: hidePreloaderPro 0.55s cubic-bezier(0.77, 0, 0.175, 1) 2.65s forwards;
         }
-        @keyframes fadeText { 100% { transform: translateY(0); opacity: 1; } }
+        #intro-preloader::before {
+            content: ''; position: absolute; width: 420px; height: 420px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(230, 0, 0, 0.22) 0%, transparent 68%);
+            filter: blur(28px); pointer-events: none;
+            animation: introGlowBreath 2.4s ease-in-out infinite alternate;
+        }
+        @keyframes introGlowBreath { from { transform: scale(0.9); opacity: 0.65; } to { transform: scale(1.15); opacity: 1; } }
+        @keyframes hidePreloaderPro {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.03); visibility: hidden; z-index: -100; pointer-events: none; }
+        }
+
+        .intro-plate {
+            position: relative; overflow: hidden;
+            background: linear-gradient(180deg, #ffffff 0%, #f1f2f6 100%);
+            color: #0b0b0e; font-family: 'Oswald', 'Courier New', monospace; font-weight: 800;
+            padding: 0 18px 0 0; height: clamp(46px, 11vw, 58px);
+            border-radius: 8px; border: 3px solid #141418;
+            font-size: clamp(20px, 5.4vw, 28px); letter-spacing: 2px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65), 0 0 32px rgba(230, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.9);
+            transform: scale(0.86) translateY(14px); opacity: 0;
+            display: inline-flex; align-items: center; gap: 10px;
+            perspective: 400px; white-space: nowrap;
+            animation: popPlatePro 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+        }
+        .intro-plate::after {
+            content: ''; position: absolute; top: -20%; left: -70%; width: 45%; height: 140%;
+            background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.85) 50%, transparent 80%);
+            transform: skewX(-20deg);
+            animation: plateSheen 1.1s ease-in-out 0.65s forwards;
+        }
+        @keyframes plateSheen { 100% { left: 140%; } }
+        @keyframes popPlatePro { 100% { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .intro-euro-strip {
+            background: linear-gradient(180deg, #003399 0%, #00236e 100%);
+            color: #fff; height: 100%; width: clamp(26px, 6.5vw, 34px);
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            padding: 5px 2px; font-family: Arial, sans-serif;
+        }
+        .intro-euro-stars { font-size: 6px; color: #ffcc00; line-height: 1.1; letter-spacing: 0; }
+        .intro-euro-d { font-size: clamp(12px, 3vw, 15px); font-weight: 900; line-height: 1; }
+        .intro-seal-dot {
+            width: 11px; height: 11px; border-radius: 50%;
+            background: radial-gradient(circle, #ff2a2a 35%, #8f0000 100%);
+            border: 1px solid #111; display: inline-block; margin: 0 -2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+        }
+
+        .year-flip-badge { display: inline-block; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.4s; transform-style: preserve-3d; }
+        .year-flip-badge.flipping { animation: yearFlip3D 0.7s ease forwards; color: #e60000; }
+        @keyframes yearFlip3D { 0% { transform: rotateX(0deg); } 50% { transform: rotateX(90deg) scale(1.15); } 100% { transform: rotateX(0deg); } }
+
+        .intro-track {
+            width: min(300px, 80vw); height: 3px;
+            background: rgba(255, 255, 255, 0.14);
+            position: relative; margin-top: 38px; border-radius: 100px; overflow: visible;
+        }
+        .intro-track-fill {
+            position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+            background: linear-gradient(90deg, rgba(230,0,0,0.15), #ff1a1a 80%, #ffffff 100%);
+            border-radius: 100px; box-shadow: 0 0 14px rgba(255, 26, 26, 0.85);
+            animation: trackFillPro 1.45s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+        }
+        @keyframes trackFillPro { 100% { width: 100%; } }
+
+        .intro-car {
+            position: absolute; top: -24px; left: -12px; width: 58px; height: auto;
+            color: #ffffff; filter: drop-shadow(0 0 12px rgba(255, 26, 26, 0.9));
+            animation: driveCarPro 1.45s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+        }
+        @keyframes driveCarPro {
+            0% { left: -10%; opacity: 0; transform: scale(0.92); }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { left: calc(100% - 46px); opacity: 1; transform: scale(1); }
+        }
+
+        .intro-text {
+            margin-top: 26px;
+            font-size: clamp(11px, 3.25vw, 19px); font-weight: 800;
+            text-transform: uppercase; letter-spacing: clamp(0.6px, 0.35vw, 2.2px);
+            text-align: center; width: 100%; max-width: 96vw; line-height: 1.5;
+            white-space: nowrap; opacity: 0; filter: blur(6px); transform: translateY(14px);
+            animation: fadeTextPro 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
+            color: #ffffff;
+        }
+        .intro-subline {
+            margin-top: 10px; font-size: clamp(8.5px, 2.2vw, 11px); font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase; color: rgba(255, 255, 255, 0.55);
+            opacity: 0; transform: translateY(8px);
+            animation: fadeTextPro 0.55s ease 1.05s forwards;
+        }
+        @keyframes fadeTextPro { 100% { transform: translateY(0); opacity: 1; filter: blur(0); } }
 
         /* Cookies */
         .cookie-overlay { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: var(--glass-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 2px solid var(--primary-red); z-index: 9999999; box-sizing: border-box; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); display: flex; justify-content: center; padding: 25px 20px calc(25px + var(--safe-bottom)); box-shadow: 0 -10px 40px rgba(0,0,0,0.45); }
@@ -1290,16 +1363,31 @@
     <!-- FREIER VOLLBILD-PINNWAND-CONTAINER (DAMIT SICH KENNZEICHEN PER MAUS & FINGER ÜBERALLHIN ZIEHEN LASSEN) -->
     <div id="pinned-container" class="admin-only-block"></div>
 
-    <!-- EINGANGSANIMATION (PRELOADER) AUF HANDY GARANTIERT EXAKT 2-ZEILIG -->
+    <!-- PROFESSIONELLE SHOWROOM-EINGANGSANIMATION (HANDY GARANTIERT EXAKT 2-ZEILIG) -->
     <div id="intro-preloader">
         <div class="intro-plate" id="introPlate">
-            B <span style="color:var(--primary-red);">-</span> RED <span id="introYearBadge" class="year-flip-badge">2026</span>
+            <div class="intro-euro-strip">
+                <span class="intro-euro-stars">★ ★<br>★ ★</span>
+                <span class="intro-euro-d">D</span>
+            </div>
+            <span>B</span>
+            <span class="intro-seal-dot"></span>
+            <span>RED</span>
+            <span id="introYearBadge" class="year-flip-badge">2026</span>
         </div>
-        <div class="intro-track"><i class="fa-solid fa-car-side intro-car" id="introCar"></i></div>
+        <div class="intro-track">
+            <div class="intro-track-fill"></div>
+            <svg class="intro-car" id="introCar" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="#ff1a1a"/>
+                <path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="#ffffff"/>
+                <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="#ffffff"/>
+            </svg>
+        </div>
         <div class="intro-text" id="introText">
             <span style="display:block; white-space:nowrap;">Herzlich Willkommen zu Ihrem</span>
-            <span style="display:block; white-space:nowrap; color:var(--primary-red);">Zulassungsdienst RED Berlin</span>
+            <span style="display:block; white-space:nowrap; color:#ff1a1a;">Zulassungsdienst RED Berlin</span>
         </div>
+        <div class="intro-subline">Schnell • Zuverlässig • Kompetent</div>
     </div>
 
     <!-- DSGVO & TDDDG COOKIE CONSENT -->
@@ -3285,10 +3373,19 @@
                         </div>
                     </div>
 
-                    <!-- WUNSCHKENNZEICHEN ODER ZUSATZHINWEIS DIREKT IM TERMIN -->
-                    <div class="form-group" style="position: relative; z-index: 20;">
-                        <label>Wunschkennzeichen oder kurzer Hinweis (Optional)</label>
-                        <input type="text" id="formCustomNote" class="form-control" placeholder="z.B. Wunschkennzeichen B - TY 2027, 2 Fahrzeuge oder Express-Wunsch..." oninput="window.updateBookingLiveSummary()">
+                    <!-- EIGENES WUNSCHKENNZEICHEN-FELD & ZUSATZHINWEIS -->
+                    <div class="form-row" style="position: relative; z-index: 20;">
+                        <div class="form-group">
+                            <label style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>Wunschkennzeichen (Optional)</span>
+                                <a href="javascript:void(0)" onclick="document.getElementById('wunschkennzeichen-section').scrollIntoView({behavior:'smooth'});" style="color:var(--primary-red); text-decoration:none; font-size:9.5px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Im Studio testen</a>
+                            </label>
+                            <input type="text" id="formWunschkennzeichen" class="form-control" placeholder="z.B. B - TY 2026 (E / H / Saison)" style="text-transform:uppercase; font-weight:800; letter-spacing:0.5px;" oninput="window.updateBookingLiveSummary()">
+                        </div>
+                        <div class="form-group">
+                            <label>Kurzer Zusatzhinweis (Optional)</label>
+                            <input type="text" id="formCustomNote" class="form-control" placeholder="z.B. 2 Fahrzeuge, Express-Wunsch..." oninput="window.updateBookingLiveSummary()">
+                        </div>
                     </div>
                     
                     <!-- SCHRITT 3: DATUM & UHRZEIT -->
@@ -3575,6 +3672,15 @@
     <script>
         document.addEventListener('touchmove', () => {}, { passive: true });
         document.addEventListener('touchstart', () => {}, { passive: true });
+
+        window.escHtml = function(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        };
 
         // =========================================================================
         // 0. DYNAMISCHER ÜBERLAPPUNGS-SCHUTZ (ECHTZEIT HEADER-HÖHENMESSUNG)
@@ -4533,13 +4639,11 @@
             const styleLabel = style === 'carbon' ? ' [3D-Carbon]' : (style === 'short' ? ' [Kurzes Schild]' : '');
             const fullPlate = `B - ${l} ${n}${s ? ' ' + s : ''}${season ? ' (Saison ' + season + ')' : ''}${styleLabel}`;
             
-            const noteInput = document.getElementById('formCustomNote');
-            if(noteInput) noteInput.value = `Wunschkennzeichen: ${fullPlate}`;
-            window.selectedServiceVal = `Zulassung inkl. Wunschkennzeichen (${fullPlate})`;
-            document.getElementById('selectTriggerText').innerText = window.selectedServiceVal;
+            const plateInput = document.getElementById('formWunschkennzeichen');
+            if(plateInput) plateInput.value = fullPlate;
             window.updateBookingLiveSummary();
             document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
-            window.showToast(`Kennzeichen "${fullPlate}" in Termin übernommen!`, 'success');
+            window.showToast(`Wunschkennzeichen "${fullPlate}" in den Termin übernommen!`, 'success');
         };
 
         window.selectedClientCategory = 'Privatkunde';
@@ -4558,8 +4662,9 @@
 
             const cat = window.selectedClientCategory || 'Privatkunde';
             const srv = window.selectedServiceVal || 'Anmeldung';
+            const plateVal = document.getElementById('formWunschkennzeichen')?.value.trim().toUpperCase() || '';
             const note = document.getElementById('formCustomNote')?.value.trim() || '';
-            srvTextEl.innerText = `${cat} • ${srv}${note ? ' (' + note + ')' : ''}`;
+            srvTextEl.innerText = `${cat} • ${srv}${plateVal ? ' • Kennz.: ' + plateVal : ''}${note ? ' (' + note + ')' : ''}`;
 
             const d = document.getElementById('datePicker')?.value || '';
             const t = window.chosenHour ? (window.chosenHour.includes('Uhr') ? window.chosenHour : window.chosenHour + ' Uhr') : '';
@@ -4577,7 +4682,7 @@
             if(!apt) return;
             let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
             if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
-            const msg = encodeURIComponent(`📅 *NEUE TERMIN-RESERVIERUNG (RED BERLIN)*\n\n• *Kunde:* ${apt.name} (${apt.category || 'Privatkunde'})\n• *Datum & Zeit:* ${apt.date} um ${apt.time}\n• *Anliegen:* ${apt.service}\n• *Hinweis/Kennzeichen:* ${apt.customNote || '-'}\n• *Telefon:* ${apt.phone || '-'}`);
+            const msg = encodeURIComponent(`📅 *NEUE TERMIN-RESERVIERUNG (RED BERLIN)*\n\n• *Kunde:* ${apt.name} (${apt.category || 'Privatkunde'})\n• *Datum & Zeit:* ${apt.date} um ${apt.time}\n• *Anliegen:* ${apt.service}\n• *Wunschkennzeichen:* ${apt.wunschkennzeichen || '-'}\n• *Hinweis:* ${apt.customNote || '-'}\n• *Telefon:* ${apt.phone || '-'}`);
             window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
         };
 
@@ -5854,9 +5959,9 @@
                 list.innerHTML += `
                     <tr>
                         <td><span class="crm-badge">${c.clientId}</span></td>
-                        <td style="font-weight:700;">${c.name || 'Unbekannt'}${catBadge}</td>
-                        <td>${c.phone || '-'}</td>
-                        <td>${c.email || '-'}</td>
+                        <td style="font-weight:700;">${window.escHtml(c.name || 'Unbekannt')}${catBadge}</td>
+                        <td>${window.escHtml(c.phone || '-')}</td>
+                        <td>${window.escHtml(c.email || '-')}</td>
                         <td>${regDate}</td>
                         <td style="text-align:center; font-weight:800;">${c.bookings || 1}</td>
                         <td class="crm-action-cell" style="white-space:nowrap;">
@@ -6223,7 +6328,8 @@
                             window.closeWidgetModal();
                             document.querySelectorAll('#vCount').forEach(el => el.innerText = parsedCount.toLocaleString('de-DE'));
                         } catch(e) {
-                            window.showToast("Aktualisierung gespeichert.", "success");
+                            console.error("Firebase Zähler-Fehler:", e);
+                            window.showToast("Fehler beim Speichern: " + (e.message || "Keine Berechtigung"), "error");
                         }
                     } else {
                         document.querySelectorAll('#vCount').forEach(el => el.innerText = parsedCount.toLocaleString('de-DE'));
@@ -6561,7 +6667,7 @@
         window.firebaseDeleteDoc = deleteDoc;
         window.firebaseSetDoc = setDoc;
 
-        window.crmClientsDetail = JSON.parse(localStorage.getItem('red_crm_details') || '{}');
+        window.crmClientsDetail = {};
         
         // Globales Theme-Sync (Standard ist Hellmodus, sofern nicht vom Kunden manuell für die Sitzung umgeschaltet)
         onSnapshot(doc(db, "settings", "global_theme_v3"), (docSnap) => {
@@ -6588,21 +6694,20 @@
             }
         });
 
-        onSnapshot(doc(db, "settings", "crm_details"), (docSnap) => {
-             if(docSnap.exists()) {
-                 window.crmClientsDetail = docSnap.data().details || {};
-                 localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
-                 if(document.getElementById('kpiTotalCrm')) {
-                     document.getElementById('kpiTotalCrm').innerText = Object.keys(window.crmClientsDetail).length;
-                 }
-                 if(document.getElementById('crmOverlay').classList.contains('open')) {
-                     window.renderCRM();
-                 }
-                 if(document.getElementById('crmViewAllOverlay').classList.contains('open')) {
-                     window.renderCRMViewAll();
-                 }
-             }
-        });
+        let crmUnsubscribe = null;
+        window.startAdminCrmListener = function() {
+            if (!window.isAuthorized || crmUnsubscribe) return;
+            crmUnsubscribe = onSnapshot(doc(db, "settings", "crm_details"), (docSnap) => {
+                if (docSnap.exists()) {
+                    window.crmClientsDetail = docSnap.data().details || {};
+                    if (document.getElementById('kpiTotalCrm')) {
+                        document.getElementById('kpiTotalCrm').innerText = Object.keys(window.crmClientsDetail).length;
+                    }
+                    if (document.getElementById('crmOverlay').classList.contains('open')) window.renderCRM();
+                    if (document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
+                }
+            });
+        };
 
         onSnapshot(collection(db, "custom_pages"), (snapshot) => {
             if (!snapshot.empty) {
@@ -6696,6 +6801,7 @@
             document.getElementById('authBox').style.display = 'none';
             document.getElementById('dashboardBox').style.display = 'block';
             
+            window.startAdminCrmListener();
             document.addEventListener('DOMContentLoaded', () => {
                 if(document.getElementById('loggedInUser')) {
                     document.getElementById('loggedInUser').innerText = savedUser;
@@ -6732,6 +6838,7 @@
                 let localPerms = JSON.parse(localStorage.getItem('red_admin_perms'));
                 if(localPerms) window.applyAdminModulePermissions(localPerms);
 
+                window.startAdminCrmListener();
                 setTimeout(window.syncHeaderHeight, 60);
                 window.showToast('Erfolgreich angemeldet.', 'success');
             } else {
@@ -6746,6 +6853,9 @@
             window.loggedInUser = null;
             document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme');
             
+            if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
+            window.crmClientsDetail = {};
+            localStorage.removeItem('red_crm_details');
             localStorage.removeItem('red_admin_saved');
             localStorage.removeItem('red_logged_in_user');
             
@@ -7132,6 +7242,12 @@
             btn.disabled = true;
 
             if(fileInput.files && fileInput.files[0]) {
+                if (fileInput.files[0].size > 700 * 1024) {
+                    window.showToast('Datei ist größer als 700 KB. Bitte vorher komprimieren.', 'error');
+                    btn.innerText = window.editingBlockId ? 'Baustein Aktualisieren' : 'Baustein Erstellen & Veröffentlichen';
+                    btn.disabled = false;
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = function(e) { saveToFirestore(e.target.result); };
                 reader.readAsDataURL(fileInput.files[0]);
@@ -7504,7 +7620,7 @@
                         notesHtml += `
                             <div class="saved-note-row" id="note-${note.id}">
                                 <div style="flex:1;">
-                                    <span class="note-text-body">${note.text}</span>
+                                    <span class="note-text-body">${window.escHtml(note.text)}</span>
                                     <span class="note-meta">${note.timeStr}</span>
                                 </div>
                                 <div class="note-row-actions">
@@ -7518,7 +7634,8 @@
 
                 const displayTime = apt.timeLabel === "Ganztägig" ? "Ganztägig" : (apt.timeLabel && apt.timeLabel.includes("Uhr") ? apt.timeLabel : (apt.timeLabel || '') + " Uhr");
                 const categoryTag = apt.category ? `<span style="font-size:9px; background:var(--bg-input); border:1px solid var(--glass-border); padding:2px 7px; border-radius:4px; color:var(--text-muted); font-weight:700;">${apt.category}</span>` : '';
-                const customNoteBanner = apt.customNote ? `<div style="font-size:11px; color:var(--primary-red); background:rgba(230,0,0,0.06); padding:6px 10px; border-radius:8px; font-weight:700;"><i class="fa-solid fa-tag"></i> ${apt.customNote}</div>` : '';
+                const plateBanner = apt.wunschkennzeichen ? `<div style="font-size:11px; color:#007aff; background:rgba(0,122,255,0.08); padding:6px 10px; border-radius:8px; font-weight:800;"><i class="fa-solid fa-id-card"></i> Wunschkennzeichen: ${window.escHtml(apt.wunschkennzeichen)}</div>` : '';
+                const customNoteBanner = plateBanner + (apt.customNote ? `<div style="font-size:11px; color:var(--primary-red); background:rgba(230,0,0,0.06); padding:6px 10px; border-radius:8px; font-weight:700;"><i class="fa-solid fa-tag"></i> ${window.escHtml(apt.customNote)}</div>` : '');
                 const pinnedBadgeIndicator = apt.marked ? `<span style="font-size:9px; background:#f5c542; color:#000; padding:2px 7px; border-radius:4px; font-weight:900;"><i class="fa-solid fa-thumbtack"></i> GEPINNT</span>` : '';
 
                 let waConfirmBtn = '';
@@ -7551,10 +7668,10 @@
                     ${customNoteBanner}
                     
                     <div class="apt-grid-info">
-                        <div><i class="fa-solid fa-user"></i> ${apt.name}</div>
-                        <div><i class="fa-solid fa-clock"></i> ${apt.date} • ${displayTime}</div>
-                        <div><i class="fa-solid fa-phone"></i> ${apt.phone || '-'}</div>
-                        <div><i class="fa-solid fa-envelope"></i> ${apt.email}</div>
+                        <div><i class="fa-solid fa-user"></i> ${window.escHtml(apt.name)}</div>
+                        <div><i class="fa-solid fa-clock"></i> ${window.escHtml(apt.date)} • ${window.escHtml(displayTime)}</div>
+                        <div><i class="fa-solid fa-phone"></i> ${window.escHtml(apt.phone || '-')}</div>
+                        <div><i class="fa-solid fa-envelope"></i> ${window.escHtml(apt.email)}</div>
                     </div>
 
                     <div class="apt-status-bar">
@@ -7828,40 +7945,11 @@
         };
 
         async function addClientToCRM(name, phone, email, category, customNote) {
-            let existingClientId = null;
-            let maxIdNumber = 0;
-            
-            for (let key in window.crmClientsDetail) {
-                let client = window.crmClientsDetail[key];
-                
-                if (client.clientId && client.clientId.startsWith('RED-')) {
-                    let numStr = client.clientId.replace(/\D/g, ''); 
-                    let numVal = parseInt(numStr, 10);
-                    if (!isNaN(numVal) && numVal > maxIdNumber) {
-                        maxIdNumber = numVal;
-                    }
-                }
-
-                if ((email && client.email === email) || (phone && client.phone === phone) || (name && client.name && client.name.toLowerCase() === name.toLowerCase())) {
-                    existingClientId = key;
-                }
-            }
-
-            if (existingClientId) {
-                window.crmClientsDetail[existingClientId].bookings = (window.crmClientsDetail[existingClientId].bookings || 1) + 1;
-                if (category) window.crmClientsDetail[existingClientId].category = category;
-                if (customNote) {
-                    const prev = window.crmClientsDetail[existingClientId].notes || '';
-                    window.crmClientsDetail[existingClientId].notes = prev ? `${prev} | ${customNote}` : customNote;
-                }
-                window.crmClientsDetail[existingClientId].timestamp = Date.now();
-            } else {
-                maxIdNumber++;
-                let paddedNum = maxIdNumber.toString().padStart(9, '0'); 
-                let formattedNum = paddedNum.replace(/(\d{3})(?=\d)/g, '$1 '); 
-                const newId = 'RED-' + formattedNum;
-
-                window.crmClientsDetail[newId] = {
+            if (!window.isAuthorized) {
+                // Kollisionsfreie ID für öffentliche Buchungen, ohne andere Kundendaten zu laden oder zu überschreiben
+                const uniqueDigits = String(Date.now()).slice(-9);
+                const newId = 'RED-' + uniqueDigits.replace(/(\d{3})(?=\d)/g, '$1 ');
+                const newClient = {
                     clientId: newId,
                     category: category || 'Privatkunde',
                     name: name,
@@ -7874,26 +7962,63 @@
                     bookings: 1,
                     timestamp: Date.now()
                 };
+                try {
+                    await setDoc(doc(db, "settings", "crm_details"), { details: { [newId]: newClient } }, { merge: true });
+                } catch(e) {}
+                return;
+            }
+
+            let existingClientId = null;
+            let maxIdNumber = 0;
+            for (let key in window.crmClientsDetail) {
+                let client = window.crmClientsDetail[key];
+                if (client.clientId && client.clientId.startsWith('RED-')) {
+                    let numVal = parseInt(client.clientId.replace(/\D/g, ''), 10);
+                    if (!isNaN(numVal) && numVal < 1000000 && numVal > maxIdNumber) maxIdNumber = numVal;
+                }
+                if ((email && client.email === email) || (phone && client.phone === phone) || (name && client.name && client.name.toLowerCase() === name.toLowerCase())) {
+                    existingClientId = key;
+                }
+            }
+
+            let targetId = existingClientId;
+            if (existingClientId) {
+                window.crmClientsDetail[existingClientId].bookings = (window.crmClientsDetail[existingClientId].bookings || 1) + 1;
+                if (category) window.crmClientsDetail[existingClientId].category = category;
+                if (customNote) {
+                    const prev = window.crmClientsDetail[existingClientId].notes || '';
+                    window.crmClientsDetail[existingClientId].notes = prev ? `${prev} | ${customNote}` : customNote;
+                }
+                window.crmClientsDetail[existingClientId].timestamp = Date.now();
+            } else {
+                maxIdNumber++;
+                targetId = 'RED-' + maxIdNumber.toString().padStart(9, '0').replace(/(\d{3})(?=\d)/g, '$1 ');
+                window.crmClientsDetail[targetId] = {
+                    clientId: targetId,
+                    category: category || 'Privatkunde',
+                    name: name, phone: phone, email: email,
+                    birthday: '', address: '', city: '',
+                    notes: customNote || '', bookings: 1, timestamp: Date.now()
+                };
             }
 
             try {
-                await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail }, {merge: true});
-            } catch(e) {
-                localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
-            }
+                await setDoc(doc(db, "settings", "crm_details"), { details: { [targetId]: window.crmClientsDetail[targetId] } }, { merge: true });
+            } catch(e) {}
             if(document.getElementById('kpiTotalCrm')) {
                 document.getElementById('kpiTotalCrm').innerText = Object.keys(window.crmClientsDetail).length;
             }
             if(document.getElementById('crmOverlay').classList.contains('open')) window.renderCRM();
         }
 
-        // --- BUCHUNGS-LOGIK MIT KUNDENART & ZUSATZHINWEIS ---
+        // --- BUCHUNGS-LOGIK MIT WUNSCHKENNZEICHEN, KUNDENART & E-MAIL-WEBHOOK ---
         window.executeBooking = async function(event) {
             event.preventDefault();
             const n = document.getElementById('formName').value.trim();
             const p = document.getElementById('formPhone').value.trim();
             const e = document.getElementById('formEmail').value.trim();
             const d = document.getElementById('datePicker').value;
+            const wunschkennzeichen = document.getElementById('formWunschkennzeichen')?.value.trim().toUpperCase() || '';
             const customNote = document.getElementById('formCustomNote')?.value.trim() || '';
             const category = window.selectedClientCategory || 'Privatkunde';
             const btn = document.getElementById('submitBtn');
@@ -7901,18 +8026,33 @@
             btn.innerText = 'Sende...';
             btn.disabled = true;
 
-            await addClientToCRM(n, p, e, category, customNote);
+            const crmNoteCombined = [
+                wunschkennzeichen ? `Wunschkennzeichen: ${wunschkennzeichen}` : '',
+                customNote
+            ].filter(Boolean).join(' | ');
+
+            await addClientToCRM(n, p, e, category, crmNoteCombined);
 
             let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
             if (!timeString.includes("Uhr")) timeString += " Uhr";
 
-            window.lastBookedApt = { name: n, phone: p, email: e, date: d, time: timeString, service: window.selectedServiceVal, category, customNote };
+            window.lastBookedApt = {
+                name: n, phone: p, email: e, date: d, time: timeString,
+                service: window.selectedServiceVal, category, wunschkennzeichen, customNote
+            };
 
-            const initialNotes = customNote ? [{ id: Date.now().toString(), text: `Kunden-Hinweis: ${customNote}`, timeStr: 'Bei Buchung angegeben' }] : [];
+            const initialNotes = [];
+            if (wunschkennzeichen) {
+                initialNotes.push({ id: String(Date.now()), text: `🪪 Wunschkennzeichen: ${wunschkennzeichen}`, timeStr: 'Bei Buchung gewählt' });
+            }
+            if (customNote) {
+                initialNotes.push({ id: String(Date.now() + 1), text: `Kunden-Hinweis: ${customNote}`, timeStr: 'Bei Buchung angegeben' });
+            }
 
             const appointmentData = {
                 name: n, phone: p, email: e, date: d, timeLabel: timeString,
-                service: window.selectedServiceVal, category, customNote,
+                service: window.selectedServiceVal, category,
+                wunschkennzeichen, customNote,
                 marked: false, orderStatus: 1, notes: initialNotes, timestamp: Date.now()
             };
 
@@ -7924,8 +8064,9 @@
                 renderAppointments(localAppointments);
             }
 
+            const ownerEmail = window.dynamicContactData?.email || "Redzulassungsdienst@gmail.com";
             const webhookUrl = window.dynamicContactData?.webhook || "";
-            if(webhookUrl.startsWith('https://script.google.com') || webhookUrl.startsWith('https://')) {
+            if(webhookUrl.startsWith('https://')) {
                 try {
                     await fetch(webhookUrl, {
                         method: 'POST',
@@ -7933,15 +8074,25 @@
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({
                             type: 'new_booking',
-                            clientName: n, clientCategory: category, clientPhone: p, clientEmail: e, 
-                            date: d, time: timeString, service: window.selectedServiceVal, customNote,
-                            adminEmail: window.dynamicContactData?.email || "Redzulassungsdienst@gmail.com"
+                            clientName: n,
+                            clientCategory: category,
+                            clientPhone: p,
+                            clientEmail: e,
+                            date: d,
+                            time: timeString,
+                            service: window.selectedServiceVal,
+                            wunschkennzeichen: wunschkennzeichen || 'Kein Wunschkennzeichen angegeben',
+                            customNote: customNote || '-',
+                            adminEmail: ownerEmail
                         })
                     });
-                } catch(err) {}
+                } catch(err) {
+                    console.error("E-Mail Webhook Fehler:", err);
+                }
             }
-            
-            document.getElementById('confirmModalText').innerText = `Vielen Dank ${n}! Ihr Termin (${category}) am ${d} um ${timeString} für "${window.selectedServiceVal}" wurde verbindlich im System eingetragen.`;
+
+            const plateInfo = wunschkennzeichen ? ` | Wunschkennzeichen: ${wunschkennzeichen}` : '';
+            document.getElementById('confirmModalText').innerText = `Vielen Dank ${n}! Ihr Termin (${category}) am ${d} um ${timeString} für "${window.selectedServiceVal}"${plateInfo} wurde verbindlich im System eingetragen.`;
             document.getElementById('confirmModalOverlay').classList.add('open');
             
             document.getElementById('bookingForm').reset();
@@ -8107,6 +8258,10 @@
             };
 
             if(fileInput && fileInput.files && fileInput.files[0]) {
+                if (fileInput.files[0].size > 700 * 1024) {
+                    window.showToast('Datei ist größer als 700 KB. Bitte vorher komprimieren oder als Link einfügen.', 'error');
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = function(ev) { saveFormRecord(ev.target.result); };
                 reader.readAsDataURL(fileInput.files[0]);
@@ -8172,6 +8327,10 @@
             };
 
             if(fileInput && fileInput.files && fileInput.files[0]) {
+                if (fileInput.files[0].size > 700 * 1024) {
+                    window.showToast('Datei ist größer als 700 KB. Bitte vorher komprimieren oder als Link einfügen.', 'error');
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = function(ev) { persistUpdate(ev.target.result); };
                 reader.readAsDataURL(fileInput.files[0]);
@@ -8188,6 +8347,10 @@
             fileInput.onchange = async e => {
                 if(e.target.files.length > 0) {
                     const file = e.target.files[0];
+                    if (file.size > 700 * 1024) {
+                        window.showToast('Datei ist größer als 700 KB. Bitte vorher komprimieren oder als Link einfügen.', 'error');
+                        return;
+                    }
                     const reader = new FileReader();
                     reader.onload = async function(ev) {
                         const existing = window.allFormsMap[formId] || { id: formId, title: file.name };
@@ -8421,6 +8584,10 @@
             if(!title || !fileInput.files[0]) { window.showToast('Bitte Modellnamen und Datei angeben.', 'error'); return; }
             
             const file = fileInput.files[0];
+            if (file.size > 700 * 1024) {
+                window.showToast('Datei ist größer als 700 KB. Bitte vorher komprimieren.', 'error');
+                return;
+            }
             const reader = new FileReader();
             reader.onload = async function(e) {
                 const mediaUrl = e.target.result; 
@@ -8473,7 +8640,7 @@
                 } catch (err) {
                     let localApts = JSON.parse(localStorage.getItem('red_local_apts')) || [];
                     localApts = localApts.filter(a => a.id !== id);
-                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
+                    localStorage.setItem('red_local_apts', JSON.stringify(localApts));
                     
                     if (typeof renderAppointments === "function") {
                         renderAppointments(localApts);
@@ -8485,4 +8652,4 @@
     </script>
 
 </body>
-</html>    
+</html>
