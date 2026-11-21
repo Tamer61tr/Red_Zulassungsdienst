@@ -1004,6 +1004,39 @@
         .tool-box:hover { border-color: rgba(230, 0, 0, 0.35); }
         .tool-box h3 { font-size: 18px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; color: var(--text-light); }
         .tool-box h3 i { color: var(--primary-red); }
+
+        /* ONLINE-TOOLS TAB-ANSICHT (CORPORATE DESIGN) */
+        .online-tools-hub {
+            background: var(--bg-card); border: 1px solid var(--glass-border);
+            border-top: 3px solid var(--primary-red); border-radius: var(--global-radius);
+            padding: 30px 26px; box-shadow: var(--card-shadow); position: relative;
+        }
+        .tools-tab-bar {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+            background: var(--bg-input); padding: 6px; border-radius: 14px;
+            border: 1px solid var(--glass-border); margin: 18px 0 22px;
+        }
+        .tools-tab-btn {
+            background: transparent; border: 1px solid transparent; color: var(--text-muted);
+            padding: 11px 10px; border-radius: 10px; font-size: 11.5px !important; font-weight: 800;
+            cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center;
+            justify-content: center; gap: 7px; text-align: center; line-height: 1.25;
+        }
+        .tools-tab-btn i { font-size: 13px; color: var(--primary-red); transition: 0.2s; }
+        .tools-tab-btn:hover { color: var(--text-light); background: var(--bg-card); border-color: var(--glass-border); }
+        .tools-tab-btn.active {
+            background: var(--primary-red); color: #ffffff; border-color: var(--primary-red);
+            box-shadow: 0 4px 14px rgba(217, 0, 0, 0.25);
+        }
+        .tools-tab-btn.active i { color: #ffffff; }
+        .tool-tab-pane { display: none; animation: toolTabFade 0.28s ease forwards; }
+        .tool-tab-pane.active { display: block; }
+        @keyframes toolTabFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) {
+            .online-tools-hub { padding: 22px 15px; }
+            .tools-tab-bar { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .tools-tab-btn { padding: 9px 6px; font-size: 10.5px !important; }
+        }
         
         .live-german-plate {
             display: flex; align-items: center; background: #ffffff; color: #000000;
@@ -3004,91 +3037,188 @@
             </div>
         </section>
 
-        <!-- WUNSCHKENNZEICHEN-GENERATOR & SCHNELL-KALKULATOR -->
-        <section id="wunschkennzeichen-section" class="interactive-tools-grid">
-            <div class="tool-box editable-section">
-                <div class="section-edit-btn action-content" onclick="window.openContentEditor('tools')" title="Überschriften bearbeiten"><i class="fa-solid fa-pencil"></i></div>
-                <h3><i class="fa-solid fa-id-card"></i> <span id="txt-wk-title">Berliner Wunschkennzeichen Studio</span></h3>
-                <p id="txt-wk-desc" style="font-size:12px; color:var(--text-muted);">Testen Sie Ihre Wunschkombination live (inkl. E-Auto, Oldtimer, Saison-Zeiträumen & 3D-Optik) und übernehmen Sie diese direkt in Ihren Termin.</p>
-                
-                <div class="live-german-plate" id="liveGermanPlatePreview">
-                    <div class="euro-blue-strip">
-                        <div class="euro-stars">★ ★<br>★ ★</div>
-                        <div class="euro-d">D</div>
-                    </div>
-                    <div class="plate-content-area">
-                        <span>B</span>
-                        <div class="plate-stamps">
-                            <div class="stamp-hu" id="livePlateHuStamp">26</div>
-                            <div class="stamp-berlin" style="background:radial-gradient(circle, #ffffff 35%, #d90000 100%); color:#111; font-size:8px; font-weight:900; font-family:Arial,sans-serif;">B</div>
+<!-- ZENTRALE ONLINE-TOOLS IN 4-TAB-ANSICHT -->
+        <section id="wunschkennzeichen-section" class="compass-wrapper" style="margin-top:35px;">
+            <div class="online-tools-hub editable-section">
+                <div class="section-edit-btn action-content" onclick="window.openContentEditor('tools')" title="Tool-Überschriften bearbeiten"><i class="fa-solid fa-pencil"></i></div>
+                <div style="text-align:center;">
+                    <span style="background:rgba(217,0,0,0.1); color:var(--primary-red); font-weight:800; font-size:10px; padding:5px 14px; border-radius:50px; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-sliders"></i> Digitale Service-Tools</span>
+                    <h2 style="font-size:clamp(20px, 3vw, 28px); font-weight:900; text-transform:uppercase; margin-top:10px; color:var(--text-light);">Online-Tools für Ihre Berliner Zulassung</h2>
+                    <p style="font-size:12px; color:var(--text-muted); max-width:650px; margin:6px auto 0;">Wunschkennzeichen testen, Leistungen kalkulieren, Daten auf Tippfehler prüfen und amtliche LABO-Gebühren berechnen.</p>
+                </div>
+
+                <!-- 4 REITER -->
+                <div class="tools-tab-bar" role="tablist">
+                    <button type="button" class="tools-tab-btn active" data-tool-tab="plate" onclick="window.switchOnlineToolTab('plate', this)">
+                        <i class="fa-solid fa-id-card"></i><span>Wunschkennzeichen</span>
+                    </button>
+                    <button type="button" class="tools-tab-btn" data-tool-tab="calc" onclick="window.switchOnlineToolTab('calc', this)">
+                        <i class="fa-solid fa-calculator"></i><span>Schnell-Kalkulator</span>
+                    </button>
+                    <button type="button" class="tools-tab-btn" data-tool-tab="check" onclick="window.switchOnlineToolTab('check', this)">
+                        <i class="fa-solid fa-shield-check"></i><span>eVB / IBAN / FIN-Prüfer</span>
+                    </button>
+                    <button type="button" class="tools-tab-btn" data-tool-tab="labo" onclick="window.switchOnlineToolTab('labo', this)">
+                        <i class="fa-solid fa-leaf"></i><span>LABO & Umweltplakette</span>
+                    </button>
+                </div>
+
+                <!-- TAB 1: WUNSCHKENNZEICHEN-STUDIO -->
+                <div class="tool-tab-pane active" id="tool-pane-plate">
+                    <div style="max-width:660px; margin:0 auto; text-align:center;">
+                        <h3 style="font-size:17px; font-weight:900; text-transform:uppercase; color:var(--text-light); margin-bottom:6px;"><i class="fa-solid fa-id-card" style="color:var(--primary-red);"></i> <span id="txt-wk-title">Berliner Wunschkennzeichen Studio</span></h3>
+                        <p id="txt-wk-desc" style="font-size:12px; color:var(--text-muted);">Testen Sie Ihre Wunschkombination live (inkl. E-Auto, Oldtimer, Saison-Zeiträumen & 3D-Optik) und übernehmen Sie diese direkt in Ihren Termin.</p>
+                        
+                        <div class="live-german-plate" id="liveGermanPlatePreview">
+                            <div class="euro-blue-strip">
+                                <div class="euro-stars">★ ★<br>★ ★</div>
+                                <div class="euro-d">D</div>
+                            </div>
+                            <div class="plate-content-area">
+                                <span>B</span>
+                                <div class="plate-stamps">
+                                    <div class="stamp-hu" id="livePlateHuStamp">26</div>
+                                    <div class="stamp-berlin" style="background:radial-gradient(circle, #ffffff 35%, #d90000 100%); color:#111; font-size:8px; font-weight:900; font-family:Arial,sans-serif;">B</div>
+                                </div>
+                                <span id="platePreviewLetters">RED</span>
+                                <span id="platePreviewNumbers">2026</span>
+                                <span id="platePreviewSuffix" style="font-size:19px; color:#003399;"></span>
+                                <div class="plate-season-fraction" id="plateSeasonBox">
+                                    <span id="seasonStartTxt">04</span>
+                                    <div class="season-line"></div>
+                                    <span id="seasonEndTxt">10</span>
+                                </div>
+                            </div>
                         </div>
-                        <span id="platePreviewLetters">RED</span>
-                        <span id="platePreviewNumbers">2026</span>
-                        <span id="platePreviewSuffix" style="font-size:19px; color:#003399;"></span>
-                        <div class="plate-season-fraction" id="plateSeasonBox">
-                            <span id="seasonStartTxt">04</span>
-                            <div class="season-line"></div>
-                            <span id="seasonEndTxt">10</span>
+
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;">
+                            <button type="button" class="district-pill" onclick="window.generatePlateIdea('random')" title="Zufällige Kombination"><i class="fa-solid fa-shuffle" style="color:var(--primary-red);"></i> Zufall</button>
+                            <button type="button" class="district-pill" onclick="window.generatePlateIdea('schnaps')" title="Schnapszahl (z.B. 777 / 8888)">Schnapszahl</button>
+                            <button type="button" class="district-pill" onclick="window.generatePlateIdea('short')" title="Kurzes VIP-Kennzeichen">Extra Kurz</button>
+                            <button type="button" class="district-pill" onclick="window.generatePlateIdea('berlin')" title="Berliner Klassiker (B-BE / B-TY)">Berlin-Klassiker</button>
+                            <button type="button" class="district-pill" onclick="window.generatePlateIdea('elektro')" title="E-Auto Kombination"><i class="fa-solid fa-bolt" style="color:var(--green-accent);"></i> E-Kennzeichen</button>
+                        </div>
+
+                        <div class="plate-input-row">
+                            <input type="text" class="form-control plate-input-field" value="B" readonly style="width: 52px; color: var(--primary-red);">
+                            <input type="text" id="wkLetters" class="form-control plate-input-field" maxlength="2" placeholder="AB" value="TY" oninput="window.updateLivePlatePreview()" style="width: 82px;">
+                            <input type="text" id="wkNumbers" class="form-control plate-input-field" maxlength="4" placeholder="1234" value="2026" oninput="window.updateLivePlatePreview()" style="width: 100px;">
+                            <select id="wkType" class="form-control" onchange="window.updateLivePlatePreview()" style="width: 135px; padding: 10px 30px 10px 10px;">
+                                <option value="">Normal</option>
+                                <option value="E">E-Kennzeichen</option>
+                                <option value="H">H-Oldtimer</option>
+                            </select>
+                        </div>
+
+                        <div class="plate-input-row" style="margin-top:8px;">
+                            <select id="wkSeason" class="form-control" onchange="window.updateLivePlatePreview()" style="flex:1; padding: 10px 32px 10px 10px;">
+                                <option value="">Ganzjährig (Ohne Saison)</option>
+                                <option value="03/10">Saison 03 / 10 (März–Okt.)</option>
+                                <option value="04/10">Saison 04 / 10 (April–Okt.)</option>
+                                <option value="05/09">Saison 05 / 09 (Mai–Sept.)</option>
+                                <option value="10/04">Winter 10 / 04 (Okt.–April)</option>
+                            </select>
+                            <select id="wkStyle" class="form-control" onchange="window.updateLivePlatePreview()" style="flex:1; padding: 10px 32px 10px 10px;">
+                                <option value="std">Standard Alu-Prägung (520mm)</option>
+                                <option value="carbon">3D-Carbon Sport-Optik</option>
+                                <option value="short">Kurzes Schild (460/420mm)</option>
+                            </select>
+                        </div>
+
+                        <div style="display:flex; gap:10px; margin-top:16px;">
+                            <button type="button" class="btn-primary" style="flex:1; justify-content:center;" onclick="window.applyPlateToBooking()"><i class="fa-solid fa-check"></i> Wunschkennzeichen in Termin übernehmen</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- 1-KLICK BERLINER WUNSCHKENNZEICHEN-IDEEN-GENERATOR -->
-                <div style="display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;">
-                    <button type="button" class="district-pill" onclick="window.generatePlateIdea('random')" title="Zufällige Kombination"><i class="fa-solid fa-dice" style="color:var(--primary-red);"></i> Zufall</button>
-                    <button type="button" class="district-pill" onclick="window.generatePlateIdea('schnaps')" title="Schnapszahl (z.B. 777 / 8888)">🔥 Schnapszahl</button>
-                    <button type="button" class="district-pill" onclick="window.generatePlateIdea('short')" title="Kurzes VIP-Kennzeichen">📏 Extra Kurz</button>
-                    <button type="button" class="district-pill" onclick="window.generatePlateIdea('berlin')" title="Berliner Klassiker (B-BE / B-TY)">🐻 Berlin-Style</button>
-                    <button type="button" class="district-pill" onclick="window.generatePlateIdea('elektro')" title="E-Auto Kombination">⚡ E-Power</button>
-                </div>
+                <!-- TAB 2: SCHNELL-KALKULATOR & EXTRAS -->
+                <div class="tool-tab-pane" id="tool-pane-calc">
+                    <div style="max-width:720px; margin:0 auto;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px;">
+                            <h3 style="font-size:17px; font-weight:900; text-transform:uppercase; color:var(--text-light); margin:0;"><i class="fa-solid fa-calculator" style="color:var(--primary-red);"></i> <span id="txt-calc-title">Schnell-Kalkulator & Extras</span></h3>
+                            <button type="button" class="mini-admin-btn edit action-prices" onclick="window.addNewCalcItem()" title="Neue Kalkulator-Option hinzufügen" style="width:auto; padding:0 10px; font-weight:800; font-size:10px;"><i class="fa-solid fa-plus" style="margin-right:4px;"></i> Option</button>
+                        </div>
+                        <p id="txt-calc-desc" style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Wählen Sie Ihre gewünschten Leistungen & Zusatzoptionen für Ihren Termin:</p>
+                        
+                        <div id="calcOptionsList"></div>
 
-                <div class="plate-input-row">
-                    <input type="text" class="form-control plate-input-field" value="B" readonly style="width: 52px; color: var(--primary-red);">
-                    <input type="text" id="wkLetters" class="form-control plate-input-field" maxlength="2" placeholder="AB" value="TY" oninput="window.updateLivePlatePreview()" style="width: 80px;">
-                    <input type="text" id="wkNumbers" class="form-control plate-input-field" maxlength="4" placeholder="1234" value="2026" oninput="window.updateLivePlatePreview()" style="width: 98px;">
-                    <select id="wkType" class="form-control" onchange="window.updateLivePlatePreview()" style="width: 120px; padding: 10px 30px 10px 10px;">
-                        <option value="">Normal</option>
-                        <option value="E">⚡ E-Kennz.</option>
-                        <option value="H">🏛️ H-Oldtimer</option>
-                    </select>
-                </div>
-
-                <div class="plate-input-row" style="margin-top:8px;">
-                    <select id="wkSeason" class="form-control" onchange="window.updateLivePlatePreview()" style="flex:1; padding: 10px 32px 10px 10px;">
-                        <option value="">Ganzjährig (Ohne Saison)</option>
-                        <option value="03/10">☀️ Saison 03 / 10 (März–Okt.)</option>
-                        <option value="04/10">☀️ Saison 04 / 10 (April–Okt.)</option>
-                        <option value="05/09">☀️ Saison 05 / 09 (Mai–Sept.)</option>
-                        <option value="10/04">❄️ Winter 10 / 04 (Okt.–April)</option>
-                    </select>
-                    <select id="wkStyle" class="form-control" onchange="window.updateLivePlatePreview()" style="flex:1; padding: 10px 32px 10px 10px;">
-                        <option value="std">Standard Alu-Prägung (520mm)</option>
-                        <option value="carbon">✨ 3D-Carbon Sport-Optik</option>
-                        <option value="short">📏 Kurzes Schild (460/420mm)</option>
-                    </select>
-                </div>
-
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button type="button" class="btn-primary" style="flex:1; justify-content:center;" onclick="window.applyPlateToBooking()"><i class="fa-solid fa-check"></i> In Termin übernehmen</button>
-                </div>
-            </div>
-
-            <!-- SCHNELL-KALKULATOR -->
-            <div class="tool-box editable-section">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-                    <h3><i class="fa-solid fa-calculator"></i> <span id="txt-calc-title">Schnell-Kalkulator & Extras</span></h3>
-                    <button type="button" class="mini-admin-btn edit action-prices" onclick="window.addNewCalcItem()" title="Neue Kalkulator-Option hinzufügen" style="width:auto; padding:0 10px; font-weight:800; font-size:10px;"><i class="fa-solid fa-plus" style="margin-right:4px;"></i> Option</button>
-                </div>
-                <p id="txt-calc-desc" style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Wählen Sie Ihre gewünschten Leistungen & Zusatzoptionen für Ihren Termin:</p>
-                
-                <div id="calcOptionsList"></div>
-
-                <div class="calc-total-bar">
-                    <div>
-                        <span style="font-size:10px; text-transform:uppercase; color:var(--text-muted); display:block; font-weight:700;">Geschätzte Service-Summe*</span>
-                        <strong style="font-size:20px; color:var(--primary-red);" id="calcTotalSum">- €</strong>
+                        <div class="calc-total-bar">
+                            <div>
+                                <span style="font-size:10px; text-transform:uppercase; color:var(--text-muted); display:block; font-weight:700;">Geschätzte Service-Summe*</span>
+                                <strong style="font-size:20px; color:var(--primary-red);" id="calcTotalSum">- €</strong>
+                            </div>
+                            <button type="button" class="btn-primary" style="padding:10px 18px;" onclick="window.applyCalcToBooking()">Auswahl buchen <i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
                     </div>
-                    <button type="button" class="btn-primary" style="padding:10px 18px;" onclick="window.applyCalcToBooking()">Auswahl buchen <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
+                <!-- TAB 3: LIVE eVB-, IBAN- & FIN-PRÜFER -->
+                <div class="tool-tab-pane" id="tool-pane-check">
+                    <div style="max-width:720px; margin:0 auto;">
+                        <h3 style="font-size:17px; font-weight:900; text-transform:uppercase; color:var(--text-light); margin-bottom:6px;"><i class="fa-solid fa-user-check" style="color:var(--green-accent);"></i> Live eVB-, IBAN- & FIN-Prüfer</h3>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">Häufigster Grund für Verzögerungen beim Amt sind Zahlendreher. Prüfen Sie Ihre Daten hier kostenlos vorab (100 % lokal auf Ihrem Gerät):</p>
+                        
+                        <div class="form-row" style="gap:12px;">
+                            <div class="form-group" style="margin-bottom:10px;">
+                                <label>eVB-Versicherungs-Nr. (7 Zeichen)</label>
+                                <input type="text" id="chkEvbInput" class="form-control" maxlength="7" placeholder="z.B. AB12C34" style="padding:11px 14px; text-transform:uppercase; font-weight:700;" oninput="window.validateCustomerDocsLive()">
+                                <small id="chkEvbStatus" style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:4px;">Noch 7 Zeichen eingeben</small>
+                            </div>
+                            <div class="form-group" style="margin-bottom:10px;">
+                                <label>Fahrzeug-Ident-Nr. / FIN (17 Zeichen)</label>
+                                <input type="text" id="chkFinInput" class="form-control" maxlength="17" placeholder="z.B. WVWZZZ..." style="padding:11px 14px; text-transform:uppercase; font-weight:700;" oninput="window.validateCustomerDocsLive()">
+                                <small id="chkFinStatus" style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:4px;">Optional: 17-stellige FIN</small>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label>Deutsche IBAN für Kfz-Steuer SEPA-Mandat (22 Zeichen)</label>
+                            <input type="text" id="chkIbanInput" class="form-control" maxlength="27" placeholder="DE12 3456 7890 1234 5678 90" style="padding:11px 14px; text-transform:uppercase; font-weight:700;" oninput="window.validateCustomerDocsLive()">
+                            <small id="chkIbanStatus" style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:4px;">Format: DE + 20 Ziffern</small>
+                        </div>
+                        <button type="button" class="btn-primary btn-green-adaptive" style="width:100%; justify-content:center; padding:12px 18px;" onclick="window.transferCheckedDocsToVollmacht()">
+                            <i class="fa-solid fa-file-import"></i> Geprüfte Daten direkt in Digitale Vollmacht übernehmen
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB 4: BERLINER UMWELTPLAKETTEN- & LABO-GEBÜHREN-RECHNER -->
+                <div class="tool-tab-pane" id="tool-pane-labo">
+                    <div style="max-width:760px; margin:0 auto;">
+                        <h3 style="font-size:17px; font-weight:900; text-transform:uppercase; color:var(--text-light); margin-bottom:6px;"><i class="fa-solid fa-leaf" style="color:var(--green-accent);"></i> Berliner Umweltplaketten- & LABO-Gebühren-Rechner</h3>
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">Prüfen Sie die amtlichen LABO-Richtwerte und welche Umweltplakette Ihr Fahrzeug für die Berliner Umweltzone erhält:</p>
+
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label>1. Ihr Zulassungsvorgang beim LABO Berlin</label>
+                                <select id="laboFeeCaseSelect" class="form-control" onchange="window.calculateLaboAndEnvGuide()">
+                                    <option value="ummeldung_berlin">Ummeldung / Halterwechsel (innerhalb Berlins)</option>
+                                    <option value="ummeldung_auswaerts">Umschreibung von außerhalb nach Berlin</option>
+                                    <option value="neuzulassung">Neuzulassung (Fabrikneues Fahrzeug)</option>
+                                    <option value="wiederzulassung">Wiederzulassung eines abgemeldeten Kfz</option>
+                                    <option value="kurzzeit">Kurzzeitkennzeichen (5 Tage Überführung)</option>
+                                    <option value="zoll">Zoll- / Ausfuhrkennzeichen (Internationaler Export)</option>
+                                    <option value="abmeldung">Außerbetriebsetzung / Abmeldung</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label>2. Antriebsart / Abgasnorm (Für Berliner Umweltzone)</label>
+                                <select id="envBadgeFuelSelect" class="form-control" onchange="window.calculateLaboAndEnvGuide()">
+                                    <option value="benzin_euro4">Benziner / Hybrid ab Euro 1 / G-Kat (ab Bj. 1993)</option>
+                                    <option value="diesel_euro4">Diesel ab Euro 4 / Euro 5 / Euro 6 (ab Bj. 2006)</option>
+                                    <option value="elektro">Reines Elektrofahrzeug / Brennstoffzelle (E-Kennzeichen)</option>
+                                    <option value="oldtimer">Oldtimer mit H-Kennzeichen (mind. 30 Jahre alt)</option>
+                                    <option value="alt_diesel">Älterer Diesel (Euro 1–3 ohne Partikelfilter)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="laboEnvResultBox" style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+                            <div style="flex:1; min-width:240px; text-align:left;">
+                                <div id="envBadgeResultTitle" style="font-weight:900; font-size:13.5px; color:var(--green-accent);"><i class="fa-solid fa-circle-check"></i> Grüne Feinstaubplakette (Stufe 4) – Freie Fahrt in ganz Berlin!</div>
+                                <div id="laboFeeResultDesc" style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">Amtlicher LABO-Gebühren-Richtwert: <strong>ca. 26,00 € – 31,00 €</strong> (zzgl. Wunschkennzeichen 12,80 € falls gewünscht). Grüne Umweltplakette stellen wir direkt vor Ort aus!</div>
+                            </div>
+                            <button type="button" class="btn-primary" style="padding:10px 18px;" onclick="window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});"><i class="fa-solid fa-calendar-check"></i> Direkt Termin sichern</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -3165,48 +3295,32 @@
             </div>
         </section>
 
-        <!-- INTERAKTIVER BERLINER UMWELTPLAKETTEN- & LABO-BEHÖRDENGEBÜHREN-ASSISTENT -->
-        <section class="compass-wrapper" style="margin-top:25px;">
-            <div class="compass-box" style="padding:26px 22px; border-top-color:var(--green-border);">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-                    <div>
-                        <span style="background:var(--green-bg-soft); color:var(--green-accent); font-weight:800; font-size:10px; padding:4px 12px; border-radius:50px; text-transform:uppercase;"><i class="fa-solid fa-leaf"></i> Berlin Umweltzone & Gebühren-Info</span>
-                        <h3 style="font-size:clamp(17px, 2.5vw, 22px); font-weight:900; text-transform:uppercase; margin-top:6px; color:var(--text-light);">Berliner Umweltplaketten- & LABO-Gebühren-Rechner</h3>
+        <!-- 100% LOKALER eVB-, IBAN- & FIN-SCHNELLPRÜFER -->
+            <div class="tool-box" style="border-top: 2px solid var(--green-border);">
+                <h3><i class="fa-solid fa-user-check" style="color:var(--green-accent);"></i> Live eVB-, IBAN- & FIN-Prüfer</h3>
+                <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Häufigster Grund für Verzögerungen beim Amt sind Zahlendreher. Prüfen Sie Ihre Daten hier kostenlos vorab (100 % lokal auf Ihrem Gerät):</p>
+                
+                <div class="form-row" style="gap:10px;">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>eVB-Versicherungs-Nr. (7 Zeichen)</label>
+                        <input type="text" id="chkEvbInput" class="form-control" maxlength="7" placeholder="z.B. AB12C34" style="padding:10px 12px; text-transform:uppercase; font-weight:700;" oninput="window.validateCustomerDocsLive()">
+                        <small id="chkEvbStatus" style="font-size:10px; color:var(--text-muted); display:block; margin-top:3px;">Noch 7 Zeichen eingeben</small>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>Fahrzeug-Ident-Nr. / FIN (17 Zeichen)</label>
+                        <input type="text" id="chkFinInput" class="form-control" maxlength="17" placeholder="z.B. WVWZZZ..." style="padding:10px 12px; text-transform:uppercase; font-weight:700;" oninput="window.validateCustomerDocsLive()">
+                        <small id="chkFinStatus" style="font-size:10px; color:var(--text-muted); display:block; margin-top:3px;">Optional: 17-stellige FIN</small>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group" style="margin-bottom:10px;">
-                        <label>1. Ihr Zulassungsvorgang beim LABO Berlin</label>
-                        <select id="laboFeeCaseSelect" class="form-control" onchange="window.calculateLaboAndEnvGuide()">
-                            <option value="ummeldung_berlin">Ummeldung / Halterwechsel (innerhalb Berlins)</option>
-                            <option value="ummeldung_auswaerts">Umschreibung von außerhalb nach Berlin</option>
-                            <option value="neuzulassung">Neuzulassung (Fabrikneues Fahrzeug)</option>
-                            <option value="wiederzulassung">Wiederzulassung eines abgemeldeten Kfz</option>
-                            <option value="kurzzeit">Kurzzeitkennzeichen (5 Tage Überführung)</option>
-                            <option value="zoll">Zoll- / Ausfuhrkennzeichen (Internationaler Export)</option>
-                            <option value="abmeldung">Außerbetriebsetzung / Abmeldung</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:10px;">
-                        <label>2. Antriebsart / Abgasnorm (Für Berliner Umweltzone)</label>
-                        <select id="envBadgeFuelSelect" class="form-control" onchange="window.calculateLaboAndEnvGuide()">
-                            <option value="benzin_euro4">Benziner / Hybrid ab Euro 1 / G-Kat (ab Bj. 1993)</option>
-                            <option value="diesel_euro4">Diesel ab Euro 4 / Euro 5 / Euro 6 (ab Bj. 2006)</option>
-                            <option value="elektro">Reines Elektrofahrzeug / Brennstoffzelle (E-Kennzeichen)</option>
-                            <option value="oldtimer">Oldtimer mit H-Kennzeichen (mind. 30 Jahre alt)</option>
-                            <option value="alt_diesel">Älterer Diesel (Euro 1–3 ohne Partikelfilter)</option>
-                        </select>
-                    </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label>Deutsche IBAN für Kfz-Steuer SEPA-Mandat (22 Zeichen)</label>
+                    <input type="text" id="chkIbanInput" class="form-control" maxlength="27" placeholder="DE12 3456 7890 1234 5678 90" style="padding:10px 12px; text-transform:uppercase; font-weight:700;" oninput="window.validateCustomerDocsLive()">
+                    <small id="chkIbanStatus" style="font-size:10px; color:var(--text-muted); display:block; margin-top:3px;">Format: DE + 20 Ziffern</small>
                 </div>
-                <div id="laboEnvResultBox" style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:15px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
-                    <div style="flex:1; min-width:240px; text-align:left;">
-                        <div id="envBadgeResultTitle" style="font-weight:900; font-size:13.5px; color:var(--green-accent);"><i class="fa-solid fa-circle-check"></i> Grüne Feinstaubplakette (Stufe 4) – Freie Fahrt in ganz Berlin!</div>
-                        <div id="laboFeeResultDesc" style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">Amtlicher LABO-Gebühren-Richtwert: <strong>ca. 26,00 € – 31,00 €</strong> (zzgl. Wunschkennzeichen 12,80 € falls gewünscht). Grüne Umweltplakette stellen wir direkt vor Ort aus!</div>
-                    </div>
-                    <button type="button" class="btn-primary" style="padding:10px 18px;" onclick="window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});"><i class="fa-solid fa-calendar-check"></i> Direkt Termin sichern</button>
-                </div>
+                <button type="button" class="btn-primary btn-green-adaptive" style="width:100%; justify-content:center; padding:10px 16px;" onclick="window.transferCheckedDocsToVollmacht()">
+                    <i class="fa-solid fa-file-import"></i> Geprüfte Daten direkt in Digitale Vollmacht übernehmen
+                </button>
             </div>
-        </section>
 
         <!-- LIVE AUFTRAGS-TRACKER & INTERAKTIVER eVB / IBAN / FIN TIPPFEHLER-PRÜFER -->
         <section class="interactive-tools-grid" style="margin-top:25px;">
@@ -3377,7 +3491,7 @@
                         <div class="form-group">
                             <label style="display:flex; justify-content:space-between; align-items:center;">
                                 <span>Wunschkennzeichen (Optional)</span>
-                                <a href="javascript:void(0)" onclick="document.getElementById('wunschkennzeichen-section').scrollIntoView({behavior:'smooth'});" style="color:var(--primary-red); text-decoration:none; font-size:9.5px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Im Studio testen</a>
+                                <a href="javascript:void(0)" onclick="window.switchOnlineToolTab('plate'); document.getElementById('wunschkennzeichen-section').scrollIntoView({behavior:'smooth'});" style="color:var(--primary-red); text-decoration:none; font-size:9.5px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Im Studio testen</a>
                             </label>
                             <input type="text" id="formWunschkennzeichen" class="form-control" placeholder="z.B. B - TY 2026 (E / H / Saison)" style="text-transform:uppercase; font-weight:800; letter-spacing:0.5px;" oninput="window.updateBookingLiveSummary()">
                         </div>
@@ -4614,6 +4728,15 @@
             if(box && districtDetails[districtKey]) {
                 box.innerHTML = `<strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Express-Anbindung (${btnEl.innerText.replace('📍 ','')}):</strong><br><span style="color:var(--text-light);">${districtDetails[districtKey]}</span>`;
             }
+        };
+
+        window.switchOnlineToolTab = function(tabKey, btnEl) {
+            document.querySelectorAll('.tools-tab-btn').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-tool-tab') === tabKey);
+            });
+            document.querySelectorAll('.tool-tab-pane').forEach(p => {
+                p.classList.toggle('active', p.id === 'tool-pane-' + tabKey);
+            });
         };
 
         window.updateLivePlatePreview = function() {
