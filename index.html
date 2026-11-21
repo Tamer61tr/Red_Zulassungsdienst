@@ -264,7 +264,7 @@
         ::-webkit-scrollbar-thumb:hover { background: var(--primary-red); filter: brightness(1.2); }
 
         /* Background Plate */
-        .plate-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+        .plate-bg { display: none !important; }
         .plate { position: absolute; background: #fff; color: #000; font-family: 'Courier New', monospace; font-weight: 900; padding: 5px 14px; border-radius: 6px; border: 2px solid #000; opacity: 0.05; display: flex; align-items: center; gap: 10px; animation: float 24s linear infinite; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .plate::before { content: 'D'; background: #003399; color: white; padding: 2px 5px; font-size: 12px; border-radius: 3px; }
         @keyframes float { 0% { transform: translateY(110vh) translateX(-40px) rotate(-8deg); } 100% { transform: translateY(-20vh) translateX(40px) rotate(8deg); } }
@@ -561,8 +561,7 @@
         #ticker-container:hover .ticker-text-wrapper { animation-play-state: paused; }
         @keyframes tickerAnim { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         .ticker-text { font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 15px; transition: all 0.3s; color: var(--text-light) !important; }
-        .ticker-highlight { animation: blinkText 1.5s infinite; font-weight: 900; text-shadow: 0 0 8px currentColor; }
-        @keyframes blinkText { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0.25; } }
+        .ticker-highlight { font-weight: 900; padding: 1px 7px; border-radius: 4px; background: rgba(217, 0, 0, 0.1); border-bottom: 2px solid currentColor; }
 
         /* Mobile Menu */
         .fullscreen-menu { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--glass-bg); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; box-sizing: border-box; transform: translateZ(0); backface-visibility: hidden; padding: 20px; overflow-y: auto; }
@@ -1097,11 +1096,11 @@
             border: 1.5px solid rgba(255,255,255,0.22); cursor: pointer; opacity: 0.94;
         }
         .fab-btn:hover { opacity: 1; transform: scale(1.1) translateY(-2px); }
-        .fab-wa { background: #25D366; color: #fff; }
+        .fab-wa { background: #1f8a4c; color: #fff; }
         .fab-book { background: var(--primary-red); font-size: 15px; }
-        .fab-cb { background: #ff9500; color: #fff; font-size: 15px; }
-        .fab-share { background: #007aff; font-size: 15px; }
-        .fab-app { background: #1e1e26; border: 1.5px solid var(--primary-red); color: #fff; font-size: 14px; }
+        .fab-cb { background: #1c1c22; color: #fff; font-size: 15px; }
+        .fab-share { background: #1c1c22; color: #fff; font-size: 15px; }
+        .fab-app { background: #1c1c22; border: 1.5px solid var(--primary-red); color: #fff; font-size: 14px; }
 
         /* Im Dunkelmodus leuchten die 5 Symbole kristallklar hervor */
         body[data-theme="dark"] .fab-btn {
@@ -3021,7 +3020,7 @@
                         <span>B</span>
                         <div class="plate-stamps">
                             <div class="stamp-hu" id="livePlateHuStamp">26</div>
-                            <div class="stamp-berlin">🐻</div>
+                            <div class="stamp-berlin" style="background:radial-gradient(circle, #ffffff 35%, #d90000 100%); color:#111; font-size:8px; font-weight:900; font-family:Arial,sans-serif;">B</div>
                         </div>
                         <span id="platePreviewLetters">RED</span>
                         <span id="platePreviewNumbers">2026</span>
@@ -4151,6 +4150,30 @@
                 } catch (e) {}
             }
 
+            const cbWebhookUrl = window.dynamicContactData?.webhook || "";
+            if (cbWebhookUrl.startsWith('https://')) {
+                try {
+                    await fetch(cbWebhookUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            type: 'callback_request',
+                            clientName: name,
+                            clientCategory: '60s Express-Rückruf',
+                            clientPhone: phone,
+                            clientEmail: '',
+                            date: todayDate,
+                            time: timeSlot,
+                            service: `RÜCKRUF-ANFRAGE: ${topic}`,
+                            wunschkennzeichen: '-',
+                            customNote: `Bitte zurückrufen (${timeSlot})`,
+                            adminEmail: window.dynamicContactData?.email || 'Redzulassungsdienst@gmail.com'
+                        })
+                    });
+                } catch (err) {}
+            }
+
             if (viaWhatsApp) {
                 let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
                 if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
@@ -4272,7 +4295,7 @@
                             <td><strong>${a.date}</strong><br>${a.timeLabel || ''}</td>
                             <td><strong>${a.name}</strong><br><small>${a.category || 'Privatkunde'}</small></td>
                             <td>${a.phone || '-'}</td>
-                            <td><strong>${a.service}</strong>${a.customNote ? '<br><small>' + a.customNote + '</small>' : ''}</td>
+                            <td><strong>${window.escHtml(a.service)}</strong>${a.wunschkennzeichen ? '<br><small style="color:#0055cc;font-weight:bold;">Kennz.: ' + window.escHtml(a.wunschkennzeichen) + '</small>' : ''}${a.customNote ? '<br><small>' + window.escHtml(a.customNote) + '</small>' : ''}</td>
                             <td>${stepMap[Number(a.orderStatus) || 1]}</td>
                         </tr>
                     `;
@@ -6003,14 +6026,14 @@
                 list.innerHTML += `
                     <tr>
                         <td><span class="crm-badge">${c.clientId}</span></td>
-                        <td style="font-weight:700;">${c.name || '-'}</td>
-                        <td>${c.category || 'Privatkunde'}</td>
-                        <td>${c.phone || '-'}</td>
-                        <td>${c.email || '-'}</td>
-                        <td>${c.birthday || '-'}</td>
-                        <td>${c.address || '-'}</td>
-                        <td>${c.city || '-'}</td>
-                        <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis;" title="${c.notes || ''}">${c.notes || '-'}</td>
+                        <td style="font-weight:700;">${window.escHtml(c.name || '-')}</td>
+                        <td>${window.escHtml(c.category || 'Privatkunde')}</td>
+                        <td>${window.escHtml(c.phone || '-')}</td>
+                        <td>${window.escHtml(c.email || '-')}</td>
+                        <td>${window.escHtml(c.birthday || '-')}</td>
+                        <td>${window.escHtml(c.address || '-')}</td>
+                        <td>${window.escHtml(c.city || '-')}</td>
+                        <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis;" title="${window.escHtml(c.notes || '')}">${window.escHtml(c.notes || '-')}</td>
                         <td>${regDate}</td>
                         <td style="text-align:center;">${c.bookings || 1}</td>
                     </tr>
@@ -6294,9 +6317,14 @@
                     }
 
                     content.innerHTML = `
-                        <div style="font-size: 30px; font-weight: 900; color: var(--green-accent); margin-bottom: 10px;">${v}</div>
-                        <div style="font-size: 14px; font-weight: 600; color: var(--text-light); margin-bottom: 20px;">Verifizierte Seitenaufrufe</div>
-                        <div class="visitor-heart">❤️</div>
+                        <div style="width:54px; height:54px; margin:0 auto 12px; border-radius:14px; background:var(--green-bg-soft); border:1.5px solid var(--green-border); display:flex; align-items:center; justify-content:center; color:var(--green-accent); font-size:22px;">
+                            <i class="fa-solid fa-shield-check"></i>
+                        </div>
+                        <div style="font-size: 32px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">${v}</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;">Verifizierte Seitenaufrufe</div>
+                        <div style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--green-accent); background:var(--green-bg-soft); padding:4px 12px; border-radius:20px;">
+                            <span style="width:7px; height:7px; border-radius:50%; background:var(--green-accent);"></span> System & Online-Terminbuchung aktiv
+                        </div>
                         ${adminBtnHtml}
                     `;
                 }
@@ -7641,7 +7669,8 @@
                 let waConfirmBtn = '';
                 if(apt.phone) {
                     let cleanPhone = apt.phone.replace(/\D/g, '').replace(/^0/, '49');
-                    let msg = encodeURIComponent(`Hallo ${apt.name}, hier ist Ihr RED Zulassungsdienst Berlin. Wir bestätigen Ihren Termin am ${apt.date} um ${displayTime} (${apt.service}). Bitte bringen Sie alle Originalunterlagen mit. Adresse: Kienitzer Str. 6, 12053 Berlin.`);
+                    const platePart = apt.wunschkennzeichen ? ` | Wunschkennzeichen: ${apt.wunschkennzeichen}` : '';
+                    let msg = encodeURIComponent(`Hallo ${apt.name}, hier ist Ihr RED Zulassungsdienst Berlin. Wir bestätigen Ihren Termin am ${apt.date} um ${displayTime} (${apt.service}${platePart}). Bitte bringen Sie alle Originalunterlagen mit. Adresse: Kienitzer Str. 6, 12053 Berlin.`);
                     waConfirmBtn = `<a href="https://wa.me/${cleanPhone}?text=${msg}" target="_blank" rel="noopener noreferrer" class="apt-btn wa-confirm" title="Termin per WhatsApp bestätigen"><i class="fa-brands fa-whatsapp"></i></a>`;
                 }
 
@@ -7702,7 +7731,7 @@
                     const tuev = `<div class="tuev-plakette" style="margin: 0 4px;">${shortYear}</div>`;
                     plate.innerHTML = `
                         <i class="fa-solid fa-thumbtack pin-gold-dot"></i>
-                        <span style="font-size:12.5px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${apt.name}</span>
+                        <span style="font-size:12.5px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${window.escHtml(apt.name)}</span>
                         ${tuev}
                         <span style="font-size:9.5px; font-weight:bold; pointer-events:none; white-space:nowrap; line-height:1.15;">${apt.date}<br>${displayTime}</span>
                         <button type="button" class="unpin-plate-btn" onclick="event.stopPropagation(); window.markApt('${id}', false)" title="Von Pinnwand lösen">×</button>
