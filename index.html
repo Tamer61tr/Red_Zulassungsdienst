@@ -515,21 +515,67 @@
         #header-wrapper { position: fixed; top: 0; left: 0; right: 0; width: 100%; z-index: 1000; box-sizing: border-box; transform: translate3d(0,0,0); backface-visibility: hidden; padding-top: var(--safe-top); background: var(--glass-bg); }
         nav { width: 100%; box-sizing: border-box; padding: 10px 4%; display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 2px solid var(--primary-red); box-shadow: 0 6px 25px rgba(0,0,0,0.1); flex-wrap: wrap; z-index: 1001; position: relative;}
         
-        .logo-container { display: flex; align-items: center; gap: 7px; cursor: pointer; text-decoration: none; position: relative; max-width: 54%; overflow: visible; transition: 0.25s; }
-        .logo-text { font-size: clamp(11px, 2.7vw, 18px); font-weight: 900; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px; transition: 0.25s; }
-        .logo-text .red-part { color: var(--primary-red); text-shadow: 0 0 15px rgba(230,0,0,0.18); }
-        .logo-text .white-part { color: var(--text-light); }
+        .logo-container { display: inline-flex; flex-direction: row; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; position: relative; max-width: 62%; overflow: visible; transition: 0.25s; }
+        .logo-text { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1px; line-height: 1; white-space: nowrap; transition: 0.25s; }
+        .logo-text .red-part { display: inline-flex; align-items: center; justify-content: center; color: var(--primary-red); font-weight: 900; font-size: clamp(15px, 2.2vw, 21px); letter-spacing: 2px; line-height: 1; filter: drop-shadow(0 1px 6px rgba(217, 0, 0, 0.22)); }
+        body[data-theme="dark"] .logo-text .red-part { filter: drop-shadow(0 0 10px rgba(255, 26, 26, 0.42)); }
+        .logo-red-svg { height: clamp(14px, 1.85vw, 19px); width: auto; display: block; }
+        .logo-text .white-part { display: flex; flex-direction: column; align-items: center; color: var(--text-light); font-weight: 900; text-transform: uppercase; letter-spacing: 0.85px; font-size: clamp(8px, 0.95vw, 10px); line-height: 1.15; margin-top: 2px; }
+        .logo-sub-line2 { font-size: 0.92em; letter-spacing: 1px; }
+        .logo-amp { color: var(--primary-red); font-weight: 900; margin-right: 2px; }
+        body[data-theme="dark"] .logo-text .red-part { text-shadow: 0 0 12px rgba(255, 26, 26, 0.45); }
         
         .speech-bubble { position: absolute; top: 120%; left: 10%; background: var(--primary-red); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 99999; }
         .speech-bubble::before { content: ''; position: absolute; top: -5px; left: 15px; border-width: 0 6px 6px 6px; border-style: solid; border-color: transparent transparent var(--primary-red) transparent; }
         .speech-bubble.show-bubble { opacity: 1; transform: translateY(0); animation: gentleBounce 2s infinite alternate ease-in-out; }
         @keyframes gentleBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-3px); } }
 
-        #headerCarDisplayWrapper { display: inline-flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .logo-car-svg { height: clamp(15px, 3.2vw, 22px); width: auto; flex-shrink: 0; fill: currentColor; transition: 0.3s; }
-        .logo-car-icon { font-size: clamp(15px, 2.8vw, 20px); transition: 0.3s; }
-        .logo-container:hover #headerCarDisplayWrapper { color: var(--primary-red) !important; transform: translateX(4px); filter: drop-shadow(0 0 8px var(--primary-red)); }
-        
+        /* Theme-adaptive Fahrzeuglichter (Hell- & Dunkelmodus + alle 36+ Themes) */
+        :root, body[data-theme^="light"] {
+            --car-front-light: #eb9800;
+            --car-front-glow: rgba(235, 152, 0, 0.55);
+            --car-rear-light: #d90000;
+            --car-rear-glow: rgba(217, 0, 0, 0.52);
+        }
+        body[data-theme="light-yellow"] {
+            --car-front-light: #c87400;
+            --car-front-glow: rgba(200, 116, 0, 0.55);
+        }
+        body:not([data-theme^="light"]) {
+            --car-front-light: #ffd93d;
+            --car-front-glow: rgba(255, 217, 61, 0.92);
+            --car-rear-light: #ff1e1e;
+            --car-rear-glow: rgba(255, 30, 30, 0.92);
+        }
+
+        #headerCarDisplayWrapper { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; transition: 0.3s; }
+        .logo-car-svg { height: clamp(28px, 3.4vw, 40px); width: auto; flex-shrink: 0; display: block; overflow: visible; transition: 0.3s; }
+        .logo-car-icon { font-size: clamp(18px, 2.8vw, 24px); transition: 0.3s; }
+        .logo-container:hover #headerCarDisplayWrapper { transform: translateX(4px); }
+        body:not([data-theme^="light"]) .logo-car-svg { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.14)); }
+
+        .logo-car-headlight {
+            fill: var(--car-front-light);
+            filter: drop-shadow(0 0 4px var(--car-front-glow));
+            animation: carHeadlightBreath 2.6s ease-in-out infinite alternate;
+        }
+        .logo-car-headlight-beam { opacity: 0.85; transition: opacity 0.3s ease; }
+        .logo-container:hover .logo-car-headlight-beam { opacity: 1; }
+        .logo-car-taillight {
+            fill: var(--car-rear-light);
+            filter: drop-shadow(0 0 4px var(--car-rear-glow));
+            animation: carTaillightBreath 2.6s ease-in-out infinite alternate;
+        }
+        .logo-car-taillight-glow { opacity: 0.85; }
+        @keyframes carHeadlightBreath {
+            from { filter: drop-shadow(0 0 3px var(--car-front-glow)); }
+            to { filter: drop-shadow(0 0 7px var(--car-front-glow)); }
+        }
+        @keyframes carTaillightBreath {
+            from { filter: drop-shadow(0 0 3px var(--car-rear-glow)); }
+            to { filter: drop-shadow(0 0 7px var(--car-rear-glow)); }
+        }
+
         .car-anim-idle { animation: gentleIdle 3s infinite ease-in-out; }
         .car-anim-turbo { animation: turboDrive 2.4s infinite ease-in-out; }
         .car-anim-neon { animation: neonCarPulse 1.5s infinite alternate; }
@@ -1375,9 +1421,10 @@
             :root { --dynamic-header-h: 160px; }
             body { font-size: 12px; padding-top: var(--dynamic-header-h, 160px); } 
             nav { flex-wrap: wrap; padding: 7px 2.5%; gap: 3px; align-items: center; }
-            .logo-container { order: 1; max-width: 52%; gap: 4px; flex-shrink: 1; min-width: 0; }
-            .logo-text { font-size: clamp(9.5px, 2.9vw, 13px); white-space: nowrap; line-height: 1.1; }
-            .logo-car-svg { height: clamp(11px, 3.2vw, 16px); }
+            .logo-container { order: 1; max-width: 68%; gap: 7px; flex-shrink: 1; min-width: 0; }
+            .logo-red-svg { height: clamp(11px, 3.2vw, 14px); }
+            .logo-text .white-part { font-size: clamp(6.6px, 1.9vw, 8.2px); letter-spacing: 0.45px; line-height: 1.12; margin-top: 1.5px; }
+            .logo-car-svg { height: clamp(21px, 6vw, 28px); }
             .nav-actions { order: 2; width: auto; margin-left: auto; gap: 3.5px; align-items: center; flex-shrink: 0; }
             .customer-theme-toggle { width: 22px; height: 22px; min-width: 22px; font-size: 9.5px !important; }
             .visitor-counter { font-size: 7.5px; padding: 2px 3px; }
@@ -1389,18 +1436,21 @@
                damit ALLES garantiert in 1 einzige oberste Zeile passt und nichts überlappt! */
             body.is-admin nav .logo-container,
             body.is-supervisor nav .logo-container {
-                max-width: 43%;
-                gap: 3px;
+                max-width: 47%;
+                gap: 4px;
             }
-            body.is-admin nav .logo-text,
-            body.is-supervisor nav .logo-text {
-                font-size: clamp(8px, 2.35vw, 10.5px) !important;
-                letter-spacing: 0px !important;
-                gap: 2px !important;
+            body.is-admin nav .logo-red-svg,
+            body.is-supervisor nav .logo-red-svg {
+                height: clamp(9px, 2.5vw, 11px) !important;
+            }
+            body.is-admin nav .logo-text .white-part,
+            body.is-supervisor nav .logo-text .white-part {
+                font-size: clamp(5.2px, 1.45vw, 6.5px) !important;
+                letter-spacing: 0.2px !important;
             }
             body.is-admin nav .logo-car-svg,
             body.is-supervisor nav .logo-car-svg {
-                height: clamp(9.5px, 2.5vw, 12.5px) !important;
+                height: clamp(16px, 4.4vw, 20px) !important;
             }
             body.is-admin nav .admin-ticker-edit-icon,
             body.is-supervisor nav .admin-ticker-edit-icon {
@@ -1640,7 +1690,7 @@
                 white-space: nowrap;
             }
             .fab-btn i { font-size: 14px; width: 18px; text-align: center; }
-            .fab-wa i { color: #1f8a4c; }
+            .fab-wa i { color: var(--green-accent); }
             .fab-book i { color: var(--primary-red); }
             .fab-cb i { color: var(--text-light); }
             .fab-share i { color: var(--text-light); }
@@ -1914,7 +1964,7 @@
             }
             .fab-btn:hover { transform: translateX(4px) !important; border-color: var(--primary-red) !important; }
             .fab-btn i { font-size: 15px; width: 18px; text-align: center; }
-            .fab-wa i { color: #1f8a4c; }
+            .fab-wa i { color: var(--green-accent); }
             .fab-book i { color: var(--primary-red); }
             .fab-cb i { color: var(--text-light); }
             .fab-share i { color: var(--text-light); }
@@ -2170,10 +2220,40 @@
         </div>
         <div class="intro-track">
             <div class="intro-track-fill"></div>
-            <svg class="intro-car" id="introCar" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="#ff1a1a"/>
-                <path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="#ffffff"/>
-                <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="#ffffff"/>
+<svg class="intro-car" id="introCar" viewBox="-20 0 510 132" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:102px; top:-25px; color:#ffffff; filter:drop-shadow(0 0 8px rgba(255,255,255,0.22));">
+                <defs>
+                    <linearGradient id="introFrontBeam" x1="376" y1="78" x2="490" y2="88" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#ffe14d" stop-opacity="0.88"/>
+                        <stop offset="45%" stop-color="#ffd026" stop-opacity="0.34"/>
+                        <stop offset="100%" stop-color="#ffd026" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="introRearTrail" x1="42" y1="63" x2="-20" y2="63" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#ff1a1a" stop-opacity="0.92"/>
+                        <stop offset="45%" stop-color="#ff1a1a" stop-opacity="0.32"/>
+                        <stop offset="100%" stop-color="#ff1a1a" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <!-- Rotes Rücklicht-Leuchtband (zieht während der Fahrt nach) -->
+                <path d="M40 57 L-20 48 L-20 79 L41 68 Z" fill="url(#introRearTrail)"/>
+                <!-- Gelber Scheinwerfer-Lichtkegel (leuchtet nach vorne aus) -->
+                <path d="M374 75 L490 50 L490 116 L382 86 Z" fill="url(#introFrontBeam)"/>
+                <!-- GT-Coupé Karosserie -->
+                <path d="M40 50 C76 41, 118 21, 168 17 C210 14, 244 26, 276 49 L284 47 C324 48, 362 58, 393 84 C396 87, 396 90, 392 94 C388 99, 386 105, 391 110 C392 112, 390 114, 385 114 C376 114, 366 112, 356 110 C366 109, 376 109, 384 108 C380 103, 382 95, 389 87 C359 64, 321 55, 274 54 C242 32, 208 22, 168 24 C122 27, 82 45, 44 52 Z" fill="currentColor"/>
+                <path d="M108 42 C136 29, 174 25, 206 29 C226 32, 244 41, 260 53 L254 54 C238 43, 222 36, 203 33 C174 30, 140 34, 116 44 C128 50, 144 53, 162 54 C194 55, 226 55, 256 54 L254 57 C222 58, 188 57, 156 56 C135 55, 118 51, 108 42 Z" fill="currentColor"/>
+                <path d="M40 52 C68 47, 102 47, 136 60 C104 52, 70 53, 44 57 Z" fill="currentColor"/>
+                <path d="M40 52 C46 58, 48 67, 48 77 C48 82, 42 84, 36 84 C37 94, 45 103, 55 108 C42 106, 32 95, 31 82 C31 79, 34 77, 38 76 C36 73, 35 68, 38 63 C40 60, 40 56, 38 52 Z" fill="currentColor"/>
+                <path d="M138 103 C186 104, 238 105, 284 108 L284 114 C238 110, 186 106, 138 104 Z" fill="currentColor"/>
+                <path d="M55 104 C55 68, 72 60, 92 60 C114 60, 128 74, 129 102 C125 79, 112 67, 92 67 C73 67, 61 78, 59 104 Z" fill="currentColor"/>
+                <path d="M284 103 C284 72, 300 60, 320 60 C342 60, 355 74, 356 105 C352 79, 340 67, 320 67 C301 67, 290 79, 288 103 Z" fill="currentColor"/>
+                <circle cx="92" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/>
+                <path d="M92 96 C95 89, 98 83, 102 78 C99 84, 97 90, 95 96 Z M92 96 C85 95, 79 96, 73 99 C79 94, 85 93, 92 93 Z M94 97 C100 98, 105 99, 111 98 C105 101, 99 101, 94 99 Z" fill="currentColor"/>
+                <circle cx="320" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/>
+                <path d="M320 96 C323 89, 326 83, 330 78 C327 84, 325 90, 323 96 Z M320 96 C313 95, 307 96, 301 99 C307 94, 313 93, 320 93 Z M322 97 C328 98, 333 99, 339 98 C333 101, 327 101, 322 99 Z" fill="currentColor"/>
+                <!-- Leuchtendes rotes Rücklicht -->
+                <path d="M39 57 C44 58, 47 62, 46 68 C42 68, 38 66, 36 62 C36 59, 37 57, 39 57 Z" fill="#ff1e1e"/>
+                <!-- Leuchtender gelber Scheinwerfer -->
+                <path d="M346 69 C361 72, 373 78, 383 85 C370 84, 356 78, 346 72 Z" fill="#ffe14d"/>
+                <path d="M366 111 C368 99, 374 92, 384 92 C376 95, 371 101, 370 109 L384 111 Z" fill="currentColor"/>
             </svg>
         </div>
         <div class="intro-text" id="introText">
@@ -2231,14 +2311,65 @@
                 <div class="speech-bubble" id="logoSpeechBubble">Schnell Termin vereinbaren</div>
                 
                 <div class="logo-text">
-                    <span class="red-part" id="txt-header-title-red">RED</span> 
-                    <span class="white-part" id="txt-header-title-sub">ZULASSUNGSDIENST</span>
+                    <span class="red-part" id="txt-header-title-red" aria-label="RED">
+                        <svg class="logo-red-svg" viewBox="0 0 134 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RED">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 2 H29 C36.2 2 40 5.1 40 10.2 C40 14.4 37.2 17.1 32 17.8 L40.5 26 H30.4 L22.2 18 H8 V26 H0 V4 C0 2.8 0.8 2 2 2 Z M8 7 V13 H27.2 C30.1 13 31.8 11.8 31.8 10 C31.8 8.2 30.1 7 27.2 7 Z" fill="var(--primary-red)"/>
+                            <path d="M55 2 H85 V7.2 H56.2 C53.2 7.2 52.8 8.6 52.8 10.2 V11.5 H82 V16.5 H52.8 V17.8 C52.8 19.4 53.2 20.8 56.2 20.8 H85 V26 H55 C48.2 26 45 22.4 45 17.2 V10.8 C45 5.6 48.2 2 55 2 Z" fill="var(--primary-red)"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M93 2 H119 C128 2 133 6.8 133 14 C133 21.2 128 26 119 26 H91 V4 C91 2.8 91.8 2 93 2 Z M98.8 7.2 V20.8 H118.2 C122.6 20.8 125 18.2 125 14 C125 9.8 122.6 7.2 118.2 7.2 Z" fill="var(--primary-red)"/>
+                        </svg>
+                    </span>
+                    <span class="white-part" id="txt-header-title-sub">
+                        <span>ZULASSUNGSDIENST</span>
+                        <span class="logo-sub-line2"><span class="logo-amp">&amp;</span>SCHILDER</span>
+                    </span>
                 </div>
-                <span id="headerCarDisplayWrapper" class="car-anim-idle" style="color: var(--text-light);">
-                    <svg class="logo-car-svg" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="currentColor"/>
-                        <path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="currentColor"/>
-                        <path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/>
+<span id="headerCarDisplayWrapper" class="car-anim-idle" style="color: var(--text-light);">
+                    <svg class="logo-car-svg" viewBox="8 0 444 132" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="hdrFrontBeam" x1="376" y1="78" x2="450" y2="86" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="var(--car-front-light)" stop-opacity="0.52"/>
+                                <stop offset="100%" stop-color="var(--car-front-light)" stop-opacity="0"/>
+                            </linearGradient>
+                            <linearGradient id="hdrRearGlow" x1="42" y1="63" x2="10" y2="63" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="var(--car-rear-light)" stop-opacity="0.52"/>
+                                <stop offset="100%" stop-color="var(--car-rear-light)" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Rotes Rücklicht-Leuchten & gelber Front-Lichtkegel -->
+                        <path class="logo-car-taillight-glow" d="M40 57 L10 51 L10 75 L41 68 Z" fill="url(#hdrRearGlow)"/>
+                        <path class="logo-car-headlight-beam" d="M374 75 L450 58 L450 108 L382 86 Z" fill="url(#hdrFrontBeam)"/>
+                        <!-- Dachbogen, lange GT-Motorhaube & Frontnase -->
+                        <path d="M40 50 C76 41, 118 21, 168 17 C210 14, 244 26, 276 49 L284 47 C324 48, 362 58, 393 84 C396 87, 396 90, 392 94 C388 99, 386 105, 391 110 C392 112, 390 114, 385 114 C376 114, 366 112, 356 110 C366 109, 376 109, 384 108 C380 103, 382 95, 389 87 C359 64, 321 55, 274 54 C242 32, 208 22, 168 24 C122 27, 82 45, 44 52 Z" fill="currentColor"/>
+                        <!-- Coupé-Seitenfenster & B-Säule -->
+                        <path d="M108 42 C136 29, 174 25, 206 29 C226 32, 244 41, 260 53 L254 54 C238 43, 222 36, 203 33 C174 30, 140 34, 116 44 C128 50, 144 53, 162 54 C194 55, 226 55, 256 54 L254 57 C222 58, 188 57, 156 56 C135 55, 118 51, 108 42 Z" fill="currentColor"/>
+                        <path d="M148 33 L154 55 L151 55 L145 34 Z" fill="currentColor" opacity="0.75"/>
+                        <!-- Heckspoiler, Heck-Schulter & Heckschürze -->
+                        <path d="M40 52 C68 47, 102 47, 136 60 C104 52, 70 53, 44 57 Z" fill="currentColor"/>
+                        <path d="M40 52 C46 58, 48 67, 48 77 C48 82, 42 84, 36 84 C37 94, 45 103, 55 108 C42 106, 32 95, 31 82 C31 79, 34 77, 38 76 C36 73, 35 68, 38 63 C40 60, 40 56, 38 52 Z" fill="currentColor"/>
+                        <!-- Rotes Rücklicht (LED-Signatur hinten) -->
+                        <path class="logo-car-taillight" d="M39 57 C44 58, 47 62, 46 68 C42 68, 38 66, 36 62 C36 59, 37 57, 39 57 Z"/>
+                        <!-- Türkontur, mittlere Charakterlinie & Side Vent -->
+                        <path d="M146 56 C139 67, 141 82, 154 97 C144 82, 143 68, 149 56 Z" fill="currentColor" opacity="0.85"/>
+                        <path d="M158 72 C202 74, 248 77, 286 78 C293 78, 297 76, 292 74 C284 73, 276 74, 268 75 C234 74, 196 72, 158 72 Z" fill="currentColor"/>
+                        <path d="M262 58 C266 72, 265 88, 260 100 C263 87, 264 72, 260 58 Z" fill="currentColor" opacity="0.7"/>
+                        <!-- Schweller-Keil & Bodenlinie -->
+                        <path d="M138 103 C186 104, 238 105, 284 108 L284 114 C238 110, 186 106, 138 104 Z" fill="currentColor"/>
+                        <path d="M126 117 C178 114, 232 115, 284 119 C232 118, 178 118, 126 117 Z" fill="currentColor" opacity="0.85"/>
+                        <!-- Hinterer & Vorderer Radkasten -->
+                        <path d="M55 104 C55 68, 72 60, 92 60 C114 60, 128 74, 129 102 C125 79, 112 67, 92 67 C73 67, 61 78, 59 104 Z" fill="currentColor"/>
+                        <path d="M284 103 C284 72, 300 60, 320 60 C342 60, 355 74, 356 105 C352 79, 340 67, 320 67 C301 67, 290 79, 288 103 Z" fill="currentColor"/>
+                        <!-- Hinterrad & Sport-Speichen -->
+                        <circle cx="92" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/>
+                        <path d="M92 96 C95 89, 98 83, 102 78 C99 84, 97 90, 95 96 Z M92 96 C85 95, 79 96, 73 99 C79 94, 85 93, 92 93 Z M94 97 C100 98, 105 99, 111 98 C105 101, 99 101, 94 99 Z M91 98 L85 106 L88 97 Z" fill="currentColor"/>
+                        <!-- Vorderrad & Sport-Speichen -->
+                        <circle cx="320" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/>
+                        <path d="M320 96 C323 89, 326 83, 330 78 C327 84, 325 90, 323 96 Z M320 96 C313 95, 307 96, 301 99 C307 94, 313 93, 320 93 Z M322 97 C328 98, 333 99, 339 98 C333 101, 327 101, 322 99 Z M319 98 L313 106 L316 97 Z" fill="currentColor"/>
+                        <!-- Gelbes Front-Scheinwerferlicht (Theme-adaptiv) -->
+                        <path class="logo-car-headlight" d="M346 69 C361 72, 373 78, 383 85 C370 84, 356 78, 346 72 Z"/>
+                        <path d="M343 72 C356 79, 370 84, 384 86 C370 86, 355 81, 342 73 Z" fill="currentColor" opacity="0.8"/>
+                        <!-- Front-Lufteinlass & Splitter -->
+                        <path d="M366 111 C368 99, 374 92, 384 92 C376 95, 371 101, 370 109 L384 111 Z" fill="currentColor"/>
+                        <path d="M354 117 C368 117, 380 115, 388 112 C380 117, 368 119, 354 117 Z" fill="currentColor"/>
                     </svg>
                 </span>
                 
@@ -6444,7 +6575,7 @@
         window.pageContentData = {
             "header": {
                 "title_red": "RED",
-                "title_sub": "ZULASSUNGSDIENST",
+                "title_sub": "ZULASSUNGSDIENST & SCHILDER",
                 "icon_car": "svg-sport",
                 "car_anim": "car-anim-idle",
                 "car_color": "var(--text-light)",
@@ -6515,14 +6646,43 @@
             }
         };
 
-        window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
+        window.renderHeaderBrandWordmark = function(redText, subText) {
+            const redEl = document.getElementById('txt-header-title-red');
+            const subEl = document.getElementById('txt-header-title-sub');
+
+            if (redEl) {
+                const cleanRed = String(redText || 'RED').trim();
+                if (cleanRed.toUpperCase() === 'RED') {
+                    redEl.innerHTML = `<svg class="logo-red-svg" viewBox="0 0 134 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RED"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 2 H29 C36.2 2 40 5.1 40 10.2 C40 14.4 37.2 17.1 32 17.8 L40.5 26 H30.4 L22.2 18 H8 V26 H0 V4 C0 2.8 0.8 2 2 2 Z M8 7 V13 H27.2 C30.1 13 31.8 11.8 31.8 10 C31.8 8.2 30.1 7 27.2 7 Z" fill="var(--primary-red)"/><path d="M55 2 H85 V7.2 H56.2 C53.2 7.2 52.8 8.6 52.8 10.2 V11.5 H82 V16.5 H52.8 V17.8 C52.8 19.4 53.2 20.8 56.2 20.8 H85 V26 H55 C48.2 26 45 22.4 45 17.2 V10.8 C45 5.6 48.2 2 55 2 Z" fill="var(--primary-red)"/><path fill-rule="evenodd" clip-rule="evenodd" d="M93 2 H119 C128 2 133 6.8 133 14 C133 21.2 128 26 119 26 H91 V4 C91 2.8 91.8 2 93 2 Z M98.8 7.2 V20.8 H118.2 C122.6 20.8 125 18.2 125 14 C125 9.8 122.6 7.2 118.2 7.2 Z" fill="var(--primary-red)"/></svg>`;
+                } else {
+                    redEl.innerText = cleanRed;
+                }
+            }
+
+            if (subEl) {
+                let cleanSub = String(subText || 'ZULASSUNGSDIENST & SCHILDER').trim();
+                if (cleanSub.toUpperCase() === 'ZULASSUNGSDIENST') {
+                    cleanSub = 'ZULASSUNGSDIENST & SCHILDER';
+                }
+                if (cleanSub.includes('&')) {
+                    const parts = cleanSub.split('&');
+                    const line1 = window.escHtml(parts[0].trim());
+                    const line2 = window.escHtml(parts.slice(1).join('&').trim());
+                    subEl.innerHTML = `<span>${line1}</span><span class="logo-sub-line2"><span class="logo-amp">&amp;</span>${line2}</span>`;
+                } else {
+                    subEl.innerText = cleanSub;
+                }
+            }
+        };
+
+window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const wrapper = document.getElementById('headerCarDisplayWrapper');
             if(!wrapper) return;
             wrapper.className = carAnim || 'car-anim-idle';
             wrapper.style.color = carColor || 'var(--text-light)';
 
             if(!carType || carType === 'svg-sport') {
-                wrapper.innerHTML = `<svg class="logo-car-svg" viewBox="0 0 271 83" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M265.8 45.4C252.1 36.6 218 24.3 194.2 16.7C168.4 8.5 137.6 2.4 104.7 2C73 1.6 54.1 6.9 44.5 12.3C30.2 20.3 18.5 32.1 8.8 45.5C4 51 0.4 56.7 3.5 61.1C5.7 64.2 11.5 67 18.7 69.4C21.7 70.4 24.5 71.3 27 72C25.6 68.3 24.8 64.2 24.8 60C24.8 45.1 36.9 33 51.8 33C66.7 33 78.8 45.1 78.8 60C78.8 61.4 78.7 62.8 78.4 64.1C83.9 64.8 89.6 65.5 95.4 66C107.6 67.2 119.3 68 129.5 68.3C130.6 67 131.9 65.7 133.4 64.6C138.8 59.8 146.4 57 154.5 57C168.2 57 179.8 65.3 184.4 77.2C193.3 76.7 201.2 75.9 208 74.8C222.8 72.3 234.3 68 238.6 66C242.4 64.2 244.7 62.3 245.8 60.5C246.7 58.9 246.7 57.3 245.9 55.7C243.6 51.5 237.4 47.7 228.6 44.4C226.7 43.7 224.7 43.1 222.6 42.4L265.8 45.4Z" fill="currentColor"/><path d="M51.8 40C40.8 40 31.8 49 31.8 60C31.8 71 40.8 80 51.8 80C62.8 80 71.8 71 71.8 60C71.8 49 62.8 40 51.8 40ZM51.8 74C44.1 74 37.8 67.7 37.8 60C37.8 52.3 44.1 46 51.8 46C59.5 46 65.8 52.3 65.8 60C65.8 67.7 59.5 74 51.8 74Z" fill="currentColor"/><path d="M154.5 63C146.2 63 139.5 69.7 139.5 78C139.5 86.3 146.2 93 154.5 93C162.8 93 169.5 86.3 169.5 78C169.5 69.7 162.8 63 154.5 63ZM154.5 87C149.5 87 145.5 83 145.5 78C145.5 73 149.5 69 154.5 69C159.5 69 163.5 73 163.5 78C163.5 83 159.5 87 154.5 87Z" fill="currentColor"/></svg>`;
+                wrapper.innerHTML = `<svg class="logo-car-svg" viewBox="8 0 444 132" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="hdrFrontBeam" x1="376" y1="78" x2="450" y2="86" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--car-front-light)" stop-opacity="0.52"/><stop offset="100%" stop-color="var(--car-front-light)" stop-opacity="0"/></linearGradient><linearGradient id="hdrRearGlow" x1="42" y1="63" x2="10" y2="63" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--car-rear-light)" stop-opacity="0.52"/><stop offset="100%" stop-color="var(--car-rear-light)" stop-opacity="0"/></linearGradient></defs><path class="logo-car-taillight-glow" d="M40 57 L10 51 L10 75 L41 68 Z" fill="url(#hdrRearGlow)"/><path class="logo-car-headlight-beam" d="M374 75 L450 58 L450 108 L382 86 Z" fill="url(#hdrFrontBeam)"/><path d="M40 50 C76 41, 118 21, 168 17 C210 14, 244 26, 276 49 L284 47 C324 48, 362 58, 393 84 C396 87, 396 90, 392 94 C388 99, 386 105, 391 110 C392 112, 390 114, 385 114 C376 114, 366 112, 356 110 C366 109, 376 109, 384 108 C380 103, 382 95, 389 87 C359 64, 321 55, 274 54 C242 32, 208 22, 168 24 C122 27, 82 45, 44 52 Z" fill="currentColor"/><path d="M108 42 C136 29, 174 25, 206 29 C226 32, 244 41, 260 53 L254 54 C238 43, 222 36, 203 33 C174 30, 140 34, 116 44 C128 50, 144 53, 162 54 C194 55, 226 55, 256 54 L254 57 C222 58, 188 57, 156 56 C135 55, 118 51, 108 42 Z" fill="currentColor"/><path d="M148 33 L154 55 L151 55 L145 34 Z" fill="currentColor" opacity="0.75"/><path d="M40 52 C68 47, 102 47, 136 60 C104 52, 70 53, 44 57 Z" fill="currentColor"/><path d="M40 52 C46 58, 48 67, 48 77 C48 82, 42 84, 36 84 C37 94, 45 103, 55 108 C42 106, 32 95, 31 82 C31 79, 34 77, 38 76 C36 73, 35 68, 38 63 C40 60, 40 56, 38 52 Z" fill="currentColor"/><path class="logo-car-taillight" d="M39 57 C44 58, 47 62, 46 68 C42 68, 38 66, 36 62 C36 59, 37 57, 39 57 Z"/><path d="M146 56 C139 67, 141 82, 154 97 C144 82, 143 68, 149 56 Z" fill="currentColor" opacity="0.85"/><path d="M158 72 C202 74, 248 77, 286 78 C293 78, 297 76, 292 74 C284 73, 276 74, 268 75 C234 74, 196 72, 158 72 Z" fill="currentColor"/><path d="M262 58 C266 72, 265 88, 260 100 C263 87, 264 72, 260 58 Z" fill="currentColor" opacity="0.7"/><path d="M138 103 C186 104, 238 105, 284 108 L284 114 C238 110, 186 106, 138 104 Z" fill="currentColor"/><path d="M126 117 C178 114, 232 115, 284 119 C232 118, 178 118, 126 117 Z" fill="currentColor" opacity="0.85"/><path d="M55 104 C55 68, 72 60, 92 60 C114 60, 128 74, 129 102 C125 79, 112 67, 92 67 C73 67, 61 78, 59 104 Z" fill="currentColor"/><path d="M284 103 C284 72, 300 60, 320 60 C342 60, 355 74, 356 105 C352 79, 340 67, 320 67 C301 67, 290 79, 288 103 Z" fill="currentColor"/><circle cx="92" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/><path d="M92 96 C95 89, 98 83, 102 78 C99 84, 97 90, 95 96 Z M92 96 C85 95, 79 96, 73 99 C79 94, 85 93, 92 93 Z M94 97 C100 98, 105 99, 111 98 C105 101, 99 101, 94 99 Z M91 98 L85 106 L88 97 Z" fill="currentColor"/><circle cx="320" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/><path d="M320 96 C323 89, 326 83, 330 78 C327 84, 325 90, 323 96 Z M320 96 C313 95, 307 96, 301 99 C307 94, 313 93, 320 93 Z M322 97 C328 98, 333 99, 339 98 C333 101, 327 101, 322 99 Z M319 98 L313 106 L316 97 Z" fill="currentColor"/><path class="logo-car-headlight" d="M346 69 C361 72, 373 78, 383 85 C370 84, 356 78, 346 72 Z"/><path d="M343 72 C356 79, 370 84, 384 86 C370 86, 355 81, 342 73 Z" fill="currentColor" opacity="0.8"/><path d="M366 111 C368 99, 374 92, 384 92 C376 95, 371 101, 370 109 L384 111 Z" fill="currentColor"/><path d="M354 117 C368 117, 380 115, 388 112 C380 117, 368 119, 354 117 Z" fill="currentColor"/></svg>`;
             } else {
                 wrapper.innerHTML = `<i class="fa-solid ${carType} logo-car-icon"></i>`;
             }
@@ -6536,8 +6696,7 @@
             
             const d = window.pageContentData;
             if(d.header) {
-                if(document.getElementById('txt-header-title-red')) document.getElementById('txt-header-title-red').innerText = d.header.title_red;
-                if(document.getElementById('txt-header-title-sub')) document.getElementById('txt-header-title-sub').innerText = d.header.title_sub;
+                window.renderHeaderBrandWordmark(d.header.title_red, d.header.title_sub);                
                 if(document.getElementById('txt-header-crm')) document.getElementById('txt-header-crm').innerText = d.header.txt_crm;
                 if(document.getElementById('icon-header-crm')) document.getElementById('icon-header-crm').className = "fa-solid " + d.header.icon_crm;
                 if(document.getElementById('txt-header-visitors')) document.getElementById('txt-header-visitors').innerText = d.header.txt_visitors + " ";
