@@ -1586,6 +1586,23 @@
                 pointer-events: auto;
                 transform: translateY(0);
             }
+            .fab-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 7490;
+                background: rgba(0, 0, 0, 0.38);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: opacity 0.2s ease, visibility 0.2s ease;
+            }
+            .fab-backdrop.open {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
             .fab-btn {
                 width: auto !important;
                 height: 36px !important;
@@ -1749,6 +1766,7 @@
         @media (min-width: 769px) {
             .red-select-wrap { display: contents; }
             .mobile-select-display { display: none !important; }
+            .fab-backdrop { display: none !important; }
 
             nav {
                 padding: 10px 4% 0 !important;
@@ -2064,6 +2082,9 @@
         </div>
     </div>
     
+    <!-- MOBILER BLUR-HINTERGRUND BEI GEÖFFNETER SCHNELL-SERVICE-LEISTE -->
+    <div class="fab-backdrop" id="fabBackdrop" onclick="window.closeMobileQuickBar()"></div>
+
     <!-- SCHNELL-SERVICE-LEISTE: AM PC NEBENEINANDER, AM HANDY KOMPAKT AUFKLAPPBAR -->
     <div class="floating-quick-bar" id="floatingQuickBar">
         <button type="button" class="fab-main-toggle" id="fabMainToggle" onclick="window.toggleMobileQuickBar(event)" aria-label="Schnellzugriff öffnen" aria-expanded="false">
@@ -7649,20 +7670,24 @@
             });
         };
 
-        // Aufklappbare Mobile Service-Leiste
+        // Aufklappbare Mobile Service-Leiste inkl. Blur-Hintergrund
         window.toggleMobileQuickBar = function(e) {
             if (e) e.stopPropagation();
             const bar = document.getElementById('floatingQuickBar');
             const btn = document.getElementById('fabMainToggle');
+            const backdrop = document.getElementById('fabBackdrop');
             if (!bar) return;
             const isOpen = bar.classList.toggle('fab-open');
             if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            if (backdrop) backdrop.classList.toggle('open', isOpen);
         };
         window.closeMobileQuickBar = function() {
             const bar = document.getElementById('floatingQuickBar');
             const btn = document.getElementById('fabMainToggle');
+            const backdrop = document.getElementById('fabBackdrop');
             if (bar) bar.classList.remove('fab-open');
             if (btn) btn.setAttribute('aria-expanded', 'false');
+            if (backdrop) backdrop.classList.remove('open');
         };
         document.addEventListener('click', (e) => {
             const bar = document.getElementById('floatingQuickBar');
