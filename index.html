@@ -14,7 +14,10 @@
     <meta name="application-name" content="RED Zulassung">
     <meta name="theme-color" content="#f2f2f7" id="metaThemeColor">
     <meta name="description" content="RED Zulassungsdienst Berlin – Kfz-Zulassung in Bestzeit, Sofortkennzeichen zum Mitnehmen, Kurzzeitkennzeichen, Zollkennzeichen & Auto Ankauf.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="author" content="RED Zulassungsdienst Berlin – Tamer Yazici">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="RED Zulassungsdienst Berlin">
     <meta property="og:locale" content="de_DE">
     <meta property="og:title" content="RED Zulassungsdienst Berlin | Schnell. Zuverlässig. Kompetent.">
     <meta property="og:description" content="Kfz-Zulassung in Berlin ohne Wartezeit beim Amt: Anmeldung, Ummeldung, Abmeldung, Sofortkennzeichen, Kurzzeit- & Zollkennzeichen in der Kienitzer Str. 6.">
@@ -70,7 +73,25 @@
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Sofortkennzeichen & Wunschkennzeichen-Prägung" } },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Auto Ankauf Berlin" } }
         ]
-      }
+      },
+      "hasMap": "https://www.google.com/maps/search/?api=1&query=Kienitzer+Str.+6,+12053+Berlin",
+      "sameAs": [
+        "https://instagram.com/red_zulassungsdienst"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Wie schnell bekomme ich meine Zulassung in Berlin?", "acceptedAnswer": { "@type": "Answer", "text": "In der Regel dauert die reguläre Anmeldung beim LABO Berlin 1–2 Werktage. Mit unserem Express-Service sowie bei Kurzzeit- und Sofortkennzeichen oft noch am selben Tag." } },
+        { "@type": "Question", "name": "Prägt RED Zulassungsdienst die Kennzeichenschilder direkt vor Ort?", "acceptedAnswer": { "@type": "Answer", "text": "Ja, in unserem Büro in der Kienitzer Str. 6 (12053 Berlin) prägen wir Euro-, E-, Saison-, Kurzzeit- oder Zollkennzeichen sofort zum Mitnehmen." } },
+        { "@type": "Question", "name": "Muss ich die Formulare vorher zu Hause ausdrucken?", "acceptedAnswer": { "@type": "Answer", "text": "Nein. Sie können unsere digitale Vollmacht direkt online ausfüllen oder alle Vordrucke bei der Abgabe in unserem Büro unterschreiben." } },
+        { "@type": "Question", "name": "Brauche ich selbst einen Termin bei der Zulassungsstelle (LABO)?", "acceptedAnswer": { "@type": "Answer", "text": "Nein. Als eingetragener Berliner Zulassungsdienst verfügen wir über direkte Behördenkontingente und erledigen den Behördengang komplett für Sie." } },
+        { "@type": "Question", "name": "Kann auch eine andere Person meine Papiere abgeben?", "acceptedAnswer": { "@type": "Answer", "text": "Ja, jederzeit. Wichtig ist, dass Vollmacht und SEPA-Lastschriftmandat vom zukünftigen Fahrzeughalter unterschrieben sind und der Original-Ausweis vorliegt." } },
+        { "@type": "Question", "name": "Was passiert, wenn mein TÜV abgelaufen ist oder Papiere fehlen?", "acceptedAnswer": { "@type": "Answer", "text": "Für Fahrten zum TÜV erstellen wir ein Kurzzeitkennzeichen. Bei verlorenen Papieren helfen wir sofort mit der amtlichen Verlusterklärung und Ersatzbeantragung." } }
+      ]
     }
     </script>
     
@@ -2064,6 +2085,38 @@
             flex-shrink: 0;
         }
         .mobile-select-option.selected .ms-opt-check { color: var(--primary-red); }
+        .mobile-select-option .ms-opt-text { text-wrap: pretty; }
+        .mobile-select-display .ms-val-wrap { text-wrap: balance; }
+
+        /* Direkt-Buchen-Button auf der Rückseite jeder Leistungskarte */
+        .card-info-slide { padding: 14px 16px; gap: 8px; overflow-y: auto; }
+        .card-slide-book-btn {
+            background: var(--primary-red); color: #ffffff; border: none;
+            border-radius: 50px; padding: 6px 14px; font-size: 10.5px !important;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+            flex-shrink: 0; transition: transform 0.2s ease, filter 0.2s ease;
+        }
+        .card-slide-book-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+
+        /* Rendering-Optimierung für untere Seitenbereiche */
+        .faq-wrapper, footer { content-visibility: auto; contain-intrinsic-size: auto 380px; }
+
+        /* Barrierefreiheit (WCAG 2.1): Klarer Fokus-Rahmen nur bei Tastatur-Navigation */
+        :focus-visible {
+            outline: 2.5px solid var(--primary-red) !important;
+            outline-offset: 2px !important;
+        }
+
+        /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 
@@ -2287,22 +2340,22 @@
                 <div class="form-group">
                     <label>Wann sollen wir anrufen?</label>
                     <select id="cbReqTime" class="form-control">
-                        <option value="Sofort / Schnellstmöglich">⚡ Sofort / Schnellstmöglich</option>
-                        <option value="In ca. 15–30 Minuten">⏱️ In ca. 15–30 Minuten</option>
-                        <option value="Heute Vormittag (09–12 Uhr)">☀️ Heute Vormittag (09–12 Uhr)</option>
-                        <option value="Heute Nachmittag (12–17 Uhr)">🌤️ Heute Nachmittag (12–17 Uhr)</option>
-                        <option value="Heute Abend (17–20 Uhr)">🌙 Heute Abend (17–20 Uhr)</option>
+                        <option value="Sofort / Schnellstmöglich">Sofort / Schnellstmöglich</option>
+                        <option value="In ca. 15–30 Minuten">In ca. 15–30 Minuten</option>
+                        <option value="Heute Vormittag (09–12 Uhr)">Heute Vormittag (09–12 Uhr)</option>
+                        <option value="Heute Nachmittag (12–17 Uhr)">Heute Nachmittag (12–17 Uhr)</option>
+                        <option value="Heute Abend (17–20 Uhr)">Heute Abend (17–20 Uhr)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Worum geht es kurz?</label>
                     <select id="cbReqTopic" class="form-control">
-                        <option value="Kfz-Anmeldung / Ummeldung">🚗 Anmeldung / Ummeldung</option>
-                        <option value="Express-Zulassung (Eilig)">⚡ Express-Zulassung</option>
-                        <option value="Kurzzeit- / 5-Tage-Kennzeichen">⏱️ Kurzzeitkennzeichen</option>
-                        <option value="Zoll- / Ausfuhrkennzeichen">🌍 Zollkennzeichen</option>
-                        <option value="Auto Ankauf / Bargeld-Angebot">💶 Auto Ankauf</option>
-                        <option value="Frage zu fehlenden Papieren">❓ Frage zu Papieren</option>
+                        <option value="Kfz-Anmeldung / Ummeldung">Anmeldung / Ummeldung</option>
+                        <option value="Express-Zulassung (Eilig)">Express-Zulassung (Eilig)</option>
+                        <option value="Kurzzeit- / 5-Tage-Kennzeichen">Kurzzeitkennzeichen (5 Tage)</option>
+                        <option value="Zoll- / Ausfuhrkennzeichen">Zoll- / Ausfuhrkennzeichen</option>
+                        <option value="Auto Ankauf / Bargeld-Angebot">Auto Ankauf (Bargeld-Angebot)</option>
+                        <option value="Frage zu fehlenden Papieren">Frage zu fehlenden Papieren</option>
                     </select>
                 </div>
             </div>
@@ -4453,8 +4506,8 @@
                 </div>
             </div>
             <div class="social-icons">
-                <a href="https://instagram.com/red_zulassungsdienst" id="link-ig" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" id="link-fb" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="https://instagram.com/red_zulassungsdienst" id="link-ig" target="_blank" rel="noopener noreferrer" aria-label="RED Zulassungsdienst Berlin auf Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" id="link-fb" target="_blank" rel="noopener noreferrer" aria-label="RED Zulassungsdienst Berlin auf Facebook"><i class="fa-brands fa-facebook-f"></i></a>
             </div>
         </div>
     </div>
@@ -4571,27 +4624,26 @@
             if (!resEl) return;
 
             if (srv === 'plates_only') {
-                resEl.innerHTML = `🪪 <strong style="color:var(--green-accent);">Sofort zum Mitnehmen (ca. 3–5 Minuten):</strong> Ihre Kennzeichenschilder (Alu, 3D-Carbon oder Kurzkennzeichen) sowie die grüne Umweltplakette prägen wir direkt bei Ihrem Besuch!`;
-                return;
-            }
-            if (srv === 'kurzzeit') {
-                if (dropoff === 'morning' || dropoff === 'noon') {
-                    resEl.innerHTML = `⏱️ <strong style="color:var(--green-accent);">Gleicher Werktag / Sofort-Service:</strong> Bei Abgabe bis 15:00 Uhr sind Ihre 5-Tage-Kurzzeit- oder Zollkennzeichen inkl. Papieren meist noch <strong>am selben Tag abholbereit</strong>!`;
-                } else {
-                    resEl.innerHTML = `⏱️ <strong style="color:var(--green-accent);">Nächster Werktag:</strong> Ihre Unterlagen gehen direkt in den ersten Morgen-Lauf und sind <strong>am nächsten Werktag ab Mittag abholbereit</strong>!`;
-                }
-                return;
-            }
-            if (srv === 'express') {
-                if (dropoff === 'morning') {
-                    resEl.innerHTML = `⚡ <strong style="color:var(--green-accent);">Express-Priorisierung (Gleicher Tag / 24h):</strong> Direkte Einreichung im ersten Behörden-Lauf – Fertigstellung meist noch <strong>heute am Spätnachmittag oder morgen Vormittag</strong>!`;
-                } else {
-                    resEl.innerHTML = `⚡ <strong style="color:var(--green-accent);">Express-Priorisierung (ca. 24 Stunden):</strong> Priorisierte Einreichung beim LABO Berlin – Ihre fertigen Papiere & Schilder sind in der Regel <strong>innerhalb von 24h abholbereit</strong>!`;
-                }
-                return;
-            }
-            // Standard An-/Ummeldung
-            resEl.innerHTML = `🚗 <strong style="color:var(--primary-red);">Reguläre Bearbeitungszeit (1–2 Werktage):</strong> Wir übernehmen den kompletten Behördengang inkl. Schilderprägung. Sobald im Live-Tracker „Abholbereit“ leuchtet, können Sie alles abholen!`;
+             resEl.innerHTML = `<i class="fa-solid fa-id-card" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Sofort zum Mitnehmen (ca. 3–5 Minuten):</strong> Ihre Kennzeichenschilder (Alu, 3D-Carbon oder Kurzkennzeichen) sowie die grüne Umweltplakette prägen wir direkt bei Ihrem Besuch.`;
+             return;
+         }
+         if (srv === 'kurzzeit') {
+             if (dropoff === 'morning' || dropoff === 'noon') {
+                 resEl.innerHTML = `<i class="fa-solid fa-stopwatch" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Gleicher Werktag / Sofort-Service:</strong> Bei Abgabe bis 15:00 Uhr sind Ihre 5-Tage-Kurzzeit- oder Zollkennzeichen inkl. Papieren meist noch <strong>am selben Tag abholbereit</strong>.`;
+             } else {
+                 resEl.innerHTML = `<i class="fa-solid fa-stopwatch" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Nächster Werktag:</strong> Ihre Unterlagen gehen direkt in den ersten Morgen-Lauf und sind <strong>am nächsten Werktag ab Mittag abholbereit</strong>.`;
+             }
+             return;
+         }
+         if (srv === 'express') {
+             if (dropoff === 'morning') {
+                 resEl.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Express-Priorisierung (Gleicher Tag / 24h):</strong> Direkte Einreichung im ersten Behörden-Lauf – Fertigstellung meist noch <strong>heute am Spätnachmittag oder morgen Vormittag</strong>.`;
+             } else {
+                 resEl.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Express-Priorisierung (ca. 24 Stunden):</strong> Priorisierte Einreichung beim LABO Berlin – Ihre fertigen Papiere & Schilder sind in der Regel <strong>innerhalb von 24h abholbereit</strong>.`;
+             }
+             return;
+         }
+         resEl.innerHTML = `<i class="fa-solid fa-car" style="color:var(--primary-red); margin-right:5px;"></i><strong style="color:var(--primary-red);">Reguläre Bearbeitungszeit (1–2 Werktage):</strong> Wir übernehmen den kompletten Behördengang inkl. Schilderprägung. Sobald im Live-Tracker „Abholbereit“ leuchtet, können Sie alles abholen.`;
         };
 
         window.sendCompassDocsToWhatsApp = function() {
@@ -4948,16 +5000,16 @@
 
             if (fuelType === 'elektro') {
                 titleEl.style.color = 'var(--green-accent)';
-                titleEl.innerHTML = '⚡ E-Kennzeichen & Grüne Plakette (Stufe 4) – Volle Elektro-Privilegien in Berlin!';
+                titleEl.innerHTML = '<i class="fa-solid fa-bolt" style="margin-right:5px;"></i>E-Kennzeichen & Grüne Plakette (Stufe 4) – Volle Elektro-Privilegien in Berlin.';
             } else if (fuelType === 'oldtimer') {
                 titleEl.style.color = 'var(--gold-accent)';
-                titleEl.innerHTML = '🏛️ H-Oldtimer-Sonderrecht – Freie Fahrt in der gesamten Berliner Umweltzone (ohne Plakettenpflicht)!';
+                titleEl.innerHTML = '<i class="fa-solid fa-landmark" style="margin-right:5px;"></i>H-Oldtimer-Sonderrecht – Freie Fahrt in der gesamten Berliner Umweltzone (ohne Plakettenpflicht).';
             } else if (fuelType === 'alt_diesel') {
-                titleEl.style.color = '#ff9500';
-                titleEl.innerHTML = '⚠️ Hinweis: Ohne Partikelfilter keine grüne Plakette – wir beraten Sie gerne zu Nachrüstung oder Ausnahmen!';
+                titleEl.style.color = '#d97706';
+                titleEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="margin-right:5px;"></i>Hinweis: Ohne Partikelfilter keine grüne Plakette – wir beraten Sie gerne zu Nachrüstung oder Ausnahmen.';
             } else {
                 titleEl.style.color = 'var(--green-accent)';
-                titleEl.innerHTML = '🟢 Grüne Feinstaubplakette (Stufe 4) – Freie Fahrt in ganz Berlin!';
+                titleEl.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>Grüne Feinstaubplakette (Stufe 4) – Freie Fahrt in ganz Berlin!';
             }
 
             const selectedFee = feeMap[feeCase] || { price: 'ca. 28,00&nbsp;€', note: 'Amtlicher Richtwert' };
@@ -5279,7 +5331,7 @@
                 txt.innerText = 'Online-Termin 24/7 aktiv';
             }
         };
-        setInterval(window.updateOfficeStatusBadge, 60000);
+        setInterval(() => { if (!document.hidden) window.updateOfficeStatusBadge(); }, 60000);
 
         window.updateDispatchCountdown = function() {
             const el = document.getElementById('liveDispatchCountdown');
@@ -5303,7 +5355,7 @@
             const remM = diffMins % 60;
             el.innerHTML = `<strong style="display:block; color:var(--text-light); margin-bottom:2px;"><i class="fa-solid fa-bolt" style="color:var(--primary-red); margin-right:5px;"></i>Nächste Behörden-Abgabe <span class="paren-inline">(LABO&nbsp;Berlin)</span></strong>In <span class="nowrap-unit" style="color:var(--primary-red); font-weight:900;">${remH}&nbsp;Std. ${remM}&nbsp;Min.</span> – jetzt Unterlagen einreichen.`;
         };
-        setInterval(window.updateDispatchCountdown, 30000);
+        setInterval(() => { if (!document.hidden) window.updateDispatchCountdown(); }, 30000);
 
         const compassData = {
             "privat": {
@@ -6612,7 +6664,10 @@
                         }
                     </div>
                     <p class="${srv.descAnim}" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${srv.desc}</p>
-                    <div class="card-info-slide"><p>${hoverHtml}</p></div>
+                    <div class="card-info-slide">
+                        <p>${hoverHtml}</p>
+                        <button type="button" class="card-slide-book-btn" onclick="event.stopPropagation(); window.bookServiceFromCard('${srv.id}')">Termin wählen <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
                 `;
                 grid.appendChild(card);
 
@@ -7012,8 +7067,8 @@
                 view.className = 'view-section dynamic-custom-page';
                 view.innerHTML = `
                     <div class="subpage-nav-bar">
-                        <button class="btn-primary" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
-                    </div>
+                     <button type="button" class="subpage-back-btn" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
+                 </div>
                     <div class="booking-wrapper" style="margin-top:15px;">
                         <h2 style="color:var(--primary-red); margin-bottom:20px; font-weight:900; text-transform:uppercase;">${page.title}</h2>
                         <div style="white-space:pre-wrap; color:var(--text-light); line-height:1.8;">${page.content}</div>
@@ -7416,6 +7471,18 @@
             if(!isActive) card.classList.add('reveal-active');
         };
 
+        window.bookServiceFromCard = function(srvId) {
+            const srv = (window.servicesData || []).find(s => s.id === srvId);
+            if (!srv) return;
+            window.selectedServiceVal = srv.title;
+            const trig = document.getElementById('selectTriggerText');
+            if (trig) trig.innerText = srv.title;
+            window.updateBookingLiveSummary();
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
+            document.getElementById('termin')?.scrollIntoView({ behavior: 'smooth' });
+            window.showToast(`Leistung „${srv.title}“ im Terminformular vorausgewählt!`, 'success');
+        };
+
         // =========================================================================
         // UNIVERSELLE DRAG-&-DROP ENGINE FÜR PINNWAND-KENNZEICHEN (MAUS + TOUCH)
         // =========================================================================
@@ -7661,9 +7728,9 @@
                 window.syncMobileSelectDisplay(sel);
             });
 
-            // Synchronisiert dynamisch gesetzte Werte beim Öffnen beliebiger Modals
+            // Synchronisiert dynamisch gesetzte Werte beim Öffnen beliebiger Modals (nur mobil nötig)
             const modalObserver = new MutationObserver(() => {
-                setTimeout(window.syncAllMobileSelectDisplays, 30);
+                if (window.innerWidth <= 768) setTimeout(window.syncAllMobileSelectDisplays, 30);
             });
             document.querySelectorAll('.custom-dialog-overlay').forEach(ov => {
                 modalObserver.observe(ov, { attributes: true, attributeFilter: ['class'] });
@@ -7789,8 +7856,26 @@
                 window.formatParenthesesEverywhere(document.body);
             }, 400);
 
+            // ESC-Taste schließt jederzeit sauber das oberste aktive Fenster / Menü / Select-Sheet
+            if (!window._escHandlerBound) {
+                window._escHandlerBound = true;
+                document.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Escape') return;
+                    const mobileSel = document.getElementById('mobileSelectOverlay');
+                    if (mobileSel && mobileSel.classList.contains('open')) { window.closeMobileSelectSheet(); return; }
+                    const qMenu = document.getElementById('quickMenu');
+                    if (qMenu && qMenu.classList.contains('active')) { window.toggleMenu(); return; }
+                    const qBar = document.getElementById('floatingQuickBar');
+                    if (qBar && qBar.classList.contains('fab-open')) { window.closeMobileQuickBar(); return; }
+                    document.querySelectorAll('.custom-dialog-overlay.open').forEach(ov => {
+                        ov.classList.remove('open');
+                        if (ov.id === 'widgetModalOverlay') window.closeWidgetModal();
+                    });
+                });
+            }
+
             // Dynamische Ergebnis-Boxen automatisch nachformatieren, sobald der Nutzer klickt
-            const dynamicIds = ['districtResultBox', 'laboEnvResultBox', 'pickupForecastResult', 'compassDocList', 'calcOptionsList'];
+            const dynamicIds = ['districtResultBox', 'laboEnvResultBox', 'pickupForecastResult', 'compassCaseTitle', 'compassCaseDesc', 'compassDocList', 'calcOptionsList'];
             const dynObs = new MutationObserver((mutations) => {
                 mutations.forEach(m => {
                     if (m.target && m.target.nodeType === 1) {
