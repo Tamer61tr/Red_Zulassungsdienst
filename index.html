@@ -2489,6 +2489,156 @@
             }
         }
 
+        /* =========================================================================
+           HEADER-UPGRADES: SMART-SCROLL, DESKTOP-NAV, KLICK-TICKER & FORTSCHRITTSLINIE
+           ========================================================================= */
+        #header-wrapper {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+        }
+        body[data-theme^="light"] #header-wrapper {
+            border-bottom: 2px solid rgba(217, 0, 0, 0.22);
+        }
+        body[data-theme^="light"] #header-wrapper #ticker-container,
+        #header-wrapper #ticker-container {
+            cursor: pointer;
+            border-bottom: none !important;
+            max-height: 36px;
+            opacity: 1;
+            transition: max-height 0.28s ease, padding 0.28s ease, opacity 0.22s ease, background-color 0.2s ease;
+        }
+        #header-wrapper #ticker-container:hover {
+            background: #14141f !important;
+        }
+
+        /* Smart-Scroll-Kompaktmodus beim Runterscrollen (mehr Platz auf Handy & Desktop) */
+        #header-wrapper.header-compact #ticker-container {
+            max-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+        @media (max-width: 768px) {
+            #header-wrapper.header-compact nav {
+                padding-top: 5px !important;
+            }
+            #header-wrapper.header-compact .header-widgets-wrapper {
+                margin-top: 4px !important;
+                padding-top: 3px !important;
+                padding-bottom: 3px !important;
+            }
+        }
+        @media (min-width: 769px) {
+            #header-wrapper.header-compact nav {
+                padding-top: 6px !important;
+            }
+            #header-wrapper.header-compact .header-widgets-wrapper {
+                margin-top: 6px !important;
+                padding-top: 4px !important;
+                padding-bottom: 4px !important;
+            }
+        }
+
+        /* Rote Fortschrittslinie am unteren Header-Rand (0 px extra Höhe, GPU-glatt) */
+        .header-scroll-progress {
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 2.5px;
+            background: linear-gradient(90deg, var(--primary-red), #ff4d4d);
+            transform: scaleX(0);
+            transform-origin: left center;
+            pointer-events: none;
+            z-index: 1005;
+            will-change: transform;
+            box-shadow: 0 0 8px rgba(255, 26, 26, 0.55);
+        }
+
+        /* Direkte Desktop-Navigation (standardmäßig ausgeblendet, ab 1024 px aktiv) */
+        .desktop-header-nav {
+            display: none;
+        }
+        @media (min-width: 1024px) {
+            nav .logo-container { order: 1 !important; }
+            nav .header-hours-countdown { order: 2 !important; margin: 0 0 0 14px !important; }
+            .desktop-header-nav {
+                order: 3;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                margin: 0 auto;
+                padding: 0 8px;
+            }
+            nav .nav-actions { order: 4 !important; }
+            nav .header-widgets-wrapper { order: 5 !important; }
+
+            .dhn-link {
+                position: relative;
+                color: #c8c8d6;
+                text-decoration: none;
+                font-size: 11px !important;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.45px;
+                padding: 6px 10px;
+                border-radius: 8px;
+                white-space: nowrap;
+                transition: color 0.2s ease, background-color 0.2s ease;
+            }
+            .dhn-link:hover {
+                color: #ffffff;
+                background: rgba(255, 255, 255, 0.08);
+            }
+            .dhn-link.is-active {
+                color: #ffffff;
+                background: rgba(255, 255, 255, 0.09);
+            }
+            .dhn-link.is-active::after {
+                content: '';
+                position: absolute;
+                left: 10px;
+                right: 10px;
+                bottom: 2px;
+                height: 2px;
+                border-radius: 2px;
+                background: var(--primary-red);
+            }
+            .dhn-cta {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                margin-left: 6px;
+                padding: 6px 13px;
+                border-radius: 9px;
+                background: var(--primary-red);
+                color: #ffffff;
+                text-decoration: none;
+                font-size: 10.5px !important;
+                font-weight: 900;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+                box-shadow: 0 4px 14px rgba(255, 26, 26, 0.32);
+                transition: transform 0.2s ease, filter 0.2s ease;
+            }
+            .dhn-cta:hover {
+                transform: translateY(-1px);
+                filter: brightness(1.12);
+            }
+        }
+        @media (min-width: 1240px) {
+            .desktop-header-nav { gap: 8px; }
+            .dhn-link { font-size: 11.5px !important; padding: 6px 12px; }
+        }
+        /* Bei eingeloggtem Admin auf kleineren Desktop-Breiten kompakt halten */
+        @media (min-width: 1024px) and (max-width: 1200px) {
+            body.is-admin .desktop-header-nav,
+            body.is-supervisor .desktop-header-nav {
+                display: none !important;
+            }
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
@@ -2730,6 +2880,15 @@
                 </span>
                 <span class="hhc-timer" id="hhcCountdownText">--:--:--</span>
             </button>
+
+            <!-- DIREKTE DESKTOP-NAVIGATION (NUR AB 1024px SICHTBAR) -->
+            <div class="desktop-header-nav" id="desktopHeaderNav" aria-label="Hauptnavigation">
+                <a href="javascript:void(0)" class="dhn-link" data-nav-key="leistungen" onclick="window.desktopNavGo('leistungen')">Leistungen</a>
+                <a href="javascript:void(0)" class="dhn-link" data-nav-key="tools" onclick="window.desktopNavGo('wunschkennzeichen-section')">Tools</a>
+                <a href="javascript:void(0)" class="dhn-link" data-nav-key="view-formulare" onclick="window.switchView('view-formulare')">Formulare</a>
+                <a href="javascript:void(0)" class="dhn-link" data-nav-key="view-ankauf" onclick="window.switchView('view-ankauf')">Auto Ankauf</a>
+                <a href="javascript:void(0)" class="dhn-cta" data-nav-key="termin" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Termin</a>
+            </div>
             
             <div class="nav-actions">
                 <div class="header-widget-item mod-crm btn-crm-header" onclick="window.openCRM()" title="Unabhängige Kundendatenbank">
@@ -2776,7 +2935,7 @@
             </div>
         </nav>
         
-        <div id="ticker-container">
+        <div id="ticker-container" role="button" tabindex="0" onclick="window.jumpToBookingFromTicker()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.jumpToBookingFromTicker();}" title="Klicken, um direkt Ihren Wunschtermin zu buchen">
             <div class="ticker-text-wrapper" id="tickerWrapper" style="animation-duration: 15s;">
                 <div class="ticker-text" id="tickerTextContent">
                     <i class="fa-solid fa-car-side ticker-car"></i>
@@ -2785,6 +2944,7 @@
                 </div>
             </div>
         </div>
+        <div class="header-scroll-progress" id="headerScrollProgress" aria-hidden="true"></div>
     </div>
 
     <!-- HAUPTMENÜ -->
@@ -5086,7 +5246,7 @@
         }
 
         window._userHasScrolledPage = false;
-        window.addEventListener('touchstart', () => { window._userHasScrolledPage = true; }, { once: true, passive: true });
+        window.addEventListener('touchmove', () => { window._userHasScrolledPage = true; }, { once: true, passive: true });
         window.addEventListener('wheel', () => { window._userHasScrolledPage = true; }, { once: true, passive: true });
 
         window.forceStartAtTop = function() {
@@ -5101,11 +5261,94 @@
 
         window.syncHeaderHeight = function() {
             const headerEl = document.getElementById('header-wrapper');
-            if (!headerEl) return;
+            if (!headerEl || headerEl.classList.contains('header-compact')) return;
             const measuredHeight = Math.ceil(headerEl.getBoundingClientRect().height || headerEl.offsetHeight);
             if (measuredHeight > 40) {
                 document.documentElement.style.setProperty('--dynamic-header-h', (measuredHeight + 14) + 'px');
             }
+        };
+
+        // =========================================================================
+        // SMART-SCROLL-KOMPAKTMODUS, FORTSCHRITTSLINIE & DESKTOP-NAVIGATION
+        // =========================================================================
+        window._lastHeaderScrollY = 0;
+        window._headerScrollTicking = false;
+
+        window.updateHeaderNavActiveState = function(forcedViewId) {
+            const links = document.querySelectorAll('#desktopHeaderNav .dhn-link');
+            if (!links.length) return;
+
+            const activeView = forcedViewId || (document.querySelector('.view-section.active')?.id || 'view-home');
+            let activeKey = '';
+
+            if (activeView === 'view-formulare' || activeView === 'view-ankauf') {
+                activeKey = activeView;
+            } else if (activeView === 'view-home') {
+                const y = window.scrollY + 180;
+                const terminEl = document.getElementById('termin');
+                const toolsEl = document.getElementById('wunschkennzeichen-section');
+                const leistEl = document.getElementById('leistungen');
+
+                if (terminEl && y >= terminEl.offsetTop) activeKey = '';
+                else if (toolsEl && y >= toolsEl.offsetTop) activeKey = 'tools';
+                else if (leistEl && y >= leistEl.offsetTop) activeKey = 'leistungen';
+            }
+
+            links.forEach(a => {
+                a.classList.toggle('is-active', a.getAttribute('data-nav-key') === activeKey);
+            });
+        };
+
+        window.updateHeaderOnScroll = function() {
+            window._headerScrollTicking = false;
+            const y = window.scrollY || window.pageYOffset || 0;
+            const headerEl = document.getElementById('header-wrapper');
+            const bar = document.getElementById('headerScrollProgress');
+
+            // 1. Rote Fortschrittslinie (0..100%)
+            if (bar) {
+                const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+                const progress = maxScroll > 20 ? Math.min(1, Math.max(0, y / maxScroll)) : 0;
+                bar.style.transform = `scaleX(${progress.toFixed(4)})`;
+            }
+
+            // 2. Smart-Scroll-Kompaktmodus (ab 120px beim Runterscrollen ein, beim Hochscrollen sofort aus)
+            if (headerEl) {
+                const delta = y - window._lastHeaderScrollY;
+                if (y <= 65 || window._isBodyScrollLocked) {
+                    headerEl.classList.remove('header-compact');
+                } else if (y > 120 && delta > 6) {
+                    headerEl.classList.add('header-compact');
+                } else if (delta < -10) {
+                    headerEl.classList.remove('header-compact');
+                }
+            }
+            window._lastHeaderScrollY = y;
+
+            // 3. Aktiven Desktop-Nav-Punkt aktualisieren
+            window.updateHeaderNavActiveState();
+        };
+
+        window.addEventListener('scroll', () => {
+            if (!window._headerScrollTicking) {
+                window._headerScrollTicking = true;
+                requestAnimationFrame(window.updateHeaderOnScroll);
+            }
+        }, { passive: true });
+
+        window.desktopNavGo = function(targetId) {
+            const headerEl = document.getElementById('header-wrapper');
+            if (headerEl) headerEl.classList.remove('header-compact');
+            const isHome = (document.querySelector('.view-section.active')?.id === 'view-home');
+            if (!isHome) window.switchView('view-home');
+            setTimeout(() => {
+                const target = document.getElementById(targetId);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, isHome ? 20 : 120);
+        };
+
+        window.jumpToBookingFromTicker = function() {
+            window.desktopNavGo('termin');
         };
 
         // =========================================================================
@@ -5294,13 +5537,14 @@
 
         // Direkt-Sprung zum Live-Tracker aus der Header-Leiste
         window.jumpToLiveTracker = function() {
-            window.switchView('view-home');
+            const isHome = (document.querySelector('.view-section.active')?.id === 'view-home');
+            if (!isHome) window.switchView('view-home');
             setTimeout(() => {
                 const input = document.getElementById('liveTrackerInput');
                 const section = input ? input.closest('section') : null;
                 if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 if (input) setTimeout(() => input.focus({ preventScroll: true }), 420);
-            }, 80);
+            }, isHome ? 20 : 120);
         };
 
         // =========================================================================
@@ -8251,7 +8495,13 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         window.triggerLogoBubble = function(e) {
             e.preventDefault();
-            window.switchView('view-home');
+            const headerEl = document.getElementById('header-wrapper');
+            if (headerEl) headerEl.classList.remove('header-compact');
+            if (window.getCurrentViewId() === 'view-home') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.switchView('view-home');
+            }
         };
 
         window._openModalOrder = [];
@@ -8383,9 +8633,14 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             const target = document.getElementById(viewId);
             if(target) target.classList.add('active');
+            const headerEl = document.getElementById('header-wrapper');
+            if (headerEl) headerEl.classList.remove('header-compact');
             if (viewId === 'view-formulare' && typeof window.ensureFormsLoaded === 'function') window.ensureFormsLoaded();
             if (viewId === 'view-ankauf' && typeof window.ensureCarsLoaded === 'function') window.ensureCarsLoaded();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (typeof window.updateHeaderNavActiveState === 'function') window.updateHeaderNavActiveState(viewId);
+            const progBar = document.getElementById('headerScrollProgress');
+            if (progBar) progBar.style.transform = 'scaleX(0)';
             
             if(pushState && viewId !== prevViewId) {
                 const replaceMenuLayer = !!(history.state && history.state.redLayer);
