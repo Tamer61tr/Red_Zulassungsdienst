@@ -6707,6 +6707,8 @@
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             const target = document.getElementById(viewId);
             if(target) target.classList.add('active');
+            if (viewId === 'view-formulare' && typeof window.ensureFormsLoaded === 'function') window.ensureFormsLoaded();
+            if (viewId === 'view-ankauf' && typeof window.ensureCarsLoaded === 'function') window.ensureCarsLoaded();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
             if(pushState) {
@@ -8394,34 +8396,41 @@
             });
         }
 
-        onSnapshot(collection(db, "forms"), (snapshot) => {
-            staticForms.forEach(f => {
-                if(!window.allFormsMap[f.id]) window.allFormsMap[f.id] = { ...f };
-            });
-            if(!snapshot.empty) {
-                snapshot.forEach(docSnap => {
-                    const d = docSnap.data();
-                    let validUrl = '';
-                    if (d.url && d.url.startsWith('data:')) {
-                        validUrl = d.url;
-                    } else if (d.customUploaded && hasValidUploadedFile(d.url)) {
-                        validUrl = d.url;
-                    }
-                    window.allFormsMap[docSnap.id] = {
-                        id: docSnap.id,
-                        title: d.title || (window.allFormsMap[docSnap.id]?.title || 'Formular'),
-                        url: validUrl,
-                        customUploaded: !!d.customUploaded,
-                        deleted: !!d.deleted
-                    };
-                });
-            }
-            const activeList = getActiveFormsList();
-            localStorage.setItem('red_forms_clean_v2', JSON.stringify(activeList));
-            renderFormsList(activeList);
-        }, () => {
+        let formsListenerStarted = false;
+        window.ensureFormsLoaded = function() {
+            if (formsListenerStarted) return;
+            formsListenerStarted = true;
             renderFormsList(getActiveFormsList());
-        });
+            onSnapshot(collection(db, "forms"), (snapshot) => {
+                staticForms.forEach(f => {
+                    if(!window.allFormsMap[f.id]) window.allFormsMap[f.id] = { ...f };
+                });
+                if(!snapshot.empty) {
+                    snapshot.forEach(docSnap => {
+                        const d = docSnap.data();
+                        let validUrl = '';
+                        if (d.url && d.url.startsWith('data:')) {
+                            validUrl = d.url;
+                        } else if (d.customUploaded && hasValidUploadedFile(d.url)) {
+                            validUrl = d.url;
+                        }
+                        window.allFormsMap[docSnap.id] = {
+                            id: docSnap.id,
+                            title: d.title || (window.allFormsMap[docSnap.id]?.title || 'Formular'),
+                            url: validUrl,
+                            customUploaded: !!d.customUploaded,
+                            deleted: !!d.deleted
+                        };
+                    });
+                }
+                const activeList = getActiveFormsList();
+                localStorage.setItem('red_forms_clean_v2', JSON.stringify(activeList));
+                renderFormsList(activeList);
+            }, () => {
+                renderFormsList(getActiveFormsList());
+            });
+        };
+        if (window.location.hash === '#view-formulare') window.ensureFormsLoaded();
 
         window.restoreDefaultFormsList = async function() {
             for (const f of staticForms) {
@@ -8778,19 +8787,26 @@
             });
         }
 
-        onSnapshot(collection(db, "cars"), (snapshot) => {
-            if(!snapshot.empty) {
-                const carsData = [];
-                snapshot.forEach(docSnap => {
-                    carsData.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                renderGalleryList(carsData);
-            } else {
-                renderGalleryList(localCarsGallery);
-            }
-        }, () => {
+        let carsListenerStarted = false;
+        window.ensureCarsLoaded = function() {
+            if (carsListenerStarted) return;
+            carsListenerStarted = true;
             renderGalleryList(localCarsGallery);
-        });
+            onSnapshot(collection(db, "cars"), (snapshot) => {
+                if(!snapshot.empty) {
+                    const carsData = [];
+                    snapshot.forEach(docSnap => {
+                        carsData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    renderGalleryList(carsData);
+                } else {
+                    renderGalleryList(localCarsGallery);
+                }
+            }, () => {
+                renderGalleryList(localCarsGallery);
+            });
+        };
+        if (window.location.hash === '#view-ankauf') window.ensureCarsLoaded();
 
         window.uploadNewCarMedia = async function(event) {
             const title = document.getElementById('newCarTitle').value;
