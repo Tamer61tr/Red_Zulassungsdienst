@@ -1392,9 +1392,65 @@
                 font-size: 8.5px !important;
             }
 
-            .header-widgets-wrapper { order: 3; width: 100%; display: flex !important; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--glass-border); white-space: normal; margin-right: 0; }
-            .header-widget-item { padding: 2.5px 6.5px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-            .header-clock-date, .header-weather, .header-office-status, .header-calendar-chip, .header-app-install-chip { font-size: 8.8px; }
+            nav {
+                padding: 8px 3.5% 0 !important;
+                border-top: 2.5px solid var(--primary-red);
+                border-bottom: 1px solid var(--glass-border) !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+            }
+            .quick-menu-btn {
+                border-radius: 8px !important;
+                padding: 5px 9px !important;
+                font-size: 9.5px !important;
+                letter-spacing: 0.4px;
+            }
+            .header-widgets-wrapper {
+                order: 3;
+                width: calc(100% + 7%);
+                margin: 7px -3.5% 0 !important;
+                padding: 5px 2%;
+                background: var(--bg-input);
+                border-top: 1px solid var(--glass-border);
+                display: flex !important;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+            .header-widgets-wrapper::-webkit-scrollbar { display: none; }
+            .header-widget-item,
+            .header-app-install-chip {
+                background: transparent !important;
+                border: none !important;
+                border-right: 1px solid var(--glass-border) !important;
+                border-radius: 0 !important;
+                padding: 2px 7px !important;
+                flex: 1 1 auto;
+                justify-content: center;
+                color: var(--text-light) !important;
+                font-weight: 700 !important;
+            }
+            .header-widgets-wrapper > *:last-child { border-right: none !important; }
+            .header-app-install-chip { color: var(--primary-red) !important; font-weight: 800 !important; }
+            .header-office-status, .header-calendar-chip, .header-app-install-chip { font-size: 9px !important; }
+            #ticker-container {
+                padding: 4px 0 !important;
+                background: var(--bg-card) !important;
+                border-bottom: 1px solid var(--glass-border) !important;
+            }
+            .ticker-text {
+                font-size: 10.5px !important;
+                font-weight: 600 !important;
+                color: var(--text-muted) !important;
+                gap: 10px;
+            }
+            .ticker-highlight {
+                background: transparent !important;
+                border-bottom: 1.5px solid var(--primary-red) !important;
+                padding: 0 2px !important;
+            }
             
             .subpage-nav-bar { margin-top: 12px; margin-bottom: 20px; padding: 10px 4%; gap: 8px; }
             .subpage-nav-bar .btn-primary { flex: 1 1 auto; min-width: 140px; padding: 10px 14px !important; font-size: 10.5px !important; }
@@ -1431,18 +1487,74 @@
             /* WICHTIGER FIX 2: AUF MOBILGERÄTEN & IN DER APP STEHEN DIE 5 SYMBOLE LINKS ÜBEREINANDER (VERTIKAL),
                DAMIT SIE NIEMALS DIE MITTLEREN BUTTONS VERDECKEN! */
             .floating-quick-bar {
-                flex-direction: column !important;
-                bottom: calc(12px + var(--safe-bottom));
-                left: 5px;
-                gap: 5px;
+                flex-direction: column-reverse !important;
+                align-items: flex-start !important;
+                bottom: calc(14px + var(--safe-bottom));
+                left: 12px;
+                gap: 8px;
+            }
+            .fab-main-toggle {
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                background: var(--primary-red);
+                color: #ffffff;
+                border: 2px solid var(--bg-card);
+                box-shadow: 0 6px 20px rgba(217, 0, 0, 0.34);
+                cursor: pointer;
+                font-size: 16px !important;
+                transition: transform 0.2s ease, background 0.2s ease;
+                position: relative;
+            }
+            .fab-main-toggle .fab-icon-close { display: none; }
+            .floating-quick-bar.fab-open .fab-main-toggle {
+                background: #1c1c22;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.38);
+            }
+            .floating-quick-bar.fab-open .fab-main-toggle .fab-icon-open { display: none; }
+            .floating-quick-bar.fab-open .fab-main-toggle .fab-icon-close { display: inline-block; }
+            .fab-items-list {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 7px;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transform: translateY(10px);
+                transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+            }
+            .floating-quick-bar.fab-open .fab-items-list {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+                transform: translateY(0);
             }
             .fab-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-                opacity: 0.9;
-                box-shadow: 0 3px 10px rgba(0,0,0,0.32);
+                width: auto !important;
+                height: 36px !important;
+                padding: 0 13px 0 9px !important;
+                border-radius: 50px !important;
+                background: var(--bg-card) !important;
+                color: var(--text-light) !important;
+                border: 1px solid var(--glass-border) !important;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22) !important;
+                gap: 8px;
+                font-size: 12px !important;
+                font-weight: 700;
+                opacity: 1 !important;
+                white-space: nowrap;
             }
+            .fab-btn i { font-size: 14px; width: 18px; text-align: center; }
+            .fab-wa i { color: #1f8a4c; }
+            .fab-book i { color: var(--primary-red); }
+            .fab-cb i { color: var(--text-light); }
+            .fab-share i { color: var(--text-light); }
+            .fab-app i { color: var(--primary-red); }
+            .fab-label { display: inline !important; font-size: 11.5px; font-weight: 800; color: var(--text-light); }
             footer { padding-bottom: calc(52px + var(--safe-bottom)); }
             .tool-box h3 { font-size: 15px; align-items: flex-start; line-height: 1.3; text-wrap: balance; }
             .tool-box h3 i { margin-top: 2px; flex-shrink: 0; }
@@ -1526,9 +1638,12 @@
         @media (min-width: 769px) {
             .red-select-wrap { display: contents; }
             .mobile-select-display { display: none !important; }
+            .fab-main-toggle { display: none !important; }
+            .fab-items-list { display: contents; }
+            .fab-label { display: none !important; }
         }
 
-        /* GLOBALE KLAMMER-TYPOGRAFIE (ÜBERALL KLEIN & IN NEUER ZEILE) */
+        /* GLOBALE KLAMMER-TYPOGRAFIE (ÜBERALL KLEIN & SAUBER IN NEUER ZEILE) */
         .paren-text-group {
             display: inline-flex;
             flex-direction: column;
@@ -1537,18 +1652,23 @@
         }
         .paren-sub {
             display: block;
-            font-size: 0.78em;
+            font-size: 0.8em;
             font-weight: 600;
-            opacity: 0.82;
-            line-height: 1.3;
+            color: var(--text-muted);
+            opacity: 0.92;
+            line-height: 1.35;
             margin-top: 2px;
+            margin-bottom: 3px;
             letter-spacing: 0.1px;
         }
         .paren-inline {
+            display: inline-block;
+            max-width: 100%;
             font-size: 0.82em;
             font-weight: 600;
-            opacity: 0.82;
-            white-space: nowrap;
+            color: var(--text-muted);
+            line-height: 1.3;
+            vertical-align: baseline;
         }
 
         /* THEME-ADAPTIVES MOBILE AUSWAHL-SHEET (ZENTRIERT & OHNE ZITTERN) */
@@ -1677,13 +1797,19 @@
         </div>
     </div>
     
-    <!-- DIE 5 SCHNELL-SYMBOLE: AM PC NEBENEINANDER, AM HANDY/APP LINKS ÜBEREINANDER & IM DARK-MODE LEUCHTEND -->
-    <div class="floating-quick-bar">
-        <a href="https://wa.me/491783783875" id="fab-wa-link" target="_blank" rel="noopener noreferrer" class="fab-btn fab-wa" title="Direkt per WhatsApp schreiben"><i class="fa-brands fa-whatsapp"></i></a>
-        <button class="fab-btn fab-book" onclick="window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});" title="Schnell-Termin buchen"><i class="fa-solid fa-calendar-check"></i></button>
-        <button class="fab-btn fab-cb" onclick="window.openCallbackModal()" title="Kostenlosen 60s-Rückruf anfordern"><i class="fa-solid fa-phone-volume"></i></button>
-        <button class="fab-btn fab-share" onclick="window.openViralShareModal()" title="Weiterempfehlen & QR-Visitenkarte"><i class="fa-solid fa-qrcode"></i></button>
-        <button class="fab-btn fab-app" id="fabAppInstallBtn" onclick="window.triggerAppInstall()" title="Als Smartphone-App installieren"><i class="fa-solid fa-mobile-screen-button"></i></button>
+    <!-- SCHNELL-SERVICE-LEISTE: AM PC NEBENEINANDER, AM HANDY KOMPAKT AUFKLAPPBAR -->
+    <div class="floating-quick-bar" id="floatingQuickBar">
+        <button type="button" class="fab-main-toggle" id="fabMainToggle" onclick="window.toggleMobileQuickBar(event)" aria-label="Schnellzugriff öffnen" aria-expanded="false">
+            <i class="fa-solid fa-headset fab-icon-open"></i>
+            <i class="fa-solid fa-xmark fab-icon-close"></i>
+        </button>
+        <div class="fab-items-list" id="fabItemsList">
+            <a href="https://wa.me/491783783875" id="fab-wa-link" target="_blank" rel="noopener noreferrer" class="fab-btn fab-wa" title="Direkt per WhatsApp schreiben" onclick="window.closeMobileQuickBar()"><i class="fa-brands fa-whatsapp"></i><span class="fab-label">WhatsApp</span></a>
+            <button type="button" class="fab-btn fab-book" onclick="window.closeMobileQuickBar(); window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});" title="Schnell-Termin buchen"><i class="fa-solid fa-calendar-check"></i><span class="fab-label">Termin buchen</span></button>
+            <button type="button" class="fab-btn fab-cb" onclick="window.closeMobileQuickBar(); window.openCallbackModal();" title="Kostenlosen 60s-Rückruf anfordern"><i class="fa-solid fa-phone-volume"></i><span class="fab-label">60s Rückruf</span></button>
+            <button type="button" class="fab-btn fab-share" onclick="window.closeMobileQuickBar(); window.openViralShareModal();" title="Weiterempfehlen & QR-Visitenkarte"><i class="fa-solid fa-qrcode"></i><span class="fab-label">QR & Teilen</span></button>
+            <button type="button" class="fab-btn fab-app" id="fabAppInstallBtn" onclick="window.closeMobileQuickBar(); window.triggerAppInstall();" title="Als Smartphone-App installieren"><i class="fa-solid fa-mobile-screen-button"></i><span class="fab-label">Als App</span></button>
+        </div>
     </div>
 
     <!-- FREIER VOLLBILD-PINNWAND-CONTAINER (DAMIT SICH KENNZEICHEN PER MAUS & FINGER ÜBERALLHIN ZIEHEN LASSEN) -->
@@ -3584,8 +3710,10 @@
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('zoll', this)">Zoll / Export</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('zweizeilig', this)">Motorrad / US</button>
                     </div>
-                    <p id="plateGuideInfoText" style="font-size:11.5px; color:var(--text-light); margin-top:10px; line-height:1.45;">
-                        <strong>🇪🇺 Euro-Standardkennzeichen (520 × 110 mm):</strong> Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.
+                    <p id="plateGuideInfoText" style="font-size:11.5px; color:var(--text-light); margin-top:10px; line-height:1.5;">
+                        <strong style="display:block;"><i class="fa-solid fa-id-card" style="color:var(--primary-red); margin-right:5px;"></i>Euro-Standardkennzeichen</strong>
+                        <span class="paren-sub">(520 × 110 mm)</span>
+                        Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.
                     </p>
                 </div>
             </div>
@@ -4992,14 +5120,14 @@
         };
 
         const plateGuideDetails = {
-            "euro": "<strong>🇪🇺 Euro-Standardkennzeichen (520 × 110 mm):</strong> Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.",
-            "kurz": "<strong>📏 Kurzes Berliner Kennzeichen (460 mm oder 420 mm × 110 mm):</strong> Besonders beliebt für sportliche Optik bei kurzen Zeichenkombinationen (z.B. B - TY 1). Wir haben alle kurzen Rohlinge direkt vorrätig!",
-            "elektro": "<strong>⚡ E-Kennzeichen (Elektro & Plug-In Hybrid):</strong> Mit dem Zusatzbuchstaben „E“ am Ende profitieren Sie von Steuervorteilen und Bevorrechtigungen im Straßenverkehr. Sofort bei uns prägbar!",
-            "oldtimer": "<strong>🏛️ H-Kennzeichen (Historische Oldtimer ab 30 Jahren):</strong> Pauschalierter Kfz-Steuersatz und freie Fahrt in allen Umweltzonen ohne grüne Plakette (Oldtimer-Gutachten nach § 23 StVZO erforderlich).",
-            "saison": "<strong>☀️ Saisonkennzeichen (z.B. 04/10 oder 03/10):</strong> Ideal für Cabrios, Motorräder, Wohnmobile & Sommerfahrzeuge – Sie zahlen Steuer & Versicherung nur für den gewählten Zulassungszeitraum!",
-            "kurzzeit": "<strong>⏱️ Kurzzeitkennzeichen (5 Tage mit gelbem Rand):</strong> Perfekt für Probe-, Überführungs- und TÜV-Fahrten von abgemeldeten Fahrzeugen innerhalb Deutschlands. Sofort zum Mitnehmen!",
-            "zoll": "<strong>🌍 Zoll- / Ausfuhrkennzeichen (Roter Rand, 15–30 Tage):</strong> Für den sicheren Export von Fahrzeugen ins EU- und Nicht-EU-Ausland inklusive internationaler gelber Versicherungskarte.",
-            "zweizeilig": "<strong>🏍️ Motorrad- & Zweizeilige Schilder (180×200 mm / 255×130 mm):</strong> Offizielle Kraftrad-, Leichtkraftrad-, Quad- und US-Import-Kennzeichen sofort zum Mitnehmen vor Ort."
+            "euro": `<strong style="display:block;"><i class="fa-solid fa-id-card" style="color:var(--primary-red); margin-right:5px;"></i>Euro-Standardkennzeichen</strong><span class="paren-sub">(520 × 110 mm)</span>Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.`,
+            "kurz": `<strong style="display:block;"><i class="fa-solid fa-ruler-horizontal" style="color:var(--primary-red); margin-right:5px;"></i>Kurzes Berliner Kennzeichen</strong><span class="paren-sub">(460 mm oder 420 × 110 mm)</span>Besonders beliebt für sportliche Optik bei kurzen Zeichenkombinationen <span class="paren-inline">(z.B. B - TY 1)</span>. Wir haben alle kurzen Rohlinge direkt vorrätig.`,
+            "elektro": `<strong style="display:block;"><i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i>E-Kennzeichen</strong><span class="paren-sub">(Elektro & Plug-In Hybrid)</span>Mit dem Zusatzbuchstaben „E“ am Ende profitieren Sie von Steuervorteilen und Bevorrechtigungen im Straßenverkehr. Sofort bei uns prägbar.`,
+            "oldtimer": `<strong style="display:block;"><i class="fa-solid fa-landmark" style="color:var(--primary-red); margin-right:5px;"></i>H-Kennzeichen</strong><span class="paren-sub">(Historische Oldtimer ab 30 Jahren)</span>Pauschalierter Kfz-Steuersatz und freie Fahrt in allen Umweltzonen ohne grüne Plakette <span class="paren-inline">(Gutachten nach § 23 StVZO erforderlich)</span>.`,
+            "saison": `<strong style="display:block;"><i class="fa-solid fa-calendar-days" style="color:var(--primary-red); margin-right:5px;"></i>Saisonkennzeichen</strong><span class="paren-sub">(z.B. 04/10 oder 03/10)</span>Ideal für Cabrios, Motorräder, Wohnmobile & Sommerfahrzeuge – Sie zahlen Steuer & Versicherung nur für den gewählten Zulassungszeitraum.`,
+            "kurzzeit": `<strong style="display:block;"><i class="fa-solid fa-stopwatch" style="color:var(--primary-red); margin-right:5px;"></i>Kurzzeitkennzeichen</strong><span class="paren-sub">(5 Tage mit gelbem Rand)</span>Perfekt für Probe-, Überführungs- und TÜV-Fahrten von abgemeldeten Fahrzeugen innerhalb Deutschlands. Sofort zum Mitnehmen.`,
+            "zoll": `<strong style="display:block;"><i class="fa-solid fa-globe" style="color:var(--primary-red); margin-right:5px;"></i>Zoll- / Ausfuhrkennzeichen</strong><span class="paren-sub">(Roter Rand, 15–30 Tage)</span>Für den sicheren Export von Fahrzeugen ins EU- und Nicht-EU-Ausland inklusive internationaler gelber Versicherungskarte.`,
+            "zweizeilig": `<strong style="display:block;"><i class="fa-solid fa-motorcycle" style="color:var(--primary-red); margin-right:5px;"></i>Motorrad- & Zweizeilige Schilder</strong><span class="paren-sub">(180×200 mm / 255×130 mm)</span>Offizielle Kraftrad-, Leichtkraftrad-, Quad- und US-Import-Kennzeichen sofort zum Mitnehmen vor Ort.`
         };
 
         window.selectPlateGuide = function(key, btnEl) {
@@ -7199,14 +7327,36 @@
             });
         };
 
-        // Globale Klammer-Formatierung (überall in kleiner Schriftgröße; bei Labels/Buttons/Titeln in neuer Zeile)
+        // Aufklappbare Mobile Service-Leiste
+        window.toggleMobileQuickBar = function(e) {
+            if (e) e.stopPropagation();
+            const bar = document.getElementById('floatingQuickBar');
+            const btn = document.getElementById('fabMainToggle');
+            if (!bar) return;
+            const isOpen = bar.classList.toggle('fab-open');
+            if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
+        window.closeMobileQuickBar = function() {
+            const bar = document.getElementById('floatingQuickBar');
+            const btn = document.getElementById('fabMainToggle');
+            if (bar) bar.classList.remove('fab-open');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        };
+        document.addEventListener('click', (e) => {
+            const bar = document.getElementById('floatingQuickBar');
+            if (bar && bar.classList.contains('fab-open') && !bar.contains(e.target)) {
+                window.closeMobileQuickBar();
+            }
+        });
+
+        // Globale Klammer-Formatierung (überall in kleiner Schriftgröße; verhindert abgebrochene Klammern)
         window.formatParenthesesEverywhere = function(rootEl) {
             const root = rootEl || document.body;
             const blockTargets = root.querySelectorAll(
-                '.form-group > label, .compass-tab-btn, .district-pill, .checklist-row span, .compass-doc-list li, .admin-details summary, .calc-item span, .download-info span, .tool-box h3, .compass-box h2, .compass-box h3, .section-header h2'
+                '.form-group > label, .compass-tab-btn, .district-pill, .checklist-row span, .compass-doc-list li, .admin-details summary, .calc-item span, .download-info span, .tool-box h3, .compass-box h2, .compass-box h3, .section-header h2, #districtResultBox strong, #laboEnvResultBox strong, #pickupForecastResult strong, .tool-box > div > div'
             );
             blockTargets.forEach(el => {
-                if (el.dataset.parenDone === '1' || el.closest('#adminModal') || el.closest('#liveGermanPlatePreview')) return;
+                if (el.dataset.parenDone === '1' || el.closest('#adminModal') || el.closest('#liveGermanPlatePreview') || el.closest('#header-wrapper')) return;
                 const textNodes = [];
                 el.childNodes.forEach(n => {
                     if (n.nodeType === 3 && /\([^)]+\)/.test(n.nodeValue)) textNodes.push(n);
@@ -7224,9 +7374,9 @@
                 el.dataset.parenDone = '1';
             });
 
-            // Fließtext-Klammern in Absätzen kleiner (ohne harten Umbruch mitten im Satz)
-            root.querySelectorAll('p, .card-info-slide p, .admin-details-content').forEach(p => {
-                if (p.dataset.parenDone === '1' || p.closest('#adminModal') || p.closest('#legalOverlay')) return;
+            // Fließtext-Klammern als untrennbare kleine Einheit (inline-block), damit nichts mitten drin abbricht
+            root.querySelectorAll('p, .card-info-slide p, .admin-details-content, #districtResultBox span, #laboFeeResultDesc, #pickupForecastResult').forEach(p => {
+                if (p.dataset.parenDone === '1' || p.closest('#adminModal') || p.closest('#legalOverlay') || p.classList.contains('paren-sub') || p.classList.contains('paren-inline')) return;
                 p.childNodes.forEach(node => {
                     if (node.nodeType === 3 && /\([^)]+\)/.test(node.nodeValue)) {
                         const span = document.createElement('span');
@@ -7245,6 +7395,22 @@
                 window.syncAllMobileSelectDisplays();
                 window.formatParenthesesEverywhere(document.body);
             }, 400);
+
+            // Dynamische Ergebnis-Boxen automatisch nachformatieren, sobald der Nutzer klickt
+            const dynamicIds = ['districtResultBox', 'laboEnvResultBox', 'pickupForecastResult', 'compassDocList', 'calcOptionsList'];
+            const dynObs = new MutationObserver((mutations) => {
+                mutations.forEach(m => {
+                    if (m.target && m.target.nodeType === 1) {
+                        m.target.removeAttribute('data-paren-done');
+                        m.target.querySelectorAll('[data-paren-done]').forEach(c => c.removeAttribute('data-paren-done'));
+                        window.formatParenthesesEverywhere(m.target);
+                    }
+                });
+            });
+            dynamicIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) dynObs.observe(el, { childList: true, subtree: false });
+            });
         });
     </script>
     
