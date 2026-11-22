@@ -469,7 +469,7 @@
             0% { left: -10%; opacity: 0; transform: scale(0.92); }
             15% { opacity: 1; }
             85% { opacity: 1; }
-            100% { left: calc(100% - 46px); opacity: 1; transform: scale(1); }
+            100% { left: calc(100% - 82px); opacity: 1; transform: scale(1); }
         }
 
         .intro-text {
@@ -489,17 +489,39 @@
         }
         @keyframes fadeTextPro { 100% { transform: translateY(0); opacity: 1; filter: blur(0); } }
 
-        /* Cookies */
-        .cookie-overlay { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: var(--glass-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 2px solid var(--primary-red); z-index: 9999999; box-sizing: border-box; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); display: flex; justify-content: center; padding: 25px 20px calc(25px + var(--safe-bottom)); box-shadow: 0 -10px 40px rgba(0,0,0,0.45); }
+        /* Cookies (immer unter dem Intro-Preloader & mobil besonders kompakt) */
+        .cookie-overlay { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: var(--glass-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 2px solid var(--primary-red); z-index: 99990; box-sizing: border-box; transform: translateY(100%); transition: transform 0.45s cubic-bezier(0.165, 0.84, 0.44, 1); display: flex; justify-content: center; padding: 18px 20px calc(18px + var(--safe-bottom)); box-shadow: 0 -10px 35px rgba(0,0,0,0.38); }
         .cookie-overlay.show { transform: translateY(0); }
-        .cookie-box { max-width: 900px; width: 100%; color: var(--text-light); }
-        .cookie-box h3 { color: var(--primary-red); margin-bottom: 12px; font-size: 18px; font-weight: 800; }
-        .cookie-box p { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
-        .cookie-options { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
+        .cookie-box { max-width: 880px; width: 100%; color: var(--text-light); }
+        .cookie-box h3 { color: var(--primary-red); margin-bottom: 6px; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 7px; }
+        .cookie-box p { font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.45; }
+        .cookie-options { display: flex; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+        .cookie-options .noble-checkbox-label { margin-top: 0; }
         .cookie-checkbox { display: none; }
-        .cookie-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
-        .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-light); }
-        .btn-outline:hover { background: var(--glass-border); border-color: var(--text-light); }
+        .cookie-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-outline { background: var(--bg-input) !important; border: 1.5px solid var(--glass-border) !important; color: var(--text-light) !important; box-shadow: none !important; }
+        .btn-outline:hover { background: var(--glass-border) !important; border-color: var(--primary-red) !important; }
+
+        @media (max-width: 768px) {
+            .cookie-overlay {
+                padding: 12px 13px calc(12px + var(--safe-bottom));
+                border-radius: 16px 16px 0 0;
+                max-height: 46dvh;
+                overflow-y: auto;
+            }
+            .cookie-box h3 { font-size: 12.5px; margin-bottom: 4px; }
+            .cookie-box p { font-size: 10.2px; line-height: 1.38; margin-bottom: 8px; }
+            .cookie-options { flex-direction: column; gap: 5px; margin-bottom: 10px; }
+            .cookie-options .noble-checkbox-label { font-size: 10.2px; gap: 7px; line-height: 1.25; }
+            .cookie-options .noble-checkbox-box { width: 15px; height: 15px; border-radius: 4px; }
+            .cookie-buttons { flex-wrap: nowrap; gap: 8px; }
+            .cookie-buttons .btn-primary {
+                flex: 1;
+                padding: 9px 6px !important;
+                font-size: 9.8px !important;
+                white-space: nowrap;
+            }
+        }
 
         /* Toasts */
         #toast-container { position: fixed; bottom: calc(30px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 92%; max-width: 420px; }
@@ -2263,11 +2285,26 @@
         <div class="intro-subline">Schnell • Zuverlässig • Kompetent</div>
     </div>
     <script>
+        window.showCookieBannerIfNeeded = function(delayMs) {
+            var hasConsent = false;
+            try { hasConsent = !!(localStorage.getItem('cookie_consent') || sessionStorage.getItem('cookie_consent')); } catch (e) {}
+            if (hasConsent) return;
+            var intro = document.getElementById('intro-preloader');
+            if (intro && !intro.classList.contains('intro-preloader-done')) return;
+            clearTimeout(window._cookieShowTimer);
+            window._cookieShowTimer = setTimeout(function() {
+                var ov = document.getElementById('cookieConsentOverlay');
+                if (ov) ov.classList.add('show');
+            }, typeof delayMs === 'number' ? delayMs : 280);
+        };
+
         window.dismissIntroPreloader = function() {
             var el = document.getElementById('intro-preloader');
             if (el) { el.classList.add('intro-preloader-done'); el.style.display = 'none'; }
             try { sessionStorage.setItem('red_intro_seen', '1'); } catch (e) {}
+            window.showCookieBannerIfNeeded(280);
         };
+
         try {
             if (sessionStorage.getItem('red_intro_seen')) {
                 window.dismissIntroPreloader();
@@ -7261,28 +7298,29 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             window.renderServices(window.servicesData);
 
-            if(!sessionStorage.getItem('cookie_consent')) {
-                setTimeout(() => { document.getElementById('cookieConsentOverlay').classList.add('show'); }, 900);
-            }
+            window.showCookieBannerIfNeeded(450);
 
-            const hash = window.location.hash.substring(1);
-            if (hash && document.getElementById(hash)) {
-                window.switchView(hash, false);
-            } else {
-                history.replaceState({ view: 'view-home' }, '', '#view-home');
+            if (typeof window.initStepByStepBackNavigation === 'function') {
+                window.initStepByStepBackNavigation();
             }
 
             window.acceptAllCookies = function() {
                 if(document.getElementById('cookieExternalMedia')) document.getElementById('cookieExternalMedia').checked = true;
                 if(document.getElementById('cookieAnalytics')) document.getElementById('cookieAnalytics').checked = true;
-                sessionStorage.setItem('cookie_consent', 'all');
+                try {
+                    localStorage.setItem('cookie_consent', 'all');
+                    sessionStorage.setItem('cookie_consent', 'all');
+                } catch(e) {}
                 window.enableGoogleMaps();
                 document.getElementById('cookieConsentOverlay').classList.remove('show');
                 window.showToast('Alle Einstellungen gespeichert.', 'success');
             };
 
             window.acceptSelectedCookies = function() {
-                sessionStorage.setItem('cookie_consent', 'selected');
+                try {
+                    localStorage.setItem('cookie_consent', 'selected');
+                    sessionStorage.setItem('cookie_consent', 'selected');
+                } catch(e) {}
                 if(document.getElementById('cookieExternalMedia')?.checked) {
                     window.enableGoogleMaps();
                 }
@@ -7568,8 +7606,132 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             window.switchView('view-home');
         };
 
+        window._openModalOrder = [];
+        window._lastHistoryState = null;
+        window._lastBackExitHint = 0;
+
+        window.getCurrentViewId = function() {
+            const active = document.querySelector('.view-section.active');
+            return active ? active.id : 'view-home';
+        };
+
+        window.pushAppHistoryState = function(stateObj, replaceOnly = false) {
+            const hashStr = '#' + (stateObj.view || 'view-home');
+            if (replaceOnly) {
+                history.replaceState(stateObj, '', hashStr);
+            } else {
+                history.pushState(stateObj, '', hashStr);
+            }
+            window._lastHistoryState = stateObj;
+        };
+
+        window.closeTopmostUiLayer = function() {
+            // 1. Mobiles Select-Sheet
+            const mobileSel = document.getElementById('mobileSelectOverlay');
+            if (mobileSel && mobileSel.classList.contains('open')) {
+                window.closeMobileSelectSheet();
+                return true;
+            }
+            // 2. Geöffneter Flatpickr-Kalender
+            const openFp = document.querySelector('.flatpickr-calendar.open');
+            if (openFp) {
+                ['datePicker', 'editAptDate'].forEach(id => {
+                    const fp = document.getElementById(id)?._flatpickr;
+                    if (fp && fp.isOpen) fp.close();
+                });
+                return true;
+            }
+            // 3. Vollbild-Menü
+            const qMenu = document.getElementById('quickMenu');
+            if (qMenu && qMenu.classList.contains('active')) {
+                window.toggleMenu();
+                return true;
+            }
+            // 4. Aufgeklappte Schnell-Service-Leiste
+            const qBar = document.getElementById('floatingQuickBar');
+            if (qBar && qBar.classList.contains('fab-open')) {
+                window.closeMobileQuickBar();
+                return true;
+            }
+            // 5. Oberstes offenes Modal / Dialogfenster
+            const openOverlays = Array.from(document.querySelectorAll('.custom-dialog-overlay.open'));
+            if (openOverlays.length > 0) {
+                let targetOv = null;
+                for (let i = window._openModalOrder.length - 1; i >= 0; i--) {
+                    const candidate = document.getElementById(window._openModalOrder[i]);
+                    if (candidate && candidate.classList.contains('open')) {
+                        targetOv = candidate;
+                        break;
+                    }
+                }
+                if (!targetOv) targetOv = openOverlays[openOverlays.length - 1];
+                targetOv.classList.remove('open');
+                if (targetOv.id === 'widgetModalOverlay') window.closeWidgetModal();
+                if (targetOv.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
+                return true;
+            }
+            return false;
+        };
+
+        window.initStepByStepBackNavigation = function() {
+            if (window._stepBackInitDone) return;
+            window._stepBackInitDone = true;
+
+            const hash = window.location.hash.substring(1);
+            const hasStartSubView = hash && hash !== 'view-home' && document.getElementById(hash) && document.getElementById(hash).classList.contains('view-section');
+
+            // Root-Basis auf Startseite setzen
+            window.pushAppHistoryState({ view: 'view-home', redRoot: true }, true);
+
+            if (hasStartSubView) {
+                window.pushAppHistoryState({ view: hash }, false);
+                window.switchView(hash, false);
+            } else {
+                // Beim ersten Fingertipp / Klick sanften Schutz-Schritt aktivieren
+                const armRootGuard = () => {
+                    if (history.state && history.state.redRoot) {
+                        window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                    }
+                };
+                document.addEventListener('pointerdown', armRootGuard, { once: true, passive: true });
+            }
+
+            // Jedes Öffnen von Modals, Menü, Select-Sheet oder Service-Leiste als Schritt merken
+            const layerSpecs = [
+                ...Array.from(document.querySelectorAll('.custom-dialog-overlay')).map(el => ({ el, cls: 'open' })),
+                { el: document.getElementById('quickMenu'), cls: 'active' },
+                { el: document.getElementById('mobileSelectOverlay'), cls: 'open' },
+                { el: document.getElementById('floatingQuickBar'), cls: 'fab-open' }
+            ];
+
+            const layerObs = new MutationObserver((mutations) => {
+                mutations.forEach(m => {
+                    const el = m.target;
+                    const cls = el.dataset.backCls;
+                    if (!cls) return;
+                    const isOpenNow = el.classList.contains(cls);
+                    const wasOpen = (m.oldValue || '').split(/\s+/).includes(cls);
+
+                    if (isOpenNow && !wasOpen) {
+                        window._openModalOrder = window._openModalOrder.filter(id => id !== el.id);
+                        window._openModalOrder.push(el.id);
+                        window.pushAppHistoryState({ view: window.getCurrentViewId(), redLayer: el.id, ts: Date.now() }, false);
+                    } else if (!isOpenNow && wasOpen) {
+                        window._openModalOrder = window._openModalOrder.filter(id => id !== el.id);
+                    }
+                });
+            });
+
+            layerSpecs.forEach(({ el, cls }) => {
+                if (!el || !el.id) return;
+                el.dataset.backCls = cls;
+                layerObs.observe(el, { attributes: true, attributeFilter: ['class'], attributeOldValue: true });
+            });
+        };
+
         window.switchView = function(viewId, pushState = true) {
             window.syncHeaderHeight();
+            const prevViewId = window.getCurrentViewId();
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             const target = document.getElementById(viewId);
             if(target) target.classList.add('active');
@@ -7577,16 +7739,61 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if (viewId === 'view-ankauf' && typeof window.ensureCarsLoaded === 'function') window.ensureCarsLoaded();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            if(pushState) {
-                history.pushState({ view: viewId }, '', `#${viewId}`);
+            if(pushState && viewId !== prevViewId) {
+                const replaceMenuLayer = !!(history.state && history.state.redLayer);
+                window.pushAppHistoryState({ view: viewId, ts: Date.now() }, replaceMenuLayer);
             }
         };
 
         window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.view) {
-                window.switchView(e.state.view, false);
-            } else {
-                window.switchView('view-home', false);
+            const prevState = window._lastHistoryState;
+            window._lastHistoryState = e.state;
+
+            // Schritt 1: Erst oberstes offenes Fenster / Menü / Auswahl-Sheet schließen
+            if (window.closeTopmostUiLayer()) {
+                if (e.state && e.state.redRoot) {
+                    window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                }
+                return;
+            }
+
+            const currentView = window.getCurrentViewId();
+            const targetView = (e.state && e.state.view) ? e.state.view : 'view-home';
+
+            // Schritt 2: Falls das vorherige Fenster schon per X geschlossen wurde, leeren Zwischenschritt überspringen
+            if (prevState && prevState.redLayer && targetView === currentView && e.state && !e.state.redRoot) {
+                history.back();
+                return;
+            }
+
+            // Schritt 3: Zur vorherigen Unterseite bzw. Startseite wechseln
+            if (targetView !== currentView) {
+                window.switchView(targetView, false);
+                return;
+            }
+
+            // Schritt 4: Auf Startseite ganz unten -> erst sanft nach oben scrollen
+            if (currentView === 'view-home' && window.scrollY > 250) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (e.state && e.state.redRoot) {
+                    window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                }
+                return;
+            }
+
+            // Schritt 5: Ganz oben auf der Startseite -> 1× Hinweis statt sofortigem Rauswurf
+            if (e.state && e.state.redRoot) {
+                const now = Date.now();
+                if (now - window._lastBackExitHint > 2500) {
+                    window._lastBackExitHint = now;
+                    window.showToast('Zum Verlassen erneut Zurück tippen', 'success');
+                    clearTimeout(window._rearmGuardTimer);
+                    window._rearmGuardTimer = setTimeout(() => {
+                        if (history.state && history.state.redRoot && window.getCurrentViewId() === 'view-home') {
+                            window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                        }
+                    }, 2600);
+                }
             }
         });
         
@@ -7950,7 +8157,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             // Fließtext- & FAQ-Klammern kleiner direkt im Satzfluss (ohne abgebrochenes ? oder .)
             root.querySelectorAll('p, .admin-details summary, .card-info-slide p, .admin-details-content, #districtResultBox span, #laboFeeResultDesc, #pickupForecastResult').forEach(p => {
-                if (p.dataset.parenDone === '1' || p.closest('#adminModal') || p.closest('#legalOverlay') || p.classList.contains('paren-sub') || p.classList.contains('paren-inline')) return;
+                if (p.dataset.parenDone === '1' || p.closest('#adminModal') || p.closest('#legalOverlay') || p.closest('.cookie-box') || p.classList.contains('paren-sub') || p.classList.contains('paren-inline')) return;
                 p.childNodes.forEach(node => {
                     if (node.nodeType === 3 && /\([^)]+\)/.test(node.nodeValue)) {
                         const span = document.createElement('span');
