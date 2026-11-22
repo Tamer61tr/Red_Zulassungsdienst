@@ -14,6 +14,35 @@
     <meta name="application-name" content="RED Zulassung">
     <meta name="theme-color" content="#f2f2f7" id="metaThemeColor">
     <meta name="description" content="RED Zulassungsdienst Berlin – Kfz-Zulassung in Bestzeit, Sofortkennzeichen zum Mitnehmen, Kurzzeitkennzeichen, Zollkennzeichen & Auto Ankauf.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="de_DE">
+    <meta property="og:title" content="RED Zulassungsdienst Berlin | Schnell. Zuverlässig. Kompetent.">
+    <meta property="og:description" content="Kfz-Zulassung in Berlin ohne Wartezeit beim Amt: Anmeldung, Ummeldung, Abmeldung, Sofortkennzeichen, Kurzzeit- & Zollkennzeichen in der Kienitzer Str. 6.">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "RED Zulassungsdienst Berlin",
+      "description": "Kfz-Zulassungsdienst in Berlin-Neukölln für Anmeldung, Ummeldung, Abmeldung, Kurzzeitkennzeichen, Zollkennzeichen, Sofortprägung und Auto Ankauf.",
+      "telephone": "+49 178 3783875",
+      "email": "Redzulassungsdienst@gmail.com",
+      "priceRange": "€€",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Kienitzer Str. 6",
+        "addressLocality": "Berlin",
+        "postalCode": "12053",
+        "addressCountry": "DE"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "20:00"
+      },
+      "areaServed": "Berlin"
+    }
+    </script>
     
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230e0e12'/%3E%3Crect x='16' y='16' width='480' height='480' rx='96' fill='none' stroke='%23e60000' stroke-width='12'/%3E%3Ctext x='256' y='230' font-family='Arial,sans-serif' font-size='135' font-weight='900' fill='%23e60000' text-anchor='middle'%3ERED%3C/text%3E%3Ctext x='256' y='325' font-family='Arial,sans-serif' font-size='54' font-weight='800' fill='%23ffffff' text-anchor='middle' letter-spacing='4'%3EBERLIN%3C/text%3E%3Cpath d='M395 390 C375 375 330 355 295 345 C255 332 210 325 160 325 C115 325 90 332 75 340 C55 352 40 368 25 388 C18 396 14 405 18 412 C22 417 30 422 42 425 L385 425 C398 422 404 410 395 390 Z' fill='%23e60000' transform='translate(48, 10)'/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230e0e12'/%3E%3Crect x='16' y='16' width='480' height='480' rx='96' fill='none' stroke='%23e60000' stroke-width='12'/%3E%3Ctext x='256' y='230' font-family='Arial,sans-serif' font-size='135' font-weight='900' fill='%23e60000' text-anchor='middle'%3ERED%3C/text%3E%3Ctext x='256' y='325' font-family='Arial,sans-serif' font-size='54' font-weight='800' fill='%23ffffff' text-anchor='middle' letter-spacing='4'%3EBERLIN%3C/text%3E%3C/svg%3E">
@@ -907,9 +936,8 @@
         .service-price { font-size: 23px; font-weight: 900; }
         
         .card-badge {
-            position: absolute; top: 15px; right: -35px; width: 125px; padding: 5px 0; font-size: 9px; font-weight: 900;
-            color: #fff; text-transform: uppercase; transform: rotate(45deg); box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-            z-index: 10; letter-spacing: 1px; pointer-events: none; text-align: center;
+            position: absolute; top: 12px; right: 12px; padding: 3px 9px; border-radius: 6px; font-size: 9px; font-weight: 800;
+            color: #fff; text-transform: uppercase; letter-spacing: 0.6px; pointer-events: none; z-index: 10;
         }
         .badge-neu { background: #007aff; }
         .badge-angebot { background: #ff9500; }
@@ -1532,7 +1560,7 @@
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home');"><i class="fa-solid fa-house" style="color:var(--primary-red);"></i> Startseite</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('leistungen').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-gears" style="color:var(--primary-red);"></i> Leistungen</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('zulassungs-kompass').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-compass" style="color:var(--primary-red);"></i> Zulassungs-Kompass</a>
-        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-calculator" style="color:var(--primary-red);"></i> Kennzeichen & Kalkulator</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-sliders" style="color:var(--primary-red);"></i> Online-Tools & Rechner</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat');"><i class="fa-solid fa-signature" style="color:var(--primary-red);"></i> Digitale Vollmacht</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openKaufvertragModal();"><i class="fa-solid fa-handshake" style="color:var(--primary-red);"></i> Kfz-Kaufvertrag</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-formulare');"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Formulare</a>
@@ -3161,7 +3189,7 @@
                         <div class="calc-total-bar">
                             <div>
                                 <span style="font-size:10px; text-transform:uppercase; color:var(--text-muted); display:block; font-weight:700;">Geschätzte Service-Summe*</span>
-                                <strong style="font-size:20px; color:var(--primary-red);" id="calcTotalSum">- €</strong>
+                                <strong style="font-size:17px; color:var(--primary-red);" id="calcTotalSum">Auf Anfrage</strong>
                             </div>
                             <button type="button" class="btn-primary" style="padding:10px 18px;" onclick="window.applyCalcToBooking()">Auswahl buchen <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
@@ -3267,14 +3295,14 @@
                 <div style="margin-top:16px; background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:14px;">
                     <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--primary-red); margin-bottom:8px;"><i class="fa-solid fa-ruler-combined"></i> Kennzeichen-Arten & Berliner Schildermaße (Klicken für Info)</div>
                     <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                        <button type="button" class="district-pill active" onclick="window.selectPlateGuide('euro', this)">🇪🇺 520mm Standard</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurz', this)">📏 460/420mm Kurz</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('elektro', this)">⚡ E-Kennzeichen</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('oldtimer', this)">🏛️ H-Oldtimer</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('saison', this)">☀️ Saison (04/10)</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurzzeit', this)">⏱️ 5-Tage Kurzzeit</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('zoll', this)">🌍 Zoll / Export</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('zweizeilig', this)">🏍️ Motorrad / US</button>
+                        <button type="button" class="district-pill active" onclick="window.selectPlateGuide('euro', this)">520 mm Standard</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurz', this)">460 / 420 mm Kurz</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('elektro', this)">E-Kennzeichen</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('oldtimer', this)">H-Oldtimer</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('saison', this)">Saison (04/10)</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurzzeit', this)">5-Tage Kurzzeit</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('zoll', this)">Zoll / Export</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('zweizeilig', this)">Motorrad / US</button>
                     </div>
                     <p id="plateGuideInfoText" style="font-size:11.5px; color:var(--text-light); margin-top:10px; line-height:1.45;">
                         <strong>🇪🇺 Euro-Standardkennzeichen (520 × 110 mm):</strong> Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.
@@ -3289,18 +3317,18 @@
                     
                     <!-- ALLE 12 BERLINER BEZIRKE -->
                     <div class="district-pills-wrap">
-                        <button type="button" class="district-pill active" onclick="window.selectBerlinDistrict('neukoelln', this)">📍 Neukölln / Britz</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('kreuzberg', this)">📍 Kreuzberg / Mitte</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('tempelhof', this)">📍 Tempelhof-Schöneberg</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('charlottenburg', this)">📍 Charlottenburg-Wilmersdorf</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('spandau', this)">📍 Spandau</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('reinickendorf', this)">📍 Tegel / Reinickendorf</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('wedding', this)">📍 Wedding / Gesundbrunnen</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('pankow', this)">📍 Pankow / Weißensee</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('marzahn', this)">📍 Marzahn-Hellersdorf</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('lichtenberg', this)">📍 Friedrichshain / Lichtenberg</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('treptow', this)">📍 Treptow-Köpenick</button>
-                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('steglitz', this)">📍 Steglitz-Zehlendorf</button>
+                        <button type="button" class="district-pill active" onclick="window.selectBerlinDistrict('neukoelln', this)">Neukölln / Britz</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('kreuzberg', this)">Kreuzberg / Mitte</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('tempelhof', this)">Tempelhof-Schöneberg</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('charlottenburg', this)">Charlottenburg-Wilmersdorf</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('spandau', this)">Spandau</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('reinickendorf', this)">Tegel / Reinickendorf</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('wedding', this)">Wedding / Gesundbrunnen</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('pankow', this)">Pankow / Weißensee</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('marzahn', this)">Marzahn-Hellersdorf</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('lichtenberg', this)">Friedrichshain / Lichtenberg</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('treptow', this)">Treptow-Köpenick</button>
+                        <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('steglitz', this)">Steglitz-Zehlendorf</button>
                     </div>
                     <div id="districtResultBox" style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:12px; padding:12px; font-size:11.5px; margin:12px 0;">
                         <strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Direkt vor Ort in Neukölln (Kienitzer Str. 6, 12053 Berlin):</strong><br>
@@ -4575,7 +4603,7 @@
             const m = now.getMinutes();
 
             if (day === 0 || day === 6 || h >= 18) {
-                el.innerHTML = `🔥 <strong>Express-Kontingent:</strong> Jetzt Online-Termin für den nächsten Werktag ab 09:00 Uhr sichern!`;
+                el.innerHTML = `<i class="fa-regular fa-clock" style="color:var(--primary-red);"></i> <strong>Express-Kontingent:</strong> Jetzt Online-Termin für den nächsten Werktag ab 09:00 Uhr sichern.`;
                 return;
             }
 
@@ -4586,7 +4614,7 @@
 
             const remH = Math.floor(diffMins / 60);
             const remM = diffMins % 60;
-            el.innerHTML = `⚡ <strong>Nächste Behörden-Abgabe (LABO Berlin):</strong> in <span style="color:var(--primary-red); font-weight:900;">${remH} Std. ${remM} Min.</span> – Jetzt Unterlagen einreichen!`;
+            el.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--primary-red);"></i> <strong>Nächste Behörden-Abgabe (LABO Berlin):</strong> in <span style="color:var(--primary-red); font-weight:900;">${remH} Std. ${remM} Min.</span> – Jetzt Unterlagen einreichen.`;
         };
         setInterval(window.updateDispatchCountdown, 30000);
 
@@ -5271,7 +5299,7 @@
             items.forEach(item => {
                 const isSel = !!item.selected;
                 const priceText = (!item.price || item.price.trim() === '' || item.price.trim() === '-') 
-                    ? '- €' 
+                    ? 'Auf Anfrage' 
                     : (item.price.includes('€') ? item.price : `${item.price} €`);
 
                 const row = document.createElement('div');
@@ -5321,7 +5349,7 @@
             const totalEl = document.getElementById('calcTotalSum');
             if(!totalEl) return;
             if(!hasNumericPrice) {
-                totalEl.innerText = '- €';
+                totalEl.innerText = 'Auf Anfrage';
             } else {
                 const formatted = Number.isInteger(sum) ? sum : sum.toFixed(2).replace('.', ',');
                 totalEl.innerText = `ab ${formatted} €`;
@@ -5641,16 +5669,6 @@
                 sndBtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Ton: Aus';
             }
         });
-
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false;
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
-        };
 
         window.redApts = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
         window.currentWeatherData = null;
@@ -6638,13 +6656,6 @@
         window.triggerLogoBubble = function(e) {
             e.preventDefault();
             window.switchView('view-home');
-            const bubble = document.getElementById('logoSpeechBubble');
-            bubble.classList.add('show-bubble');
-            
-            if(window.bubbleTimeout) clearTimeout(window.bubbleTimeout);
-            window.bubbleTimeout = setTimeout(() => {
-                bubble.classList.remove('show-bubble');
-            }, 3000);
         };
 
         window.switchView = function(viewId, pushState = true) {
