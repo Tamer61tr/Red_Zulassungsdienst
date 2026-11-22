@@ -18,15 +18,24 @@
     <meta property="og:locale" content="de_DE">
     <meta property="og:title" content="RED Zulassungsdienst Berlin | Schnell. Zuverlässig. Kompetent.">
     <meta property="og:description" content="Kfz-Zulassung in Berlin ohne Wartezeit beim Amt: Anmeldung, Ummeldung, Abmeldung, Sofortkennzeichen, Kurzzeit- & Zollkennzeichen in der Kienitzer Str. 6.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="RED Zulassungsdienst Berlin | Schnell. Zuverlässig. Kompetent.">
+    <meta name="twitter:description" content="Kfz-Zulassung in Berlin ohne Wartezeit beim Amt. Sofortkennzeichen zum Mitnehmen in der Kienitzer Str. 6.">
+    <meta name="geo.region" content="DE-BE">
+    <meta name="geo.placename" content="Berlin">
+    <meta name="geo.position" content="52.4789;13.4285">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "RED Zulassungsdienst Berlin",
+      "founder": "Tamer Yazici",
       "description": "Kfz-Zulassungsdienst in Berlin-Neukölln für Anmeldung, Ummeldung, Abmeldung, Kurzzeitkennzeichen, Zollkennzeichen, Sofortprägung und Auto Ankauf.",
       "telephone": "+49 178 3783875",
       "email": "Redzulassungsdienst@gmail.com",
       "priceRange": "€€",
+      "paymentAccepted": "Cash",
+      "currenciesAccepted": "EUR",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Kienitzer Str. 6",
@@ -34,13 +43,34 @@
         "postalCode": "12053",
         "addressCountry": "DE"
       },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 52.4789,
+        "longitude": 13.4285
+      },
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
         "opens": "09:00",
         "closes": "20:00"
       },
-      "areaServed": "Berlin"
+      "areaServed": {
+        "@type": "City",
+        "name": "Berlin"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Kfz-Zulassungsservice Berlin",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Kfz-Anmeldung & Neuzulassung Berlin" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Kfz-Ummeldung & Halterwechsel Berlin" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Kfz-Abmeldung & Außerbetriebsetzung" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "5-Tage Kurzzeitkennzeichen" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Zoll- & Ausfuhrkennzeichen" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Sofortkennzeichen & Wunschkennzeichen-Prägung" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Auto Ankauf Berlin" } }
+        ]
+      }
     }
     </script>
     
@@ -50,8 +80,13 @@
     
     <title>RED Zulassungsdienst Berlin | Schnell. Zuverlässig. Kompetent.</title>
     
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
     <style>
         /* DSGVO-KONFORME LOKALE SCHRIFT-ENGINE (Keine IP-Übertragung an Google Fonts) */
@@ -300,11 +335,15 @@
 
         /* PROFESSIONELLE SHOWROOM-EINGANGSANIMATION (HANDY GARANTIERT 2-ZEILIG) */
         #intro-preloader {
-            position: fixed; inset: 0; z-index: 99999;
+            position: fixed; inset: 0; z-index: 99999; cursor: pointer;
             background: radial-gradient(circle at 50% 42%, #1a0608 0%, #09090d 55%, #040406 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            overflow: hidden; padding: 0 14px;
-            animation: hidePreloaderPro 0.55s cubic-bezier(0.77, 0, 0.175, 1) 2.65s forwards;
+            overflow: hidden; padding: 0 14px; will-change: opacity, transform;
+            animation: hidePreloaderPro 0.5s cubic-bezier(0.77, 0, 0.175, 1) 2.2s forwards;
+        }
+        #intro-preloader.intro-preloader-done,
+        #intro-preloader.intro-preloader-done::before {
+            display: none !important; animation: none !important;
         }
         #intro-preloader::before {
             content: ''; position: absolute; width: 420px; height: 420px; border-radius: 50%;
@@ -1228,7 +1267,7 @@
         .admin-del-img-btn { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.75); color: #ff3b30; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 50 !important; border: 1px solid rgba(255,59,48,0.5); transition: 0.3s; pointer-events: auto; cursor: pointer; }
         .admin-del-img-btn:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
 
-        .contact-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 50px 5% 20px; box-sizing: border-box; }
+        .contact-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 50px 5% 20px; box-sizing: border-box; content-visibility: auto; contain-intrinsic-size: auto 420px; }
         .map-box { border-radius: var(--global-radius); overflow: hidden; border: 1px solid var(--glass-border); min-height: 260px; box-shadow: var(--card-shadow); position: relative; background: var(--bg-card); display: flex; align-items: center; justify-content: center; }
         .map-box iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         body[data-theme="dark"] .map-box iframe { filter: grayscale(1) invert(0.9) contrast(1.2); }
@@ -1424,7 +1463,7 @@
     <div id="pinned-container" class="admin-only-block"></div>
 
     <!-- PROFESSIONELLE SHOWROOM-EINGANGSANIMATION (HANDY GARANTIERT EXAKT 2-ZEILIG) -->
-    <div id="intro-preloader">
+    <div id="intro-preloader" onclick="window.dismissIntroPreloader()" title="Klicken zum Überspringen">
         <div class="intro-plate" id="introPlate">
             <div class="intro-euro-strip">
                 <span class="intro-euro-stars">★ ★<br>★ ★</span>
@@ -1449,6 +1488,20 @@
         </div>
         <div class="intro-subline">Schnell • Zuverlässig • Kompetent</div>
     </div>
+    <script>
+        window.dismissIntroPreloader = function() {
+            var el = document.getElementById('intro-preloader');
+            if (el) { el.classList.add('intro-preloader-done'); el.style.display = 'none'; }
+            try { sessionStorage.setItem('red_intro_seen', '1'); } catch (e) {}
+        };
+        try {
+            if (sessionStorage.getItem('red_intro_seen')) {
+                window.dismissIntroPreloader();
+            } else {
+                setTimeout(window.dismissIntroPreloader, 2750);
+            }
+        } catch (e) { setTimeout(window.dismissIntroPreloader, 2750); }
+    </script>
 
     <!-- DSGVO & TDDDG COOKIE CONSENT -->
     <div id="cookieConsentOverlay" class="cookie-overlay">
@@ -2308,7 +2361,7 @@
                 <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permTicker"><span class="noble-checkbox-box"></span> 🏎️ Header-Auto, Logo & Ticker Studio</label>
             </div>
             
-            <button class="btn-primary" style="background:#ff00ff; width:100%; justify-content:center;" onclick="window.saveSupervisorPerms()"><i class="fa-solid fa-shield-check"></i> Berechtigungen sofort anwenden</button>
+            <button class="btn-primary" style="background:#ff00ff; width:100%; justify-content:center;" onclick="window.saveSupervisorPerms()"><i class="fa-solid fa-shield-halved"></i> Berechtigungen sofort anwenden</button>
         </div>
     </div>
 
@@ -3031,7 +3084,7 @@
                         </div>
                     </div>
                     <div id="pickupForecastResult" style="margin-top:8px; font-size:12px; color:var(--text-light); background:var(--bg-card); padding:10px 14px; border-radius:10px; border:1px solid var(--glass-border); font-weight:700;">
-                        ⚡ <strong style="color:var(--green-accent);">Voraussichtliche Fertigstellung:</strong> Direkte Einreichung im heutigen Behörden-Lauf – Abholung meist innerhalb von <strong>24 Stunden (oft noch am selben Spätnachmittag)</strong>!
+                        <i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Voraussichtliche Fertigstellung:</strong> Direkte Einreichung im heutigen Behörden-Lauf – Abholung meist innerhalb von <strong>24 Stunden (oft noch am selben Spätnachmittag)</strong>.
                     </div>
                 </div>
             </div>
@@ -3100,7 +3153,7 @@
                         <i class="fa-solid fa-calculator"></i><span>Schnell-Kalkulator</span>
                     </button>
                     <button type="button" class="tools-tab-btn" data-tool-tab="check" onclick="window.switchOnlineToolTab('check', this)">
-                        <i class="fa-solid fa-shield-check"></i><span>eVB / IBAN / FIN-Prüfer</span>
+                        <i class="fa-solid fa-shield-halved"></i><span>eVB / IBAN / FIN-Prüfer</span>
                     </button>
                     <button type="button" class="tools-tab-btn" data-tool-tab="labo" onclick="window.switchOnlineToolTab('labo', this)">
                         <i class="fa-solid fa-leaf"></i><span>LABO & Umweltplakette</span>
@@ -3545,7 +3598,7 @@
                     <!-- SCHRITT 3: DATUM & UHRZEIT -->
                     <div class="form-group" style="margin-top: 10px; position: relative; z-index: 10;">
                         <label>Wunschdatum auswählen (Mo–Fr) *</label>
-                        <input type="text" id="datePicker" class="form-control" placeholder="📅 Hier klicken, um Wunschdatum zu wählen..." style="text-align:center; font-weight:800; letter-spacing:0.5px; cursor:pointer;" readonly="readonly" required>
+                        <input type="text" id="datePicker" class="form-control" placeholder="Hier klicken, um Wunschdatum zu wählen..." style="text-align:center; font-weight:800; letter-spacing:0.5px; cursor:pointer;" readonly="readonly" required>
                     </div>
                     
                     <div id="timeWrapper" style="display:none; margin-top:18px; position: relative; z-index: 5;">
@@ -3819,13 +3872,11 @@
         </div>
     </footer>
     
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
     <!-- TEIL 4 VON 6: HAUPT-ENGINE, DYNAMISCHER KW-KALENDER, PWA-APP & NEUE KOMFORT-FUNKTIONEN -->
     <script>
-        document.addEventListener('touchmove', () => {}, { passive: true });
-        document.addEventListener('touchstart', () => {}, { passive: true });
 
         window.escHtml = function(str) {
             return String(str || '')
@@ -4552,22 +4603,7 @@
             }
         };
 
-        window.initFloatingPlates = function() {
-            const container = document.getElementById('plate-container');
-            if(!container) return;
-            container.innerHTML = '';
-            const yr = window.getDynamicSystemYear();
-            const samplePlates = [`B - RED ${yr}`, 'B - TY 61', 'B - KFZ 1', 'B - VIP 999', 'B - EX 24', `B - BE ${yr + 1}`];
-            samplePlates.forEach((text, i) => {
-                const p = document.createElement('div');
-                p.className = 'plate';
-                p.innerText = text;
-                p.style.left = (8 + (i * 15)) + '%';
-                p.style.animationDelay = (i * 3.5) + 's';
-                p.style.animationDuration = (20 + (i * 2)) + 's';
-                container.appendChild(p);
-            });
-        };
+        window.initFloatingPlates = function() {};
 
         // =========================================================================
         // LIVE BÜRO-AMPEL, LABO-COUNTDOWN, KOMPASS, BEZIRKE & FORMULAR-DRUCK
@@ -4827,7 +4863,12 @@
             const fullPlate = `B - ${l} ${n}${s ? ' ' + s : ''}${season ? ' (Saison ' + season + ')' : ''}${styleLabel}`;
             
             const plateInput = document.getElementById('formWunschkennzeichen');
-            if(plateInput) plateInput.value = fullPlate;
+            if(plateInput) {
+                plateInput.value = fullPlate;
+                plateInput.style.borderColor = 'var(--green-border)';
+                plateInput.style.boxShadow = '0 0 0 3px rgba(18, 140, 65, 0.22)';
+                setTimeout(() => { plateInput.style.borderColor = ''; plateInput.style.boxShadow = ''; }, 2200);
+            }
             window.updateBookingLiveSummary();
             document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
             window.showToast(`Wunschkennzeichen "${fullPlate}" in den Termin übernommen!`, 'success');
@@ -4913,7 +4954,10 @@
 
             sigCanvas.onmousedown = startDraw;
             sigCanvas.onmousemove = moveDraw;
-            window.addEventListener('mouseup', endDraw);
+            if (!window._sigMouseUpBound) {
+                window._sigMouseUpBound = true;
+                window.addEventListener('mouseup', () => { isDrawingSig = false; });
+            }
             sigCanvas.ontouchstart = startDraw;
             sigCanvas.ontouchmove = moveDraw;
             sigCanvas.ontouchend = endDraw;
@@ -5473,7 +5517,7 @@
                 `DTSTART:${dtStart}`,
                 `DTEND:${dtEnd}`,
                 "LOCATION:Kienitzer Str. 6\\, 12053 Berlin",
-                `DESCRIPTION:Ihr Termin bei RED Zulassungsdienst Berlin (Ansprechpartner: Tamer Yazici). Bitte alle Originaldokumente mitbringen.`,
+                `DESCRIPTION:Ihr Termin bei RED Zulassungsdienst Berlin (Ansprechpartner: Tamer Yazici).${apt.wunschkennzeichen ? ' Wunschkennzeichen: ' + apt.wunschkennzeichen + '.' : ''}${apt.customNote ? ' Hinweis: ' + apt.customNote + '.' : ''} Bitte alle Originaldokumente mitbringen.`,
                 "END:VEVENT",
                 "END:VCALENDAR"
             ].join("\r\n");
@@ -5948,7 +5992,7 @@
                     if(block.mediaUrl.includes('video/') || block.mediaUrl.endsWith('.mp4') || block.mediaUrl.startsWith('data:video')) {
                         mediaHtml = `<video src="${block.mediaUrl}" controls autoplay loop playsinline class="dynamic-block-media"></video>`;
                     } else {
-                        mediaHtml = `<img src="${block.mediaUrl}" class="dynamic-block-media">`;
+                        mediaHtml = `<img src="${block.mediaUrl}" class="dynamic-block-media" loading="lazy" decoding="async" alt="${window.escHtml(block.title)}">`;
                     }
                 }
 
@@ -6474,7 +6518,7 @@
 
                     content.innerHTML = `
                         <div style="width:54px; height:54px; margin:0 auto 12px; border-radius:14px; background:var(--green-bg-soft); border:1.5px solid var(--green-border); display:flex; align-items:center; justify-content:center; color:var(--green-accent); font-size:22px;">
-                            <i class="fa-solid fa-shield-check"></i>
+                            <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <div style="font-size: 32px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">${v}</div>
                         <div style="font-size: 12.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;">Verifizierte Seitenaufrufe</div>
@@ -7001,6 +7045,7 @@
                 if(localPerms) window.applyAdminModulePermissions(localPerms);
 
                 window.startAdminCrmListener();
+                if (typeof window.refreshAdminAppointmentsView === 'function') window.refreshAdminAppointmentsView();
                 setTimeout(window.syncHeaderHeight, 60);
                 window.showToast('Erfolgreich angemeldet.', 'success');
             } else {
@@ -7700,7 +7745,8 @@
         };
 
         function renderAppointments(apts) {
-            window.redApts = apts; 
+            window.redApts = apts;
+            if (!window.isAuthorized) return;
             const list = document.getElementById('admin-list');
             if(!list) return;
             list.innerHTML = '';
@@ -7901,9 +7947,14 @@
             window.filterAdminLeads();
         }
 
-        // Automatischer Minuten-Check für "Zeit vorbei"
+        window.refreshAdminAppointmentsView = () => renderAppointments(window.redApts || localAppointments);
+
+        // Automatischer Minuten-Check für "Zeit vorbei" (nur für eingeloggte Admins)
         setInterval(() => {
-            if(window.redApts && window.redApts.length > 0) {
+            if (!window.isAuthorized || !window.redApts || window.redApts.length === 0) return;
+            const modalOpen = document.getElementById('adminModal')?.classList.contains('open');
+            const hasPins = window.redApts.some(a => a.marked);
+            if (modalOpen || hasPins) {
                 renderAppointments(window.redApts);
             }
         }, 60000);
@@ -8712,10 +8763,10 @@
                 if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
                    mediaHtml = `<video src="${car.mediaUrl}" playsinline muted onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
                    if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp|svg)/) || car.mediaUrl.includes('alt=')) {
-                       mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                       mediaHtml = `<img src="${car.mediaUrl}" loading="lazy" decoding="async" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${window.escHtml(car.title)}">`;
                    }
                 } else {
-                    mediaHtml = `<img src="${car.mediaUrl}" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${car.title}">`;
+                    mediaHtml = `<img src="${car.mediaUrl}" loading="lazy" decoding="async" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${window.escHtml(car.title)}">`;
                 }
                 
                 card.innerHTML = `
