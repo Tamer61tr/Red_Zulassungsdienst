@@ -9,10 +9,10 @@
     <!-- PROGRESSIVE WEB APP (PWA) FÜR IPHONE (iOS) & SAMSUNG / ANDROID -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="RED Zulassung">
     <meta name="application-name" content="RED Zulassung">
-    <meta name="theme-color" content="#f2f2f7" id="metaThemeColor">
+    <meta name="theme-color" content="#0b0b10" id="metaThemeColor">
     <meta name="description" content="RED Zulassungsdienst Berlin – Kfz-Zulassung in Bestzeit, Sofortkennzeichen zum Mitnehmen, Kurzzeitkennzeichen, Zollkennzeichen & Auto Ankauf.">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="author" content="RED Zulassungsdienst Berlin – Tamer Yazici">
@@ -2178,6 +2178,182 @@
         :focus-visible {
             outline: 2.5px solid var(--primary-red) !important;
             outline-offset: 2px !important;
+        }
+
+        /* =========================================================================
+           DAUERHAFT DUNKLER PREMIUM-HEADER & FOOTER + SANFTER THEME-ÜBERGANG (MITTE)
+           ========================================================================= */
+        #header-wrapper,
+        footer {
+            color-scheme: dark;
+            --bg-dark: #07070b;
+            --bg-card: #0c0c12;
+            --bg-input: #161620;
+            --glass-bg: rgba(11, 11, 16, 0.96);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --text-light: #ffffff;
+            --text-muted: #a6a6b6;
+            --card-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+            --car-front-light: #ffd93d;
+            --car-front-glow: rgba(255, 217, 61, 0.92);
+            --car-rear-light: #ff1e1e;
+            --car-rear-glow: rgba(255, 30, 30, 0.92);
+        }
+
+        /* Bei allen hellen Themes bleibt der Marken-Akzent im dunklen Header/Footer sattes RED-Rot */
+        body[data-theme^="light"] #header-wrapper,
+        body[data-theme^="light"] footer {
+            --primary-red: #ff1a1a;
+        }
+
+        #header-wrapper {
+            background: #0b0b10 !important;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.34);
+        }
+        #header-wrapper nav {
+            background: rgba(11, 11, 16, 0.96) !important;
+            border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+        }
+        #header-wrapper .logo-text .red-part {
+            filter: drop-shadow(0 0 10px rgba(255, 26, 26, 0.42));
+        }
+        #header-wrapper .logo-car-svg {
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.16));
+        }
+        #header-wrapper .customer-theme-toggle {
+            border-color: rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+        body:not([data-theme^="light"]) #header-wrapper .customer-theme-toggle {
+            border-color: rgba(255, 204, 0, 0.48);
+            background: rgba(255, 204, 0, 0.12);
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.22);
+        }
+        #header-wrapper .header-widgets-wrapper {
+            background: #14141d !important;
+            border-top-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        #header-wrapper #ticker-container {
+            background: #0c0c12 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        }
+        #header-wrapper .ticker-text {
+            color: #d6d6e2 !important;
+        }
+
+        footer {
+            background: #0b0b10 !important;
+            color: #ffffff !important;
+            border-top: 2px solid var(--primary-red) !important;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.22);
+        }
+        footer .footer-links a { color: #b4b4c4; }
+        footer .footer-links a:hover { color: var(--primary-red); }
+        footer #txt-footer-text { color: #8c8c9e !important; }
+        footer .theme-selector {
+            background-color: #161620 !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.18) !important;
+        }
+        footer .theme-selector option {
+            background-color: #0e0e14 !important;
+            color: #ffffff !important;
+        }
+
+        /* Sanfte 0,45s-Farbblende nur für den Mittelbereich beim Theme-Wechsel */
+        body {
+            transition: background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        body.theme-transitioning .view-section,
+        body.theme-transitioning .view-section *,
+        body.theme-transitioning .contact-layout,
+        body.theme-transitioning .contact-layout * {
+            transition: background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+
+        /* =========================================================================
+           HELLMODUS-VERBINDUNG: ANTHRAZIT-RAHMEN & AKZENTLINIEN PASSEND ZUM HEADER
+           ========================================================================= */
+        body[data-theme="light"] {
+            --bg-dark: #eceef3;
+            --glass-border: rgba(16, 16, 24, 0.18);
+            --card-shadow: 0 10px 26px rgba(12, 12, 20, 0.08);
+            background-image:
+                linear-gradient(180deg, rgba(11, 11, 16, 0.1) 0px, rgba(11, 11, 16, 0.025) 95px, transparent 190px),
+                radial-gradient(circle at 15% 15%, rgba(217, 0, 0, 0.04) 0%, transparent 42%);
+        }
+
+        /* Saubere rote Abschlusslinie zwischen schwarzem Header und heller Seite */
+        body[data-theme^="light"] #header-wrapper #ticker-container {
+            border-bottom: 2px solid #d90000 !important;
+        }
+
+        /* Hero-Karte & Zweit-Button greifen das Header-Schwarz direkt wieder auf */
+        body[data-theme^="light"] .hero-content {
+            border: 1.5px solid rgba(16, 16, 24, 0.22);
+            border-top: 4px solid #12121a;
+            box-shadow: 0 16px 38px rgba(11, 11, 16, 0.1);
+        }
+        body[data-theme^="light"] .hero-content a[style*="background:var(--bg-input)"] {
+            border: 1.5px solid #181822 !important;
+            background: #ffffff !important;
+            color: #141417 !important;
+        }
+        body[data-theme^="light"] .hero-content a[style*="background:var(--bg-input)"]:hover {
+            background: #14141c !important;
+            color: #ffffff !important;
+        }
+
+        /* Zweifarbige Marken-Linie (Schwarz + Rot) unter Abschnitts-Überschriften */
+        body[data-theme^="light"] .section-header h2::after {
+            content: '';
+            display: block;
+            width: 72px;
+            height: 3px;
+            margin: 10px auto 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #14141c 0%, #14141c 62%, var(--primary-red) 62%, var(--primary-red) 100%);
+        }
+
+        /* Leistungskarten & Inhalts-Boxen mit klarem Anthrazit-Rahmen */
+        body[data-theme^="light"] .card {
+            border-color: rgba(16, 16, 24, 0.2) !important;
+            box-shadow: 0 8px 22px rgba(12, 12, 20, 0.07), inset 0 -3px 0 #181822;
+        }
+        body[data-theme^="light"] .card:hover {
+            border-color: var(--primary-red) !important;
+            box-shadow: 0 14px 30px rgba(217, 0, 0, 0.16), inset 0 -3px 0 var(--primary-red);
+        }
+        body[data-theme^="light"] .compass-box,
+        body[data-theme^="light"] .online-tools-hub,
+        body[data-theme^="light"] .tool-box,
+        body[data-theme^="light"] .download-item,
+        body[data-theme^="light"] .subpage-nav-bar,
+        body[data-theme^="light"] .cash-banner {
+            border-color: rgba(16, 16, 24, 0.2);
+            box-shadow: 0 10px 26px rgba(12, 12, 20, 0.08);
+        }
+        body[data-theme^="light"] .tool-box,
+        body[data-theme^="light"] .download-item {
+            border-top: 2.5px solid #181822;
+        }
+        body[data-theme^="light"] #termin {
+            border-top: 2.5px solid #14141c;
+            background: #e6e9ef;
+        }
+        body[data-theme^="light"] .booking-wrapper {
+            border: 1.5px solid rgba(16, 16, 24, 0.22);
+            border-top: 4px solid #14141c;
+            box-shadow: 0 14px 34px rgba(12, 12, 20, 0.09);
+        }
+        body[data-theme^="light"] .contact-layout > div > div,
+        body[data-theme^="light"] .map-box {
+            border-color: rgba(16, 16, 24, 0.2) !important;
         }
 
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
@@ -6446,10 +6622,10 @@
             const isLight = !themeName || themeName.startsWith('light');
             if(icon) {
                 icon.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-                icon.style.color = isLight ? 'var(--text-light)' : '#ffcc00';
+                icon.style.color = isLight ? '#ffffff' : '#ffcc00';
             }
             if(metaTheme) {
-                metaTheme.setAttribute('content', isLight ? '#f2f2f7' : '#050507');
+                metaTheme.setAttribute('content', '#0b0b10');
             }
         };
 
@@ -6463,6 +6639,13 @@
 
         window.changeTheme = async function(themeName, saveToFirebase = false) {
             if(!themeName) themeName = 'light';
+            if (document.body.getAttribute('data-theme') !== themeName) {
+                document.body.classList.add('theme-transitioning');
+                clearTimeout(window._themeTransTimer);
+                window._themeTransTimer = setTimeout(() => {
+                    document.body.classList.remove('theme-transitioning');
+                }, 480);
+            }
             document.body.setAttribute('data-theme', themeName);
             localStorage.setItem('red_theme_v3', themeName);
             window.updateCustomerThemeIcon(themeName);
