@@ -2356,6 +2356,139 @@
             border-color: rgba(16, 16, 24, 0.2) !important;
         }
 
+        /* =========================================================================
+           1. SAUBERER START AB OBEN (KEIN ABSCHNEIDEN UNTER DEM FIXED HEADER)
+           ========================================================================= */
+        html {
+            scroll-padding-top: var(--dynamic-header-h, 130px);
+        }
+        .view-section {
+            scroll-margin-top: var(--dynamic-header-h, 130px);
+        }
+
+        /* =========================================================================
+           2. HINTERGRUND-SCROLLSPERRE BEI GEÖFFNETEN FENSTERN / MENÜS / SHEETS
+           ========================================================================= */
+        html.modal-scroll-lock,
+        body.modal-scroll-lock {
+            overflow: hidden !important;
+            overscroll-behavior: none !important;
+        }
+        .custom-dialog-window,
+        .mobile-select-list,
+        .fullscreen-menu,
+        .table-responsive,
+        #legalContentText,
+        .admin-list-wrapper {
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* =========================================================================
+           3. MINI ÖFFNUNGSZEITEN-COUNTDOWN ZWISCHEN LOGO UND MENÜ
+           ========================================================================= */
+        .header-hours-countdown {
+            order: 2;
+            margin: 0 auto;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+            cursor: pointer;
+            line-height: 1.1;
+            flex-shrink: 0;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        .header-hours-countdown:hover {
+            border-color: var(--primary-red);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .header-hours-countdown .hhc-top {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 8.5px !important;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.35px;
+            color: #b4b4c6;
+            white-space: nowrap;
+        }
+        .header-hours-countdown .hhc-dot {
+            width: 5.5px;
+            height: 5.5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: #ff9f1c;
+            box-shadow: 0 0 6px rgba(255, 159, 28, 0.8);
+        }
+        .header-hours-countdown.is-open .hhc-dot {
+            background: #25D366;
+            box-shadow: 0 0 6px rgba(37, 211, 102, 0.85);
+            animation: pulseAnim 1.2s infinite alternate;
+        }
+        .header-hours-countdown .hhc-timer {
+            font-size: 10px !important;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.2px;
+            color: #ffbe4d;
+            white-space: nowrap;
+        }
+        .header-hours-countdown.is-open .hhc-timer {
+            color: #3be37c;
+        }
+
+        @media (min-width: 769px) {
+            nav .logo-container { order: 1 !important; }
+            nav .header-hours-countdown { order: 2 !important; }
+            nav .nav-actions { order: 3 !important; }
+            nav .header-widgets-wrapper { order: 4 !important; }
+        }
+
+        @media (max-width: 768px) {
+            nav .logo-container { order: 1 !important; max-width: 49% !important; gap: 5px !important; }
+            nav .logo-red-svg { height: clamp(10px, 2.8vw, 13px) !important; }
+            nav .logo-text .white-part { font-size: clamp(6px, 1.7vw, 7.6px) !important; letter-spacing: 0.3px !important; }
+            nav .logo-car-svg { height: clamp(18px, 5.2vw, 24px) !important; }
+
+            nav .header-hours-countdown {
+                order: 2 !important;
+                margin: 0 auto !important;
+                padding: 3px 6px !important;
+                border-radius: 8px;
+                gap: 1px;
+            }
+            nav .header-hours-countdown .hhc-top {
+                font-size: 6.8px !important;
+                gap: 3px;
+                letter-spacing: 0.15px;
+            }
+            nav .header-hours-countdown .hhc-dot {
+                width: 4.5px;
+                height: 4.5px;
+            }
+            nav .header-hours-countdown .hhc-timer {
+                font-size: 7.8px !important;
+                letter-spacing: 0px;
+            }
+
+            nav .nav-actions { order: 3 !important; margin-left: 0 !important; gap: 3px !important; }
+            nav .header-widgets-wrapper { order: 4 !important; }
+
+            /* Im mobilen Admin-Modus ausgeblendet, damit alle Admin-Icons in 1 Zeile bleiben */
+            body.is-admin nav .header-hours-countdown,
+            body.is-supervisor nav .header-hours-countdown {
+                display: none !important;
+            }
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
@@ -2588,6 +2721,15 @@
                 
                 <i class="fa-solid fa-pencil admin-ticker-edit-icon mod-ticker" id="adminTickerIcon" onclick="event.preventDefault(); event.stopPropagation(); window.openTickerConfig();" title="Header-Auto, Logo & Ticker bearbeiten"></i>
             </div>
+
+            <!-- MINI ÖFFNUNGSZEITEN-COUNTDOWN (ZWISCHEN LOGO & MENÜ) -->
+            <button type="button" class="header-hours-countdown is-closed" id="headerHoursCountdown" onclick="window.openWidgetModal('office')" title="Öffnungszeiten Mo–Fr 09:00–20:00 Uhr (Berlin)">
+                <span class="hhc-top">
+                    <span class="hhc-dot" id="hhcStatusDot"></span>
+                    <span class="hhc-label" id="hhcHoursLabel">Mo–Fr 09–20</span>
+                </span>
+                <span class="hhc-timer" id="hhcCountdownText">--:--:--</span>
+            </button>
             
             <div class="nav-actions">
                 <div class="header-widget-item mod-crm btn-crm-header" onclick="window.openCRM()" title="Unabhängige Kundendatenbank">
@@ -4937,25 +5079,254 @@
         // =========================================================================
         // 0. DYNAMISCHER ÜBERLAPPUNGS-SCHUTZ (ECHTZEIT HEADER-HÖHENMESSUNG)
         // =========================================================================
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        window._userHasScrolledPage = false;
+        window.addEventListener('touchstart', () => { window._userHasScrolledPage = true; }, { once: true, passive: true });
+        window.addEventListener('wheel', () => { window._userHasScrolledPage = true; }, { once: true, passive: true });
+
+        window.forceStartAtTop = function() {
+            if (window._userHasScrolledPage) return;
+            const prevBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = 'auto';
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            document.documentElement.style.scrollBehavior = prevBehavior;
+        };
+
         window.syncHeaderHeight = function() {
             const headerEl = document.getElementById('header-wrapper');
             if (!headerEl) return;
-            const measuredHeight = headerEl.offsetHeight;
+            const measuredHeight = Math.ceil(headerEl.getBoundingClientRect().height || headerEl.offsetHeight);
             if (measuredHeight > 40) {
-                document.documentElement.style.setProperty('--dynamic-header-h', (measuredHeight + 10) + 'px');
+                document.documentElement.style.setProperty('--dynamic-header-h', (measuredHeight + 14) + 'px');
+            }
+        };
+
+        // =========================================================================
+        // HINTERGRUND-SCROLLSPERRE BEI GEÖFFNETEN FENSTERN / MENÜS / SHEETS
+        // =========================================================================
+        window._isBodyScrollLocked = false;
+        window._lockTouchStartY = 0;
+        window._lockTouchStartX = 0;
+
+        window.hasOpenBlockingOverlay = function() {
+            if (document.querySelector('.custom-dialog-overlay.open')) return true;
+            const qMenu = document.getElementById('quickMenu');
+            if (qMenu && qMenu.classList.contains('active')) return true;
+            const mSel = document.getElementById('mobileSelectOverlay');
+            if (mSel && mSel.classList.contains('open')) return true;
+            const fBack = document.getElementById('fabBackdrop');
+            if (fBack && fBack.classList.contains('open')) return true;
+            const intro = document.getElementById('intro-preloader');
+            if (intro && !intro.classList.contains('intro-preloader-done') && getComputedStyle(intro).display !== 'none') return true;
+            return false;
+        };
+
+        window.syncBodyScrollLock = function() {
+            const shouldLock = window.hasOpenBlockingOverlay();
+            if (shouldLock && !window._isBodyScrollLocked) {
+                window._isBodyScrollLocked = true;
+                document.documentElement.classList.add('modal-scroll-lock');
+                document.body.classList.add('modal-scroll-lock');
+            } else if (!shouldLock && window._isBodyScrollLocked) {
+                window._isBodyScrollLocked = false;
+                document.documentElement.classList.remove('modal-scroll-lock');
+                document.body.classList.remove('modal-scroll-lock');
+            }
+        };
+
+        window.findActiveScrollableInsideOverlay = function(startNode) {
+            let el = startNode;
+            const overlayRoot = startNode && startNode.closest
+                ? startNode.closest('.custom-dialog-overlay.open, #quickMenu.active, #mobileSelectOverlay.open')
+                : null;
+            if (!overlayRoot) return null;
+
+            while (el && el !== overlayRoot && el !== document.body) {
+                if (el.nodeType === 1) {
+                    const style = getComputedStyle(el);
+                    const canScrollY = (style.overflowY === 'auto' || style.overflowY === 'scroll') && (el.scrollHeight > el.clientHeight + 1);
+                    const canScrollX = (style.overflowX === 'auto' || style.overflowX === 'scroll') && (el.scrollWidth > el.clientWidth + 1);
+                    if (canScrollY || canScrollX) return { el, canScrollY, canScrollX };
+                }
+                el = el.parentElement;
+            }
+            if (overlayRoot.id === 'quickMenu' && overlayRoot.scrollHeight > overlayRoot.clientHeight + 1) {
+                return { el: overlayRoot, canScrollY: true, canScrollX: false };
+            }
+            return null;
+        };
+
+        document.addEventListener('touchstart', (e) => {
+            if (!window._isBodyScrollLocked || !e.touches || !e.touches[0]) return;
+            window._lockTouchStartY = e.touches[0].clientY;
+            window._lockTouchStartX = e.touches[0].clientX;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!window._isBodyScrollLocked) return;
+            if (e.target && e.target.closest && e.target.closest('.signature-pad-wrapper')) return;
+            const scrollInfo = window.findActiveScrollableInsideOverlay(e.target);
+            if (!scrollInfo) {
+                e.preventDefault();
+                return;
+            }
+            if (!e.touches || !e.touches[0]) return;
+            const dy = e.touches[0].clientY - window._lockTouchStartY;
+            const dx = e.touches[0].clientX - window._lockTouchStartX;
+            if (scrollInfo.canScrollX && Math.abs(dx) > Math.abs(dy)) return;
+            if (!scrollInfo.canScrollY) {
+                e.preventDefault();
+                return;
+            }
+            const { el } = scrollInfo;
+            const atTop = el.scrollTop <= 0 && dy > 0;
+            const atBottom = (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) && dy < 0;
+            if (atTop || atBottom) e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('wheel', (e) => {
+            if (!window._isBodyScrollLocked) return;
+            const scrollInfo = window.findActiveScrollableInsideOverlay(e.target);
+            if (!scrollInfo || !scrollInfo.canScrollY) {
+                e.preventDefault();
+                return;
+            }
+            const { el } = scrollInfo;
+            const atTop = el.scrollTop <= 0 && e.deltaY < 0;
+            const atBottom = (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) && e.deltaY > 0;
+            if (atTop || atBottom) e.preventDefault();
+        }, { passive: false });
+
+        // =========================================================================
+        // MINI ÖFFNUNGSZEITEN-COUNTDOWN IM HEADER (BERLINER ZEIT: MO–FR 09–20 UHR)
+        // =========================================================================
+        window.updateHeaderHoursCountdown = function() {
+            const box = document.getElementById('headerHoursCountdown');
+            const lbl = document.getElementById('hhcHoursLabel');
+            const timer = document.getElementById('hhcCountdownText');
+            if (!box || !lbl || !timer) return;
+
+            let dayNum, h, m, s;
+            try {
+                const parts = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: 'Europe/Berlin',
+                    weekday: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).formatToParts(new Date());
+                const map = {};
+                parts.forEach(p => { map[p.type] = p.value; });
+                const dayLookup = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+                dayNum = dayLookup[map.weekday];
+                h = parseInt(map.hour, 10) % 24;
+                m = parseInt(map.minute, 10);
+                s = parseInt(map.second, 10);
+            } catch (e) {
+                const now = new Date();
+                dayNum = now.getDay();
+                h = now.getHours();
+                m = now.getMinutes();
+                s = now.getSeconds();
+            }
+
+            const nowSec = h * 3600 + m * 60 + s;
+            const openSec = 9 * 3600;
+            const closeSec = 20 * 3600;
+            const isWorkday = dayNum >= 1 && dayNum <= 5;
+            const isOpen = isWorkday && nowSec >= openSec && nowSec < closeSec;
+            const pad = (n) => String(n).padStart(2, '0');
+
+            let remSec = 0;
+            if (isOpen) {
+                remSec = closeSec - nowSec;
+                const rh = Math.floor(remSec / 3600);
+                const rm = Math.floor((remSec % 3600) / 60);
+                const rs = remSec % 60;
+                box.classList.add('is-open');
+                box.classList.remove('is-closed');
+                lbl.innerText = 'Offen • 09–20';
+                timer.innerText = `Noch ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+            } else {
+                if (isWorkday && nowSec < openSec) {
+                    remSec = openSec - nowSec;
+                } else if (dayNum >= 1 && dayNum <= 4) {
+                    remSec = (86400 - nowSec) + openSec;
+                } else if (dayNum === 5) {
+                    remSec = (86400 - nowSec) + (2 * 86400) + openSec;
+                } else if (dayNum === 6) {
+                    remSec = (86400 - nowSec) + 86400 + openSec;
+                } else {
+                    remSec = (86400 - nowSec) + openSec;
+                }
+
+                const days = Math.floor(remSec / 86400);
+                const rh = Math.floor((remSec % 86400) / 3600);
+                const rm = Math.floor((remSec % 3600) / 60);
+                const rs = remSec % 60;
+
+                box.classList.remove('is-open');
+                box.classList.add('is-closed');
+                lbl.innerText = 'Mo–Fr 09–20';
+                timer.innerText = days > 0
+                    ? `In ${days}T ${pad(rh)}:${pad(rm)}:${pad(rs)}`
+                    : `Öffnet ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
             }
         };
 
         window.addEventListener('resize', window.syncHeaderHeight, { passive: true });
         window.addEventListener('orientationchange', () => setTimeout(window.syncHeaderHeight, 150), { passive: true });
+        window.addEventListener('load', () => {
+            window.syncHeaderHeight();
+            window.forceStartAtTop();
+            setTimeout(window.forceStartAtTop, 120);
+        });
+        window.addEventListener('pageshow', () => {
+            window.syncHeaderHeight();
+            window.forceStartAtTop();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             window.syncHeaderHeight();
-            setTimeout(window.syncHeaderHeight, 300);
+            window.forceStartAtTop();
+            setTimeout(() => { window.syncHeaderHeight(); window.forceStartAtTop(); }, 180);
+            setTimeout(() => { window.syncHeaderHeight(); window.forceStartAtTop(); }, 450);
+
             const headerEl = document.getElementById('header-wrapper');
             if (headerEl && typeof ResizeObserver !== 'undefined') {
                 const ro = new ResizeObserver(() => window.syncHeaderHeight());
                 ro.observe(headerEl);
             }
+
+            // Öffnungszeiten-Countdown live jede Sekunde (pausiert bei inaktivem Tab)
+            window.updateHeaderHoursCountdown();
+            setInterval(() => { if (!document.hidden) window.updateHeaderHoursCountdown(); }, 1000);
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) window.updateHeaderHoursCountdown(); });
+
+            // Scroll-Lock automatisch an alle Overlays, Menüs & Sheets koppeln
+            const lockTargets = [
+                ...Array.from(document.querySelectorAll('.custom-dialog-overlay')),
+                document.getElementById('quickMenu'),
+                document.getElementById('mobileSelectOverlay'),
+                document.getElementById('fabBackdrop'),
+                document.getElementById('intro-preloader')
+            ].filter(Boolean);
+
+            const lockObs = new MutationObserver(() => {
+                window.syncBodyScrollLock();
+                const intro = document.getElementById('intro-preloader');
+                if (intro && intro.classList.contains('intro-preloader-done')) {
+                    window.forceStartAtTop();
+                }
+            });
+            lockTargets.forEach(el => lockObs.observe(el, { attributes: true, attributeFilter: ['class', 'style'] }));
+            window.syncBodyScrollLock();
         });
 
         // =========================================================================
