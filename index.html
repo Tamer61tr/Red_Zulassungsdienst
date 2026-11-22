@@ -1671,6 +1671,24 @@
             }
             .checklist-row span { text-wrap: balance; }
 
+            /* GLOBALER MOBIL-UMBRUCHSCHUTZ: KEINE ZERRISSENEN SÄTZE, PREISE ODER UHRZEITEN */
+            p, li, .admin-details-content, #districtResultBox, #laboFeeResultDesc, #pickupForecastResult {
+                text-wrap: pretty;
+            }
+            h1, h2, h3, h4, .section-header p, .hero-content p, #liveDispatchCountdown, #envBadgeResultTitle {
+                text-wrap: balance;
+            }
+            #liveDispatchCountdown {
+                display: block;
+                line-height: 1.45;
+                font-size: 11px;
+            }
+            #laboFeeResultDesc strong,
+            .nowrap-unit {
+                display: inline-block;
+                white-space: nowrap;
+            }
+
             /* DESIGNPASSENDE MOBILE SELECT-BOXEN (ERSETZT DAS ANDROID/iOS SYSTEM-POPUP) */
             .red-select-wrap {
                 display: block;
@@ -1886,10 +1904,27 @@
             text-wrap: balance;
         }
         .compass-tab-btn.active .paren-sub,
+        .compass-tab-btn.active .paren-inline,
         .district-pill.active .paren-sub,
-        .btn-primary .paren-sub {
-            color: rgba(255, 255, 255, 0.9) !important;
-            opacity: 1 !important;
+        .district-pill.active .paren-inline,
+        .district-pill:hover .paren-sub,
+        .district-pill:hover .paren-inline,
+        .tools-tab-btn.active .paren-sub,
+        .tools-tab-btn.active .paren-inline,
+        .btn-primary .paren-sub,
+        .btn-primary .paren-inline,
+        .noble-option:hover .paren-sub,
+        .noble-option:hover .paren-inline {
+            color: inherit !important;
+            opacity: 0.92 !important;
+        }
+        body[data-theme="stealth"] .compass-tab-btn.active,
+        body[data-theme="monochrome"] .compass-tab-btn.active,
+        body[data-theme="stealth"] .district-pill.active,
+        body[data-theme="monochrome"] .district-pill.active,
+        body[data-theme="stealth"] .tools-tab-btn.active,
+        body[data-theme="monochrome"] .tools-tab-btn.active {
+            color: #000000 !important;
         }
         .paren-inline {
             display: inline;
@@ -4881,13 +4916,13 @@
             if (!titleEl || !descEl) return;
 
             const feeMap = {
-                'ummeldung_berlin': 'ca. 26,00 € – 31,00 € (Halterwechsel innerhalb Berlins)',
-                'ummeldung_auswaerts': 'ca. 30,00 € – 36,00 € (Umschreibung von außerhalb nach Berlin)',
-                'neuzulassung': 'ca. 28,00 € – 34,00 € (Fabrikneues Fahrzeug inkl. Stempel)',
-                'wiederzulassung': 'ca. 29,00 € – 35,00 € (Wiederzulassung nach Stilllegung)',
-                'kurzzeit': 'ca. 13,10 € (Amtliche Gebühr für 5-Tage-Kurzzeitkennzeichen)',
-                'zoll': 'ca. 34,00 € – 42,00 € (Amtliche Gebühr für Ausfuhr-/Zollkennzeichen)',
-                'abmeldung': 'ca. 16,50 € (Amtliche Gebühr für Außerbetriebsetzung)'
+                'ummeldung_berlin': { price: 'ca. 26,00&nbsp;€ – 31,00&nbsp;€', note: 'Halterwechsel innerhalb Berlins' },
+                'ummeldung_auswaerts': { price: 'ca. 30,00&nbsp;€ – 36,00&nbsp;€', note: 'Umschreibung von außerhalb nach Berlin' },
+                'neuzulassung': { price: 'ca. 28,00&nbsp;€ – 34,00&nbsp;€', note: 'Fabrikneues Fahrzeug inkl. Stempel' },
+                'wiederzulassung': { price: 'ca. 29,00&nbsp;€ – 35,00&nbsp;€', note: 'Wiederzulassung nach Stilllegung' },
+                'kurzzeit': { price: 'ca. 13,10&nbsp;€', note: 'Amtliche Gebühr für 5-Tage-Kurzzeitkennzeichen' },
+                'zoll': { price: 'ca. 34,00&nbsp;€ – 42,00&nbsp;€', note: 'Amtliche Gebühr für Ausfuhr-/Zollkennzeichen' },
+                'abmeldung': { price: 'ca. 16,50&nbsp;€', note: 'Amtliche Gebühr für Außerbetriebsetzung' }
             };
 
             if (fuelType === 'elektro') {
@@ -4904,7 +4939,8 @@
                 titleEl.innerHTML = '🟢 Grüne Feinstaubplakette (Stufe 4) – Freie Fahrt in ganz Berlin!';
             }
 
-            descEl.innerHTML = `Amtlicher LABO-Behörden-Richtwert: <strong>${feeMap[feeCase] || 'ca. 28,00 €'}</strong> (zzgl. 12,80 € bei Wunschkennzeichen). Ihre Umweltplakette stellen wir direkt vor Ort zum Mitnehmen aus!`;
+            const selectedFee = feeMap[feeCase] || { price: 'ca. 28,00&nbsp;€', note: 'Amtlicher Richtwert' };
+            descEl.innerHTML = `Amtlicher LABO-Gebühren-Richtwert: <strong class="nowrap-unit">${selectedFee.price}</strong><span class="paren-sub">(${selectedFee.note} • zzgl. 12,80&nbsp;€ bei Wunschkennzeichen)</span>Grüne Umweltplakette stellen wir direkt vor Ort aus.`;
         };
 
         // =========================================================================
@@ -5233,7 +5269,7 @@
             const m = now.getMinutes();
 
             if (day === 0 || day === 6 || h >= 18) {
-                el.innerHTML = `<i class="fa-regular fa-clock" style="color:var(--primary-red);"></i> <strong>Express-Kontingent:</strong> Jetzt Online-Termin für den nächsten Werktag ab 09:00 Uhr sichern.`;
+                el.innerHTML = `<strong style="display:block; color:var(--text-light); margin-bottom:2px;"><i class="fa-regular fa-clock" style="color:var(--primary-red); margin-right:5px;"></i>Express-Kontingent</strong>Jetzt Online-Termin für den nächsten Werktag <span class="nowrap-unit">ab 09:00&nbsp;Uhr</span> sichern.`;
                 return;
             }
 
@@ -5244,7 +5280,7 @@
 
             const remH = Math.floor(diffMins / 60);
             const remM = diffMins % 60;
-            el.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--primary-red);"></i> <strong>Nächste Behörden-Abgabe (LABO Berlin):</strong> in <span style="color:var(--primary-red); font-weight:900;">${remH} Std. ${remM} Min.</span> – Jetzt Unterlagen einreichen.`;
+            el.innerHTML = `<strong style="display:block; color:var(--text-light); margin-bottom:2px;"><i class="fa-solid fa-bolt" style="color:var(--primary-red); margin-right:5px;"></i>Nächste Behörden-Abgabe <span class="paren-inline">(LABO&nbsp;Berlin)</span></strong>In <span class="nowrap-unit" style="color:var(--primary-red); font-weight:900;">${remH}&nbsp;Std. ${remM}&nbsp;Min.</span> – jetzt Unterlagen einreichen.`;
         };
         setInterval(window.updateDispatchCountdown, 30000);
 
@@ -7452,14 +7488,12 @@
                 .replace(/(\d)\s+€/g, '$1&nbsp;€')
                 .replace(/Britzer\s+Damm/g, 'Britzer&nbsp;Damm');
 
-            if (asNewLine) {
-                // Nur Klammern am Ende in eine neue Zeile; Klammern mitten im Label bleiben inline & klein
-                return safe
-                    .replace(/\s*(\([^)]+\))([:?!.,;]*)$/g, '$2<span class="paren-sub">$1</span>')
-                    .replace(/(\s*)(\([^)]+\))/g, '$1<span class="paren-inline">$2</span>');
-            }
-            return safe.replace(/(\s*)(\([^)]+\))([:?!.,;]*)/g, (match, sp, paren, punct) => {
-                if (paren.length > 14) {
+            return safe.replace(/(\s*)(\([^)]+\))([:?!.,;]*)/g, (match, sp, paren, punct, offset, fullStr) => {
+                const isAtEnd = fullStr.slice(offset + match.length).trim() === '';
+                if (asNewLine && isAtEnd) {
+                    return `${punct}<span class="paren-sub">${paren}</span>`;
+                }
+                if (!asNewLine && paren.length > 14) {
                     return `${punct}<span class="paren-sub">${paren}</span>`;
                 }
                 return `${sp}<span class="paren-inline">${paren}${punct}</span>`;
@@ -7675,6 +7709,50 @@
                 });
                 p.dataset.parenDone = '1';
             });
+
+            // Globaler Umbruch-Schutz für zusammengehörige Preisspannen, Uhrzeiten, Einheiten & Ortsnamen
+            window.protectConnectedPhrases(root);
+        };
+
+        window.protectConnectedPhrases = function(rootEl) {
+            const root = rootEl || document.body;
+            const skipTags = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, SELECT: 1, OPTION: 1, CODE: 1, PRE: 1 };
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            let node;
+            while ((node = walker.nextNode())) {
+                const parent = node.parentElement;
+                if (!parent || skipTags[parent.tagName] || parent.closest('#adminModal') || parent.closest('#liveGermanPlatePreview')) continue;
+                const orig = node.nodeValue;
+                if (!orig || orig.trim().length < 3) continue;
+
+                const fixed = orig
+                    // Preisspannen & Beträge untrennbar (z.B. ca. 26,00 € – 31,00 €)
+                    .replace(/ca\.\s+(\d)/gi, 'ca.\u00A0$1')
+                    .replace(/(\d)\s+€/g, '$1\u00A0€')
+                    .replace(/€\s*([–-])\s*(\d)/g, '€\u00A0$1\u00A0$2')
+                    // Uhrzeiten & Zeitspannen untrennbar (z.B. ab 09:00 Uhr, 09:00 – 20:00 Uhr)
+                    .replace(/\b(ab|bis|um)\s+(\d{1,2}:\d{2})/gi, '$1\u00A0$2')
+                    .replace(/(\d{1,2}:\d{2})\s*([–-])\s*(\d{1,2}:\d{2})/g, '$1\u00A0$2\u00A0$3')
+                    .replace(/(\d{1,2}:\d{2})\s+Uhr\b/gi, '$1\u00A0Uhr')
+                    // Zahlen + Einheiten untrennbar (z.B. 1–2 Werktage, 24 Stunden, 5 Min., 100 %, § 23 StVZO)
+                    .replace(/(\d[\d.,–-]*)\s+(Werktage?n?|Tage?n?|Stunden?|Std\.|Minuten?|Min\.|Sekunden?|Zeichen|Jahre?n?|mm|km|%|Schritten?|Fahrzeuge?n?)\b/gi, '$1\u00A0$2')
+                    .replace(/(\d+)\s*×\s*(\d+)/g, '$1\u00A0×\u00A0$2')
+                    .replace(/§\s*(\d+)/g, '§\u00A0$1')
+                    .replace(/\bTeil\s+(I{1,2})\b/g, 'Teil\u00A0$1')
+                    .replace(/\bz\.\s?B\.\s+/g, 'z.\u00A0B.\u00A0')
+                    // Feste Berliner Orts- & Firmenbegriffe
+                    .replace(/Kienitzer\s+Str\.\s*6/g, 'Kienitzer\u00A0Str.\u00A06')
+                    .replace(/12053\s+Berlin/g, '12053\u00A0Berlin')
+                    .replace(/U8\s+(Boddinstraße|Boddinstr\.)/g, 'U8\u00A0$1')
+                    .replace(/Britzer\s+Damm/g, 'Britzer\u00A0Damm')
+                    .replace(/LABO\s+Berlin/g, 'LABO\u00A0Berlin')
+                    .replace(/RED\s+Berlin/g, 'RED\u00A0Berlin')
+                    .replace(/Tamer\s+Yazici/g, 'Tamer\u00A0Yazici');
+
+                if (fixed !== orig) {
+                    node.nodeValue = fixed;
+                }
+            }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
