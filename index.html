@@ -1602,6 +1602,21 @@
                 padding: 10px 11px !important;
                 min-width: 0;
             }
+            /* MOBILE: Mehr nutzbare Breite in Karten gegen einsame Wörter in Zeile 2 */
+            .tool-box { padding: 20px 14px !important; }
+            .compass-box { padding: 22px 14px !important; }
+            .tool-tab-pane h3 {
+                font-size: clamp(13px, 3.85vw, 15.5px) !important;
+                line-height: 1.3 !important;
+                text-wrap: balance;
+            }
+            .checklist-row {
+                font-size: clamp(10.2px, 2.9vw, 11.2px) !important;
+                padding: 9px 10px !important;
+                gap: 7px !important;
+                line-height: 1.35 !important;
+            }
+            .checklist-row span { text-wrap: balance; }
 
             /* DESIGNPASSENDE MOBILE SELECT-BOXEN (ERSETZT DAS ANDROID/iOS SYSTEM-POPUP) */
             .red-select-wrap {
@@ -1822,7 +1837,11 @@
             font-weight: 600;
             color: var(--text-muted);
             line-height: 1.35;
+            white-space: nowrap;
         }
+        #districtResultBox strong { display: block; margin-bottom: 4px; line-height: 1.3; }
+        #districtResultBox strong .paren-sub { margin-bottom: 0; }
+        #districtResultBox br { display: none; }
 
         /* THEME-ADAPTIVES MOBILE AUSWAHL-SHEET (ZENTRIERT & OHNE ZITTERN) */
         .mobile-select-overlay {
@@ -3892,7 +3911,7 @@
                         <button type="button" class="district-pill" onclick="window.selectBerlinDistrict('steglitz', this)">Steglitz-Zehlendorf</button>
                     </div>
                     <div id="districtResultBox" style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:12px; padding:12px; font-size:11.5px; margin:12px 0;">
-                        <strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Direkt vor Ort in Neukölln (Kienitzer Str. 6, 12053 Berlin):</strong><br>
+                        <strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Direkt vor Ort in Neukölln (Kienitzer Str. 6, 12053 Berlin):</strong>
                         <span style="color:var(--text-light);">Nur 2–8 Minuten Fahrzeit (U8 Boddinstr. / Hermannplatz / Stadtautobahn A100 Ausfahrt Britzer Damm). Sofort-Annahme ohne Wartezeit!</span>
                     </div>
                 </div>
@@ -5314,7 +5333,7 @@
             if(btnEl) btnEl.classList.add('active');
             const box = document.getElementById('districtResultBox');
             if(box && districtDetails[districtKey]) {
-                box.innerHTML = `<strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Express-Anbindung (${btnEl.innerText.replace('📍 ','')}):</strong><br><span style="color:var(--text-light);">${districtDetails[districtKey]}</span>`;
+                box.innerHTML = `<strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Express-Anbindung (${btnEl.innerText.replace('📍 ','')}):</strong><span style="color:var(--text-light);">${districtDetails[districtKey]}</span>`;
             }
         };
 
@@ -7369,7 +7388,12 @@
             if (asNewLine) {
                 return safe.replace(/\s*(\([^)]+\))([:?!.,;]*)/g, '$2<span class="paren-sub">$1</span>');
             }
-            return safe.replace(/(\s*)(\([^)]+\))([:?!.,;]*)/g, '$1<span class="paren-inline">$2$3</span>');
+            return safe.replace(/(\s*)(\([^)]+\))([:?!.,;]*)/g, (match, sp, paren, punct) => {
+                if (paren.length > 14) {
+                    return `${punct}<span class="paren-sub">${paren}</span>`;
+                }
+                return `${sp}<span class="paren-inline">${paren}${punct}</span>`;
+            });
         };
 
         window.activeMobileSelectEl = null;
