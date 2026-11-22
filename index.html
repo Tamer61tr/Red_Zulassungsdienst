@@ -1432,23 +1432,242 @@
                DAMIT SIE NIEMALS DIE MITTLEREN BUTTONS VERDECKEN! */
             .floating-quick-bar {
                 flex-direction: column !important;
-                bottom: calc(14px + var(--safe-bottom));
-                left: 8px;
-                gap: 6px;
+                bottom: calc(12px + var(--safe-bottom));
+                left: 5px;
+                gap: 5px;
             }
             .fab-btn {
-                width: 31px;
-                height: 31px;
-                font-size: 13px;
-                box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+                opacity: 0.9;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.32);
             }
+            footer { padding-bottom: calc(52px + var(--safe-bottom)); }
+            .tool-box h3 { font-size: 15px; align-items: flex-start; line-height: 1.3; }
+            .tool-box h3 i { margin-top: 2px; flex-shrink: 0; }
+            .contact-action-row { flex-wrap: nowrap !important; }
+            .contact-action-row .btn-primary {
+                white-space: nowrap !important;
+                font-size: 10px !important;
+                padding: 10px 8px !important;
+                gap: 5px;
+            }
+
+            /* DESIGNPASSENDE MOBILE SELECT-BOXEN (ERSETZT DAS ANDROID/iOS SYSTEM-POPUP) */
+            .red-select-wrap {
+                display: block;
+                position: relative;
+                width: 100%;
+                min-width: 0;
+            }
+            .red-select-wrap.is-flex-item { flex: 1 1 140px; width: auto; }
+            .red-select-wrap.is-compact-item { width: 135px; flex: 0 0 auto; }
+            .red-select-wrap.is-theme-select { width: 100%; max-width: 320px; }
+            .red-select-wrap > select {
+                position: absolute !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                width: 1px !important;
+                height: 1px !important;
+                overflow: hidden !important;
+            }
+            .mobile-select-display {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                width: 100%;
+                min-height: 46px;
+                padding: 10px 14px;
+                background: var(--bg-input);
+                color: var(--text-light);
+                border: 1.5px solid var(--glass-border);
+                border-radius: 12px;
+                text-align: left;
+                cursor: pointer;
+                font-size: 13px !important;
+                font-weight: 700;
+                line-height: 1.3;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            }
+            .mobile-select-display:active,
+            .mobile-select-display.active-open {
+                border-color: var(--primary-red);
+                box-shadow: 0 0 0 3px rgba(217, 0, 0, 0.14);
+            }
+            .mobile-select-display .ms-val-wrap {
+                flex: 1;
+                min-width: 0;
+                word-break: break-word;
+            }
+            .mobile-select-display .ms-chevron {
+                color: var(--primary-red);
+                font-size: 11px;
+                flex-shrink: 0;
+                transition: transform 0.2s ease;
+            }
+            .mobile-select-display.active-open .ms-chevron { transform: rotate(180deg); }
         }
+
+        /* DESKTOP BLEIBT 100% UNBERÜHRT */
+        @media (min-width: 769px) {
+            .red-select-wrap { display: contents; }
+            .mobile-select-display { display: none !important; }
+        }
+
+        /* GLOBALE KLAMMER-TYPOGRAFIE (ÜBERALL KLEIN & IN NEUER ZEILE) */
+        .paren-text-group {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: inherit;
+            line-height: 1.25;
+        }
+        .paren-sub {
+            display: block;
+            font-size: 0.78em;
+            font-weight: 600;
+            opacity: 0.82;
+            line-height: 1.3;
+            margin-top: 2px;
+            letter-spacing: 0.1px;
+        }
+        .paren-inline {
+            font-size: 0.82em;
+            font-weight: 600;
+            opacity: 0.82;
+            white-space: nowrap;
+        }
+
+        /* THEME-ADAPTIVES MOBILE AUSWAHL-SHEET (HELL, DUNKEL & ALLE 37 THEMES) */
+        .mobile-select-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.62);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 99990;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.22s ease, visibility 0.22s ease;
+            padding: 12px 10px calc(14px + var(--safe-bottom));
+        }
+        .mobile-select-overlay.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+        }
+        .mobile-select-sheet {
+            width: 100%;
+            max-width: 520px;
+            max-height: 76dvh;
+            background: var(--bg-card);
+            color: var(--text-light);
+            border: 1.5px solid var(--glass-border);
+            border-top: 3px solid var(--primary-red);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(22px);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mobile-select-overlay.open .mobile-select-sheet { transform: translateY(0); }
+        .mobile-select-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 13px 16px;
+            background: var(--bg-input);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .mobile-select-title {
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary-red);
+            text-align: left;
+            line-height: 1.3;
+        }
+        .mobile-select-close {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px !important;
+            flex-shrink: 0;
+        }
+        .mobile-select-list {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .mobile-select-option {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: var(--bg-input);
+            border: 1.5px solid var(--glass-border);
+            color: var(--text-light);
+            text-align: left;
+            cursor: pointer;
+            font-size: 13.5px !important;
+            font-weight: 700;
+            line-height: 1.3;
+            transition: background 0.18s ease, border-color 0.18s ease;
+        }
+        .mobile-select-option.selected {
+            border-color: var(--primary-red);
+            background: rgba(217, 0, 0, 0.09);
+        }
+        .mobile-select-option.is-disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .mobile-select-option .ms-opt-text { flex: 1; min-width: 0; }
+        .mobile-select-option .ms-opt-check {
+            font-size: 16px;
+            color: var(--glass-border);
+            flex-shrink: 0;
+        }
+        .mobile-select-option.selected .ms-opt-check { color: var(--primary-red); }
     </style>
 </head>
 
 <body data-theme="light">
 
     <div id="toast-container"></div>
+
+    <!-- THEME-ADAPTIVES MOBILE AUSWAHL-SHEET (FÜR ALLE THEMES: HELL, DUNKEL & FARBTHEMES) -->
+    <div class="mobile-select-overlay" id="mobileSelectOverlay" onclick="if(event.target===this) window.closeMobileSelectSheet()">
+        <div class="mobile-select-sheet" role="dialog" aria-modal="true">
+            <div class="mobile-select-header">
+                <div class="mobile-select-title" id="mobileSelectTitle">Auswahl treffen</div>
+                <button type="button" class="mobile-select-close" onclick="window.closeMobileSelectSheet()" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="mobile-select-list" id="mobileSelectList"></div>
+        </div>
+    </div>
     
     <!-- DIE 5 SCHNELL-SYMBOLE: AM PC NEBENEINANDER, AM HANDY/APP LINKS ÜBEREINANDER & IM DARK-MODE LEUCHTEND -->
     <div class="floating-quick-bar">
@@ -3767,9 +3986,12 @@
             <!-- NEUHEIT 3: ANSCHRIFT INKL. 1-KLICK ROUTEN- & U8-ANFAHRTS-STARTER -->
             <div style="background:var(--bg-card); padding:20px; border-radius:18px; border:1px solid var(--glass-border); box-shadow:var(--card-shadow);">
                 <h3 style="font-size:14px; color: var(--text-light);"><i class="fa-solid fa-location-dot" style="color:var(--primary-red);"></i> Anschrift & Schnell-Navigation</h3>
-                <p style="margin-top:8px; font-size:12.5px; font-weight:700; color: var(--text-light);">Kienitzer Str. 6, 12053 Berlin (Neukölln)</p>
-                <p style="margin-top:4px; font-size:11px; color:var(--text-muted);"><i class="fa-solid fa-clock"></i> Montag – Freitag: 09:00 – 20:00 Uhr • <i class="fa-solid fa-train-subway" style="color:#007aff;"></i> U8 Boddinstraße (2 Min.)</p>
-                <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                <p style="margin-top:8px; font-size:13px; font-weight:800; color: var(--text-light); line-height:1.35;">Kienitzer Str. 6, 12053 Berlin <span class="paren-sub" style="color:var(--text-muted);">(Berlin-Neukölln)</span></p>
+                <div style="margin-top:8px; font-size:11.5px; color:var(--text-muted); display:flex; flex-direction:column; gap:4px; line-height:1.4;">
+                    <span><i class="fa-solid fa-clock" style="width:15px;"></i> Montag – Freitag: 09:00 – 20:00 Uhr</span>
+                    <span><i class="fa-solid fa-train-subway" style="color:#007aff; width:15px;"></i> U8 Boddinstraße <span class="paren-inline">(ca. 2 Min. Fußweg)</span></span>
+                </div>
+                <div class="contact-action-row" style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; align-items:stretch;">
                     <a href="https://www.google.com/maps/dir/?api=1&destination=Kienitzer+Str.+6,+12053+Berlin" target="_blank" rel="noopener noreferrer" class="btn-primary" style="flex:1; justify-content:center; padding:9px 12px; font-size:10.5px !important;">
                         <i class="fa-solid fa-diamond-turn-right"></i> Route starten
                     </a>
@@ -6457,8 +6679,9 @@
                     const isWorkday = (now.getDay() >= 1 && now.getDay() <= 5);
                     const isOpen = isWorkday && (now.getHours() >= 9 && now.getHours() < 20);
                     content.innerHTML = `
-                        <div style="font-size: 20px; font-weight: 900; color: ${isOpen ? 'var(--green-accent)' : '#ff9500'}; margin-bottom: 10px;">
-                            ${isOpen ? '🟢 JETZT GEÖFFNET (Sofort-Annahme)' : '🌙 AKTUELL GESCHLOSSEN (Online-Termin aktiv)'}
+                        <div style="font-size: clamp(16px, 4.4vw, 19px); font-weight: 900; color: ${isOpen ? 'var(--green-accent)' : '#d97706'}; margin-bottom: 14px; line-height: 1.3;">
+                            <i class="fa-solid ${isOpen ? 'fa-circle-check' : 'fa-moon'}" style="margin-right:6px;"></i>${isOpen ? 'JETZT GEÖFFNET' : 'AKTUELL GESCHLOSSEN'}
+                            <span class="paren-sub" style="color:var(--text-muted); font-size:12px;">${isOpen ? '(Sofort-Annahme vor Ort)' : '(Online-Termin 24/7 aktiv)'}</span>
                         </div>
                         <div style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:12px; padding:14px; text-align:left; font-size:12px; color:var(--text-light); margin-bottom:15px;">
                             <strong>Unsere Servicezeiten vor Ort:</strong><br>
@@ -6848,6 +7071,167 @@
                 document.addEventListener('touchcancel', touchEndHandler);
             }, { passive: false });
         };
+
+        // =========================================================================
+        // 10. THEME-ADAPTIVES MOBILE SELECT-SHEET & GLOBALE KLAMMER-FORMATIERUNG
+        // =========================================================================
+        window.formatParenTextHtml = function(rawText, asNewLine = true) {
+            const safe = window.escHtml(rawText || '');
+            const cls = asNewLine ? 'paren-sub' : 'paren-inline';
+            return safe.replace(/\s*(\([^)]+\))/g, `<span class="${cls}">$1</span>`);
+        };
+
+        window.activeMobileSelectEl = null;
+        window.activeMobileSelectBtn = null;
+
+        window.syncMobileSelectDisplay = function(selectEl) {
+            if (!selectEl || !selectEl._mobileDisplayBtn) return;
+            const opt = selectEl.options[selectEl.selectedIndex];
+            const valWrap = selectEl._mobileDisplayBtn.querySelector('.ms-val-wrap');
+            if (valWrap) {
+                valWrap.innerHTML = opt ? window.formatParenTextHtml(opt.textContent.trim(), true) : 'Bitte wählen';
+            }
+        };
+
+        window.syncAllMobileSelectDisplays = function() {
+            document.querySelectorAll('select.form-control, select.theme-selector').forEach(sel => {
+                window.syncMobileSelectDisplay(sel);
+            });
+        };
+
+        window.openMobileSelectSheet = function(selectEl, triggerBtn) {
+            const overlay = document.getElementById('mobileSelectOverlay');
+            const listEl = document.getElementById('mobileSelectList');
+            const titleEl = document.getElementById('mobileSelectTitle');
+            if (!overlay || !listEl || !selectEl) return;
+
+            window.activeMobileSelectEl = selectEl;
+            window.activeMobileSelectBtn = triggerBtn;
+            if (triggerBtn) triggerBtn.classList.add('active-open');
+
+            const formGroup = selectEl.closest('.form-group');
+            const lbl = formGroup ? formGroup.querySelector('label') : null;
+            titleEl.innerText = lbl ? lbl.innerText.replace(/\s+/g, ' ').trim() : 'Auswahl treffen';
+
+            listEl.innerHTML = '';
+            Array.from(selectEl.options).forEach((opt, idx) => {
+                const isSelected = idx === selectEl.selectedIndex;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `mobile-select-option${isSelected ? ' selected' : ''}${opt.disabled ? ' is-disabled' : ''}`;
+                btn.innerHTML = `
+                    <span class="ms-opt-text">${window.formatParenTextHtml(opt.textContent.trim(), true)}</span>
+                    <i class="${isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} ms-opt-check"></i>
+                `;
+                if (!opt.disabled) {
+                    btn.onclick = () => {
+                        selectEl.selectedIndex = idx;
+                        selectEl.value = opt.value;
+                        window.syncMobileSelectDisplay(selectEl);
+                        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        window.closeMobileSelectSheet();
+                    };
+                }
+                listEl.appendChild(btn);
+            });
+
+            overlay.classList.add('open');
+        };
+
+        window.closeMobileSelectSheet = function() {
+            const overlay = document.getElementById('mobileSelectOverlay');
+            if (overlay) overlay.classList.remove('open');
+            if (window.activeMobileSelectBtn) window.activeMobileSelectBtn.classList.remove('active-open');
+            window.activeMobileSelectEl = null;
+            window.activeMobileSelectBtn = null;
+        };
+
+        window.initMobileThemeSelects = function() {
+            document.querySelectorAll('select.form-control, select.theme-selector').forEach(sel => {
+                if (sel.dataset.mobileSelectReady) return;
+                sel.dataset.mobileSelectReady = '1';
+
+                const wrap = document.createElement('div');
+                wrap.className = 'red-select-wrap';
+                if (sel.id === 'themeSelector') wrap.classList.add('is-theme-select');
+                else if (sel.style.flex) wrap.classList.add('is-flex-item');
+                else if (sel.style.width && sel.style.width.includes('px')) wrap.classList.add('is-compact-item');
+
+                sel.parentNode.insertBefore(wrap, sel);
+                wrap.appendChild(sel);
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mobile-select-display';
+                btn.innerHTML = `<span class="ms-val-wrap"></span><i class="fa-solid fa-chevron-down ms-chevron"></i>`;
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.openMobileSelectSheet(sel, btn);
+                };
+                wrap.appendChild(btn);
+                sel._mobileDisplayBtn = btn;
+
+                sel.addEventListener('change', () => window.syncMobileSelectDisplay(sel));
+                window.syncMobileSelectDisplay(sel);
+            });
+
+            // Synchronisiert dynamisch gesetzte Werte beim Öffnen beliebiger Modals
+            const modalObserver = new MutationObserver(() => {
+                setTimeout(window.syncAllMobileSelectDisplays, 30);
+            });
+            document.querySelectorAll('.custom-dialog-overlay').forEach(ov => {
+                modalObserver.observe(ov, { attributes: true, attributeFilter: ['class'] });
+            });
+        };
+
+        // Globale Klammer-Formatierung (überall in kleiner Schriftgröße; bei Labels/Buttons/Titeln in neuer Zeile)
+        window.formatParenthesesEverywhere = function(rootEl) {
+            const root = rootEl || document.body;
+            const blockTargets = root.querySelectorAll(
+                '.form-group > label, .compass-tab-btn, .district-pill, .checklist-row span, .compass-doc-list li, .admin-details summary, .calc-item span, .download-info span, .tool-box h3, .compass-box h2, .compass-box h3, .section-header h2'
+            );
+            blockTargets.forEach(el => {
+                if (el.dataset.parenDone === '1' || el.closest('#adminModal') || el.closest('#liveGermanPlatePreview')) return;
+                const textNodes = [];
+                el.childNodes.forEach(n => {
+                    if (n.nodeType === 3 && /\([^)]+\)/.test(n.nodeValue)) textNodes.push(n);
+                });
+                if (textNodes.length === 0) return;
+
+                const isFlex = getComputedStyle(el).display.includes('flex');
+                textNodes.forEach(node => {
+                    const html = window.formatParenTextHtml(node.nodeValue.trim(), true);
+                    const holder = document.createElement('span');
+                    holder.className = isFlex ? 'paren-text-group' : '';
+                    holder.innerHTML = html;
+                    node.parentNode.replaceChild(holder, node);
+                });
+                el.dataset.parenDone = '1';
+            });
+
+            // Fließtext-Klammern in Absätzen kleiner (ohne harten Umbruch mitten im Satz)
+            root.querySelectorAll('p, .card-info-slide p, .admin-details-content').forEach(p => {
+                if (p.dataset.parenDone === '1' || p.closest('#adminModal') || p.closest('#legalOverlay')) return;
+                p.childNodes.forEach(node => {
+                    if (node.nodeType === 3 && /\([^)]+\)/.test(node.nodeValue)) {
+                        const span = document.createElement('span');
+                        span.innerHTML = window.formatParenTextHtml(node.nodeValue, false);
+                        node.parentNode.replaceChild(span, node);
+                    }
+                });
+                p.dataset.parenDone = '1';
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.initMobileThemeSelects();
+            window.formatParenthesesEverywhere(document.body);
+            setTimeout(() => {
+                window.syncAllMobileSelectDisplays();
+                window.formatParenthesesEverywhere(document.body);
+            }, 400);
+        });
     </script>
     
 <!-- TEIL 6 VON 6: FIREBASE ECHTZEIT-DATENBANK, GELB-GOLDENE PIN-MARKIERUNG, FORMULARE & DATEI-ABSCHLUSS -->
