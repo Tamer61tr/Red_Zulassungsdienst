@@ -2753,10 +2753,10 @@
             </div>
             
             <div class="header-widgets-wrapper">
-                <!-- 1. LIVE BÜRO- & ANNAHME-AMPEL -->
-                <div class="header-office-status header-widget-item" id="liveHeaderOfficeStatus" onclick="window.openWidgetModal('office')" title="Öffnungszeiten & Direktannahme-Status">
-                    <span class="status-led open" id="officeStatusLed"></span>
-                    <span id="officeStatusText">Geöffnet • Sofort-Annahme</span>
+                <!-- 1. DIREKT-SCHNELLZUGRIFF: LIVE AUFTRAGS-TRACKER -->
+                <div class="header-calendar-chip header-widget-item" id="liveHeaderTrackerChip" onclick="window.jumpToLiveTracker()" title="Auftragsstatus live prüfen">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    <span>Live-Tracker</span>
                 </div>
                 <!-- 2. INTERAKTIVER MONATS- & WOCHENKALENDER (MIT DYNAMISCHER KW-BERECHNUNG) -->
                 <div class="header-calendar-chip header-widget-item" id="liveHeaderCalendar" onclick="window.openWidgetModal('calendar')" title="Monatskalender, Kalenderwochen & freie Tage anzeigen">
@@ -4970,7 +4970,9 @@
 
             <div style="background:var(--bg-card); padding:20px; border-radius:18px; border:1px solid var(--glass-border); box-shadow:var(--card-shadow);">
                 <h3 style="font-size:14px; color: var(--text-light);"><i class="fa-solid fa-phone" style="color:var(--primary-red);"></i> Support-Hotlines & Rückruf</h3>
-                <p style="margin-top:5px; font-size:12px; color: var(--text-light);" class="live-phone">0178 378 38 75</p>
+                <p style="margin-top:6px; font-size:13px;">
+                    <a href="tel:+491783783875" id="tel-contact-link" class="live-phone" style="color:var(--text-light); font-weight:800; text-decoration:none; border-bottom:1.5px dashed var(--primary-red); padding-bottom:1px; display:inline-block;" title="Direkt anrufen">0178 378 38 75</a>
+                </p>
                 <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
                     <a href="#" id="wa-contact-btn" target="_blank" rel="noopener noreferrer" class="btn-primary" style="background:#25D366; color:#000; flex:1; justify-content:center; padding:10px 14px;"><i class="fa-brands fa-whatsapp" style="font-size:15px;"></i> WhatsApp</a>
                     <button type="button" class="btn-primary" style="background:#ff9500; color:#000; flex:1; justify-content:center; padding:10px 14px;" onclick="window.openCallbackModal()"><i class="fa-solid fa-phone-volume"></i> 60s Rückruf</button>
@@ -5203,18 +5205,61 @@
         }, { passive: false });
 
         // =========================================================================
-        // MINI ÖFFNUNGSZEITEN-COUNTDOWN IM HEADER (BERLINER ZEIT: MO–FR 09–20 UHR)
+        // BERLINER FEIERTAGS-ENGINE (INKL. 8. MÄRZ & DYNAMISCHER OSTERBERECHNUNG)
         // =========================================================================
-        window.updateHeaderHoursCountdown = function() {
-            const box = document.getElementById('headerHoursCountdown');
-            const lbl = document.getElementById('hhcHoursLabel');
-            const timer = document.getElementById('hhcCountdownText');
-            if (!box || !lbl || !timer) return;
+        window._berlinHolidayCache = {};
 
-            let dayNum, h, m, s;
+        window.getBerlinHolidaysForYear = function(year) {
+            if (window._berlinHolidayCache[year]) return window._berlinHolidayCache[year];
+            const pad = (n) => String(n).padStart(2, '0');
+            const toKey = (utcDate) => `${utcDate.getUTCFullYear()}-${pad(utcDate.getUTCMonth() + 1)}-${pad(utcDate.getUTCDate())}`;
+            const addDays = (base, days) => new Date(base.getTime() + days * 86400000);
+
+            // Gaußsche Osterformel (funktioniert dauerhaft für jedes Jahr)
+            const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+            const d = Math.floor(b / 4), e = b % 4;
+            const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const easterMonth = Math.floor((h + l - 7 * m + 114) / 31);
+            const easterDay = ((h + l - 7 * m + 114) % 31) + 1;
+            const easter = new Date(Date.UTC(year, easterMonth - 1, easterDay));
+
+            const holidays = {};
+            holidays[`${year}-01-01`] = 'Neujahr';
+            holidays[`${year}-03-08`] = 'Weltfrauentag';
+            holidays[toKey(addDays(easter, -2))] = 'Karfreitag';
+            holidays[toKey(addDays(easter, 1))] = 'Ostermontag';
+            holidays[`${year}-05-01`] = 'Tag der Arbeit';
+            holidays[toKey(addDays(easter, 39))] = 'Christi Himmelfahrt';
+            holidays[toKey(addDays(easter, 50))] = 'Pfingstmontag';
+            holidays[`${year}-10-03`] = 'Tag der Deutschen Einheit';
+            holidays[`${year}-12-25`] = '1. Weihnachtstag';
+            holidays[`${year}-12-26`] = '2. Weihnachtstag';
+
+            window._berlinHolidayCache[year] = holidays;
+            return holidays;
+        };
+
+        window.isBerlinHolidayYMD = function(year, month, day) {
+            const key = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            return window.getBerlinHolidaysForYear(year)[key] || null;
+        };
+
+        window.getBerlinHolidayName = function(dateObj) {
+            if (!dateObj) return null;
+            return window.isBerlinHolidayYMD(dateObj.getFullYear(), dateObj.getMonth() + 1, dateObj.getDate());
+        };
+
+        window.getBerlinNowParts = function() {
             try {
                 const parts = new Intl.DateTimeFormat('en-GB', {
                     timeZone: 'Europe/Berlin',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
                     weekday: 'short',
                     hour: '2-digit',
                     minute: '2-digit',
@@ -5224,46 +5269,84 @@
                 const map = {};
                 parts.forEach(p => { map[p.type] = p.value; });
                 const dayLookup = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-                dayNum = dayLookup[map.weekday];
-                h = parseInt(map.hour, 10) % 24;
-                m = parseInt(map.minute, 10);
-                s = parseInt(map.second, 10);
+                return {
+                    year: parseInt(map.year, 10),
+                    month: parseInt(map.month, 10),
+                    day: parseInt(map.day, 10),
+                    dayNum: dayLookup[map.weekday],
+                    h: parseInt(map.hour, 10) % 24,
+                    m: parseInt(map.minute, 10),
+                    s: parseInt(map.second, 10)
+                };
             } catch (e) {
                 const now = new Date();
-                dayNum = now.getDay();
-                h = now.getHours();
-                m = now.getMinutes();
-                s = now.getSeconds();
+                return {
+                    year: now.getFullYear(),
+                    month: now.getMonth() + 1,
+                    day: now.getDate(),
+                    dayNum: now.getDay(),
+                    h: now.getHours(),
+                    m: now.getMinutes(),
+                    s: now.getSeconds()
+                };
             }
+        };
 
-            const nowSec = h * 3600 + m * 60 + s;
+        // Direkt-Sprung zum Live-Tracker aus der Header-Leiste
+        window.jumpToLiveTracker = function() {
+            window.switchView('view-home');
+            setTimeout(() => {
+                const input = document.getElementById('liveTrackerInput');
+                const section = input ? input.closest('section') : null;
+                if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (input) setTimeout(() => input.focus({ preventScroll: true }), 420);
+            }, 80);
+        };
+
+        // =========================================================================
+        // MINI ÖFFNUNGSZEITEN-COUNTDOWN IM HEADER (BERLINER ZEIT + FEIERTAGE)
+        // =========================================================================
+        window.updateHeaderHoursCountdown = function() {
+            const box = document.getElementById('headerHoursCountdown');
+            const lbl = document.getElementById('hhcHoursLabel');
+            const timer = document.getElementById('hhcCountdownText');
+            if (!box || !lbl || !timer) return;
+
+            const bn = window.getBerlinNowParts();
+            const todayHoliday = window.isBerlinHolidayYMD(bn.year, bn.month, bn.day);
+            const nowSec = bn.h * 3600 + bn.m * 60 + bn.s;
             const openSec = 9 * 3600;
             const closeSec = 20 * 3600;
-            const isWorkday = dayNum >= 1 && dayNum <= 5;
+            const isWorkday = (bn.dayNum >= 1 && bn.dayNum <= 5) && !todayHoliday;
             const isOpen = isWorkday && nowSec >= openSec && nowSec < closeSec;
             const pad = (n) => String(n).padStart(2, '0');
 
-            let remSec = 0;
             if (isOpen) {
-                remSec = closeSec - nowSec;
+                const remSec = closeSec - nowSec;
                 const rh = Math.floor(remSec / 3600);
                 const rm = Math.floor((remSec % 3600) / 60);
                 const rs = remSec % 60;
                 box.classList.add('is-open');
                 box.classList.remove('is-closed');
+                box.title = 'Geöffnet (Mo–Fr 09:00–20:00 Uhr, Berlin)';
                 lbl.innerText = 'Offen • 09–20';
                 timer.innerText = `Noch ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
             } else {
+                let remSec = 0;
                 if (isWorkday && nowSec < openSec) {
                     remSec = openSec - nowSec;
-                } else if (dayNum >= 1 && dayNum <= 4) {
-                    remSec = (86400 - nowSec) + openSec;
-                } else if (dayNum === 5) {
-                    remSec = (86400 - nowSec) + (2 * 86400) + openSec;
-                } else if (dayNum === 6) {
-                    remSec = (86400 - nowSec) + 86400 + openSec;
                 } else {
-                    remSec = (86400 - nowSec) + openSec;
+                    for (let offsetDays = 1; offsetDays <= 14; offsetDays++) {
+                        const nextUtc = new Date(Date.UTC(bn.year, bn.month - 1, bn.day + offsetDays));
+                        const wd = nextUtc.getUTCDay();
+                        const ny = nextUtc.getUTCFullYear();
+                        const nm = nextUtc.getUTCMonth() + 1;
+                        const nd = nextUtc.getUTCDate();
+                        if (wd >= 1 && wd <= 5 && !window.isBerlinHolidayYMD(ny, nm, nd)) {
+                            remSec = (86400 - nowSec) + ((offsetDays - 1) * 86400) + openSec;
+                            break;
+                        }
+                    }
                 }
 
                 const days = Math.floor(remSec / 86400);
@@ -5273,7 +5356,10 @@
 
                 box.classList.remove('is-open');
                 box.classList.add('is-closed');
-                lbl.innerText = 'Mo–Fr 09–20';
+                box.title = todayHoliday
+                    ? `Feiertag in Berlin (${todayHoliday}) – Regulär Mo–Fr 09:00–20:00 Uhr`
+                    : 'Öffnungszeiten Mo–Fr 09:00–20:00 Uhr (Berlin)';
+                lbl.innerText = todayHoliday ? 'Feiertag • Zu' : 'Mo–Fr 09–20';
                 timer.innerText = days > 0
                     ? `In ${days}T ${pad(rh)}:${pad(rm)}:${pad(rs)}`
                     : `Öffnet ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
@@ -5486,18 +5572,21 @@
 
                 const wDay = curDate.getDay();
                 const isWeekend = (wDay === 0 || wDay === 6);
+                const holidayName = window.getBerlinHolidayName(curDate);
                 const isToday = (d === now.getDate() && mo === now.getMonth() && yr === now.getFullYear());
                 const isPast = curDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const isBlocked = isWeekend || !!holidayName || isPast;
                 const formattedDate = `${String(d).padStart(2, '0')}.${String(mo + 1).padStart(2, '0')}.${yr}`;
                 const dayKw = window.getISOWeekNumber(curDate);
 
                 let cls = 'mini-cal-day';
                 if (isToday) cls += ' today';
-                if (isWeekend || isPast) cls += ' weekend';
+                if (isBlocked) cls += ' weekend';
 
-                const clickAttr = (!isWeekend && !isPast)
+                const blockedReason = holidayName ? `Feiertag: ${holidayName}` : (isWeekend ? 'Wochenende' : 'Vergangener Tag');
+                const clickAttr = !isBlocked
                     ? `onclick="window.selectDayFromHeaderCalendar('${formattedDate}', ${dayKw})" title="KW ${dayKw}: Klicken, um am ${formattedDate} einen Termin zu buchen"`
-                    : `title="KW ${dayKw} (${isWeekend ? 'Wochenende' : 'Vergangener Tag'})"`;
+                    : `title="KW ${dayKw} (${blockedReason})"`;
 
                 gridHtml += `<div class="${cls}" ${clickAttr}>${d}</div>`;
                 currentCell++;
@@ -6051,13 +6140,14 @@
         window.updateDispatchCountdown = function() {
             const el = document.getElementById('liveDispatchCountdown');
             if (!el) return;
-            const now = new Date();
-            const day = now.getDay();
-            const h = now.getHours();
-            const m = now.getMinutes();
+            const bn = window.getBerlinNowParts();
+            const todayHoliday = window.isBerlinHolidayYMD(bn.year, bn.month, bn.day);
+            const day = bn.dayNum;
+            const h = bn.h;
+            const m = bn.m;
 
-            if (day === 0 || day === 6 || h >= 18) {
-                el.innerHTML = `<strong style="display:block; color:var(--text-light); margin-bottom:2px;"><i class="fa-regular fa-clock" style="color:var(--primary-red); margin-right:5px;"></i>Express-Kontingent</strong>Jetzt Online-Termin für den nächsten Werktag <span class="nowrap-unit">ab 09:00&nbsp;Uhr</span> sichern.`;
+            if (day === 0 || day === 6 || todayHoliday || h >= 18) {
+                el.innerHTML = `<strong style="display:block; color:var(--text-light); margin-bottom:2px;"><i class="fa-regular fa-clock" style="color:var(--primary-red); margin-right:5px;"></i>Express-Kontingent${todayHoliday ? ` (${todayHoliday})` : ''}</strong>Jetzt Online-Termin für den nächsten Werktag <span class="nowrap-unit">ab 09:00&nbsp;Uhr</span> sichern.`;
                 return;
             }
 
@@ -7372,6 +7462,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('link-fb').href = data.fb;
             let waPhone = data.phone.replace(/\D/g,'');
             if(waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+            const telLink = document.getElementById('tel-contact-link');
+            if(telLink && waPhone) telLink.href = "tel:+" + waPhone;
             document.getElementById('wa-contact-btn').href = "https://wa.me/" + waPhone;
             document.getElementById('menu-wa-link').href = "https://wa.me/" + waPhone;
             if(document.getElementById('fab-wa-link')) document.getElementById('fab-wa-link').href = "https://wa.me/" + waPhone;
@@ -7910,12 +8002,14 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     window.renderHeaderInteractiveCalendar();
                 } else if(type === 'office') {
                     title.innerHTML = '<i class="fa-solid fa-door-open" style="color:var(--primary-red);"></i> Büro- & Annahme-Status';
-                    const now = new Date();
-                    const isWorkday = (now.getDay() >= 1 && now.getDay() <= 5);
-                    const isOpen = isWorkday && (now.getHours() >= 9 && now.getHours() < 20);
+                    const bn = window.getBerlinNowParts();
+                    const todayHoliday = window.isBerlinHolidayYMD(bn.year, bn.month, bn.day);
+                    const isWorkday = (bn.dayNum >= 1 && bn.dayNum <= 5) && !todayHoliday;
+                    const isOpen = isWorkday && (bn.h >= 9 && bn.h < 20);
+                    const statusHeadline = isOpen ? 'JETZT GEÖFFNET' : (todayHoliday ? `FEIERTAG (${todayHoliday})` : 'AKTUELL GESCHLOSSEN');
                     content.innerHTML = `
                         <div style="font-size: clamp(16px, 4.4vw, 19px); font-weight: 900; color: ${isOpen ? 'var(--green-accent)' : '#d97706'}; margin-bottom: 14px; line-height: 1.3;">
-                            <i class="fa-solid ${isOpen ? 'fa-circle-check' : 'fa-moon'}" style="margin-right:6px;"></i>${isOpen ? 'JETZT GEÖFFNET' : 'AKTUELL GESCHLOSSEN'}
+                            <i class="fa-solid ${isOpen ? 'fa-circle-check' : 'fa-moon'}" style="margin-right:6px;"></i>${statusHeadline}
                             <span class="paren-sub" style="color:var(--text-muted); font-size:12px;">${isOpen ? '(Sofort-Annahme vor Ort)' : '(Online-Termin 24/7 aktiv)'}</span>
                         </div>
                         <div style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:12px; padding:14px; text-align:left; font-size:12px; color:var(--text-light); margin-bottom:15px;">
@@ -8067,7 +8161,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     locale: "de", 
                     minDate: "today", 
                     disableMobile: "true", 
-                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
+                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6 || !!window.getBerlinHolidayName(d); } ],
                     onChange: function(selectedDates, dateStr, instance) {
                         document.getElementById('timeWrapper').style.display = 'block';
                         const container = document.getElementById('timeSlots');
@@ -8106,7 +8200,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     locale: "de", 
                     minDate: "today", 
                     disableMobile: "true",
-                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6; } ],
+                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6 || !!window.getBerlinHolidayName(d); } ],
                     onChange: function(selectedDates, dateStr, instance) {
                         const selectTime = document.getElementById('editAptTime');
                         selectTime.innerHTML = '<option value="Ganztägig">Ganztägig</option>';
