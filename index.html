@@ -773,10 +773,15 @@
         body.is-admin.perm-prices .card .admin-action-btn.action-prices, body.is-supervisor .card .admin-action-btn.action-prices { display: flex !important; }
         body.is-admin.perm-blocks .dynamic-block-inner .admin-action-btn.action-blocks, body.is-supervisor .dynamic-block-inner .admin-action-btn.action-blocks { display: flex !important; }
         
-        .btn-edit-green { color: #25D366; border: 1px solid #25D366; top: 15px; left: 15px; }
-        .btn-edit-green:hover { background: #25D366; color: #000; transform: scale(1.1); }
-        .btn-del-red { color: #ff3b30; border: 1px solid #ff3b30; top: 15px; right: 15px; }
-        .btn-del-red:hover { background: #ff3b30; color: #fff; transform: scale(1.1); }
+        .btn-edit-green { color: #16a34a; border: 1.5px solid #16a34a; top: 14px; left: 14px; }
+        .btn-edit-green:hover { background: #16a34a; color: #fff; transform: scale(1.08); }
+        .btn-del-red { color: #e60000; border: 1.5px solid #e60000; top: 14px; right: 14px; }
+        .btn-del-red:hover { background: #e60000; color: #fff; transform: scale(1.08); }
+
+        /* Auf Leistungskarten sitzen Stift (unten links) & Löschen (unten rechts), damit Badges oben rechts nie verdeckt werden */
+        .card .admin-action-btn.btn-edit-green { top: auto; bottom: 12px; left: 12px; width: 31px; height: 31px; font-size: 13px; }
+        .card .admin-action-btn.btn-del-red { top: auto; bottom: 12px; right: 12px; width: 31px; height: 31px; font-size: 13px; }
+        body.is-admin.perm-prices .card, body.is-supervisor .card { padding-bottom: 42px; }
 
         .mini-admin-btn { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; transition: 0.2s; background: var(--bg-card); border: 1px solid var(--glass-border); }
         .mini-admin-btn.edit { color: #25D366; border-color: rgba(37,211,102,0.5); }
@@ -1829,6 +1834,193 @@
         .admin-pro-card .form-control { height: 40px; padding: 0 12px; border-radius: 9px; margin-bottom: 0; }
         .admin-pro-card .noble-file-upload { margin-top: 0; }
         .admin-pro-card .noble-file-trigger { height: 40px; padding: 0 14px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+        /* BÜNDIGE FORMULARZEILEN & KOMPAKTE FARBPICKER IN ALLEN ADMIN-STUDIO-BEREICHEN */
+        .admin-pro-accordion .form-row,
+        .service-config-section .form-row {
+            align-items: flex-end;
+        }
+        .admin-pro-section-box {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 15px 4px;
+            margin-bottom: 12px;
+        }
+        .admin-pro-section-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 10.5px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--primary-red);
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .admin-color-wrap {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 4px 10px 4px 6px;
+            height: 40px;
+        }
+        .admin-color-wrap input[type="color"] {
+            width: 34px !important;
+            min-width: 34px;
+            height: 28px !important;
+            padding: 0 !important;
+            border: none !important;
+            border-radius: 6px !important;
+            background: transparent !important;
+            cursor: pointer;
+        }
+        .admin-color-wrap span {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* TICKER-STUDIO LIVE-VORSCHAU & MODERNE SYMBOL-KACHELN */
+        .ticker-live-preview-box {
+            background: #0c0c12;
+            border: 1.5px solid var(--primary-red);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            text-align: center;
+            color: #ffffff;
+        }
+        .ticker-live-preview-label {
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #a6a6b6;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .symbol-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+            background: var(--bg-card);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        .symbol-grid .noble-checkbox-label {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            padding: 7px 9px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+        .symbol-grid .noble-checkbox-label:hover {
+            border-color: var(--primary-red);
+        }
+
+        /* EXECUTIVE RED KUNDENDATENBANK & CRM */
+        .crm-kpi-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .crm-kpi-tile {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-top: 3px solid var(--kpi-accent, var(--primary-red));
+            border-radius: 11px;
+            padding: 9px 10px;
+            text-align: center;
+        }
+        .crm-kpi-tile strong {
+            display: block;
+            font-size: 17px;
+            font-weight: 900;
+            color: var(--kpi-accent, var(--primary-red));
+            line-height: 1.15;
+        }
+        .crm-kpi-tile span {
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+        .crm-filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .crm-cat-pills {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .crm-cat-pill {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 10.5px !important;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .crm-cat-pill:hover { border-color: var(--primary-red); color: var(--text-light); }
+        .crm-cat-pill.active { background: var(--primary-red); border-color: var(--primary-red); color: #fff; }
+        .crm-toolbar-btn {
+            height: 38px;
+            padding: 0 13px !important;
+            border-radius: 10px !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            box-shadow: none !important;
+        }
+        .crm-cat-tag {
+            display: inline-block;
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+            margin-top: 3px;
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+        .crm-cat-tag.cat-vip { background: var(--gold-bg-soft); border-color: var(--gold-border); color: var(--gold-accent); }
+        .crm-cat-tag.cat-gewerbe { background: rgba(0, 122, 255, 0.1); border-color: rgba(0, 122, 255, 0.3); color: #0066d6; }
+        .crm-cat-tag.cat-haendler { background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.35); color: #7c3aed; }
+        .crm-table tbody tr:nth-child(even) { background: rgba(128, 128, 140, 0.04); }
+        .crm-note-preview {
+            display: block;
+            font-size: 10px;
+            color: var(--text-muted);
+            max-width: 240px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        @media (max-width: 768px) {
+            .crm-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (min-width: 769px) {
             .admin-pro-card .form-control, .admin-pro-accordion .form-control { font-size: 13px !important; }
         }
@@ -4399,34 +4591,57 @@
         </div>
     </div>
 
-    <!-- RED KUNDEN CRM OVERLAYS -->
+    <!-- RED KUNDEN CRM OVERLAYS (PROFI-ANSICHT MIT KPI, KATEGORIEN & SORTIERUNG) -->
     <div class="custom-dialog-overlay" id="crmOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCRM()"></i>
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-right:42px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-right:42px; padding-bottom:10px; border-bottom:1px solid var(--glass-border);">
                 <div>
-                    <h3 style="color:var(--primary-red); font-weight:900; margin-bottom:2px; padding:0 !important;"><i class="fa-solid fa-database"></i> RED Kundendatenbank & CRM</h3>
-                    <p style="color:var(--text-muted); font-size:11.5px; margin:0;">Unabhängiges Kunden-, Stammkunden- & Historien-Management mit automatischer RED-ID.</p>
+                    <h3 style="color:var(--primary-red); font-weight:900; margin-bottom:2px; padding:0 !important; font-size:17px;"><i class="fa-solid fa-database"></i> RED Kundendatenbank &amp; CRM</h3>
+                    <p style="color:var(--text-muted); font-size:11px; margin:0;">Stammkunden-, Buchungshistorien- &amp; Kontaktverwaltung mit automatischer RED-ID.</p>
                 </div>
-                <div style="display:flex; gap:8px;">
-                    <div style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:10px; padding:6px 12px; text-align:center;">
-                        <strong id="crmStatTotal" style="color:var(--primary-red); font-size:15px; display:block;">0</strong>
-                        <span style="font-size:9px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Kunden Gesamt</span>
-                    </div>
-                    <div style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:10px; padding:6px 12px; text-align:center;">
-                        <strong id="crmStatVip" style="color:var(--green-accent); font-size:15px; display:block;">0</strong>
-                        <span style="font-size:9px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Mehrfach-Bucher</span>
-                    </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button class="btn-primary crm-toolbar-btn" style="background:#16a34a; color:#fff;" onclick="window.createNewCRMClientManual()"><i class="fa-solid fa-user-plus"></i> Neuer Kunde</button>
+                    <button class="btn-primary crm-toolbar-btn" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light);" onclick="window.openCRMViewAll()"><i class="fa-solid fa-table" style="color:#007aff;"></i> Vollansicht</button>
+                    <button class="btn-primary crm-toolbar-btn" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light);" onclick="window.exportCRMToCSV()"><i class="fa-solid fa-file-csv" style="color:#d97706;"></i> CSV</button>
+                    <button class="btn-primary crm-toolbar-btn" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light);" onclick="window.printCRM()"><i class="fa-solid fa-print" style="color:var(--primary-red);"></i> Drucken</button>
                 </div>
             </div>
-            
-            <div id="crmActionButtons" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 12px;">
-                <input type="text" id="crmSearch" class="form-control" placeholder="🔍 Suche nach Name, E-Mail, Telefon, Kategorie oder RED-ID..." onkeyup="window.filterCRM()" style="flex:1; min-width: 240px; padding:10px 15px;">
-                <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                    <button class="btn-primary" style="background:#25D366; color:#000; padding:10px 16px;" onclick="window.createNewCRMClientManual()"><i class="fa-solid fa-user-plus"></i> Neuer Kunde</button>
-                    <button class="btn-primary" style="background:#007aff; color:#fff; padding:10px 16px;" onclick="window.openCRMViewAll()"><i class="fa-solid fa-table"></i> Vollansicht</button>
-                    <button class="btn-primary" style="background:#ff9500; color:#000; padding:10px 16px;" onclick="window.exportCRMToCSV()"><i class="fa-solid fa-file-csv"></i> CSV Export</button>
-                    <button class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); padding:10px 16px; box-shadow:none;" onclick="window.printCRM()"><i class="fa-solid fa-print"></i> Drucken</button>
+
+            <div class="crm-kpi-strip">
+                <div class="crm-kpi-tile" style="--kpi-accent:#d90000;">
+                    <strong id="crmStatTotal">0</strong>
+                    <span>Kunden Gesamt</span>
+                </div>
+                <div class="crm-kpi-tile" style="--kpi-accent:#16a34a;">
+                    <strong id="crmStatVip">0</strong>
+                    <span>Stamm- / Mehrfachkunden</span>
+                </div>
+                <div class="crm-kpi-tile" style="--kpi-accent:#007aff;">
+                    <strong id="crmStatBusiness">0</strong>
+                    <span>Gewerbe &amp; Händler</span>
+                </div>
+                <div class="crm-kpi-tile" style="--kpi-accent:#d97706;">
+                    <strong id="crmStatBookings">0</strong>
+                    <span>Buchungen Gesamt</span>
+                </div>
+            </div>
+
+            <div class="crm-filter-bar">
+                <div class="crm-cat-pills" id="crmCatPills">
+                    <button type="button" class="crm-cat-pill active" data-cat="all" onclick="window.setCrmCategoryFilter('all')">Alle</button>
+                    <button type="button" class="crm-cat-pill" data-cat="Privatkunde" onclick="window.setCrmCategoryFilter('Privatkunde')">Privatkunde</button>
+                    <button type="button" class="crm-cat-pill" data-cat="Gewerbe" onclick="window.setCrmCategoryFilter('Gewerbe')">Gewerbe</button>
+                    <button type="button" class="crm-cat-pill" data-cat="VIP" onclick="window.setCrmCategoryFilter('VIP')">VIP / Stamm</button>
+                    <button type="button" class="crm-cat-pill" data-cat="Händler" onclick="window.setCrmCategoryFilter('Händler')">Händler</button>
+                </div>
+                <div style="display:flex; gap:8px; flex:1 1 280px; justify-content:flex-end; flex-wrap:wrap;">
+                    <input type="text" id="crmSearch" class="form-control" placeholder="🔍 Suche nach Name, ID, Tel., E-Mail oder Notiz..." oninput="window.filterCRM()" style="flex:1 1 200px; padding:8px 13px !important; font-size:12.5px !important; border-radius:10px;">
+                    <select id="crmSortSelect" class="form-control" onchange="window.changeCrmSort(this.value)" style="flex:0 0 170px; padding:8px 30px 8px 11px !important; font-size:11.5px !important; border-radius:10px;">
+                        <option value="newest">Neueste zuerst</option>
+                        <option value="bookings">Meiste Buchungen</option>
+                        <option value="name">Name (A–Z)</option>
+                    </select>
                 </div>
             </div>
             
@@ -4435,11 +4650,11 @@
                     <thead>
                         <tr>
                             <th>Kunden-ID</th>
-                            <th>Name / Kategorie</th>
+                            <th>Name / Kategorie &amp; Historie</th>
                             <th>Telefon</th>
                             <th>E-Mail</th>
-                            <th>Registriert am</th>
-                            <th>Buchungen</th>
+                            <th>Zuletzt aktiv</th>
+                            <th style="text-align:center;">Buchungen</th>
                             <th class="crm-action-cell">Aktionen</th>
                         </tr>
                     </thead>
@@ -4847,75 +5062,80 @@
 
     <!-- ERWEITERTES HEADER-AUTO, LOGO & TICKER STUDIO -->
     <div class="custom-dialog-overlay" id="tickerConfigOverlay">
-        <div class="custom-dialog-window">
+        <div class="custom-dialog-window" style="max-width:680px; border-top-color:var(--primary-red); text-align:left;">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeTickerConfig()"></i>
-            <h3 style="color:#007aff; font-weight:900; margin-bottom:8px; text-align:center;"><i class="fa-solid fa-car-on"></i> Header-Auto, Logo & Ticker Studio</h3>
-            <p style="font-size:11px; color:var(--text-muted); margin-bottom:18px; text-align:center;">Passen Sie hier das Fahrzeug im Header, die Logo-Texte sowie die Laufschrift (Ticker) individuell an.</p>
+            <div style="text-align:center; margin-bottom:14px;">
+                <h3 style="color:var(--primary-red); font-weight:900; margin-bottom:4px;"><i class="fa-solid fa-car-on"></i> Header-Auto, Logo &amp; Ticker Studio</h3>
+                <p style="font-size:11.5px; color:var(--text-muted); margin:0;">Fahrzeug-Silhouette, Marken-Logo und die Laufschrift im Header live gestalten.</p>
+            </div>
+
+            <div class="ticker-live-preview-box">
+                <span class="ticker-live-preview-label"><i class="fa-solid fa-eye" style="color:var(--primary-red);"></i> Live-Vorschau der Laufschrift</span>
+                <div id="tickerStudioLivePreview" style="font-size:12.5px; font-weight:700; line-height:1.4; word-break:break-word;">+++ WICHTIG: Vorschau wird geladen... +++</div>
+            </div>
             
             <div class="service-config-section">
-                <h4>1. Header-Fahrzeug & Logo-Texte</h4>
+                <h4><i class="fa-solid fa-car-side"></i> 1. Header-Fahrzeug &amp; Marken-Logo</h4>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Logo Hauptwort (Rot)</label>
+                        <label>Logo Hauptwort</label>
                         <input type="text" id="hcLogoRed" class="form-control" value="RED">
                     </div>
-                    <div class="form-group">
-                        <label>Logo Zusatzwort</label>
-                        <input type="text" id="hcLogoSub" class="form-control" value="ZULASSUNGSDIENST">
+                    <div class="form-group" style="flex:1.6;">
+                        <label>Logo Unterzeile</label>
+                        <input type="text" id="hcLogoSub" class="form-control" value="ZULASSUNGSDIENST & SCHILDER">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Header-Fahrzeug Modell wählen</label>
+                        <label>Fahrzeug-Modell</label>
                         <select id="hcCarType" class="form-control">
-                            <option value="svg-sport" selected>🏎️ Original Sport-Coupé (Vektor-Silhouette)</option>
-                            <option value="fa-car-side">🚗 Limousine / PKW (Seitenansicht)</option>
-                            <option value="fa-car">🚘 Sport-Limousine (Frontansicht)</option>
+                            <option value="svg-sport" selected>🏎️ Original Sport-Coupé (Vektor)</option>
+                            <option value="fa-car-side">🚗 Limousine / PKW (Seite)</option>
+                            <option value="fa-car">🚘 Sport-Limousine (Front)</option>
                             <option value="fa-truck-pickup">🛻 SUV / Pickup</option>
                             <option value="fa-motorcycle">🏍️ Motorrad / Bike</option>
-                            <option value="fa-truck-fast">🚛 Express-Transporter / LKW</option>
+                            <option value="fa-truck-fast">🚛 Express-Transporter</option>
                             <option value="fa-bolt">⚡ Express-Blitz</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Fahrzeug-Animation</label>
+                        <label>Animation</label>
                         <select id="hcCarAnim" class="form-control">
-                            <option value="car-anim-idle" selected>Sanftes Schweben (Standard)</option>
-                            <option value="car-anim-turbo">Turbo-Sprint (Dynamisch)</option>
-                            <option value="car-anim-neon">Pulsierendes Neon-Licht</option>
+                            <option value="car-anim-idle" selected>Sanftes Schweben</option>
+                            <option value="car-anim-turbo">Turbo-Sprint</option>
+                            <option value="car-anim-neon">Pulsierendes Neon</option>
                             <option value="car-anim-rev">Sportmotor-Vibration</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group">
                         <label>Fahrzeug-Farbe</label>
                         <select id="hcCarColor" class="form-control">
-                            <option value="var(--text-light)" selected>Automatisch (Passend zu Hell-/Dunkelmodus)</option>
+                            <option value="var(--text-light)" selected>Automatisch</option>
                             <option value="var(--primary-red)">RED Marken-Rot</option>
                             <option value="#f5c542">Premium Gold</option>
                             <option value="#25D366">Express Grün</option>
-                            <option value="#00a8cc">Neon Cyan / Blau</option>
+                            <option value="#00a8cc">Neon Cyan</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <div class="service-config-section">
-                <h4>2. Laufschrift (Ticker) & Symbole</h4>
+                <h4><i class="fa-solid fa-bullhorn"></i> 2. Laufschrift (Ticker) &amp; Symbole</h4>
                 <div class="form-group">
-                    <label>Gesamter Ticker-Text</label>
-                    <input type="text" id="tickerFullText" class="form-control" value="+++ WICHTIG: Die aktuellen Wartezeiten bei den Zulassungsstellen betragen 1-2 Werktage. Sichern Sie sich jetzt Ihren Termin bei RED Berlin! +++">
+                    <label>Ticker-Nachricht</label>
+                    <textarea id="tickerFullText" class="form-control" rows="2" style="resize:vertical;" oninput="window.updateTickerStudioPreview()">+++ WICHTIG: Die aktuellen Wartezeiten bei den Zulassungsstellen betragen 1-2 Werktage. Sichern Sie sich jetzt Ihren Termin bei RED Berlin! +++</textarea>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Blinkendes Wort (Hervorhebung)</label>
-                        <input type="text" id="tickerBlinkWord" class="form-control" value="jetzt">
+                        <label>Hervorgehobenes Wort</label>
+                        <input type="text" id="tickerBlinkWord" class="form-control" value="jetzt" oninput="window.updateTickerStudioPreview()">
                     </div>
                     <div class="form-group">
-                        <label>Farbe des blinkenden Wortes</label>
-                        <select id="tickerBlinkColor" class="form-control">
+                        <label>Highlight-Farbe</label>
+                        <select id="tickerBlinkColor" class="form-control" onchange="window.updateTickerStudioPreview()">
                             <option value="#e60000" selected>Rot</option>
                             <option value="#ffcc00">Premium Gold</option>
                             <option value="#25D366">WhatsApp Grün</option>
@@ -4927,8 +5147,8 @@
                     </div>
                 </div>
                 
-                <div class="form-group" style="margin-top:8px;">
-                    <label style="margin-bottom:8px;">Gleitende Ticker-Symbole (Mehrfachauswahl)</label>
+                <div class="form-group" style="margin-top:6px;">
+                    <label style="margin-bottom:7px;">Gleitende Symbole (Mehrfachauswahl)</label>
                     <div class="symbol-grid">
                         <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symCar" checked><span class="noble-checkbox-box"></span> 🚗 PKW</label>
                         <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="symMotorcycle"><span class="noble-checkbox-box"></span> 🏍️ Motorrad</label>
@@ -4948,9 +5168,9 @@
                     </div>
                 </div>
                 
-                <div class="form-row" style="margin-top:12px;">
+                <div class="form-row" style="margin-top:10px;">
                     <div class="form-group">
-                        <label>Lauf-Geschwindigkeit</label>
+                        <label>Geschwindigkeit</label>
                         <select id="tickerSpeed" class="form-control">
                             <option value="40s">Sehr Langsam</option>
                             <option value="25s">Langsam</option>
@@ -4959,9 +5179,9 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Standard Textfarbe</label>
-                        <select id="tickerColor" class="form-control">
-                            <option value="var(--text-light)" selected>Dynamisch (Theme-Farbe)</option>
+                        <label>Textfarbe</label>
+                        <select id="tickerColor" class="form-control" onchange="window.updateTickerStudioPreview()">
+                            <option value="var(--text-light)" selected>Dynamisch (Theme)</option>
                             <option value="#ffffff">Clean Weiß</option>
                             <option value="#ccc">Muted Grau</option>
                             <option value="#ffcc00">Gold</option>
@@ -4970,31 +5190,28 @@
                             <option value="#000000">Schwarz</option>
                         </select>
                     </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
                         <label>Schriftart</label>
-                        <select id="tickerFont" class="form-control">
-                            <option value="'Montserrat', sans-serif" selected>Montserrat (Modern)</option>
-                            <option value="'Courier New', monospace">Courier (Kennzeichen Style)</option>
-                            <option value="'Playfair Display', serif">Playfair Display (Nobel)</option>
+                        <select id="tickerFont" class="form-control" onchange="window.updateTickerStudioPreview()">
+                            <option value="'Montserrat', sans-serif" selected>Montserrat</option>
+                            <option value="'Courier New', monospace">Courier</option>
+                            <option value="'Playfair Display', serif">Playfair</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Schriftgröße</label>
-                        <select id="tickerSize" class="form-control">
-                            <option value="11px">Minimal (11px)</option>
-                            <option value="13px" selected>Standard (13px)</option>
+                        <label>Größe</label>
+                        <select id="tickerSize" class="form-control" onchange="window.updateTickerStudioPreview()">
+                            <option value="11px">Klein (11px)</option>
+                            <option value="13px" selected>Normal (13px)</option>
                             <option value="16px">Groß (16px)</option>
                         </select>
                     </div>
                 </div>
             </div>
             
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button class="btn-primary" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-light); flex:1; justify-content:center;" onclick="window.toggleTickerDisplay()">Ticker Ein/Aus</button>
-                <button class="btn-primary" style="background:#007aff; flex:1; justify-content:center;" onclick="window.saveTickerConfig()"><i class="fa-solid fa-floppy-disk"></i> Alles Speichern</button>
+            <div style="display:flex; gap:10px; margin-top:12px;">
+                <button class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none;" onclick="window.toggleTickerDisplay()"><i class="fa-solid fa-power-off" style="color:var(--primary-red);"></i> Ticker Ein/Aus</button>
+                <button class="btn-primary" style="flex:1.5; justify-content:center;" onclick="window.saveTickerConfig()"><i class="fa-solid fa-floppy-disk"></i> Änderungen Speichern</button>
             </div>
         </div>
     </div>
@@ -5043,90 +5260,129 @@
                 <div class="admin-pro-head">
                     <div>
                         <div class="admin-pro-title-row">
-                            <span class="admin-pro-badge">CMS</span>
-                            <h4 class="admin-pro-title"><i class="fa-solid fa-layer-group"></i> Leistungskarten &amp; Preise verwalten</h4>
+                            <span class="admin-pro-badge">Leistungen &amp; Preise</span>
+                            <h4 class="admin-pro-title"><i class="fa-solid fa-layer-group"></i> Leistungskarten &amp; Kalkulator verwalten</h4>
                         </div>
-                        <p class="admin-pro-sub">Bestehende Karten, Header-Elemente und den Kalkulator direkt über das Stift-Symbol bearbeiten.</p>
+                        <p class="admin-pro-sub">Neue Leistungskarte anlegen oder bestehende Karten unten links/rechts bearbeiten bzw. entfernen.</p>
                     </div>
-                    <button type="button" class="admin-pro-btn admin-pro-btn-primary" onclick="window.addNewServiceCard()"><i class="fa-solid fa-plus"></i> Neue Leistungskarte</button>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="admin-pro-btn admin-pro-btn-secondary" onclick="document.getElementById('leistungen').scrollIntoView({behavior:'smooth'});"><i class="fa-solid fa-arrow-down"></i> Zu den Karten</button>
+                        <button type="button" class="admin-pro-btn admin-pro-btn-primary" onclick="window.addNewServiceCard()"><i class="fa-solid fa-plus"></i> Neue Leistungskarte</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="admin-workspace-box admin-pro-wrap mod-blocks">
             <details class="admin-details admin-pro-accordion">
-                <summary><span class="admin-pro-summary-title"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span></summary>
+                <summary>
+                    <span class="admin-pro-summary-title"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span>
+                    <span class="admin-pro-badge">Content Builder</span>
+                </summary>
                 <div class="admin-details-content">
-                    <div class="form-row">
-                        <div class="form-group"><input type="text" id="cbTitle" class="form-control" placeholder="Titel (z.B. Wichtige Kundeninfo)"></div>
-                        <div class="form-group"><input type="text" id="cbIcon" class="form-control" placeholder="Icon Klasse (z.B. fa-solid fa-star)"></div>
-                        <div class="form-group">
-                            <select id="cbPage" class="form-control">
-                                <option value="home">Auf Startseite</option>
-                                <option value="formulare">Auf Formulare</option>
-                                <option value="ankauf">Auf Auto Ankauf</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Titel Schriftart</label>
-                            <select id="cbTitleFont" class="form-control">
-                                <option value="'Montserrat', sans-serif">Montserrat</option>
-                                <option value="'Courier New', monospace">Courier</option>
-                                <option value="'Playfair Display', serif">Playfair Display</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Titel Größe</label>
-                            <select id="cbTitleSize" class="form-control">
-                                <option value="clamp(20px, 3vw, 28px)">Standard</option>
-                                <option value="clamp(26px, 4vw, 36px)">Groß</option>
-                                <option value="clamp(32px, 5vw, 46px)">Mega</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Titel Farbe</label>
-                            <input type="color" id="cbTitleColor" class="form-control" value="#e60000" style="padding: 2px; height: 42px; cursor: pointer;">
-                        </div>
-                    </div>
-
-                    <div class="form-row" style="margin-top: 5px;">
-                        <div class="form-group">
-                            <label>Rahmendicke (Border)</label>
-                            <select id="cbBorderSize" class="form-control">
-                                <option value="0px">Kein Rahmen</option>
-                                <option value="1px" selected>Dünn (1px)</option>
-                                <option value="3px">Mittel (3px)</option>
-                                <option value="5px">Dick (5px)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Rahmenfarbe</label>
-                            <input type="color" id="cbBorderColor" class="form-control" value="#e60000" style="padding: 2px; height: 42px; cursor: pointer;">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row" style="margin-top: 5px;">
-                        <div class="form-group" style="flex:2;">
-                            <label>Bild / Video Hochladen (Optional)</label>
-                            <label class="noble-file-upload" style="margin-top:0;">
-                                <input type="file" id="cbMediaFile" accept="image/*,video/*" onchange="window.updateCbFileLabel(this)">
-                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-upload"></i> Durchsuchen</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div style="background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
-                        <label style="color:var(--primary-red); font-size:11px; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-flag"></i> Integriertes Banner (Wie "Sofortkennzeichen")</label>
-                        <div class="form-row" style="margin-top:10px;">
+                    <div class="admin-pro-section-box">
+                        <div class="admin-pro-section-label"><i class="fa-solid fa-heading"></i> 1. Titel, Inhalt &amp; Zielseite</div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1.4;"><label>Baustein-Titel *</label><input type="text" id="cbTitle" class="form-control" placeholder="z.B. Wichtige Kundeninfo"></div>
+                            <div class="form-group"><label>Icon-Klasse (Optional)</label><input type="text" id="cbIcon" class="form-control" placeholder="z.B. fa-solid fa-star"></div>
                             <div class="form-group">
-                                <input type="text" id="cbBannerText" class="form-control" placeholder="Banner Text (z.B. Aktion!)">
+                                <label>Zielseite</label>
+                                <select id="cbPage" class="form-control">
+                                    <option value="home">Startseite</option>
+                                    <option value="formulare">Formulare</option>
+                                    <option value="ankauf">Auto Ankauf</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Beschreibungstext *</label>
+                            <textarea id="cbText" class="form-control" rows="3" placeholder="Informationstext für Ihre Besucher..." style="resize:vertical;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="admin-pro-section-box">
+                        <div class="admin-pro-section-label"><i class="fa-solid fa-palette"></i> 2. Typografie, Rahmen &amp; Farben</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Titel-Schriftart</label>
+                                <select id="cbTitleFont" class="form-control">
+                                    <option value="'Montserrat', sans-serif">Montserrat</option>
+                                    <option value="'Courier New', monospace">Courier</option>
+                                    <option value="'Playfair Display', serif">Playfair Display</option>
+                                </select>
                             </div>
                             <div class="form-group">
+                                <label>Titel-Größe</label>
+                                <select id="cbTitleSize" class="form-control">
+                                    <option value="clamp(20px, 3vw, 28px)">Standard</option>
+                                    <option value="clamp(26px, 4vw, 36px)">Groß</option>
+                                    <option value="clamp(32px, 5vw, 46px)">Mega</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Titel-Farbe</label>
+                                <div class="admin-color-wrap">
+                                    <input type="color" id="cbTitleColor" value="#e60000">
+                                    <span>Überschrift</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Text-Schriftart</label>
+                                <select id="cbTextFont" class="form-control">
+                                    <option value="'Montserrat', sans-serif">Montserrat</option>
+                                    <option value="'Courier New', monospace">Courier</option>
+                                    <option value="'Playfair Display', serif">Playfair Display</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Text-Größe</label>
+                                <select id="cbTextSize" class="form-control">
+                                    <option value="12px">Klein</option>
+                                    <option value="14px" selected>Normal</option>
+                                    <option value="16px">Groß</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Text-Farbe</label>
+                                <div class="admin-color-wrap">
+                                    <input type="color" id="cbTextColor" value="#cccccc">
+                                    <span>Fließtext</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Rahmendicke</label>
+                                <select id="cbBorderSize" class="form-control">
+                                    <option value="0px">Kein Rahmen</option>
+                                    <option value="1px" selected>Dünn (1px)</option>
+                                    <option value="3px">Mittel (3px)</option>
+                                    <option value="5px">Dick (5px)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Rahmenfarbe</label>
+                                <div class="admin-color-wrap">
+                                    <input type="color" id="cbBorderColor" value="#e60000">
+                                    <span>Rahmenlinie</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-pro-section-box">
+                        <div class="admin-pro-section-label"><i class="fa-solid fa-flag"></i> 3. Aktions-Banner &amp; Medien (Optional)</div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1.4;">
+                                <label>Banner-Text</label>
+                                <input type="text" id="cbBannerText" class="form-control" placeholder="z.B. Express-Aktion!">
+                            </div>
+                            <div class="form-group">
+                                <label>Banner-Symbol</label>
                                 <select id="cbBannerEmoji" class="form-control">
-                                    <option value="">Kein Emoji</option>
+                                    <option value="">Kein Symbol</option>
                                     <option value="🔥">🔥 Feuer</option>
                                     <option value="⚡">⚡ Blitz</option>
                                     <option value="⭐">⭐ Stern</option>
@@ -5160,35 +5416,19 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input type="color" id="cbBannerColor" class="form-control" value="#e60000" title="Banner Hintergrundfarbe" style="padding: 2px; height: 42px; cursor: pointer;">
+                                <label>Banner-Farbe</label>
+                                <div class="admin-color-wrap">
+                                    <input type="color" id="cbBannerColor" value="#e60000" title="Banner Hintergrundfarbe">
+                                    <span>Hintergrund</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <textarea id="cbText" class="form-control" rows="3" placeholder="Beschreibungstext..." style="resize:vertical;"></textarea>
-                    </div>
-                    
-                    <div class="form-row">
                         <div class="form-group">
-                            <label>Text Schriftart</label>
-                            <select id="cbTextFont" class="form-control">
-                                <option value="'Montserrat', sans-serif">Montserrat</option>
-                                <option value="'Courier New', monospace">Courier</option>
-                                <option value="'Playfair Display', serif">Playfair Display</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Text Größe</label>
-                            <select id="cbTextSize" class="form-control">
-                                <option value="12px">Klein</option>
-                                <option value="14px" selected>Normal</option>
-                                <option value="16px">Groß</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Text Farbe</label>
-                            <input type="color" id="cbTextColor" class="form-control" value="#cccccc" style="padding: 2px; height: 42px; cursor: pointer;">
+                            <label>Bild oder kurzes Video hochladen (max. 700 KB)</label>
+                            <label class="noble-file-upload" style="margin-top:0;">
+                                <input type="file" id="cbMediaFile" accept="image/*,video/*" onchange="window.updateCbFileLabel(this)">
+                                <span class="noble-file-trigger" id="cbFileLabelText"><i class="fa-solid fa-cloud-arrow-up"></i> Datei vom Gerät auswählen</span>
+                            </label>
                         </div>
                     </div>
 
@@ -5202,22 +5442,27 @@
 
         <div class="admin-workspace-box admin-pro-wrap mod-data">
             <details class="admin-details admin-pro-accordion">
-                <summary><span class="admin-pro-summary-title"><i class="fa-solid fa-address-card"></i> Firmendaten &amp; Webhook-Schnittstelle</span></summary>
+                <summary>
+                    <span class="admin-pro-summary-title"><i class="fa-solid fa-address-card"></i> Firmendaten &amp; E-Mail/WhatsApp-Schnittstelle</span>
+                    <span class="admin-pro-badge">System</span>
+                </summary>
                 <div class="admin-details-content">
-                    <div class="form-row">
-                        <div class="form-group"><label>Telefonnummer</label><input type="text" id="adminPhone" class="form-control" value="0178 378 38 75"></div>
-                        <div class="form-group"><label>E-Mail-Adresse</label><input type="email" id="adminEmail" class="form-control" value="Redzulassungsdienst@gmail.com"></div>
+                    <div class="admin-pro-section-box">
+                        <div class="admin-pro-section-label"><i class="fa-solid fa-building"></i> 1. Kontaktdaten &amp; Impressum</div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Telefon / WhatsApp</label><input type="text" id="adminPhone" class="form-control" value="0178 378 38 75"></div>
+                            <div class="form-group"><label>E-Mail-Adresse</label><input type="email" id="adminEmail" class="form-control" value="Redzulassungsdienst@gmail.com"></div>
+                            <div class="form-group"><label>Umsatzsteuer-ID</label><input type="text" id="adminUstid" class="form-control" placeholder="DE..."></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Instagram-Link</label><input type="text" id="adminIg" class="form-control" value="https://instagram.com/red_zulassungsdienst"></div>
+                            <div class="form-group"><label>Facebook-Link</label><input type="text" id="adminFb" class="form-control" value="#"></div>
+                        </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Umsatzsteuer-ID (Impressum)</label><input type="text" id="adminUstid" class="form-control" placeholder="DE..."></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Instagram-Link</label><input type="text" id="adminIg" class="form-control" value="https://instagram.com/red_zulassungsdienst"></div>
-                        <div class="form-group"><label>Facebook-Link</label><input type="text" id="adminFb" class="form-control" value="#"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fa-solid fa-plug" style="color:var(--primary-red);"></i> Google Apps Script URL (E-Mail &amp; WhatsApp Benachrichtigung)</label>
+                    <div class="admin-pro-section-box">
+                        <div class="admin-pro-section-label"><i class="fa-solid fa-plug"></i> 2. Automatisierung (Google Apps Script)</div>
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <label>Google Apps Script Web-App-URL (/exec)</label>
                             <input type="text" id="adminWebhook" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
                             <p style="font-size:11px; color:var(--text-muted); margin-top:5px;">Sendet neue Termine, Auftrags-Codes und Rückrufe automatisch parallel per E-Mail und WhatsApp.</p>
                         </div>
@@ -9245,45 +9490,98 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         window.closeCRMDetail = function() { document.getElementById('crmDetailOverlay').classList.remove('open'); };
 
+        window.crmCategoryFilter = 'all';
+        window.crmSortMode = 'newest';
+
+        window.setCrmCategoryFilter = function(catKey) {
+            window.crmCategoryFilter = catKey || 'all';
+            document.querySelectorAll('#crmCatPills .crm-cat-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-cat') === window.crmCategoryFilter);
+            });
+            window.renderCRM();
+        };
+
+        window.changeCrmSort = function(mode) {
+            window.crmSortMode = mode || 'newest';
+            window.renderCRM();
+        };
+
         window.renderCRM = function() {
             const list = document.getElementById('crmList');
             if(!list) return;
             list.innerHTML = '';
             
-            let clients = Object.values(window.crmClientsDetail || {});
-            const vipCount = clients.filter(c => (c.bookings || 1) > 1 || (c.category && c.category.includes('VIP'))).length;
+            const allClients = Object.values(window.crmClientsDetail || {});
+            const vipCount = allClients.filter(c => (c.bookings || 1) > 1 || (c.category && c.category.includes('VIP'))).length;
+            const businessCount = allClients.filter(c => c.category && (c.category.includes('Gewerbe') || c.category.includes('Händler'))).length;
+            const totalBookings = allClients.reduce((acc, c) => acc + (Number(c.bookings) || 1), 0);
 
-            if(document.getElementById('kpiTotalCrm')) document.getElementById('kpiTotalCrm').innerText = clients.length;
-            if(document.getElementById('crmStatTotal')) document.getElementById('crmStatTotal').innerText = clients.length;
+            if(document.getElementById('kpiTotalCrm')) document.getElementById('kpiTotalCrm').innerText = allClients.length;
+            if(document.getElementById('crmStatTotal')) document.getElementById('crmStatTotal').innerText = allClients.length;
             if(document.getElementById('crmStatVip')) document.getElementById('crmStatVip').innerText = vipCount;
+            if(document.getElementById('crmStatBusiness')) document.getElementById('crmStatBusiness').innerText = businessCount;
+            if(document.getElementById('crmStatBookings')) document.getElementById('crmStatBookings').innerText = totalBookings;
 
-            clients.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+            const q = (document.getElementById('crmSearch')?.value || '').trim().toLowerCase();
+            const catFilter = window.crmCategoryFilter || 'all';
+
+            let clients = allClients.filter(c => {
+                const catStr = String(c.category || 'Privatkunde');
+                let catMatch = true;
+                if (catFilter === 'VIP') catMatch = catStr.includes('VIP') || (Number(c.bookings) || 1) > 1;
+                else if (catFilter !== 'all') catMatch = catStr.toLowerCase().includes(catFilter.toLowerCase());
+
+                const searchHay = `${c.clientId || ''} ${c.name || ''} ${c.phone || ''} ${c.email || ''} ${catStr} ${c.notes || ''}`.toLowerCase();
+                return catMatch && (!q || searchHay.includes(q));
+            });
+
+            if (window.crmSortMode === 'bookings') {
+                clients.sort((a, b) => (Number(b.bookings) || 1) - (Number(a.bookings) || 1));
+            } else if (window.crmSortMode === 'name') {
+                clients.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'de'));
+            } else {
+                clients.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            }
             
             if(clients.length === 0) {
-                list.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px; color:var(--text-muted);">Noch keine Kunden in der Datenbank erfasst.</td></tr>';
+                list.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 24px; color:var(--text-muted);">Keine passenden Kunden gefunden.</td></tr>';
                 return;
             }
             
             clients.forEach(c => {
-                let waLink = c.phone ? `https://wa.me/${c.phone.replace(/\D/g,'').replace(/^0/,'49')}` : '#';
-                let regDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString('de-DE') : '-';
-                let catBadge = `<span style="font-size:9.5px; color:var(--text-muted); display:block;">${c.category || 'Privatkunde'}</span>`;
+                const cleanDigits = (c.phone || '').replace(/\D/g, '');
+                const waLink = cleanDigits ? `https://wa.me/${cleanDigits.replace(/^0/, '49')}` : '#';
+                const regDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString('de-DE') : '-';
+                const catStr = c.category || 'Privatkunde';
+                let catClass = '';
+                if (catStr.includes('VIP')) catClass = 'cat-vip';
+                else if (catStr.includes('Gewerbe')) catClass = 'cat-gewerbe';
+                else if (catStr.includes('Händler')) catClass = 'cat-haendler';
+
+                const lastNoteLine = c.notes ? String(c.notes).split('\n').filter(Boolean).pop() : '';
+                const notePreviewHtml = lastNoteLine
+                    ? `<span class="crm-note-preview" title="${window.escHtml(c.notes)}"><i class="fa-regular fa-note-sticky" style="color:var(--primary-red);"></i> ${window.escHtml(lastNoteLine)}</span>`
+                    : '';
                 
                 list.innerHTML += `
                     <tr>
-                        <td><span class="crm-badge">${c.clientId}</span></td>
-                        <td style="font-weight:700;">${window.escHtml(c.name || 'Unbekannt')}${catBadge}</td>
-                        <td>${window.escHtml(c.phone || '-')}</td>
-                        <td>${window.escHtml(c.email || '-')}</td>
-                        <td>${regDate}</td>
-                        <td style="text-align:center; font-weight:800;">${c.bookings || 1}</td>
+                        <td><span class="crm-badge">${window.escHtml(c.clientId)}</span></td>
+                        <td>
+                            <strong style="display:block; font-size:12.5px; color:var(--text-light);">${window.escHtml(c.name || 'Unbekannt')}</strong>
+                            <span class="crm-cat-tag ${catClass}">${window.escHtml(catStr)}</span>
+                            ${notePreviewHtml}
+                        </td>
+                        <td>${cleanDigits ? `<a href="tel:${window.escHtml(c.phone)}" style="color:inherit; text-decoration:none; font-weight:600;">${window.escHtml(c.phone)}</a>` : '-'}</td>
+                        <td>${c.email && c.email.includes('@') ? `<a href="mailto:${window.escHtml(c.email)}" style="color:inherit; text-decoration:none;">${window.escHtml(c.email)}</a>` : '-'}</td>
+                        <td style="font-variant-numeric:tabular-nums;">${regDate}</td>
+                        <td style="text-align:center;"><span style="display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:24px; padding:0 7px; border-radius:20px; background:var(--bg-input); border:1px solid var(--glass-border); font-weight:900; color:${(c.bookings || 1) > 1 ? 'var(--green-accent)' : 'var(--text-light)'};">${c.bookings || 1}</span></td>
                         <td class="crm-action-cell" style="white-space:nowrap;">
-                            ${c.phone ? `
-                                <a href="tel:${c.phone}" class="btn-primary" style="padding:4px 8px; background:#007aff; font-size:11px;" title="Anrufen"><i class="fa-solid fa-phone"></i></a>
-                                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="padding:4px 8px; background:#25D366; color:#000; font-size:11px;" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                            ${cleanDigits ? `
+                                <a href="tel:${window.escHtml(c.phone)}" class="apt-btn call-btn" style="display:inline-flex;" title="Anrufen"><i class="fa-solid fa-phone"></i></a>
+                                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="apt-btn wa-confirm" style="display:inline-flex;" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                             ` : ''}
-                            <button class="btn-primary" style="padding:4px 8px; background:transparent; border:1px solid #00a8cc; color:#00a8cc; font-size:11px; box-shadow:none;" onclick="window.openCRMDetail('${c.clientId}')" title="Akte bearbeiten"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-primary" style="padding:4px 8px; background:var(--primary-red); font-size:11px;" onclick="window.rebookClient('${c.clientId}')" title="Neuen Termin für diesen Kunden buchen"><i class="fa-solid fa-calendar-plus"></i></button>
+                            <button type="button" class="apt-btn crm-sync" style="display:inline-flex;" onclick="window.openCRMDetail('${c.clientId}')" title="Kundenakte &amp; Historie bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="apt-btn" style="display:inline-flex; color:var(--primary-red); border-color:rgba(217,0,0,0.35);" onclick="window.rebookClient('${c.clientId}')" title="Neuen Termin für diesen Kunden buchen"><i class="fa-solid fa-calendar-plus"></i></button>
                         </td>
                     </tr>
                 `;
@@ -9332,13 +9630,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         };
 
         window.filterCRM = function() {
-            let filter = document.getElementById('crmSearch').value.toLowerCase();
-            let rows = document.getElementById('crmList').getElementsByTagName('tr');
-            for(let row of rows) {
-                if(row.children.length === 1) continue; 
-                let text = row.innerText.toLowerCase();
-                row.style.display = text.includes(filter) ? "" : "none";
-            }
+            window.renderCRM();
         };
 
         // --- PAGE BUILDER ---
@@ -10845,14 +11137,28 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('editSectionId').value = section;
             const fieldsDiv = document.getElementById('contentEditorFields');
             fieldsDiv.innerHTML = '';
-            
+
+            const labelMap = {
+                badge: 'Aktions-Badge (oben)', h1_1: 'Hauptüberschrift Zeile 1', h1_2: 'Hauptüberschrift Zeile 2 (Rot)',
+                title: 'Bereichs-Überschrift', subtitle: 'Untertitel', desc: 'Beschreibungstext', sign: 'Signatur / Kürzel',
+                wk_title: 'Wunschkennzeichen-Studio – Überschrift', wk_desc: 'Wunschkennzeichen-Studio – Beschreibung',
+                calc_title: 'Schnell-Kalkulator – Überschrift', calc_desc: 'Schnell-Kalkulator – Beschreibung',
+                item_1: 'Checkliste Punkt 1', item_2: 'Checkliste Punkt 2', item_3: 'Checkliste Punkt 3', item_4: 'Checkliste Punkt 4', item_5: 'Checkliste Punkt 5',
+                q1: 'Frage 1', a1: 'Antwort 1', q2: 'Frage 2', a2: 'Antwort 2', q3: 'Frage 3', a3: 'Antwort 3',
+                q4: 'Frage 4', a4: 'Antwort 4', q5: 'Frage 5', a5: 'Antwort 5', q6: 'Frage 6', a6: 'Antwort 6',
+                datenschutz_extra: 'Datenschutz – Zusatzhinweis (Buchung)', text: 'Footer-Text (Copyright)'
+            };
+
             const contentObj = window.pageContentData[section] || {};
             
             for (const key in contentObj) {
+                const niceLabel = labelMap[key] || key.replace(/_/g, ' ').toUpperCase();
+                const val = String(contentObj[key] || '');
+                const rows = val.length > 90 ? 3 : 2;
                 fieldsDiv.innerHTML += `
                     <div class="form-group" style="margin-bottom:12px;">
-                        <label style="color:var(--text-muted);">Feld: ${key.toUpperCase()}</label>
-                        <textarea id="ce_${key}" class="form-control" rows="2">${contentObj[key]}</textarea>
+                        <label style="color:var(--text-light); font-weight:800; font-size:11px;">${window.escHtml(niceLabel)}</label>
+                        <textarea id="ce_${key}" class="form-control" rows="${rows}" style="resize:vertical;">${window.escHtml(val)}</textarea>
                     </div>
                 `;
             }
@@ -11154,14 +11460,38 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         };
 
         // --- HEADER-AUTO, LOGO & TICKER STUDIO ---
+        window.updateTickerStudioPreview = function() {
+            const box = document.getElementById('tickerStudioLivePreview');
+            if (!box) return;
+            const fullText = document.getElementById('tickerFullText')?.value || '';
+            const blinkWord = (document.getElementById('tickerBlinkWord')?.value || '').trim();
+            const blinkColor = document.getElementById('tickerBlinkColor')?.value || '#e60000';
+            const textColor = document.getElementById('tickerColor')?.value || '#ffffff';
+            const font = document.getElementById('tickerFont')?.value || "'Montserrat', sans-serif";
+            const size = document.getElementById('tickerSize')?.value || '13px';
+
+            const safeText = window.escHtml(fullText);
+            const safeBlink = window.escHtml(blinkWord);
+            if (safeBlink && safeText.includes(safeBlink)) {
+                const parts = safeText.split(safeBlink);
+                box.innerHTML = `${parts[0]}<span class="ticker-highlight" style="color:${blinkColor};">${safeBlink}</span>${parts.slice(1).join(safeBlink)}`;
+            } else {
+                box.innerHTML = safeText;
+            }
+            box.style.color = textColor === 'var(--text-light)' ? '#ffffff' : textColor;
+            box.style.fontFamily = font;
+            box.style.fontSize = size;
+        };
+
         window.openTickerConfig = function() {
             if(!window.isAuthorized) return;
             const h = window.pageContentData?.header || {};
             if(document.getElementById('hcLogoRed')) document.getElementById('hcLogoRed').value = h.title_red || 'RED';
-            if(document.getElementById('hcLogoSub')) document.getElementById('hcLogoSub').value = h.title_sub || 'ZULASSUNGSDIENST';
+            if(document.getElementById('hcLogoSub')) document.getElementById('hcLogoSub').value = h.title_sub || 'ZULASSUNGSDIENST & SCHILDER';
             if(document.getElementById('hcCarType')) document.getElementById('hcCarType').value = h.icon_car || 'svg-sport';
             if(document.getElementById('hcCarAnim')) document.getElementById('hcCarAnim').value = h.car_anim || 'car-anim-idle';
             if(document.getElementById('hcCarColor')) document.getElementById('hcCarColor').value = h.car_color || 'var(--text-light)';
+            window.updateTickerStudioPreview();
             document.getElementById('tickerConfigOverlay').classList.add('open');
         };
         window.closeTickerConfig = function() {
