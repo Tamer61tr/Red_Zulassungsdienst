@@ -844,14 +844,90 @@
         #widgetModalOverlay .custom-dialog-window { max-width: 460px; border-top-color: var(--primary-red); }
         #supervisorPermsOverlay .custom-dialog-window { max-width: 500px; border-top-color: #ff00ff; }
 
-        /* 8 KLEINE KOMPAKTE MONITORING-VIERECKE NEBENEINANDER */
+        /* =========================================================================
+           PROFI LIVE-LEADS & MONITORING TERMINAL (DESKTOP & MOBIL OPTIMIERT)
+           ========================================================================= */
+        #adminModal .custom-dialog-window {
+            max-width: 960px;
+            padding: 20px 22px;
+        }
+        .admin-term-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-right: 44px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .admin-term-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+        .admin-term-live-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #25D366;
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.85);
+            flex-shrink: 0;
+            animation: pulseAnim 1.3s infinite alternate;
+        }
+        .admin-term-header-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .admin-hdr-chip {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            font-size: 10.5px !important;
+            font-weight: 800;
+            padding: 5px 11px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+        .admin-hdr-chip:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-1px);
+        }
+        .admin-role-pill {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            background: var(--bg-input);
+            padding: 5px 11px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        body.is-supervisor .admin-role-pill {
+            border-color: rgba(192, 38, 211, 0.45);
+            background: rgba(192, 38, 211, 0.08);
+        }
+        body.is-admin:not(.is-supervisor) .admin-role-pill {
+            border-color: rgba(18, 140, 65, 0.45);
+            background: var(--green-bg-soft);
+        }
+
+        /* 8 FARBKODIERTE MONITORING-KACHELN */
         .admin-kpi-grid {
             display: grid !important;
             grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            margin: 10px 0;
+            gap: 7px;
+            margin: 12px 0 10px;
         }
-        @media (min-width: 640px) {
+        @media (min-width: 700px) {
             .admin-kpi-grid {
                 grid-template-columns: repeat(8, 1fr);
             }
@@ -859,8 +935,9 @@
         .admin-kpi-box {
             background: var(--bg-input);
             border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 8px 4px;
+            border-top: 3px solid var(--kpi-accent, var(--primary-red));
+            border-radius: 11px;
+            padding: 9px 4px 7px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -868,118 +945,497 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 54px;
+            min-height: 58px;
+            position: relative;
         }
         .admin-kpi-box:hover {
-            border-color: var(--primary-red);
+            border-color: var(--kpi-accent, var(--primary-red));
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.09);
+        }
+        .admin-kpi-box.is-selected {
+            background: var(--bg-card);
+            border-color: var(--kpi-accent, var(--primary-red));
+            box-shadow: 0 0 0 2px color-mix(in srgb, var(--kpi-accent, #d90000) 25%, transparent);
         }
         .admin-kpi-val {
-            font-size: 15px;
+            font-size: 16.5px;
             font-weight: 900;
-            color: var(--primary-red);
+            color: var(--kpi-accent, var(--primary-red));
             display: block;
             line-height: 1.1;
+            font-variant-numeric: tabular-nums;
         }
         .admin-kpi-lbl {
-            font-size: 8px;
+            font-size: 8.2px;
             text-transform: uppercase;
             color: var(--text-muted);
             font-weight: 800;
             display: block;
-            margin-top: 3px;
+            margin-top: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            letter-spacing: 0.2px;
         }
 
-        /* KOMPAKTE EINZEILIGE ADMIN-BUTTON-LEISTE UNTER DEN VIERECKEN */
+        /* KOMPAKTE ADMIN-WERKZEUGLEISTE */
         .admin-quick-toolbar {
-            margin-top: 6px;
+            margin-top: 4px;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             gap: 6px;
             border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 10px;
+            padding-bottom: 11px;
         }
         .admin-tool-btn {
-            padding: 6px 11px !important;
-            font-size: 10px !important;
+            padding: 7px 12px !important;
+            font-size: 10.2px !important;
             font-weight: 800 !important;
-            border-radius: 50px !important;
+            border-radius: 10px !important;
             white-space: nowrap !important;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 5px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s ease;
             flex: 1 1 auto;
             box-shadow: none !important;
         }
+        .admin-tool-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.06);
+        }
 
+        /* FILTER-PILLS + SUCHE & SORTIERUNG */
         .admin-filter-pills {
-            display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin: 8px 0;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0 8px;
         }
         .admin-filter-pill {
-            background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-muted);
-            padding: 4px 10px; border-radius: 20px; font-size: 9.5px !important; font-weight: 800;
-            cursor: pointer; transition: 0.2s; text-transform: uppercase; white-space: nowrap;
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 10px !important;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-        .admin-filter-pill.active, .admin-filter-pill:hover {
-            background: var(--primary-red); color: #fff; border-color: var(--primary-red);
+        .admin-filter-pill:hover {
+            border-color: var(--primary-red);
+            color: var(--text-light);
+        }
+        .admin-filter-pill.active {
+            background: var(--primary-red);
+            color: #ffffff;
+            border-color: var(--primary-red);
+            box-shadow: 0 3px 10px rgba(217, 0, 0, 0.25);
+        }
+        .admin-search-sort-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .admin-search-sort-row input {
+            flex: 1 1 240px;
+            padding: 9px 14px !important;
+            font-size: 12.5px !important;
+            border-radius: 10px !important;
+        }
+        .admin-search-sort-row select {
+            flex: 0 0 185px;
+            padding: 9px 34px 9px 12px !important;
+            font-size: 11.5px !important;
+            border-radius: 10px !important;
         }
 
-        .admin-list-wrapper { max-height: 430px; overflow-y: auto; overflow-x: hidden; margin-top: 8px; padding-right: 4px; display: grid; gap: 10px; }
-        .admin-apt-card { background: var(--bg-card); border-radius: 14px; padding: 13px; position: relative; border: 1px solid var(--glass-border); border-left: 5px solid var(--text-muted); text-align: left; transition: 0.25s; display: flex; flex-direction: column; gap: 7px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
-        .admin-apt-card:hover { border-color: var(--primary-red); }
-        .admin-apt-card.marked { border-left-color: #f5c542 !important; border-color: rgba(245, 197, 66, 0.55) !important; background: var(--gold-bg-soft); }
-        .admin-apt-card.prio-high { border-left-color: #ff3b30; }
+        /* AUFTRAGSLISTE + EINGEKLAPPTES ARCHIV */
+        .admin-list-wrapper {
+            max-height: 50dvh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 10px;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .admin-section-divider {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 10.5px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            padding: 4px 2px 2px;
+        }
+        .admin-section-count {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 900;
+        }
+        .admin-cards-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .admin-archive-details {
+            margin-top: 6px;
+            background: var(--bg-input);
+            border: 1px solid var(--green-border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .admin-archive-details summary {
+            padding: 11px 14px;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--green-accent);
+            user-select: none;
+            background: var(--green-bg-soft);
+        }
+        .admin-archive-details summary::-webkit-details-marker { display: none; }
+        .admin-archive-details summary .archive-chevron {
+            transition: transform 0.2s ease;
+            font-size: 12px;
+        }
+        .admin-archive-details[open] summary .archive-chevron {
+            transform: rotate(180deg);
+        }
+        .admin-archive-body {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        /* AUFTRAGSKARTEN (DETAILLIERT & FARBKODIERT) */
+        .admin-apt-card {
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 13px 14px;
+            position: relative;
+            border: 1px solid var(--glass-border);
+            border-left: 5px solid var(--text-muted);
+            text-align: left;
+            transition: all 0.22s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+        }
+        .admin-apt-card:hover {
+            border-color: rgba(217, 0, 0, 0.45);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.09);
+        }
+        .admin-apt-card.marked {
+            border-left-color: #d99a00 !important;
+            border-color: rgba(217, 154, 0, 0.55) !important;
+            background: var(--gold-bg-soft);
+        }
+        .admin-apt-card.prio-high { border-left-color: #e60000; }
         .admin-apt-card.prio-normal { border-left-color: #007aff; }
-        .admin-apt-card.prio-expired { border-left-color: #ff9500; opacity: 0.92; }
-        .admin-apt-card.prio-done { border-left-color: #25D366; }
+        .admin-apt-card.prio-labo { border-left-color: #8b5cf6; }
+        .admin-apt-card.prio-expired { border-left-color: #f59e0b; }
+        .admin-apt-card.prio-done { border-left-color: #16a34a; opacity: 0.94; }
 
-        .prio-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 900; padding: 3px 9px; border-radius: 6px; text-transform: uppercase; }
-        .prio-high .prio-badge { background: rgba(255,59,48,0.15); color: #ff3b30; animation: pulse-badge 1s infinite alternate; }
-        .prio-normal .prio-badge { background: rgba(0,122,255,0.14); color: #007aff; }
-        .prio-expired .prio-badge { background: rgba(255,149,0,0.18); color: #d97706; }
-        .prio-done .prio-badge { background: rgba(37,211,102,0.18); color: var(--green-accent); }
+        .prio-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9.5px;
+            font-weight: 900;
+            padding: 3px 9px;
+            border-radius: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .prio-high .prio-badge { background: rgba(230, 0, 0, 0.14); color: #d90000; }
+        .prio-normal .prio-badge { background: rgba(0, 122, 255, 0.14); color: #0066d6; }
+        .prio-labo .prio-badge { background: rgba(139, 92, 246, 0.15); color: #7c3aed; }
+        .prio-expired .prio-badge { background: rgba(245, 158, 11, 0.18); color: #b45309; }
+        .prio-done .prio-badge { background: var(--green-bg-soft); color: var(--green-accent); }
+        body:not([data-theme^="light"]) .prio-high .prio-badge { color: #ff5c5c; }
+        body:not([data-theme^="light"]) .prio-normal .prio-badge { color: #60a5fa; }
+        body:not([data-theme^="light"]) .prio-labo .prio-badge { color: #c084fc; }
+        body:not([data-theme^="light"]) .prio-expired .prio-badge { color: #fbbf24; }
 
-        .apt-grid-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; background: var(--bg-input); padding: 9px 11px; border-radius: 10px; border: 1px solid var(--glass-border); }
-        .apt-grid-info div { font-size: 11px; color: var(--text-light); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-        .apt-grid-info i { color: var(--primary-red); width: 14px; text-align: center; font-size: 11px; }
-        .apt-actions-horizontal { display: flex; gap: 5px; justify-content: flex-end; background: var(--bg-input); padding: 4px 6px; border-radius: 10px; border: 1px solid var(--glass-border); flex-wrap: wrap; }
-        .apt-btn { background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; font-size: 11.5px; transition: 0.25s; width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .apt-head-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .apt-badges-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .apt-code-chip {
+            cursor: pointer;
+            font-size: 10px;
+            background: rgba(217, 0, 0, 0.08);
+            border: 1px solid rgba(217, 0, 0, 0.32);
+            color: var(--primary-red);
+            padding: 2px 8px;
+            border-radius: 7px;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.2s;
+        }
+        .apt-code-chip:hover {
+            background: var(--primary-red);
+            color: #ffffff;
+        }
+        .apt-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .apt-title-row h4 {
+            font-size: 14.5px;
+            margin: 0;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 0.2px;
+        }
+        .apt-meta-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .apt-highlight-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .apt-plate-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            color: #0066d6;
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid rgba(0, 122, 255, 0.24);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 800;
+        }
+        body:not([data-theme^="light"]) .apt-plate-pill { color: #60a5fa; }
+        .apt-hint-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            color: var(--primary-red);
+            background: rgba(217, 0, 0, 0.08);
+            border: 1px solid rgba(217, 0, 0, 0.22);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .apt-grid-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 7px 14px;
+            background: var(--bg-input);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+        .apt-grid-info div {
+            font-size: 11.5px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+        }
+        .apt-grid-info a {
+            color: inherit;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .apt-grid-info a:hover {
+            color: var(--primary-red);
+            text-decoration: underline;
+        }
+        .apt-grid-info i {
+            color: var(--primary-red);
+            width: 14px;
+            text-align: center;
+            font-size: 11.5px;
+            flex-shrink: 0;
+        }
+
+        .apt-actions-horizontal {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            background: var(--bg-input);
+            padding: 4px 6px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            flex-wrap: wrap;
+        }
+        .apt-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 12px !important;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .apt-btn.call-btn:hover { background: #0ea5e9; color: #fff; border-color: #0ea5e9; }
+        .apt-btn.wa-confirm:hover { background: #25D366; color: #000; border-color: #25D366; }
+        .apt-btn.crm-sync { color: #0891b2; border-color: rgba(8, 145, 178, 0.45); }
+        .apt-btn.crm-sync:hover { background: #0891b2; color: #fff; border-color: #0891b2; }
+        .apt-btn.done-btn { color: var(--green-accent); border-color: var(--green-border); }
+        .apt-btn.done-btn:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
         .apt-btn.mark:hover { background: #f5c542; color: #000; border-color: #f5c542; }
-        /* NEU: WENN GEPINNT, IST AUCH DAS PIN-SYMBOL SELBST LEUCHTEND GELB/GOLD MARKIERT! */
         .apt-btn.mark.is-pinned {
             background: #f5c542 !important;
             color: #000000 !important;
             border-color: #d4af37 !important;
-            box-shadow: 0 0 12px rgba(245, 197, 66, 0.75) !important;
-            transform: scale(1.06);
+            box-shadow: 0 0 12px rgba(245, 197, 66, 0.7) !important;
+            transform: scale(1.05);
         }
         .apt-btn.edit:hover { background: #007aff; color: #fff; border-color: #007aff; }
-        .apt-btn.wa-confirm:hover { background: #25D366; color: #fff; border-color: #25D366; }
         .apt-btn.delete:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
 
-        .apt-status-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--bg-input); padding: 5px; border-radius: 8px; border: 1px solid var(--glass-border); }
-        .status-pill-btn { font-size: 9px !important; font-weight: 800; padding: 5px 4px; border-radius: 6px; border: 1px solid var(--glass-border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; transition: 0.2s; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .status-pill-btn.active { background: var(--primary-red); color: #fff; border-color: var(--primary-red); box-shadow: 0 0 8px rgba(230,0,0,0.3); }
-        .status-pill-btn.done-ready.active { background: #25D366; color: #000; border-color: #25D366; box-shadow: 0 0 10px rgba(37,211,102,0.4); }
+        /* 4-STUFEN FARB-PIPELINE */
+        .apt-status-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            background: var(--bg-input);
+            padding: 5px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+        .status-pill-btn {
+            font-size: 9.8px !important;
+            font-weight: 800;
+            padding: 6px 5px;
+            border-radius: 7px;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .status-pill-btn:hover { border-color: var(--text-muted); color: var(--text-light); }
+        .status-pill-btn.step-1.active { background: #d90000; color: #fff; border-color: #d90000; box-shadow: 0 2px 8px rgba(217, 0, 0, 0.3); }
+        .status-pill-btn.step-2.active { background: #7c3aed; color: #fff; border-color: #7c3aed; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.32); }
+        .status-pill-btn.step-3.active { background: #007aff; color: #fff; border-color: #007aff; box-shadow: 0 2px 8px rgba(0, 122, 255, 0.32); }
+        .status-pill-btn.step-4.active { background: #16a34a; color: #fff; border-color: #16a34a; box-shadow: 0 2px 10px rgba(22, 163, 74, 0.35); }
 
-        .admin-note-input { width: 100%; background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-light); font-size: 12px; padding: 8px 12px; border-radius: 8px; outline: none; display: none; margin-top: 4px; box-sizing: border-box; }
-        .admin-note-input.active { display: block; animation: viewFadeIn 0.3s ease; }
-        .notes-list-box { display: flex; flex-direction: column; gap: 6px; }
-        .saved-note-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--text-light); background: var(--bg-input); padding: 8px 12px; border-radius: 8px; border-left: 3px solid var(--gold-border); }
+        .admin-note-input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1.5px solid var(--primary-red);
+            color: var(--text-light);
+            font-size: 12px !important;
+            padding: 8px 12px;
+            border-radius: 9px;
+            outline: none;
+            display: none;
+            margin-top: 2px;
+            box-sizing: border-box;
+        }
+        .admin-note-input.active { display: block; animation: viewFadeIn 0.25s ease; }
+        .notes-list-box { display: flex; flex-direction: column; gap: 5px; }
+        .saved-note-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 11.2px;
+            color: var(--text-light);
+            background: var(--bg-input);
+            padding: 7px 11px;
+            border-radius: 8px;
+            border-left: 3px solid var(--gold-border);
+        }
         .note-meta { font-size: 9px; color: var(--text-muted); display: block; margin-top: 2px; font-weight: 600; }
-        .note-row-actions { display: flex; gap: 6px; }
-        .note-row-btn { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+        .note-row-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        .note-row-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 11px !important;
+        }
         .note-row-btn:hover { color: var(--text-light); border-color: var(--text-light); }
         .note-row-btn.del:hover { color: var(--primary-red); border-color: var(--primary-red); }
+
+        @media (max-width: 768px) {
+            #adminModal .custom-dialog-window { padding: 16px 12px !important; }
+            .admin-term-header { padding-right: 38px; gap: 8px; }
+            .admin-search-sort-row select { flex: 1 1 100%; }
+            .admin-list-wrapper { max-height: 46dvh; }
+            .apt-btn { width: 28px; height: 28px; font-size: 11px !important; }
+            .status-pill-btn { font-size: 8.8px !important; padding: 6px 3px; }
+        }
 
         /* PINNWAND-KENNZEICHEN FREI BEWEGLICH (TOUCH & MAUS) + GOLDENER PIN-INDIKATOR */
         #pinned-container {
@@ -3501,67 +3957,76 @@
             </div>
 
             <div id="dashboardBox" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-right:42px; padding-left:4px;">
-                    <h3 style="color:var(--primary-red); font-weight:900; font-size:15.5px; margin:0; padding:0 !important;"><i class="fa-solid fa-satellite-dish"></i> Live-Leads & Monitoring Terminal</h3>
-                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                        <button type="button" id="adminSoundToggleBtn" onclick="window.toggleAdminSoundAlert()" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--green-accent); font-size:10px !important; font-weight:800; padding:3px 9px; border-radius:20px; cursor:pointer;" title="Signalton bei neuen Buchungen Ein/Aus">
+                <div class="admin-term-header">
+                    <div class="admin-term-title-wrap">
+                        <span class="admin-term-live-dot" title="Echtzeit-Synchronisation aktiv"></span>
+                        <div>
+                            <h3 style="color:var(--primary-red); font-weight:900; font-size:16px; margin:0; padding:0 !important; line-height:1.15;"><i class="fa-solid fa-satellite-dish"></i> Live-Leads &amp; Monitoring Terminal</h3>
+                            <span style="font-size:10px; color:var(--text-muted); font-weight:700;">Offene Vorgänge live steuern • Erledigte wandern automatisch ins CRM &amp; Archiv</span>
+                        </div>
+                    </div>
+                    <div class="admin-term-header-controls">
+                        <button type="button" id="adminSoundToggleBtn" class="admin-hdr-chip" onclick="window.toggleAdminSoundAlert()" style="color:var(--green-accent);" title="Signalton bei neuen Buchungen Ein/Aus">
                             <i class="fa-solid fa-volume-high"></i> Ton: An
                         </button>
-                        <button type="button" onclick="window.printTodayAgenda()" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); font-size:10px !important; font-weight:800; padding:3px 9px; border-radius:20px; cursor:pointer;" title="Tages-Agenda (Heute fällige & offene Termine) drucken">
+                        <button type="button" class="admin-hdr-chip" onclick="window.printTodayAgenda()" title="Tages-Agenda (Heute fällige & offene Termine) drucken">
                             <i class="fa-solid fa-print" style="color:var(--primary-red);"></i> Tages-Agenda
                         </button>
-                        <span style="font-size:10.5px; color:var(--text-muted); background:var(--bg-input); padding:3px 10px; border-radius:20px; border:1px solid var(--glass-border);">Aktiv: <strong id="loggedInUser" style="color:var(--text-light);"></strong></span>
+                        <span class="admin-role-pill">
+                            <i class="fa-solid fa-user-shield" style="color:var(--primary-red);"></i>
+                            <strong id="loggedInUser" style="color:var(--text-light);"></strong>
+                        </span>
                     </div>
                 </div>
                 
-                <!-- 8 KLEINE KOMPAKTE VIERECKE NEBENEINANDER -->
-                <div class="admin-kpi-grid mod-leads">
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('all')" title="Alle Termine anzeigen">
+                <!-- 8 FARBKODIERTE MONITORING-KACHELN -->
+                <div class="admin-kpi-grid mod-leads" id="adminKpiGrid">
+                    <div class="admin-kpi-box is-selected" data-kpi-filter="open" style="--kpi-accent:#d90000;" onclick="window.setLeadStatusFilter('open')" title="Nur offene / aktive Vorgänge anzeigen">
                         <span class="admin-kpi-val" id="kpiTotalApts">0</span>
-                        <span class="admin-kpi-lbl">Gesamt</span>
+                        <span class="admin-kpi-lbl">Offen</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('today')" title="Heute fällige Termine">
-                        <span class="admin-kpi-val" id="kpiTodayApts" style="color:#ff3b30;">0</span>
+                    <div class="admin-kpi-box" data-kpi-filter="today" style="--kpi-accent:#ef4444;" onclick="window.setLeadStatusFilter('today')" title="Heute fällige Termine">
+                        <span class="admin-kpi-val" id="kpiTodayApts">0</span>
                         <span class="admin-kpi-lbl">Heute Fällig</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('planned')" title="Zukünftig geplante Termine">
-                        <span class="admin-kpi-val" id="kpiPlannedApts" style="color:#007aff;">0</span>
+                    <div class="admin-kpi-box" data-kpi-filter="planned" style="--kpi-accent:#007aff;" onclick="window.setLeadStatusFilter('planned')" title="Zukünftig geplante Termine">
+                        <span class="admin-kpi-val" id="kpiPlannedApts">0</span>
                         <span class="admin-kpi-lbl">Geplant</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('expired')" title="Termine, deren Uhrzeit verstrichen ist">
-                        <span class="admin-kpi-val" id="kpiExpiredApts" style="color:#ff9500;">0</span>
+                    <div class="admin-kpi-box" data-kpi-filter="expired" style="--kpi-accent:#f59e0b;" onclick="window.setLeadStatusFilter('expired')" title="Termine, deren Uhrzeit verstrichen ist">
+                        <span class="admin-kpi-val" id="kpiExpiredApts">0</span>
                         <span class="admin-kpi-lbl">Zeit vorbei</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('labo')" title="Aktuell beim LABO / Schilder">
-                        <span class="admin-kpi-val" id="kpiLaboApts" style="color:#a855f7;">0</span>
+                    <div class="admin-kpi-box" data-kpi-filter="labo" style="--kpi-accent:#8b5cf6;" onclick="window.setLeadStatusFilter('labo')" title="Aktuell beim LABO / Schilder">
+                        <span class="admin-kpi-val" id="kpiLaboApts">0</span>
                         <span class="admin-kpi-lbl">Beim LABO</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('done')" title="Abgeschlossene Aufträge">
-                        <span class="admin-kpi-val" id="kpiDoneApts" style="color:var(--green-accent);">0</span>
+                    <div class="admin-kpi-box" data-kpi-filter="done" style="--kpi-accent:#16a34a;" onclick="window.setLeadStatusFilter('done')" title="Erledigte Aufträge (Archiv öffnen)">
+                        <span class="admin-kpi-val" id="kpiDoneApts">0</span>
                         <span class="admin-kpi-lbl">Erledigt</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.openCRM()" title="RED Kundendatenbank öffnen">
-                        <span class="admin-kpi-val" id="kpiTotalCrm" style="color:#00a8cc;">0</span>
+                    <div class="admin-kpi-box" data-kpi-filter="crm" style="--kpi-accent:#0891b2;" onclick="window.safeOpenCRMFromTerminal()" title="RED Kundendatenbank öffnen">
+                        <span class="admin-kpi-val" id="kpiTotalCrm">0</span>
                         <span class="admin-kpi-lbl">Kunden</span>
                     </div>
-                    <div class="admin-kpi-box" onclick="window.setLeadStatusFilter('pinned')" title="Angeheftete Kennzeichen">
-                        <span class="admin-kpi-val" id="kpiPinnedApts" style="color:var(--gold-accent);">0</span>
+                    <div class="admin-kpi-box" data-kpi-filter="pinned" style="--kpi-accent:#d99a00;" onclick="window.setLeadStatusFilter('pinned')" title="Angeheftete Kennzeichen">
+                        <span class="admin-kpi-val" id="kpiPinnedApts">0</span>
                         <span class="admin-kpi-lbl">Angeheftet</span>
                     </div>
                 </div>
 
-                <!-- EINZEILIGE, SAUBERE WERKZEUGLEISTE DARUNTER -->
+                <!-- ROLLENGESTEUERTE WERKZEUGLEISTE (SUPERVISOR VS. ADMIN) -->
                 <div class="admin-quick-toolbar">
-                    <button type="button" class="btn-primary admin-tool-btn mod-crm" style="background:rgba(230,0,0,0.08); border:1px solid var(--primary-red); color:var(--primary-red);" onclick="window.openCRM()">
+                    <button type="button" class="btn-primary admin-tool-btn mod-crm" style="background:rgba(217,0,0,0.08); border:1px solid var(--primary-red); color:var(--primary-red);" onclick="window.openCRM()">
                         <i class="fa-solid fa-database"></i> <span>RED Kunden</span>
                     </button>
-                    <button type="button" class="btn-primary admin-tool-btn supervisor-only-inline" style="background:rgba(255,0,255,0.08); border:1px solid #ff00ff; color:#ff00ff;" onclick="window.openSupervisorPanel()">
+                    <button type="button" class="btn-primary admin-tool-btn supervisor-only-inline" style="background:rgba(192,38,211,0.1); border:1px solid #c026d3; color:#c026d3;" onclick="window.openSupervisorPanel()">
                         <i class="fa-solid fa-crown"></i> <span>Rechte</span>
                     </button>
-                    <button type="button" class="btn-primary admin-tool-btn mod-theme" style="background:rgba(0,168,204,0.08); border:1px solid #00a8cc; color:#00a8cc;" onclick="window.openThemeEditor()">
+                    <button type="button" class="btn-primary admin-tool-btn mod-theme" style="background:rgba(8,145,178,0.1); border:1px solid #0891b2; color:#0891b2;" onclick="window.openThemeEditor()">
                         <i class="fa-solid fa-palette"></i> <span>Design</span>
                     </button>
-                    <button type="button" class="btn-primary admin-tool-btn mod-pages" style="background:rgba(255,149,0,0.08); border:1px solid #ff9500; color:#ff9500;" onclick="window.openPageManager()">
+                    <button type="button" class="btn-primary admin-tool-btn mod-pages" style="background:rgba(245,158,11,0.1); border:1px solid #d97706; color:#d97706;" onclick="window.openPageManager()">
                         <i class="fa-solid fa-file-lines"></i> <span>Seiten</span>
                     </button>
                     <button type="button" class="btn-primary admin-tool-btn btn-gold-adaptive" onclick="window.changePassPrompt()">
@@ -3572,18 +4037,26 @@
                     </button>
                 </div>
 
-                <!-- 1-KLICK MONITORING FILTER & SUCHE -->
-                <div class="mod-leads" style="margin-top: 8px;">
+                <!-- 1-KLICK MONITORING FILTER, SUCHE & SORTIERUNG -->
+                <div class="mod-leads">
                     <div class="admin-filter-pills" id="adminLeadFilterPills">
-                        <button type="button" class="admin-filter-pill active" data-filter="all" onclick="window.setLeadStatusFilter('all', this)">Alle</button>
+                        <button type="button" class="admin-filter-pill active" data-filter="open" onclick="window.setLeadStatusFilter('open', this)"><i class="fa-solid fa-bolt"></i> Offen</button>
                         <button type="button" class="admin-filter-pill" data-filter="today" onclick="window.setLeadStatusFilter('today', this)">🔥 Heute</button>
                         <button type="button" class="admin-filter-pill" data-filter="planned" onclick="window.setLeadStatusFilter('planned', this)">📅 Geplant</button>
                         <button type="button" class="admin-filter-pill" data-filter="expired" onclick="window.setLeadStatusFilter('expired', this)">⌛ Zeit vorbei</button>
                         <button type="button" class="admin-filter-pill" data-filter="labo" onclick="window.setLeadStatusFilter('labo', this)">🏛️ Beim LABO</button>
-                        <button type="button" class="admin-filter-pill" data-filter="done" onclick="window.setLeadStatusFilter('done', this)">✅ Abgeschlossen</button>
-                        <button type="button" class="admin-filter-pill" data-filter="pinned" onclick="window.setLeadStatusFilter('pinned', this)">📌 Angeheftet</button>
+                        <button type="button" class="admin-filter-pill" data-filter="done" onclick="window.setLeadStatusFilter('done', this)">✅ Archiv</button>
+                        <button type="button" class="admin-filter-pill" data-filter="pinned" onclick="window.setLeadStatusFilter('pinned', this)">📌 Gepinnt</button>
+                        <button type="button" class="admin-filter-pill" data-filter="all" onclick="window.setLeadStatusFilter('all', this)">Alle</button>
                     </div>
-                    <input type="text" id="adminLeadSearch" class="form-control" placeholder="🔍 Schnellsuche nach Name, Datum, Leistung, Kennzeichen oder Telefon..." onkeyup="window.filterAdminLeads()" style="padding: 8px 14px; font-size: 12px !important;">
+                    <div class="admin-search-sort-row">
+                        <input type="text" id="adminLeadSearch" class="form-control" placeholder="🔍 Suche nach Name, Code (RED-...), Kennzeichen, Datum, Telefon..." oninput="window.filterAdminLeads()">
+                        <select id="adminLeadSortSelect" class="form-control" onchange="window.changeAdminLeadSort(this.value)">
+                            <option value="priority">Sortierung: Dringlichkeit</option>
+                            <option value="newest">Sortierung: Neueste zuerst</option>
+                            <option value="date">Sortierung: Termin-Datum</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="admin-list-wrapper mod-leads" id="admin-module-leads">
@@ -8005,37 +8478,94 @@
             window.showToast('Kalendereintrag heruntergeladen!', 'success');
         };
 
-        // --- LIVE-LEADS MONITORING FILTER & SUCHE ---
-        window.currentLeadFilter = 'all';
+        // --- LIVE-LEADS MONITORING FILTER, SORTIERUNG & ARCHIV-STEUERUNG ---
+        window.currentLeadFilter = 'open';
+        window.adminLeadSortMode = 'priority';
+
+        window.safeOpenCRMFromTerminal = function() {
+            const isSup = document.body.classList.contains('is-supervisor');
+            if (isSup || window.adminPermissions?.crm) {
+                window.openCRM();
+            } else {
+                window.showToast('Der Supervisor hat das Kunden-CRM für dieses Konto gesperrt.', 'error');
+            }
+        };
+
+        window.changeAdminLeadSort = function(mode) {
+            window.adminLeadSortMode = mode || 'priority';
+            if (typeof window.refreshAdminAppointmentsView === 'function') {
+                window.refreshAdminAppointmentsView();
+            }
+        };
 
         window.setLeadStatusFilter = function(filterKey, btnEl) {
-            window.currentLeadFilter = filterKey;
+            window.currentLeadFilter = filterKey || 'open';
             document.querySelectorAll('#adminLeadFilterPills .admin-filter-pill').forEach(p => {
-                p.classList.toggle('active', p.getAttribute('data-filter') === filterKey);
+                p.classList.toggle('active', p.getAttribute('data-filter') === window.currentLeadFilter);
+            });
+            document.querySelectorAll('#adminKpiGrid .admin-kpi-box').forEach(box => {
+                box.classList.toggle('is-selected', box.getAttribute('data-kpi-filter') === window.currentLeadFilter);
             });
             window.filterAdminLeads();
         };
 
         window.filterAdminLeads = function() {
-            const q = (document.getElementById('adminLeadSearch')?.value || '').toLowerCase();
-            const f = window.currentLeadFilter || 'all';
-            const cards = document.querySelectorAll('#admin-list .admin-apt-card');
-            cards.forEach(card => {
-                const textMatch = card.innerText.toLowerCase().includes(q);
+            const q = (document.getElementById('adminLeadSearch')?.value || '').trim().toLowerCase();
+            const f = window.currentLeadFilter || 'open';
+            const openSection = document.getElementById('adminOpenSectionWrap');
+            const archiveDetails = document.getElementById('adminCompletedArchive');
+
+            let visibleOpen = 0;
+            let visibleDone = 0;
+
+            document.querySelectorAll('#admin-list .admin-apt-card').forEach(card => {
+                const textMatch = !q || card.innerText.toLowerCase().includes(q);
                 const statusAttr = card.getAttribute('data-status-cat') || 'planned';
                 const isPinned = card.getAttribute('data-pinned') === 'true';
                 const isLabo = card.getAttribute('data-labo') === 'true';
+                const isDone = (statusAttr === 'done');
 
                 let filterMatch = true;
-                if (f === 'today') filterMatch = (statusAttr === 'today');
+                if (f === 'open') filterMatch = !isDone;
+                else if (f === 'today') filterMatch = (statusAttr === 'today');
                 else if (f === 'planned') filterMatch = (statusAttr === 'planned');
                 else if (f === 'expired') filterMatch = (statusAttr === 'expired');
-                else if (f === 'done') filterMatch = (statusAttr === 'done');
+                else if (f === 'done') filterMatch = isDone;
                 else if (f === 'labo') filterMatch = isLabo;
                 else if (f === 'pinned') filterMatch = isPinned;
+                else if (f === 'all') filterMatch = true;
 
-                card.style.display = (textMatch && filterMatch) ? 'flex' : 'none';
+                // Im Standardfilter "open" bleiben erledigte Karten im eingeklappten Archiv erhalten (per Suche oder Klick ausklappbar)
+                const isInArchive = !!card.closest('#adminCompletedArchive');
+                let show = textMatch && filterMatch;
+                if (f === 'open' && isInArchive) {
+                    show = textMatch;
+                }
+
+                card.style.display = show ? 'flex' : 'none';
+                if (show) {
+                    if (isInArchive) visibleDone++;
+                    else visibleOpen++;
+                }
             });
+
+            if (openSection) {
+                openSection.style.display = (f === 'done') ? 'none' : 'block';
+            }
+            if (archiveDetails) {
+                const showArchiveBlock = (f === 'open' || f === 'done' || f === 'all' || (q && visibleDone > 0) || (f === 'pinned' && visibleDone > 0));
+                archiveDetails.style.display = (showArchiveBlock && (visibleDone > 0 || f === 'done')) ? 'block' : 'none';
+                if (f === 'done' || f === 'all' || (q && visibleDone > 0)) {
+                    archiveDetails.open = true;
+                } else if (f === 'open' && !q) {
+                    archiveDetails.open = false;
+                }
+            }
+
+            const emptyOpenMsg = document.getElementById('adminOpenEmptyHint');
+            if (emptyOpenMsg) {
+                emptyOpenMsg.style.display = (visibleOpen === 0 && f !== 'done') ? 'block' : 'none';
+            }
         };
 
         // =========================================================================
@@ -10795,49 +11325,365 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if(hasPrio) b.classList.add('prio-pulse');
         }
         
-        function isAptExpired(dateStr, timeStr) {
-            if(!dateStr) return false;
-            const parts = dateStr.split('.');
-            if(parts.length !== 3) return false;
-            
-            const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1;
-            const year = parseInt(parts[2], 10);
-            if(isNaN(day) || isNaN(month) || isNaN(year)) return false;
+        function parseAptDateParts(dateStr) {
+            if (!dateStr) return null;
+            const s = String(dateStr).trim();
+            if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+                const p = s.substring(0, 10).split('-');
+                return { year: parseInt(p[0], 10), month: parseInt(p[1], 10) - 1, day: parseInt(p[2], 10) };
+            }
+            if (/^\d{1,2}\.\d{1,2}\.\d{4}/.test(s)) {
+                const p = s.split('.');
+                return { year: parseInt(p[2], 10), month: parseInt(p[1], 10) - 1, day: parseInt(p[0], 10) };
+            }
+            return null;
+        }
 
+        function formatAptDateDE(dateStr) {
+            const p = parseAptDateParts(dateStr);
+            if (!p || isNaN(p.day) || isNaN(p.month) || isNaN(p.year)) return dateStr || '-';
+            return `${String(p.day).padStart(2, '0')}.${String(p.month + 1).padStart(2, '0')}.${p.year}`;
+        }
+
+        function getAptTimestamp(dateStr, timeStr) {
+            const p = parseAptDateParts(dateStr);
+            if (!p) return 0;
             let hour = 20, min = 0;
-            if(timeStr && timeStr.includes(':')) {
-                const tMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
-                if(tMatch) {
+            if (timeStr && String(timeStr).includes(':')) {
+                const tMatch = String(timeStr).match(/(\d{1,2}):(\d{2})/);
+                if (tMatch) {
                     hour = parseInt(tMatch[1], 10);
                     min = parseInt(tMatch[2], 10);
                 }
             }
-            const aptDate = new Date(year, month, day, hour, min, 0);
-            return aptDate.getTime() < Date.now();
+            return new Date(p.year, p.month, p.day, hour, min, 0).getTime();
         }
+
+        function isAptExpired(dateStr, timeStr) {
+            const ts = getAptTimestamp(dateStr, timeStr);
+            return ts > 0 && ts < Date.now();
+        }
+
+        function isAptToday(dateStr) {
+            const p = parseAptDateParts(dateStr);
+            if (!p) return false;
+            const now = new Date();
+            return p.day === now.getDate() && p.month === now.getMonth() && p.year === now.getFullYear();
+        }
+
+        async function syncAppointmentToCRM(apt, markCompleted = false) {
+            if (!apt || !window.isAuthorized) return null;
+            const cleanEmail = (apt.email || '').trim().toLowerCase();
+            const cleanPhone = (apt.phone || '').replace(/\D/g, '');
+            const cleanName = (apt.name || '').trim().toLowerCase();
+
+            let existingId = null;
+            let maxIdNum = 0;
+            for (const key in (window.crmClientsDetail || {})) {
+                const c = window.crmClientsDetail[key];
+                if (c.clientId && c.clientId.startsWith('RED-')) {
+                    const num = parseInt(c.clientId.replace(/\D/g, ''), 10);
+                    if (!isNaN(num) && num < 1000000 && num > maxIdNum) maxIdNum = num;
+                }
+                const cEmail = (c.email || '').trim().toLowerCase();
+                const cPhone = (c.phone || '').replace(/\D/g, '');
+                const cName = (c.name || '').trim().toLowerCase();
+                if ((cleanEmail && cleanEmail.includes('@') && cEmail === cleanEmail) ||
+                    (cleanPhone.length >= 6 && cPhone === cleanPhone) ||
+                    (cleanName && cName === cleanName)) {
+                    existingId = key;
+                }
+            }
+
+            const niceDate = formatAptDateDE(apt.date);
+            const code = apt.trackingCode || ((apt.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '';
+            const statusPrefix = markCompleted ? '✅ Erledigt' : '📅 Termin';
+            const entryLine = `${statusPrefix} (${niceDate}): ${apt.service || 'Zulassung'}${apt.wunschkennzeichen ? ' | Kennz.: ' + apt.wunschkennzeichen : ''}${code ? ' [' + code + ']' : ''}`;
+
+            let targetId = existingId;
+            if (existingId) {
+                const client = window.crmClientsDetail[existingId];
+                const syncedIds = Array.isArray(client.syncedAptIds) ? client.syncedAptIds : [];
+                if (!syncedIds.includes(apt.id)) {
+                    client.bookings = (client.bookings || 1) + 1;
+                    syncedIds.push(apt.id);
+                    client.syncedAptIds = syncedIds;
+                }
+                if (apt.category && !client.category) client.category = apt.category;
+                const prevNotes = client.notes || '';
+                if (!prevNotes.includes(entryLine)) {
+                    client.notes = prevNotes ? `${prevNotes}\n${entryLine}` : entryLine;
+                }
+                client.timestamp = Date.now();
+            } else {
+                maxIdNum++;
+                targetId = 'RED-' + maxIdNum.toString().padStart(9, '0').replace(/(\d{3})(?=\d)/g, '$1 ');
+                window.crmClientsDetail[targetId] = {
+                    clientId: targetId,
+                    category: apt.category || 'Privatkunde',
+                    name: apt.name || 'Unbekannt',
+                    phone: apt.phone || '',
+                    email: (apt.email && apt.email.includes('@')) ? apt.email : '',
+                    birthday: '',
+                    address: '',
+                    city: '',
+                    notes: entryLine,
+                    bookings: 1,
+                    syncedAptIds: [apt.id],
+                    timestamp: Date.now()
+                };
+            }
+
+            try {
+                await setDoc(doc(db, "settings", "crm_details"), { details: { [targetId]: window.crmClientsDetail[targetId] } }, { merge: true });
+            } catch (e) {}
+            if (document.getElementById('kpiTotalCrm')) {
+                document.getElementById('kpiTotalCrm').innerText = Object.keys(window.crmClientsDetail || {}).length;
+            }
+            return targetId;
+        }
+
+        window.openClientInCrmFromApt = async function(aptId) {
+            const isSup = document.body.classList.contains('is-supervisor');
+            if (!isSup && !window.adminPermissions?.crm) {
+                window.showToast('Kunden-CRM ist durch den Supervisor gesperrt.', 'error');
+                return;
+            }
+            const apt = (window.redApts || []).find(a => a.id === aptId);
+            if (!apt) return;
+            const clientId = await syncAppointmentToCRM(apt, Number(apt.orderStatus) === 4);
+            if (clientId) {
+                window.openCRMDetail(clientId);
+                window.showToast(`Kundenakte ${clientId} geladen.`, 'success');
+            }
+        };
 
         window.setAptOrderStatus = async function(id, step) {
             try {
-                await updateDoc(doc(db, "appointments", id), { orderStatus: step });
                 const apt = (window.redApts || []).find(a => a.id === id);
-                if (apt && apt.trackingCode) {
-                    await updateDoc(doc(db, "order_tracking", apt.trackingCode), { orderStatus: step }).catch(() => {});
+                const updatePayload = { orderStatus: step };
+                if (step === 4 && apt?.marked) updatePayload.marked = false;
+
+                await updateDoc(doc(db, "appointments", id), updatePayload);
+
+                const resolvedCode = apt?.trackingCode || ((apt?.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '';
+                if (resolvedCode) {
+                    await setDoc(doc(db, "order_tracking", resolvedCode), {
+                        code: resolvedCode,
+                        date: formatAptDateDE(apt?.date || ''),
+                        timeLabel: apt?.timeLabel || '',
+                        service: apt?.service || 'Kfz-Zulassung',
+                        wunschkennzeichen: apt?.wunschkennzeichen || '',
+                        orderStatus: step,
+                        updatedAt: Date.now()
+                    }, { merge: true }).catch(() => {});
                 }
-                window.showToast(step === 4 ? '✅ Auftrag als abgeschlossen markiert!' : `Auftragsstatus auf Stufe ${step} gesetzt!`, 'success');
+
+                if (step === 4 && apt) {
+                    await syncAppointmentToCRM(apt, true);
+                    window.showToast('✅ Auftrag erledigt, im Kunden-CRM gesichert & ins Archiv verschoben!', 'success');
+                } else {
+                    window.showToast(`Auftragsstatus auf Stufe ${step} aktualisiert!`, 'success');
+                }
             } catch(e) {
                 window.showToast('Status konnte nicht gespeichert werden.', 'error');
             }
         };
 
+        function buildAdminAppointmentCard(apt, ctx) {
+            const id = apt.id;
+            const curStep = Number(apt.orderStatus) || 1;
+            const isDone = (curStep === 4);
+            const isLabo = (!isDone && (curStep === 2 || curStep === 3));
+            const isExpired = isAptExpired(apt.date, apt.timeLabel);
+            const isTodayDate = isAptToday(apt.date);
+            const niceDate = formatAptDateDE(apt.date);
+
+            let prioClass = 'prio-normal';
+            let badgeText = '📅 Geplant';
+            let statusCat = 'planned';
+
+            if (isDone) {
+                prioClass = 'prio-done';
+                badgeText = '✅ Erledigt';
+                statusCat = 'done';
+            } else if (isLabo) {
+                prioClass = 'prio-labo';
+                badgeText = curStep === 3 ? '🪪 Schilder bereit' : '🏛️ Beim LABO';
+                statusCat = isTodayDate ? 'today' : 'planned';
+            } else if (isExpired) {
+                prioClass = 'prio-expired';
+                badgeText = '⌛ Zeit vorbei';
+                statusCat = 'expired';
+            } else if (isTodayDate) {
+                prioClass = 'prio-high';
+                badgeText = '🔥 Heute Fällig';
+                statusCat = 'today';
+            }
+
+            const markedClass = apt.marked ? 'marked' : '';
+            const card = document.createElement('div');
+            card.className = `admin-apt-card ${prioClass} ${markedClass}`;
+            card.id = id;
+            card.setAttribute('data-status-cat', statusCat);
+            card.setAttribute('data-pinned', apt.marked ? 'true' : 'false');
+            card.setAttribute('data-labo', isLabo ? 'true' : 'false');
+
+            const resolvedCode = apt.trackingCode || ((apt.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '';
+
+            // Automatisch erzeugte Doppel-Notizen ausblenden, wenn sie schon oben als farbige Badges stehen
+            let notesHtml = '';
+            if (apt.notes && apt.notes.length > 0) {
+                apt.notes.forEach(note => {
+                    const t = String(note.text || '');
+                    const isDupCode = resolvedCode && t.includes(resolvedCode) && note.timeStr === 'Automatisch vergeben';
+                    const isDupPlate = apt.wunschkennzeichen && t.includes(apt.wunschkennzeichen) && note.timeStr === 'Bei Buchung gewählt';
+                    const isDupHint = apt.customNote && t.includes(apt.customNote) && note.timeStr === 'Bei Buchung angegeben';
+                    if (isDupCode || isDupPlate || isDupHint) return;
+
+                    notesHtml += `
+                        <div class="saved-note-row" id="note-${note.id}">
+                            <div style="flex:1;">
+                                <span class="note-text-body">${window.escHtml(note.text)}</span>
+                                <span class="note-meta">${window.escHtml(note.timeStr || '')}</span>
+                            </div>
+                            <div class="note-row-actions">
+                                <button class="note-row-btn" onclick="window.triggerEditNote('note-${note.id}', '${id}')" title="Notiz bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                                <button class="note-row-btn del" onclick="window.triggerDeleteNote('note-${note.id}', '${id}')" title="Notiz löschen"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const displayTime = apt.timeLabel === "Ganztägig"
+                ? "Ganztägig"
+                : (apt.timeLabel && apt.timeLabel.includes("Uhr") ? apt.timeLabel : (apt.timeLabel || '') + " Uhr");
+            const createdStr = apt.timestamp
+                ? `Gebucht: ${new Date(apt.timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} • ${new Date(apt.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`
+                : '';
+
+            const categoryTag = apt.category
+                ? `<span style="font-size:9.5px; background:var(--bg-input); border:1px solid var(--glass-border); padding:2px 8px; border-radius:6px; color:var(--text-muted); font-weight:800;">${window.escHtml(apt.category)}</span>`
+                : '';
+            const pinnedBadgeIndicator = apt.marked
+                ? `<span style="font-size:9.5px; background:#f5c542; color:#000; padding:2px 7px; border-radius:6px; font-weight:900;"><i class="fa-solid fa-thumbtack"></i> GEPINNT</span>`
+                : '';
+            const codeBadgeIndicator = resolvedCode
+                ? `<span class="apt-code-chip" onclick="navigator.clipboard?.writeText('${resolvedCode}'); window.showToast('Auftrags-Code ${resolvedCode} kopiert!', 'success');" title="Klicken zum Kopieren"><i class="fa-solid fa-satellite-dish"></i> ${window.escHtml(resolvedCode)}</span>`
+                : '';
+
+            const highlightPills = [
+                apt.wunschkennzeichen ? `<span class="apt-plate-pill"><i class="fa-solid fa-id-card"></i> ${window.escHtml(apt.wunschkennzeichen)}</span>` : '',
+                apt.customNote ? `<span class="apt-hint-pill"><i class="fa-solid fa-tag"></i> ${window.escHtml(apt.customNote)}</span>` : ''
+            ].filter(Boolean).join('');
+
+            let callBtn = '';
+            let waConfirmBtn = '';
+            const cleanDigits = (apt.phone || '').replace(/\D/g, '');
+            if (cleanDigits.length >= 5) {
+                const waNumber = cleanDigits.replace(/^0/, '49');
+                callBtn = `<a href="tel:${window.escHtml(apt.phone)}" class="apt-btn call-btn" title="Kunden direkt anrufen"><i class="fa-solid fa-phone"></i></a>`;
+                const platePart = apt.wunschkennzeichen ? ` (${apt.wunschkennzeichen})` : '';
+                const codePart = resolvedCode ? ` | Auftrags-Code: ${resolvedCode}` : '';
+                const waText = curStep >= 3
+                    ? `Hallo ${apt.name}, gute Nachricht von Ihrem RED Zulassungsdienst Berlin! Ihre Zulassung (${apt.service}${platePart}) ist fertig und abholbereit in der Kienitzer Str. 6, 12053 Berlin (Mo–Fr 09:00–20:00 Uhr).`
+                    : `Hallo ${apt.name}, hier ist Ihr RED Zulassungsdienst Berlin. Wir bestätigen Ihren Termin am ${niceDate} um ${displayTime} (${apt.service}${platePart}${codePart}). Bitte bringen Sie alle Originalunterlagen mit. Adresse: Kienitzer Str. 6, 12053 Berlin.`;
+                waConfirmBtn = `<a href="https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener noreferrer" class="apt-btn wa-confirm" title="${curStep >= 3 ? 'Abholbereit per WhatsApp melden' : 'Termin per WhatsApp bestätigen'}"><i class="fa-brands fa-whatsapp"></i></a>`;
+            }
+
+            const emailCell = (apt.email && apt.email.includes('@'))
+                ? `<a href="mailto:${window.escHtml(apt.email)}" title="${window.escHtml(apt.email)}">${window.escHtml(apt.email)}</a>`
+                : window.escHtml(apt.email || '-');
+            const phoneCell = cleanDigits.length >= 5
+                ? `<a href="tel:${window.escHtml(apt.phone)}">${window.escHtml(apt.phone)}</a>`
+                : window.escHtml(apt.phone || '-');
+
+            card.innerHTML = `
+                <div class="apt-head-row">
+                    <div class="apt-badges-group">
+                        <div class="prio-badge">${badgeText}</div>
+                        ${codeBadgeIndicator}
+                        ${categoryTag}
+                        ${pinnedBadgeIndicator}
+                    </div>
+                    <div class="apt-actions-horizontal">
+                        ${callBtn}
+                        ${waConfirmBtn}
+                        <button type="button" class="apt-btn crm-sync mod-crm" onclick="window.openClientInCrmFromApt('${id}')" title="Kundenakte im CRM öffnen / sichern"><i class="fa-solid fa-address-book"></i></button>
+                        <button type="button" class="apt-btn done-btn" onclick="window.setAptOrderStatus('${id}', ${isDone ? 1 : 4})" title="${isDone ? 'Wieder als Offen zurückholen' : 'Als Erledigt abschließen & ins Archiv verschieben'}"><i class="fa-solid ${isDone ? 'fa-rotate-left' : 'fa-check'}"></i></button>
+                        <button type="button" class="apt-btn mark ${apt.marked ? 'is-pinned' : ''}" onclick="window.markApt('${id}', ${!apt.marked})" title="${apt.marked ? 'Von Pinnwand lösen' : 'Auf Bildschirm anheften'}"><i class="fa-solid fa-thumbtack"></i></button>
+                        <button type="button" class="apt-btn edit" onclick="window.editAptNotes('${id}')" title="Notiz hinzufügen"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="apt-btn edit" style="border-color:#007aff; color:#007aff;" onclick="window.openEditAptModal('${id}')" title="Termin verschieben"><i class="fa-solid fa-calendar-day"></i></button>
+                        <button type="button" class="apt-btn delete" onclick="window.deleteApt('${id}')" title="Termin löschen"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+
+                <div class="apt-title-row">
+                    <h4>${window.escHtml(apt.service)}</h4>
+                    ${createdStr ? `<span class="apt-meta-time">${createdStr}</span>` : ''}
+                </div>
+                ${highlightPills ? `<div class="apt-highlight-row">${highlightPills}</div>` : ''}
+
+                <div class="apt-grid-info">
+                    <div><i class="fa-solid fa-user"></i> <span>${window.escHtml(apt.name)}</span></div>
+                    <div><i class="fa-solid fa-clock"></i> <strong>${window.escHtml(niceDate)}</strong> • ${window.escHtml(displayTime)}</div>
+                    <div><i class="fa-solid fa-phone"></i> ${phoneCell}</div>
+                    <div><i class="fa-solid fa-envelope"></i> ${emailCell}</div>
+                </div>
+
+                <div class="apt-status-bar">
+                    <button type="button" class="status-pill-btn step-1 ${curStep===1?'active':''}" onclick="window.setAptOrderStatus('${id}', 1)">1. Erfasst</button>
+                    <button type="button" class="status-pill-btn step-2 ${curStep===2?'active':''}" onclick="window.setAptOrderStatus('${id}', 2)">2. Beim LABO</button>
+                    <button type="button" class="status-pill-btn step-3 ${curStep===3?'active':''}" onclick="window.setAptOrderStatus('${id}', 3)">3. Schilder geprägt</button>
+                    <button type="button" class="status-pill-btn step-4 ${curStep===4?'active':''}" onclick="window.setAptOrderStatus('${id}', 4)">4. Abgeschlossen</button>
+                </div>
+
+                ${notesHtml ? `<div class="notes-list-box" id="notes-container-${id}">${notesHtml}</div>` : `<div class="notes-list-box" id="notes-container-${id}"></div>`}
+                <input type="text" class="admin-note-input" id="note-input-${id}" placeholder="Interne Notiz eingeben und Enter drücken..." onkeypress="window.saveNote(event, this, '${id}')">
+            `;
+
+            // Pinnwand-Kennzeichen (nur für angeheftete Aufträge)
+            if (apt.marked && ctx.pinContainer) {
+                const plate = document.createElement('div');
+                let plateStateClass = 'normal-day';
+                if (isExpired || isDone) plateStateClass = 'expired-plate';
+                else if (isTodayDate) plateStateClass = 'urgent-today';
+
+                plate.className = `pinned-plate ${plateStateClass}`;
+                plate.id = 'pinned-' + id;
+                plate.title = 'Mit Maus oder Finger frei über den Bildschirm ziehen';
+                plate.innerHTML = `
+                    <i class="fa-solid fa-thumbtack pin-gold-dot"></i>
+                    <span style="font-size:12.5px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${window.escHtml(apt.name)}</span>
+                    <div class="tuev-plakette" style="margin: 0 4px;">${ctx.shortYear}</div>
+                    <span style="font-size:9.5px; font-weight:bold; pointer-events:none; white-space:nowrap; line-height:1.15;">${niceDate}<br>${displayTime}</span>
+                    <button type="button" class="unpin-plate-btn" onclick="event.stopPropagation(); window.markApt('${id}', false)" title="Von Pinnwand lösen">×</button>
+                `;
+
+                if (ctx.savedPositions[id] && ctx.savedPositions[id].top && ctx.savedPositions[id].left) {
+                    plate.style.top = ctx.savedPositions[id].top;
+                    plate.style.left = ctx.savedPositions[id].left;
+                } else {
+                    const existingPinsCount = ctx.pinContainer.querySelectorAll('.pinned-plate').length;
+                    plate.style.top = Math.max(90, window.innerHeight - 85 - (existingPinsCount * 54)) + 'px';
+                    plate.style.left = Math.max(12, window.innerWidth - 260) + 'px';
+                }
+                ctx.pinContainer.appendChild(plate);
+                window.makeDraggable(plate, id);
+            }
+
+            return card;
+        }
+
         function renderAppointments(apts) {
             window.redApts = apts;
             if (!window.isAuthorized) return;
             const list = document.getElementById('admin-list');
-            if(!list) return;
+            if (!list) return;
             list.innerHTML = '';
             const pinContainer = document.getElementById('pinned-container');
-            if(pinContainer) pinContainer.innerHTML = '';
+            if (pinContainer) pinContainer.innerHTML = '';
 
             let hasPrio = false;
             let todayCount = 0;
@@ -10851,189 +11697,117 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 list.innerHTML = '<p style="font-size:12px; color:var(--text-muted); text-align:center; margin-top:20px;">Keine Termine im System.</p>';
                 updateBadgeDisplay(false, 0);
                 ['kpiTotalApts','kpiTodayApts','kpiPlannedApts','kpiExpiredApts','kpiLaboApts','kpiDoneApts','kpiPinnedApts'].forEach(k => {
-                    if(document.getElementById(k)) document.getElementById(k).innerText = '0';
+                    if (document.getElementById(k)) document.getElementById(k).innerText = '0';
                 });
                 return;
             }
 
-            let savedPositions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
-            const shortYear = String(window.getDynamicSystemYear()).slice(-2);
-            const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const todayStrAlt = new Date().toLocaleDateString('de-DE');
+            const openApts = [];
+            const doneApts = [];
 
             apts.forEach((apt) => {
-                const id = apt.id;
                 const curStep = Number(apt.orderStatus) || 1;
                 const isDone = (curStep === 4);
-                const isLabo = (curStep === 2 || curStep === 3);
+                const isLabo = (!isDone && (curStep === 2 || curStep === 3));
                 const isExpired = isAptExpired(apt.date, apt.timeLabel);
-                const isTodayDate = (apt.date === todayStr || apt.date === todayStrAlt);
+                const isTodayDate = isAptToday(apt.date);
 
-                let prioClass = 'prio-normal';
-                let badgeText = '📅 Geplant';
-                let statusCat = 'planned';
-
-                if (isDone) {
-                    prioClass = 'prio-done';
-                    badgeText = '✅ Abgeschlossen';
-                    statusCat = 'done';
-                    doneCount++;
-                } else if (isExpired) {
-                    prioClass = 'prio-expired';
-                    badgeText = '⌛ Zeit vorbei';
-                    statusCat = 'expired';
-                    expiredCount++;
-                } else if (isTodayDate) {
-                    prioClass = 'prio-high';
-                    badgeText = '🔥 Heute Fällig';
-                    statusCat = 'today';
-                    todayCount++;
-                    hasPrio = true;
-                } else {
-                    prioClass = 'prio-normal';
-                    badgeText = '📅 Geplant';
-                    statusCat = 'planned';
-                    plannedCount++;
-                }
-
-                if (isLabo) laboCount++;
                 if (apt.marked) pinnedCount++;
-                
-                const markedClass = apt.marked ? 'marked' : '';
-
-                const card = document.createElement('div');
-                card.className = `admin-apt-card ${prioClass} ${markedClass}`;
-                card.id = id;
-                card.setAttribute('data-status-cat', statusCat);
-                card.setAttribute('data-pinned', apt.marked ? 'true' : 'false');
-                card.setAttribute('data-labo', isLabo ? 'true' : 'false');
-                
-                let notesHtml = '';
-                if(apt.notes && apt.notes.length > 0) {
-                    apt.notes.forEach(note => {
-                        notesHtml += `
-                            <div class="saved-note-row" id="note-${note.id}">
-                                <div style="flex:1;">
-                                    <span class="note-text-body">${window.escHtml(note.text)}</span>
-                                    <span class="note-meta">${note.timeStr}</span>
-                                </div>
-                                <div class="note-row-actions">
-                                    <button class="note-row-btn" onclick="window.triggerEditNote('note-${note.id}', '${id}')" title="Notiz bearbeiten"><i class="fa-solid fa-pencil"></i></button>
-                                    <button class="note-row-btn del" onclick="window.triggerDeleteNote('note-${note.id}', '${id}')" title="Notiz löschen"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-
-                const displayTime = apt.timeLabel === "Ganztägig" ? "Ganztägig" : (apt.timeLabel && apt.timeLabel.includes("Uhr") ? apt.timeLabel : (apt.timeLabel || '') + " Uhr");
-                const categoryTag = apt.category ? `<span style="font-size:9px; background:var(--bg-input); border:1px solid var(--glass-border); padding:2px 7px; border-radius:4px; color:var(--text-muted); font-weight:700;">${window.escHtml(apt.category)}</span>` : '';
-                const plateBanner = apt.wunschkennzeichen ? `<div style="font-size:11px; color:#007aff; background:rgba(0,122,255,0.08); padding:6px 10px; border-radius:8px; font-weight:800;"><i class="fa-solid fa-id-card"></i> Wunschkennzeichen: ${window.escHtml(apt.wunschkennzeichen)}</div>` : '';
-                const customNoteBanner = plateBanner + (apt.customNote ? `<div style="font-size:11px; color:var(--primary-red); background:rgba(230,0,0,0.06); padding:6px 10px; border-radius:8px; font-weight:700;"><i class="fa-solid fa-tag"></i> ${window.escHtml(apt.customNote)}</div>` : '');
-                const pinnedBadgeIndicator = apt.marked ? `<span style="font-size:9px; background:#f5c542; color:#000; padding:2px 7px; border-radius:4px; font-weight:900;"><i class="fa-solid fa-thumbtack"></i> GEPINNT</span>` : '';
-                const resolvedCode = apt.trackingCode || ((apt.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '';
-                const codeBadgeIndicator = resolvedCode ? `<span onclick="navigator.clipboard?.writeText('${resolvedCode}'); window.showToast('Auftrags-Code ${resolvedCode} kopiert!', 'success');" title="Klicken zum Kopieren" style="cursor:pointer; font-size:9.5px; background:rgba(217,0,0,0.1); border:1px solid rgba(217,0,0,0.35); color:var(--primary-red); padding:2px 8px; border-radius:4px; font-weight:900; font-family:'Courier New', monospace;"><i class="fa-solid fa-satellite-dish"></i> ${window.escHtml(resolvedCode)}</span>` : '';
-
-                let waConfirmBtn = '';
-                if(apt.phone) {
-                    let cleanPhone = apt.phone.replace(/\D/g, '').replace(/^0/, '49');
-                    const platePart = apt.wunschkennzeichen ? ` | Wunschkennzeichen: ${apt.wunschkennzeichen}` : '';
-                    const codePart = resolvedCode ? ` | Ihr Live-Tracker-Code: ${resolvedCode}` : '';
-                    let msg = encodeURIComponent(`Hallo ${apt.name}, hier ist Ihr RED Zulassungsdienst Berlin. Wir bestätigen Ihren Termin am ${apt.date} um ${displayTime} (${apt.service}${platePart}${codePart}). Bitte bringen Sie alle Originalunterlagen mit. Adresse: Kienitzer Str. 6, 12053 Berlin.`);
-                    waConfirmBtn = `<a href="https://wa.me/${cleanPhone}?text=${msg}" target="_blank" rel="noopener noreferrer" class="apt-btn wa-confirm" title="Termin per WhatsApp bestätigen"><i class="fa-brands fa-whatsapp"></i></a>`;
-                }
-
-                card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
-                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                            <div class="prio-badge">${badgeText}</div>
-                            ${codeBadgeIndicator}
-                            ${categoryTag}
-                            ${pinnedBadgeIndicator}
-                        </div>
-                        <div class="apt-actions-horizontal">
-                            ${waConfirmBtn}
-                            <button class="apt-btn" style="color:var(--green-accent); border-color:var(--green-border);" onclick="window.setAptOrderStatus('${id}', ${isDone ? 1 : 4})" title="${isDone ? 'Wieder öffnen' : 'Sofort als Abgeschlossen markieren'}"><i class="fa-solid fa-check"></i></button>
-                            <button class="apt-btn mark ${apt.marked ? 'is-pinned' : ''}" onclick="window.markApt('${id}', ${!apt.marked})" title="${apt.marked ? 'Gepinnt (Gelb markiert) – Klicken zum Abheften' : 'Auf Bildschirm anheften'}"><i class="fa-solid fa-thumbtack"></i></button>
-                            <button class="apt-btn edit" onclick="window.editAptNotes('${id}')" title="Notiz hinzufügen"><i class="fa-solid fa-pen"></i></button>
-                            <button class="apt-btn edit" style="border-color:#007aff; color:#007aff;" onclick="window.openEditAptModal('${id}')" title="Termin verschieben"><i class="fa-solid fa-calendar-day"></i></button>
-                            <button class="apt-btn delete" onclick="window.deleteApt('${id}')" title="Termin löschen"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap;">
-                        <h4 style="font-size:14px; margin:0; color:var(--text-light); text-transform:uppercase; font-weight:900;">${window.escHtml(apt.service)}</h4>
-                    </div>
-                    ${customNoteBanner}
-                    
-                    <div class="apt-grid-info">
-                        <div><i class="fa-solid fa-user"></i> ${window.escHtml(apt.name)}</div>
-                        <div><i class="fa-solid fa-clock"></i> ${window.escHtml(apt.date)} • ${window.escHtml(displayTime)}</div>
-                        <div><i class="fa-solid fa-phone"></i> ${window.escHtml(apt.phone || '-')}</div>
-                        <div><i class="fa-solid fa-envelope"></i> ${window.escHtml(apt.email)}</div>
-                    </div>
-
-                    <div class="apt-status-bar">
-                        <button type="button" class="status-pill-btn ${curStep===1?'active':''}" onclick="window.setAptOrderStatus('${id}', 1)">1. Erfasst</button>
-                        <button type="button" class="status-pill-btn ${curStep===2?'active':''}" onclick="window.setAptOrderStatus('${id}', 2)">2. Beim LABO</button>
-                        <button type="button" class="status-pill-btn ${curStep===3?'active':''}" onclick="window.setAptOrderStatus('${id}', 3)">3. Schilder geprägt</button>
-                        <button type="button" class="status-pill-btn done-ready ${curStep===4?'active':''}" onclick="window.setAptOrderStatus('${id}', 4)">4. Abgeschlossen</button>
-                    </div>
-                    
-                    <div class="notes-list-box" id="notes-container-${id}">${notesHtml}</div>
-                    <input type="text" class="admin-note-input" id="note-input-${id}" placeholder="Notiz eingeben und Enter drücken..." onkeypress="window.saveNote(event, this, '${id}')">
-                `;
-                list.appendChild(card);
-
-                // FREI BEWEGLICHES PINNWAND-KENNZEICHEN MIT GELB-GOLDENEM PIN-SYMBOL & ABHEFT-"×"
-                if (apt.marked && pinContainer) {
-                    const plate = document.createElement('div');
-                    let plateStateClass = 'normal-day';
-                    if (isExpired || isDone) {
-                        plateStateClass = 'expired-plate';
-                    } else if (isTodayDate) {
-                        plateStateClass = 'urgent-today';
-                    }
-                    plate.className = `pinned-plate ${plateStateClass}`;
-                    plate.id = 'pinned-' + id;
-                    plate.title = 'Mit Maus oder Finger frei über den Bildschirm ziehen';
-                    
-                    const tuev = `<div class="tuev-plakette" style="margin: 0 4px;">${shortYear}</div>`;
-                    plate.innerHTML = `
-                        <i class="fa-solid fa-thumbtack pin-gold-dot"></i>
-                        <span style="font-size:12.5px; font-family:'Courier New', monospace; font-weight:bold; pointer-events:none; white-space:nowrap;">${window.escHtml(apt.name)}</span>
-                        ${tuev}
-                        <span style="font-size:9.5px; font-weight:bold; pointer-events:none; white-space:nowrap; line-height:1.15;">${apt.date}<br>${displayTime}</span>
-                        <button type="button" class="unpin-plate-btn" onclick="event.stopPropagation(); window.markApt('${id}', false)" title="Von Pinnwand lösen">×</button>
-                    `;
-                    
-                    if(savedPositions[id] && savedPositions[id].top && savedPositions[id].left) {
-                        plate.style.top = savedPositions[id].top;
-                        plate.style.left = savedPositions[id].left;
-                    } else {
-                        const existingPinsCount = pinContainer.querySelectorAll('.pinned-plate').length;
-                        const defaultTop = Math.max(90, window.innerHeight - 85 - (existingPinsCount * 54));
-                        const defaultLeft = Math.max(12, window.innerWidth - 260);
-                        plate.style.top = defaultTop + 'px';
-                        plate.style.left = defaultLeft + 'px';
-                    }
-
-                    pinContainer.appendChild(plate);
-                    window.makeDraggable(plate, id);
+                if (isDone) {
+                    doneCount++;
+                    doneApts.push(apt);
+                } else {
+                    openApts.push(apt);
+                    if (isLabo) laboCount++;
+                    if (isExpired && !isLabo) expiredCount++;
+                    else if (isTodayDate) { todayCount++; hasPrio = true; }
+                    else plannedCount++;
                 }
             });
 
-            if(document.getElementById('kpiTotalApts')) document.getElementById('kpiTotalApts').innerText = apts.length;
-            if(document.getElementById('kpiTodayApts')) document.getElementById('kpiTodayApts').innerText = todayCount;
-            if(document.getElementById('kpiPlannedApts')) document.getElementById('kpiPlannedApts').innerText = plannedCount;
-            if(document.getElementById('kpiExpiredApts')) document.getElementById('kpiExpiredApts').innerText = expiredCount;
-            if(document.getElementById('kpiLaboApts')) document.getElementById('kpiLaboApts').innerText = laboCount;
-            if(document.getElementById('kpiDoneApts')) document.getElementById('kpiDoneApts').innerText = doneCount;
-            if(document.getElementById('kpiPinnedApts')) document.getElementById('kpiPinnedApts').innerText = pinnedCount;
-            if(document.getElementById('kpiTotalCrm')) document.getElementById('kpiTotalCrm').innerText = Object.keys(window.crmClientsDetail || {}).length;
+            // Intelligente Sortierung für offene Vorgänge
+            const sortMode = window.adminLeadSortMode || 'priority';
+            openApts.sort((a, b) => {
+                if (sortMode === 'newest') return (b.timestamp || 0) - (a.timestamp || 0);
+                if (sortMode === 'date') return getAptTimestamp(a.date, a.timeLabel) - getAptTimestamp(b.date, b.timeLabel);
+                // Dringlichkeit: Gepinnt & Heute zuerst, dann Beim LABO, dann Geplant, dann Zeit vorbei
+                const rank = (x) => {
+                    if (x.marked) return 0;
+                    if (isAptToday(x.date) && !isAptExpired(x.date, x.timeLabel)) return 1;
+                    if (Number(x.orderStatus) === 2 || Number(x.orderStatus) === 3) return 2;
+                    if (!isAptExpired(x.date, x.timeLabel)) return 3;
+                    return 4;
+                };
+                const rDiff = rank(a) - rank(b);
+                if (rDiff !== 0) return rDiff;
+                return (b.timestamp || 0) - (a.timestamp || 0);
+            });
 
-            const openCount = apts.filter(a => Number(a.orderStatus) !== 4).length;
-            updateBadgeDisplay(hasPrio, openCount);
+            doneApts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            const ctx = {
+                pinContainer,
+                savedPositions: JSON.parse(localStorage.getItem('pin_positions') || '{}'),
+                shortYear: String(window.getDynamicSystemYear()).slice(-2)
+            };
+
+            // 1. BEREICH: OFFENE & AKTIVE AUFTRÄGE
+            const openWrap = document.createElement('div');
+            openWrap.id = 'adminOpenSectionWrap';
+            openWrap.innerHTML = `
+                <div class="admin-section-divider">
+                    <span><i class="fa-solid fa-fire-flame-curved" style="color:var(--primary-red);"></i> Offene &amp; Aktive Vorgänge</span>
+                    <span class="admin-section-count">${openApts.length} offen</span>
+                </div>
+                <div class="admin-cards-stack" id="adminOpenStack"></div>
+                <div id="adminOpenEmptyHint" style="display:none; text-align:center; padding:18px; font-size:12px; color:var(--text-muted); background:var(--bg-input); border-radius:12px; margin-top:6px;">
+                    <i class="fa-solid fa-circle-check" style="color:var(--green-accent); font-size:18px; display:block; margin-bottom:5px;"></i>
+                    Alle offenen Aufträge in dieser Ansicht sind erledigt!
+                </div>
+            `;
+            list.appendChild(openWrap);
+
+            const openStack = openWrap.querySelector('#adminOpenStack');
+            openApts.forEach(apt => openStack.appendChild(buildAdminAppointmentCard(apt, ctx)));
+
+            // 2. BEREICH: EINGEKLAPPTES ARCHIV FÜR ERLEDIGTE AUFTRÄGE
+            const archiveEl = document.createElement('details');
+            archiveEl.id = 'adminCompletedArchive';
+            archiveEl.className = 'admin-archive-details';
+            archiveEl.innerHTML = `
+                <summary>
+                    <span style="display:inline-flex; align-items:center; gap:7px;">
+                        <i class="fa-solid fa-box-archive"></i>
+                        <span>Erledigte Aufträge (Archiv)</span>
+                        <span class="admin-section-count" style="background:var(--bg-card); color:var(--green-accent); border-color:var(--green-border);">${doneApts.length}</span>
+                    </span>
+                    <span style="display:inline-flex; align-items:center; gap:6px; font-size:10.5px; color:var(--text-muted); font-weight:700;">
+                        <span>Im Kunden-CRM gesichert</span>
+                        <i class="fa-solid fa-chevron-down archive-chevron"></i>
+                    </span>
+                </summary>
+                <div class="admin-archive-body" id="adminArchiveStack"></div>
+            `;
+            list.appendChild(archiveEl);
+
+            const archiveStack = archiveEl.querySelector('#adminArchiveStack');
+            if (doneApts.length === 0) {
+                archiveStack.innerHTML = '<p style="font-size:11.5px; color:var(--text-muted); text-align:center; padding:8px 0;">Noch keine abgeschlossenen Aufträge im Archiv.</p>';
+            } else {
+                doneApts.forEach(apt => archiveStack.appendChild(buildAdminAppointmentCard(apt, ctx)));
+            }
+
+            // KPI-Zähler aktualisieren (erste Kachel zeigt jetzt direkt die offenen Vorgänge)
+            if (document.getElementById('kpiTotalApts')) document.getElementById('kpiTotalApts').innerText = openApts.length;
+            if (document.getElementById('kpiTodayApts')) document.getElementById('kpiTodayApts').innerText = todayCount;
+            if (document.getElementById('kpiPlannedApts')) document.getElementById('kpiPlannedApts').innerText = plannedCount;
+            if (document.getElementById('kpiExpiredApts')) document.getElementById('kpiExpiredApts').innerText = expiredCount;
+            if (document.getElementById('kpiLaboApts')) document.getElementById('kpiLaboApts').innerText = laboCount;
+            if (document.getElementById('kpiDoneApts')) document.getElementById('kpiDoneApts').innerText = doneCount;
+            if (document.getElementById('kpiPinnedApts')) document.getElementById('kpiPinnedApts').innerText = pinnedCount;
+            if (document.getElementById('kpiTotalCrm')) document.getElementById('kpiTotalCrm').innerText = Object.keys(window.crmClientsDetail || {}).length;
+
+            updateBadgeDisplay(hasPrio, openApts.length);
             window.filterAdminLeads();
         }
 
