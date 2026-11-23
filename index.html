@@ -1403,20 +1403,231 @@
         
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 5%; box-sizing: border-box; }
 
-        .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 5%; box-sizing: border-box; }
-        .download-item { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-card); padding: 25px; border-radius: var(--global-radius); border: 1px solid var(--glass-border); transition: 0.3s; position: relative; cursor: pointer; user-select: none; box-shadow: var(--card-shadow); }
-        .download-item:hover { transform: translateY(-5px); border-color: var(--primary-red); box-shadow: var(--argon-glow); }
-        .download-info { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; margin-bottom: 20px; }
-        .download-info i { font-size: 35px; color: var(--primary-red); transition: 0.3s; }
-        .download-item:hover .download-info i { transform: scale(1.1); }
-        .download-info span { font-size: 15px; font-weight: 800; white-space: normal; line-height: 1.3; color: var(--text-light); }
-        .download-actions { width: 100%; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--glass-border); padding-top: 15px; flex-wrap: wrap; }
-        .download-actions i { font-size: 14px; padding: 8px 11px; border-radius: 8px; background: var(--bg-input); color: var(--text-light); border: 1px solid var(--glass-border); transition: 0.3s; }
-        .download-actions i.user-view:hover { background: #007aff; color: #fff; border-color: #007aff; }
-        .download-actions i.user-dl:hover { background: #25D366; color: #000; border-color: #25D366; }
-        .download-actions i.action-forms.fa-pen:hover { background: #25D366; color: #000; }
-        .download-actions i.action-forms.fa-upload:hover { background: #ff9500; color: #fff; }
-        .download-actions i.action-forms.fa-trash-can:hover { background: #ff3b30; color: #fff; }
+        .forms-toolbar-wrap {
+            max-width: 1180px;
+            width: calc(100% - 10%);
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-left: 3.5px solid var(--primary-red);
+            border-radius: 14px;
+            padding: 12px 16px;
+            box-shadow: var(--card-shadow);
+        }
+        .forms-search-box {
+            position: relative;
+            flex: 1 1 260px;
+            min-width: 220px;
+        }
+        .forms-search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+            pointer-events: none;
+        }
+        .forms-search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px !important;
+            border-radius: 10px !important;
+            font-size: 13px !important;
+        }
+        .forms-count-pill {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            padding: 7px 12px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .forms-count-pill strong { color: var(--primary-red); }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+            max-width: 1180px;
+            width: calc(100% - 10%);
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .download-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: var(--bg-card);
+            padding: 20px 20px 16px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            border-top: 3px solid var(--glass-border);
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: var(--card-shadow);
+        }
+        .download-item:hover {
+            transform: translateY(-3px);
+            border-color: rgba(217, 0, 0, 0.45);
+            border-top-color: var(--primary-red);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+        }
+        .download-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            width: 100%;
+            margin-bottom: 18px;
+        }
+        .form-doc-icon-box {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 11px;
+            background: rgba(217, 0, 0, 0.08);
+            border: 1px solid rgba(217, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.22s ease;
+        }
+        .download-item:hover .form-doc-icon-box {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+        .form-doc-icon-box i {
+            font-size: 20px;
+            color: var(--primary-red);
+            transition: 0.22s ease;
+        }
+        .download-item:hover .form-doc-icon-box i {
+            color: #ffffff;
+        }
+        .form-doc-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            min-width: 0;
+            flex: 1;
+            text-align: left;
+        }
+        .form-doc-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            line-height: 1.3;
+            color: var(--text-light);
+            word-break: break-word;
+        }
+        .form-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            line-height: 1.3;
+        }
+        .form-status-pill i {
+            font-size: 11px !important;
+        }
+        .form-status-pill.is-ready {
+            background: var(--green-bg-soft);
+            color: var(--green-accent);
+        }
+        .form-status-pill.is-empty {
+            background: var(--bg-input);
+            color: var(--text-muted);
+        }
+        .download-actions {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 13px;
+            flex-wrap: wrap;
+        }
+        .form-user-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-left: auto;
+        }
+        .form-admin-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .form-user-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 11px !important;
+            font-weight: 800;
+            background: var(--bg-input);
+            color: var(--text-light);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .form-user-btn i { font-size: 12px; }
+        .form-user-btn.user-view:hover {
+            border-color: #007aff;
+            color: #007aff;
+            background: rgba(0, 122, 255, 0.08);
+        }
+        .form-user-btn.user-dl {
+            background: #14141c;
+            color: #ffffff;
+            border-color: #14141c;
+        }
+        body:not([data-theme^="light"]) .form-user-btn.user-dl {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+        .form-user-btn.user-dl:hover {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: #ffffff;
+        }
+        .download-actions i.action-forms {
+            font-size: 12px;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            background: var(--bg-input);
+            color: var(--text-light);
+            border: 1px solid var(--glass-border);
+            transition: 0.2s;
+        }
+        .download-actions i.action-forms.fa-pen:hover { background: #25D366; color: #000; border-color: #25D366; }
+        .download-actions i.action-forms.fa-link:hover { background: #007aff; color: #fff; border-color: #007aff; }
+        .download-actions i.action-forms.fa-upload:hover { background: #ff9500; color: #fff; border-color: #ff9500; }
+        .download-actions i.action-forms.fa-trash-can:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
+        @media (max-width: 768px) {
+            .forms-toolbar-wrap, .download-grid { width: calc(100% - 8%); }
+            .download-grid { grid-template-columns: 1fr; gap: 12px; }
+            .download-item { padding: 16px; }
+        }
 
         .auto-ankauf-box { background: var(--bg-card); border: 1px solid var(--glass-border); border-top: 3px solid var(--gold-border); border-bottom: 3px solid var(--gold-border); text-align: center; padding: 40px 30px; border-radius: var(--global-radius); max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; box-sizing: border-box; box-shadow: var(--card-shadow); }
         .vintage-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; max-width: 850px; margin: 0 auto; padding: 0 5%; box-sizing: border-box; }
@@ -2683,6 +2894,169 @@
             body.is-supervisor .desktop-header-nav {
                 display: none !important;
             }
+        }
+
+        /* =========================================================================
+           VIP AUTO ANKAUF SHOWROOM-STYLES (HELL- & DUNKELMODUS KOMPATIBEL)
+           ========================================================================= */
+        .ankauf-showroom-wrap {
+            max-width: 980px;
+            width: calc(100% - 10%);
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .ankauf-hero-card {
+            max-width: 100% !important;
+            width: 100%;
+            background: var(--bg-card);
+            border: 1.5px solid var(--gold-border) !important;
+            border-top: 4px solid var(--gold-border) !important;
+            border-radius: var(--global-radius);
+            padding: 36px 28px 30px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            text-align: center;
+        }
+        .ankauf-vip-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--gold-bg-soft);
+            border: 1px solid var(--gold-border);
+            color: var(--gold-accent);
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 10.5px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            margin-bottom: 14px;
+        }
+        .ankauf-perks-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-top: 22px;
+            text-align: left;
+        }
+        .ankauf-perk-item {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 13px 12px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .ankauf-perk-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold-border);
+        }
+        .ankauf-perk-item i {
+            font-size: 17px;
+            color: var(--gold-accent);
+            margin-bottom: 6px;
+            display: block;
+        }
+        .ankauf-perk-item strong {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--text-light);
+            line-height: 1.25;
+            margin-bottom: 3px;
+        }
+        .ankauf-perk-item span {
+            display: block;
+            font-size: 10.5px;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+        .ankauf-cond-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin: 8px 0 16px;
+        }
+        .ankauf-cond-pill {
+            background: var(--bg-input);
+            border: 1.5px solid var(--glass-border);
+            color: var(--text-light);
+            padding: 7px 12px;
+            border-radius: 50px;
+            font-size: 11px !important;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ankauf-cond-pill i {
+            color: var(--gold-accent);
+        }
+        .ankauf-cond-pill:hover,
+        .ankauf-cond-pill.active {
+            background: var(--gold-bg-soft);
+            border-color: var(--gold-border);
+            color: var(--gold-accent);
+        }
+        .ankauf-cta-row {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .ankauf-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 26px;
+        }
+        .ankauf-step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: left;
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+        .ankauf-step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gold-bg-soft);
+            border: 1.5px solid var(--gold-border);
+            color: var(--gold-accent);
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        .ankauf-trust-strip {
+            margin-top: 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--green-border);
+            border-radius: 14px;
+            padding: 15px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            text-align: left;
+            box-shadow: var(--card-shadow);
+        }
+        @media (max-width: 768px) {
+            .ankauf-showroom-wrap { width: calc(100% - 8%); }
+            .ankauf-hero-card { padding: 24px 15px 22px; }
+            .ankauf-perks-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .ankauf-steps-grid { grid-template-columns: 1fr; gap: 10px; }
+            .ankauf-cta-row { grid-template-columns: 1fr; }
+            .ankauf-cond-pill { font-size: 10.2px !important; padding: 6px 10px; }
         }
 
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
@@ -4357,9 +4731,9 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label><i class="fa-solid fa-plug" style="color:var(--primary-red);"></i> Webhook-URL (Automatisierte Termin-Benachrichtigung)</label>
-                            <input type="text" id="adminWebhook" class="form-control" placeholder="https://script.google.com/...">
-                            <p style="font-size:11px; color:var(--text-muted); margin-top:5px;">Optionale Schnittstelle zur automatisierten Weiterleitung neuer Buchungen.</p>
+                            <label><i class="fa-solid fa-plug" style="color:var(--primary-red);"></i> Google Apps Script URL (E-Mail &amp; WhatsApp Benachrichtigung)</label>
+                            <input type="text" id="adminWebhook" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                            <p style="font-size:11px; color:var(--text-muted); margin-top:5px;">Sendet neue Termine, Auftrags-Codes und Rückrufe automatisch parallel per E-Mail und WhatsApp.</p>
                         </div>
                     </div>
                     <div class="admin-pro-actions">
@@ -5078,10 +5452,18 @@
         
         <section id="dynamic-client-section-formulare" class="dynamic-block-container"></section>
 
-        <div class="section-header editable-section">
+        <div class="section-header editable-section" style="margin-bottom:22px;">
             <div class="section-edit-btn action-content" onclick="window.openContentEditor('formulare')" style="right:5%; top:-10px;"><i class="fa-solid fa-pencil"></i></div>
-            <h2 id="txt-form-title">Formulare & Anträge</h2>
+            <h2 id="txt-form-title">Formulare &amp; Anträge</h2>
             <p id="txt-form-desc" style="color:var(--text-muted); font-size:12px;">Alle wichtigen Zulassungsformulare und Anträge in der Übersicht</p>
+        </div>
+
+        <div class="forms-toolbar-wrap">
+            <div class="forms-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="formsSearchInput" class="form-control" placeholder="Formular suchen (z.B. Vollmacht, SEPA, Kurzzeit, Gewerbe)..." oninput="window.filterFormItems()">
+            </div>
+            <span class="forms-count-pill" id="formsCountPill"><strong id="formsCountNum">0</strong> Dokumente verfügbar</span>
         </div>
         
         <div class="download-grid" id="formItemsGrid"></div>
@@ -5118,42 +5500,144 @@
 
         <section id="dynamic-client-section-ankauf" class="dynamic-block-container"></section>
 
-        <div class="auto-ankauf-box editable-section">
-            <div class="section-edit-btn action-content" onclick="window.openContentEditor('ankauf')" style="right:15px; top:15px;"><i class="fa-solid fa-pencil"></i></div>
-            <h2 id="txt-ankauf-title" style="font-family:'Playfair Display', serif; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(24px, 4vw, 36px); letter-spacing: 2px; margin: 0;">AUTO ANKAUF</h2>
-            <p id="txt-ankauf-subtitle" style="font-size: clamp(16px, 2.5vw, 20px); font-weight: bold; color: var(--text-light); margin: 0;">Jeglicher Art – Sofort Bargeld!</p>
-            <p id="txt-ankauf-desc" style="color: var(--text-muted); font-size: 13px; max-width: 500px; margin: 10px 0 0;">Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort. Inklusive kostenloser Abmeldung Ihres Fahrzeugs.</p>
-            <div id="txt-ankauf-sign" style="font-family: 'Playfair Display', serif; font-size: 35px; color: var(--gold-accent); opacity: 0.45; margin-top: 5px; line-height: 1;">Ty</div>
-        </div>
+        <div class="ankauf-showroom-wrap">
+            <!-- VIP SHOWROOM HERO MIT 4 SOFORT-VORTEILEN -->
+            <div class="auto-ankauf-box ankauf-hero-card editable-section">
+                <div class="section-edit-btn action-content" onclick="window.openContentEditor('ankauf')" style="right:15px; top:15px;"><i class="fa-solid fa-pencil"></i></div>
+                <div class="ankauf-vip-pill"><i class="fa-solid fa-crown"></i> Direktankauf Berlin • Ohne Zwischenhändler</div>
+                <h2 id="txt-ankauf-title" style="font-family:'Playfair Display', serif; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(26px, 4.4vw, 42px); letter-spacing: 2px; margin: 0;">AUTO ANKAUF</h2>
+                <p id="txt-ankauf-subtitle" style="font-size: clamp(16px, 2.5vw, 21px); font-weight: 900; color: var(--text-light); margin: 4px 0 0;">Jeglicher Art – Sofort Bargeld!</p>
+                <p id="txt-ankauf-desc" style="color: var(--text-muted); font-size: 13px; max-width: 580px; margin: 10px auto 0; line-height: 1.6;">Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort. Inklusive kostenloser Abmeldung Ihres Fahrzeugs.</p>
+                <div id="txt-ankauf-sign" style="font-family: 'Playfair Display', serif; font-size: 32px; color: var(--gold-accent); opacity: 0.5; margin-top: 6px; line-height: 1;">Ty</div>
 
-        <!-- 30-SEKUNDEN AUTO-ANKAUF BLITZ-BEWERTUNG -->
-        <div class="booking-wrapper" style="max-width:700px; margin: 30px auto 0; border-top: 2px solid var(--gold-border);">
-            <h3 style="color:var(--gold-accent); font-size:17px; font-weight:900; text-transform:uppercase; margin-bottom:8px; text-align:center;"><i class="fa-solid fa-car-on"></i> 30-Sekunden Blitz-Angebot anfordern</h3>
-            <p style="font-size:12px; color:var(--text-muted); text-align:center; margin-bottom:20px;">Senden Sie uns die Eckdaten Ihres Fahrzeugs direkt per WhatsApp – wir melden uns umgehend mit einem Höchstpreis-Angebot inkl. gratis Abmeldung!</p>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Marke & Modell</label>
-                    <input type="text" id="ankaufModel" class="form-control" placeholder="z.B. Mercedes C-Klasse / VW Golf">
-                </div>
-                <div class="form-group">
-                    <label>Erstzulassung / Baujahr</label>
-                    <input type="text" id="ankaufYear" class="form-control" placeholder="z.B. 2018">
+                <div class="ankauf-perks-grid">
+                    <div class="ankauf-perk-item">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        <strong>Sofort Bargeld</strong>
+                        <span>Direkte Barauszahlung bei Übergabe in Berlin – kein Warten.</span>
+                    </div>
+                    <div class="ankauf-perk-item">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                        <strong>0 € Abmeldung</strong>
+                        <span>Kostenlose Stilllegung beim LABO inkl. offizieller Bestätigung.</span>
+                    </div>
+                    <div class="ankauf-perk-item">
+                        <i class="fa-solid fa-car-burst"></i>
+                        <strong>Jeder Zustand</strong>
+                        <span>Auch ohne TÜV, hohe Laufleistung, Unfall- oder Motorschaden.</span>
+                    </div>
+                    <div class="ankauf-perk-item">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <strong>100 % Sorgenfrei</strong>
+                        <span>Rechtssicherer Kaufvertrag ohne Gewährleistungsrisiko für Sie.</span>
+                    </div>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Kilometerstand (ca.)</label>
-                    <input type="text" id="ankaufKm" class="form-control" placeholder="z.B. 125.000 km">
+
+            <!-- 30-SEKUNDEN BLITZ-BEWERTUNG & DIREKT-ANGEBOT -->
+            <div class="booking-wrapper" style="max-width:100%; margin: 26px auto 0; border-top: 3px solid var(--gold-border);">
+                <div style="text-align:center; margin-bottom:18px;">
+                    <span style="display:inline-block; background:var(--green-bg-soft); color:var(--green-accent); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; padding:4px 12px; border-radius:50px; margin-bottom:6px;"><i class="fa-solid fa-bolt"></i> Unverbindlich &amp; Kostenlos</span>
+                    <h3 style="color:var(--gold-accent); font-size:clamp(16px, 2.6vw, 20px); font-weight:900; text-transform:uppercase; margin:0;"><i class="fa-solid fa-car-on"></i> 30-Sekunden Blitz-Angebot anfordern</h3>
+                    <p style="font-size:12px; color:var(--text-muted); max-width:560px; margin:6px auto 0;">Eckdaten kurz eintragen – <strong>Tamer Yazici</strong> meldet sich umgehend mit einem fairen Höchstpreis-Angebot inkl. kostenloser Abmeldung.</p>
                 </div>
-                <div class="form-group">
-                    <label>Ihre Preisvorstellung / Zustand</label>
-                    <input type="text" id="ankaufPrice" class="form-control" placeholder="z.B. Fahrbereit, TÜV neu...">
+
+                <label style="display:block; font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; text-align:left; letter-spacing:0.5px;">1. Fahrzeugzustand / Kategorie antippen</label>
+                <div class="ankauf-cond-pills" id="ankaufConditionPills">
+                    <button type="button" class="ankauf-cond-pill active" onclick="window.selectAnkaufCondition('Fahrbereit & Gepflegt', this)"><i class="fa-solid fa-circle-check"></i> Fahrbereit &amp; Gepflegt</button>
+                    <button type="button" class="ankauf-cond-pill" onclick="window.selectAnkaufCondition('Ohne TÜV / Mängel', this)"><i class="fa-solid fa-wrench"></i> Ohne TÜV / Mängel</button>
+                    <button type="button" class="ankauf-cond-pill" onclick="window.selectAnkaufCondition('Hohe Kilometer', this)"><i class="fa-solid fa-gauge-high"></i> Hohe Kilometer</button>
+                    <button type="button" class="ankauf-cond-pill" onclick="window.selectAnkaufCondition('Unfall- / Motorschaden', this)"><i class="fa-solid fa-triangle-exclamation"></i> Unfall- / Motorschaden</button>
+                    <button type="button" class="ankauf-cond-pill" onclick="window.selectAnkaufCondition('Oldtimer / Youngtimer', this)"><i class="fa-solid fa-gem"></i> Oldtimer / Youngtimer</button>
+                    <button type="button" class="ankauf-cond-pill" onclick="window.selectAnkaufCondition('Firmenwagen / Transporter', this)"><i class="fa-solid fa-truck"></i> Transporter / Firma</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marke &amp; Modell *</label>
+                        <input type="text" id="ankaufModel" class="form-control" placeholder="z.B. Mercedes C 220 d / VW Golf 7">
+                    </div>
+                    <div class="form-group">
+                        <label>Erstzulassung / Baujahr</label>
+                        <input type="text" id="ankaufYear" class="form-control" placeholder="z.B. 2018">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kilometerstand (ca.)</label>
+                        <input type="text" id="ankaufKm" class="form-control" placeholder="z.B. 125.000 km">
+                    </div>
+                    <div class="form-group">
+                        <label>Motor / Getriebe</label>
+                        <select id="ankaufFuel" class="form-control">
+                            <option value="Benzin • Automatik">Benzin • Automatik</option>
+                            <option value="Benzin • Schaltgetriebe">Benzin • Schaltgetriebe</option>
+                            <option value="Diesel • Automatik">Diesel • Automatik</option>
+                            <option value="Diesel • Schaltgetriebe">Diesel • Schaltgetriebe</option>
+                            <option value="Hybrid / Elektro">Hybrid / Elektro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Preisvorstellung / Besonderheiten</label>
+                        <input type="text" id="ankaufPrice" class="form-control" placeholder="z.B. 8.500 €, 2. Hand, Scheckheft...">
+                    </div>
+                    <div class="form-group">
+                        <label>Ihre Telefonnummer (Für schnelles Angebot)</label>
+                        <input type="tel" id="ankaufPhone" class="form-control" placeholder="z.B. 0178 ...">
+                    </div>
+                </div>
+
+                <div class="ankauf-cta-row">
+                    <button type="button" class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center; padding:14px 18px;" onclick="window.sendAnkaufWhatsApp()">
+                        <i class="fa-brands fa-whatsapp" style="font-size:17px;"></i> Per WhatsApp senden (+ Fotos)
+                    </button>
+                    <button type="button" class="btn-primary btn-gold-adaptive" style="width:100%; justify-content:center; padding:14px 18px;" onclick="window.submitAnkaufInquiry(false)">
+                        <i class="fa-solid fa-paper-plane"></i> Direkt-Angebot anfordern
+                    </button>
+                </div>
+                <p style="font-size:10.5px; color:var(--text-muted); text-align:center; margin-top:10px;">
+                    <i class="fa-solid fa-camera" style="color:var(--green-accent);"></i> Tipp: Über WhatsApp können Sie direkt 2–3 Fahrzeugfotos anhängen für eine noch genauere Sofort-Bewertung.
+                </p>
+            </div>
+
+            <!-- 3-SCHRITTE-ABLAUF -->
+            <div class="ankauf-steps-grid">
+                <div class="ankauf-step-card">
+                    <span class="ankauf-step-badge">1</span>
+                    <h4 style="font-size:13px; font-weight:900; text-transform:uppercase; color:var(--text-light); margin-bottom:5px;">30-Sekunden-Anfrage</h4>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.5;">Senden Sie uns Marke, Baujahr und Kilometerstand – Sie erhalten schnell eine ehrliche Ersteinschätzung.</p>
+                </div>
+                <div class="ankauf-step-card">
+                    <span class="ankauf-step-badge">2</span>
+                    <h4 style="font-size:13px; font-weight:900; text-transform:uppercase; color:var(--text-light); margin-bottom:5px;">Kurzer Check in Berlin</h4>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.5;">Kurze Besichtigung bei uns in der Kienitzer Str. 6 (12053 Berlin) oder nach Absprache direkt bei Ihnen vor Ort.</p>
+                </div>
+                <div class="ankauf-step-card">
+                    <span class="ankauf-step-badge">3</span>
+                    <h4 style="font-size:13px; font-weight:900; text-transform:uppercase; color:var(--text-light); margin-bottom:5px;">Sofort Bargeld &amp; Abmeldung</h4>
+                    <p style="font-size:11.5px; color:var(--text-muted); line-height:1.5;">Sie erhalten sofort Ihr Bargeld auf die Hand – wir übernehmen danach kostenlos die amtliche Abmeldung beim LABO.</p>
                 </div>
             </div>
-            <button type="button" class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.sendAnkaufWhatsApp()"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Sofort-Angebot per WhatsApp anfordern</button>
-        </div>
 
-        <div style="text-align: center; margin: 40px 0 20px; text-transform: uppercase; font-size: 14px; font-weight: 800; color: var(--gold-accent);">Wertermittlung & Oldtimer Galerie</div>
+            <!-- VERTRAUENS-HINWEIS & KAUFVERTRAG-SCHNELLZUGRIFF -->
+            <div class="ankauf-trust-strip">
+                <div style="flex:1; min-width:230px;">
+                    <strong style="font-size:12.5px; color:var(--text-light); display:block;"><i class="fa-solid fa-handshake" style="color:var(--green-accent); margin-right:6px;"></i>Persönlicher Ankauf durch Inhaber Tamer Yazici</strong>
+                    <span style="font-size:11px; color:var(--text-muted);">Keine anonymen Callcenter, keine Lockangebote – verbindliche Zusage und sofortige Stilllegung.</span>
+                </div>
+                <button type="button" class="btn-primary" style="padding:10px 16px; font-size:11px !important;" onclick="window.openKaufvertragModal()">
+                    <i class="fa-solid fa-file-contract"></i> Kfz-Kaufvertrag ansehen
+                </button>
+            </div>
+
+            <!-- GALERIE -->
+            <div style="text-align: center; margin: 38px 0 18px;">
+                <span style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); display:block;">Einblicke &amp; Fahrzeugklassen</span>
+                <h3 style="text-transform: uppercase; font-size: 16px; font-weight: 900; color: var(--gold-accent); margin-top:3px;">Wertermittlung &amp; Oldtimer Galerie</h3>
+            </div>
+        </div>
         
         <div class="vintage-gallery" id="carsGalleryGrid"></div>
     </div>
@@ -6186,19 +6670,17 @@
             }
 
             await window.sendToMakeWebhook({
-                type: 'new_booking',
-                trackingCode: typeof trackingCode !== 'undefined' ? trackingCode : '',
-                clientName: n,
-                clientCategory: category,
-                clientPhone: p || '-',
-                clientEmail: e,
-                date: d,
-                time: timeString,
-                service: window.selectedServiceVal,
-                wunschkennzeichen: wunschkennzeichen || 'Kein Wunschkennzeichen angegeben',
-                customNote: customNote || '-'
+                type: 'callback_request',
+                clientName: name,
+                clientCategory: 'Express-Rückruf',
+                clientPhone: phone,
+                clientEmail: '-',
+                date: todayDate,
+                time: timeSlot,
+                service: `Rückruf: ${topic}`,
+                wunschkennzeichen: '-',
+                customNote: `Bitte zurückrufen (${timeSlot})`
             });
-            try { sessionStorage.removeItem('red_pending_plate'); } catch (err) {}
 
             if (viaWhatsApp) {
                 let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
@@ -6318,7 +6800,7 @@
                     rowsHtml += `
                         <tr>
                             <td>${idx + 1}</td>
-                            <td><strong>${window.escHtml(a.date)}</strong><br>${window.escHtml(a.timeLabel || '')}</td>
+                            <td><strong>${window.escHtml(a.date)}</strong><br>${window.escHtml(a.timeLabel || '')}${a.trackingCode ? '<br><small style="color:#d90000;font-weight:bold;">Code: ' + window.escHtml(a.trackingCode) + '</small>' : ''}</td>
                             <td><strong>${window.escHtml(a.name)}</strong><br><small>${window.escHtml(a.category || 'Privatkunde')}</small></td>
                             <td>${window.escHtml(a.phone || '-')}</td>
                             <td><strong>${window.escHtml(a.service)}</strong>${a.wunschkennzeichen ? '<br><small style="color:#0055cc;font-weight:bold;">Kennz.: ' + window.escHtml(a.wunschkennzeichen) + '</small>' : ''}${a.customNote ? '<br><small>' + window.escHtml(a.customNote) + '</small>' : ''}</td>
@@ -6723,7 +7205,7 @@
             if(!apt) return;
             let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
             if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
-            const msg = encodeURIComponent(`📅 *NEUE TERMIN-RESERVIERUNG (RED BERLIN)*\n\n• *Kunde:* ${apt.name} (${apt.category || 'Privatkunde'})\n• *Datum & Zeit:* ${apt.date} um ${apt.time}\n• *Anliegen:* ${apt.service}\n• *Wunschkennzeichen:* ${apt.wunschkennzeichen || '-'}\n• *Hinweis:* ${apt.customNote || '-'}\n• *Telefon:* ${apt.phone || '-'}`);
+            const msg = encodeURIComponent(`📅 *NEUE TERMIN-RESERVIERUNG (RED BERLIN)*\n\n• *Auftrags-Code:* ${apt.trackingCode || '-'}\n• *Kunde:* ${apt.name} (${apt.category || 'Privatkunde'})\n• *Datum & Zeit:* ${apt.date} um ${apt.time}\n• *Anliegen:* ${apt.service}\n• *Wunschkennzeichen:* ${apt.wunschkennzeichen || '-'}\n• *Hinweis:* ${apt.customNote || '-'}\n• *Telefon:* ${apt.phone || '-'}`);
             window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
         };
 
@@ -7041,25 +7523,95 @@
             });
         };
 
-        window.sendAnkaufWhatsApp = function() {
-            const model = document.getElementById('ankaufModel').value.trim();
-            const year = document.getElementById('ankaufYear').value.trim();
-            const km = document.getElementById('ankaufKm').value.trim();
-            const price = document.getElementById('ankaufPrice').value.trim();
+        window.ankaufSelectedCondition = 'Fahrbereit & Gepflegt';
+
+        window.selectAnkaufCondition = function(condLabel, btnEl) {
+            window.ankaufSelectedCondition = condLabel;
+            document.querySelectorAll('#ankaufConditionPills .ankauf-cond-pill').forEach(p => p.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+        };
+
+        window.submitAnkaufInquiry = async function(viaWhatsApp = true) {
+            const model = document.getElementById('ankaufModel')?.value.trim() || '';
+            const year = document.getElementById('ankaufYear')?.value.trim() || '';
+            const km = document.getElementById('ankaufKm')?.value.trim() || '';
+            const fuel = document.getElementById('ankaufFuel')?.value.trim() || '';
+            const price = document.getElementById('ankaufPrice')?.value.trim() || '';
+            const phone = document.getElementById('ankaufPhone')?.value.trim() || '';
+            const condition = window.ankaufSelectedCondition || 'Fahrbereit & Gepflegt';
 
             if (!model) {
                 window.showToast('Bitte mindestens Marke & Modell eingeben.', 'error');
                 return;
             }
-            let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
-            if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+            if (!viaWhatsApp && !phone) {
+                window.showToast('Bitte Ihre Telefonnummer für unser Rückruf-Angebot eingeben.', 'error');
+                return;
+            }
 
-            const msg = encodeURIComponent(`🚗 *AUTO-ANKAUF BLITZ-ANFRAGE*\n\n• *Fahrzeug:* ${model}\n• *Baujahr/EZ:* ${year || '-'}\n• *Kilometerstand:* ${km || '-'}\n• *Zustand/Preiswunsch:* ${price || '-'}\n\nBitte um ein unverbindliches Ankauf-Angebot!`);
-            window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+            const summaryNote = `Zustand: ${condition} | EZ: ${year || '-'} | KM: ${km || '-'} | ${fuel || '-'} | Preiswunsch: ${price || '-'}`;
+            const todayDate = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            if (window.firebaseDb && window.firebaseAddDoc) {
+                try {
+                    await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "appointments"), {
+                        name: `Ankauf: ${model}`,
+                        phone: phone || 'Über WhatsApp',
+                        email: 'Auto-Ankauf Anfrage',
+                        date: todayDate,
+                        timeLabel: 'Sofort-Bewertung',
+                        service: `🚗 AUTO ANKAUF: ${model}`,
+                        category: 'Auto Ankauf',
+                        customNote: summaryNote,
+                        marked: true,
+                        orderStatus: 1,
+                        notes: [{ id: Date.now().toString(), text: summaryNote, timeStr: 'Auto-Ankauf Formular' }],
+                        timestamp: Date.now()
+                    });
+                } catch (e) {}
+            }
+
+            if (typeof window.sendToMakeWebhook === 'function') {
+                window.sendToMakeWebhook({
+                    type: 'callback_request',
+                    clientName: `Auto-Ankauf (${model})`,
+                    clientCategory: 'Auto Ankauf',
+                    clientPhone: phone || 'Über WhatsApp',
+                    clientEmail: '-',
+                    date: todayDate,
+                    time: 'Sofort-Bewertung',
+                    service: `Auto Ankauf: ${model}`,
+                    wunschkennzeichen: '-',
+                    customNote: summaryNote
+                });
+            }
+
+            if (viaWhatsApp) {
+                let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
+                if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+                const msg = encodeURIComponent(`🚗 *AUTO-ANKAUF BLITZ-ANFRAGE (RED BERLIN)*\n\n• *Fahrzeug:* ${model}\n• *Zustand:* ${condition}\n• *Baujahr/EZ:* ${year || '-'}\n• *Kilometerstand:* ${km || '-'}\n• *Motor/Getriebe:* ${fuel || '-'}\n• *Preiswunsch / Info:* ${price || '-'}${phone ? '\n• *Rückruf-Nr.:* ' + phone : ''}\n\nBitte um ein unverbindliches Höchstpreis-Angebot inkl. kostenloser Abmeldung!`);
+                window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+            } else {
+                window.showToast('🚗 Ihre Ankauf-Anfrage wurde gesendet! Wir melden uns in Kürze.', 'success');
+                document.getElementById('ankaufModel').value = '';
+                document.getElementById('ankaufYear').value = '';
+                document.getElementById('ankaufKm').value = '';
+                document.getElementById('ankaufPrice').value = '';
+                document.getElementById('ankaufPhone').value = '';
+            }
+        };
+
+        window.sendAnkaufWhatsApp = function() {
+            window.submitAnkaufInquiry(true);
         };
 
         window.checkLiveOrderStatus = async function() {
-            const code = (document.getElementById('liveTrackerInput')?.value || '').trim().toUpperCase();
+            const inputEl = document.getElementById('liveTrackerInput');
+            let code = (inputEl?.value || '').trim().toUpperCase().replace(/\s+/g, '');
+            if (/^\d{6}$/.test(code)) {
+                code = 'RED-' + code;
+                if (inputEl) inputEl.value = code;
+            }
             if (!/^RED-\d{6}$/.test(code)) {
                 window.showToast('Bitte gültigen Auftrags-Code eingeben (z.B. RED-123456).', 'error');
                 return;
@@ -7075,8 +7627,10 @@
                 const data = snap.data();
                 resBox.style.display = 'block';
                 const step = Number(data.orderStatus) || 1;
-                document.getElementById('trackerClientTitle').innerText = `Auftrag ${data.code} (${data.date})`;
-                document.getElementById('trackerServiceBadge').innerText = data.service || 'Kfz-Zulassung';
+                const timeInfo = data.timeLabel ? ` • ${data.timeLabel}` : '';
+                const plateInfo = data.wunschkennzeichen ? ` | Kennz.: ${data.wunschkennzeichen}` : '';
+                document.getElementById('trackerClientTitle').innerText = `Auftrag ${data.code} (${data.date}${timeInfo})`;
+                document.getElementById('trackerServiceBadge').innerText = (data.service || 'Kfz-Zulassung') + plateInfo;
 
                 for (let i = 1; i <= 4; i++) {
                     const stepEl = document.getElementById('tStep' + i);
@@ -7329,7 +7883,7 @@
                 `DTSTART:${dtStart}`,
                 `DTEND:${dtEnd}`,
                 "LOCATION:Kienitzer Str. 6\\, 12053 Berlin",
-                `DESCRIPTION:Ihr Termin bei RED Zulassungsdienst Berlin (Ansprechpartner: Tamer Yazici).${apt.wunschkennzeichen ? ' Wunschkennzeichen: ' + apt.wunschkennzeichen + '.' : ''}${apt.customNote ? ' Hinweis: ' + apt.customNote + '.' : ''} Bitte alle Originaldokumente mitbringen.`,
+                `DESCRIPTION:Ihr Termin bei RED Zulassungsdienst Berlin (Ansprechpartner: Tamer Yazici).${apt.trackingCode ? ' Auftrags-Code (Live-Tracker): ' + apt.trackingCode + '.' : ''}${apt.wunschkennzeichen ? ' Wunschkennzeichen: ' + apt.wunschkennzeichen + '.' : ''}${apt.customNote ? ' Hinweis: ' + apt.customNote + '.' : ''} Bitte alle Originaldokumente mitbringen.`,
                 "END:VEVENT",
                 "END:VCALENDAR"
             ].join("\r\n");
@@ -7535,7 +8089,7 @@
         window.redApts = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
         window.currentWeatherData = null;
         window.modalClockInterval = null;
-        window.DEFAULT_MAKE_WEBHOOK = 'https://hook.eu1.make.com/vclqdb1w6g10ankgsttekqef2kw8yido';
+        window.DEFAULT_MAKE_WEBHOOK = 'https://script.google.com/macros/s/HIER_DEINE_KOPIERTE_ID/exec';
         window.dynamicContactData = { 
             phone: '0178 378 38 75', 
             email: 'Redzulassungsdienst@gmail.com', 
@@ -10270,12 +10824,15 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 const plateBanner = apt.wunschkennzeichen ? `<div style="font-size:11px; color:#007aff; background:rgba(0,122,255,0.08); padding:6px 10px; border-radius:8px; font-weight:800;"><i class="fa-solid fa-id-card"></i> Wunschkennzeichen: ${window.escHtml(apt.wunschkennzeichen)}</div>` : '';
                 const customNoteBanner = plateBanner + (apt.customNote ? `<div style="font-size:11px; color:var(--primary-red); background:rgba(230,0,0,0.06); padding:6px 10px; border-radius:8px; font-weight:700;"><i class="fa-solid fa-tag"></i> ${window.escHtml(apt.customNote)}</div>` : '');
                 const pinnedBadgeIndicator = apt.marked ? `<span style="font-size:9px; background:#f5c542; color:#000; padding:2px 7px; border-radius:4px; font-weight:900;"><i class="fa-solid fa-thumbtack"></i> GEPINNT</span>` : '';
+                const resolvedCode = apt.trackingCode || ((apt.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '';
+                const codeBadgeIndicator = resolvedCode ? `<span onclick="navigator.clipboard?.writeText('${resolvedCode}'); window.showToast('Auftrags-Code ${resolvedCode} kopiert!', 'success');" title="Klicken zum Kopieren" style="cursor:pointer; font-size:9.5px; background:rgba(217,0,0,0.1); border:1px solid rgba(217,0,0,0.35); color:var(--primary-red); padding:2px 8px; border-radius:4px; font-weight:900; font-family:'Courier New', monospace;"><i class="fa-solid fa-satellite-dish"></i> ${window.escHtml(resolvedCode)}</span>` : '';
 
                 let waConfirmBtn = '';
                 if(apt.phone) {
                     let cleanPhone = apt.phone.replace(/\D/g, '').replace(/^0/, '49');
                     const platePart = apt.wunschkennzeichen ? ` | Wunschkennzeichen: ${apt.wunschkennzeichen}` : '';
-                    let msg = encodeURIComponent(`Hallo ${apt.name}, hier ist Ihr RED Zulassungsdienst Berlin. Wir bestätigen Ihren Termin am ${apt.date} um ${displayTime} (${apt.service}${platePart}). Bitte bringen Sie alle Originalunterlagen mit. Adresse: Kienitzer Str. 6, 12053 Berlin.`);
+                    const codePart = resolvedCode ? ` | Ihr Live-Tracker-Code: ${resolvedCode}` : '';
+                    let msg = encodeURIComponent(`Hallo ${apt.name}, hier ist Ihr RED Zulassungsdienst Berlin. Wir bestätigen Ihren Termin am ${apt.date} um ${displayTime} (${apt.service}${platePart}${codePart}). Bitte bringen Sie alle Originalunterlagen mit. Adresse: Kienitzer Str. 6, 12053 Berlin.`);
                     waConfirmBtn = `<a href="https://wa.me/${cleanPhone}?text=${msg}" target="_blank" rel="noopener noreferrer" class="apt-btn wa-confirm" title="Termin per WhatsApp bestätigen"><i class="fa-brands fa-whatsapp"></i></a>`;
                 }
 
@@ -10283,6 +10840,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
                         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                             <div class="prio-badge">${badgeText}</div>
+                            ${codeBadgeIndicator}
                             ${categoryTag}
                             ${pinnedBadgeIndicator}
                         </div>
@@ -10719,7 +11277,9 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 await setDoc(doc(db, "order_tracking", trackingCode), {
                     code: trackingCode,
                     date: d,
+                    timeLabel: timeString,
                     service: window.selectedServiceVal,
+                    wunschkennzeichen: wunschkennzeichen || '',
                     orderStatus: 1,
                     timestamp: Date.now()
                 });
@@ -10731,36 +11291,23 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 return;
             }
 
-            const ownerEmail = window.dynamicContactData?.email || "Redzulassungsdienst@gmail.com";
-            const webhookUrl = window.dynamicContactData?.webhook || "";
-            if(webhookUrl.startsWith('https://')) {
-                try {
-                    await fetch(webhookUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({
-                            type: 'new_booking',
-                            trackingCode: trackingCode,
-                            clientName: n,
-                            clientCategory: category,
-                            clientPhone: p,
-                            clientEmail: e,
-                            date: d,
-                            time: timeString,
-                            service: window.selectedServiceVal,
-                            wunschkennzeichen: wunschkennzeichen || 'Kein Wunschkennzeichen angegeben',
-                            customNote: customNote || '-',
-                            adminEmail: ownerEmail
-                        })
-                    });
-                } catch(err) {
-                    console.error("E-Mail Webhook Fehler:", err);
-                }
-            }
+            await window.sendToMakeWebhook({
+                type: 'new_booking',
+                trackingCode: trackingCode,
+                clientName: n,
+                clientCategory: category,
+                clientPhone: p || '-',
+                clientEmail: e,
+                date: d,
+                time: timeString,
+                service: window.selectedServiceVal,
+                wunschkennzeichen: wunschkennzeichen || 'Kein Wunschkennzeichen angegeben',
+                customNote: customNote || '-'
+            });
+            try { sessionStorage.removeItem('red_pending_plate'); } catch (err) {}
 
             const plateInfo = wunschkennzeichen ? ` | Wunschkennzeichen: ${wunschkennzeichen}` : '';
-            document.getElementById('confirmModalText').innerHTML = `Vielen Dank ${window.escHtml(n)}! Ihr Termin (${window.escHtml(category)}) am <strong>${window.escHtml(d)}</strong> um <strong>${window.escHtml(timeString)}</strong> für „${window.escHtml(window.selectedServiceVal)}“${window.escHtml(plateInfo)} wurde verbindlich eingetragen.<br><br><span style="display:inline-block; background:var(--bg-input); border:1.5px dashed var(--primary-red); padding:8px 14px; border-radius:10px; font-weight:900; color:var(--primary-red); font-size:15px;">Ihr Live-Tracker-Code: ${trackingCode}</span>`;
+            document.getElementById('confirmModalText').innerHTML = `Vielen Dank ${window.escHtml(n)}! Ihr Termin (${window.escHtml(category)}) am <strong>${window.escHtml(d)}</strong> um <strong>${window.escHtml(timeString)}</strong> für „${window.escHtml(window.selectedServiceVal)}“${window.escHtml(plateInfo)} wurde verbindlich eingetragen.<br><br><div style="display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; background:var(--bg-input); border:1.5px dashed var(--primary-red); padding:9px 14px; border-radius:12px;"><span style="font-weight:900; color:var(--primary-red); font-size:15px;">Ihr Auftrags-Code: ${trackingCode}</span><button type="button" onclick="navigator.clipboard?.writeText('${trackingCode}'); window.showToast('Auftrags-Code ${trackingCode} kopiert!', 'success');" style="background:var(--primary-red); color:#fff; border:none; border-radius:8px; padding:5px 10px; font-size:11px !important; font-weight:800; cursor:pointer;"><i class="fa-regular fa-copy"></i> Kopieren</button></div><br><small style="color:var(--text-muted); display:inline-block; margin-top:6px;">Wir haben Ihnen diesen Code zusätzlich an <strong>${window.escHtml(e)}</strong> gesendet.</small>`;
             document.getElementById('confirmModalOverlay').classList.add('open');
             
             document.getElementById('bookingForm').reset();
@@ -10813,6 +11360,20 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             return Object.values(window.allFormsMap).filter(f => !f.deleted);
         }
 
+        window.filterFormItems = function() {
+            const q = (document.getElementById('formsSearchInput')?.value || '').trim().toLowerCase();
+            const items = document.querySelectorAll('#formItemsGrid .download-item');
+            let visible = 0;
+            items.forEach(item => {
+                const title = (item.querySelector('.form-doc-title')?.innerText || '').toLowerCase();
+                const match = !q || title.includes(q);
+                item.style.display = match ? 'flex' : 'none';
+                if (match) visible++;
+            });
+            const countEl = document.getElementById('formsCountNum');
+            if (countEl) countEl.innerText = String(visible);
+        };
+
         function renderFormsList(formsList) {
             const grid = document.getElementById('formItemsGrid');
             if(!grid) return;
@@ -10826,26 +11387,36 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 element.setAttribute('data-url', cleanUrl);
                 
                 const statusBadge = cleanUrl !== ''
-                    ? `<span style="font-size:10px; color:var(--green-accent); font-weight:800;"><i class="fa-solid fa-circle-check"></i> Dokument bereit zum Download</span>`
-                    : `<span style="font-size:10px; color:var(--text-muted); font-weight:600;"><i class="fa-regular fa-clock"></i> Noch keine Datei hinterlegt</span>`;
+                    ? `<span class="form-status-pill is-ready"><i class="fa-solid fa-circle-check"></i> PDF bereit zum Download</span>`
+                    : `<span class="form-status-pill is-empty"><i class="fa-regular fa-clock"></i> In Vorbereitung</span>`;
 
                 element.innerHTML = `
                     <div class="download-info" onclick="window.openFormFromCard('${form.id}')">
-                        <i class="fa-solid fa-file-pdf" style="opacity:${cleanUrl !== '' ? '1' : '0.45'};"></i>
-                        <span title="${form.title}">${form.title}</span>
-                        ${statusBadge}
+                        <div class="form-doc-icon-box" style="opacity:${cleanUrl !== '' ? '1' : '0.45'};">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div class="form-doc-meta">
+                            <span class="form-doc-title" title="${window.escHtml(form.title)}">${window.escHtml(form.title)}</span>
+                            ${statusBadge}
+                        </div>
                     </div>
                     <div class="download-actions">
-                        <i class="fa-solid fa-pen action-forms" title="Mit Stift bearbeiten / Datei hochladen" onclick="event.stopPropagation(); window.openFormEditModal('${form.id}')"></i>
-                        <i class="fa-solid fa-link action-forms" title="Direkt-Link hinterlegen" onclick="event.stopPropagation(); window.triggerAdminLinkUpdate(this, '${form.id}')"></i>
-                        <i class="fa-solid fa-upload action-forms" title="PDF/Datei vom Gerät hochladen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
-                        <i class="fa-solid fa-trash-can action-forms" title="Formular entfernen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
-                        <i class="fa-solid fa-eye user-view" title="Ansehen" onclick="event.stopPropagation(); window.openForm(this)"></i>
-                        <i class="fa-solid fa-download user-dl" title="Herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"></i>
+                        <div class="form-admin-btn-group">
+                            <i class="fa-solid fa-pen action-forms" title="Mit Stift bearbeiten / Datei hochladen" onclick="event.stopPropagation(); window.openFormEditModal('${form.id}')"></i>
+                            <i class="fa-solid fa-link action-forms" title="Direkt-Link hinterlegen" onclick="event.stopPropagation(); window.triggerAdminLinkUpdate(this, '${form.id}')"></i>
+                            <i class="fa-solid fa-upload action-forms" title="PDF/Datei vom Gerät hochladen" onclick="event.stopPropagation(); window.triggerAdminUpload(this, '${form.id}')"></i>
+                            <i class="fa-solid fa-trash-can action-forms" title="Formular entfernen" onclick="event.stopPropagation(); window.adminDeleteForm('${form.id}')"></i>
+                        </div>
+                        <div class="form-user-btn-group">
+                            <button type="button" class="form-user-btn user-view" title="Dokument ansehen" onclick="event.stopPropagation(); window.openForm(this)"><i class="fa-solid fa-eye"></i> Ansehen</button>
+                            <button type="button" class="form-user-btn user-dl" title="Dokument herunterladen" onclick="event.stopPropagation(); window.downloadForm(this)"><i class="fa-solid fa-download"></i> PDF</button>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(element);
             });
+
+            window.filterFormItems();
         }
 
         let formsListenerStarted = false;
