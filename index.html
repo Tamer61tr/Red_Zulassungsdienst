@@ -1338,12 +1338,51 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 12px rgba(255, 59, 48, 0.45);
         }
 
-        .admin-details { background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
-        .admin-details summary { padding: 13px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; color: var(--text-light); }
+        .admin-details { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; transition: border-color 0.2s ease; }
+        .admin-details:hover, .admin-details[open] { border-color: rgba(217, 0, 0, 0.35); }
+        .admin-details summary { padding: 13px 16px; font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; user-select: none; outline: none; color: var(--text-light); }
         .admin-details summary::-webkit-details-marker { display: none; }
-        .admin-details summary::after { content: '▼'; font-size: 12px; color: var(--primary-red); transition: transform 0.3s; }
-        .admin-details[open] summary::after { transform: rotate(180deg); }
-        .admin-details-content { padding: 0 16px 16px; border-top: 1px solid var(--glass-border); margin-top: 8px; padding-top: 12px; }
+        .admin-details summary::after { content: ''; width: 7px; height: 7px; border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); transform: rotate(45deg); transition: transform 0.22s ease, border-color 0.22s ease; flex-shrink: 0; margin-right: 4px; }
+        .admin-details[open] summary::after { transform: rotate(-135deg); border-color: var(--primary-red); }
+        .admin-details-content { padding: 14px 16px 16px; border-top: 1px solid var(--glass-border); background: var(--bg-card); }
+
+        /* PROFESSIONELLE ADMIN-CMS-PANELS (STARTSEITE, FORMULARE, ANKAUF & FOOTER) */
+        .admin-pro-wrap { max-width: 1100px; width: calc(100% - 10%); margin: 0 auto 12px; padding: 0; box-sizing: border-box; }
+        .admin-pro-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-left: 3px solid var(--primary-red); border-radius: 12px; padding: 16px 18px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); text-align: left; }
+        .admin-pro-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .admin-pro-title-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+        .admin-pro-badge { font-size: 9.5px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: rgba(217, 0, 0, 0.1); color: var(--primary-red); border: 1px solid rgba(217, 0, 0, 0.2); }
+        .admin-pro-title { font-size: 13.5px; font-weight: 800; color: var(--text-light); margin: 0; display: inline-flex; align-items: center; gap: 8px; }
+        .admin-pro-title i { color: var(--primary-red); font-size: 13px; }
+        .admin-pro-sub { font-size: 11.5px; color: var(--text-muted); margin: 4px 0 0; line-height: 1.45; }
+        .admin-pro-accordion { margin-bottom: 0; border-left: 3px solid var(--glass-border); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04); }
+        .admin-pro-accordion[open] { border-left-color: var(--primary-red); }
+        .admin-pro-summary-title { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; color: var(--text-light); }
+        .admin-pro-summary-title i { color: var(--primary-red); width: 16px; text-align: center; font-size: 13px; }
+        .admin-pro-grid-3 { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: center; margin-top: 14px; }
+        .admin-pro-grid-2 { display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px; align-items: center; margin-top: 12px; }
+        .admin-pro-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--glass-border); }
+        .admin-pro-btn { height: 40px; padding: 0 16px; border-radius: 9px; font-size: 12px !important; font-weight: 700; letter-spacing: 0.2px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; border: 1px solid transparent; box-shadow: none; text-decoration: none; }
+        .admin-pro-btn-primary { background: #14141c; color: #ffffff; border-color: #14141c; }
+        .admin-pro-btn-primary:hover { background: var(--primary-red); border-color: var(--primary-red); transform: translateY(-1px); }
+        body:not([data-theme^="light"]) .admin-pro-btn-primary { background: var(--primary-red); border-color: var(--primary-red); }
+        body:not([data-theme^="light"]) .admin-pro-btn-primary:hover { filter: brightness(1.12); }
+        .admin-pro-btn-secondary { background: var(--bg-input); color: var(--text-light); border-color: var(--glass-border); }
+        .admin-pro-btn-secondary:hover { border-color: var(--primary-red); color: var(--primary-red); }
+        .admin-pro-btn-sm { height: 32px; padding: 0 12px; font-size: 11px !important; border-radius: 7px; }
+        .admin-pro-card .form-control { height: 40px; padding: 0 12px; border-radius: 9px; margin-bottom: 0; }
+        .admin-pro-card .noble-file-upload { margin-top: 0; }
+        .admin-pro-card .noble-file-trigger { height: 40px; padding: 0 14px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        @media (min-width: 769px) {
+            .admin-pro-card .form-control, .admin-pro-accordion .form-control { font-size: 13px !important; }
+        }
+        @media (max-width: 768px) {
+            .admin-pro-wrap { width: calc(100% - 8%); }
+            .admin-pro-card { padding: 14px; }
+            .admin-pro-grid-3, .admin-pro-grid-2 { grid-template-columns: 1fr; }
+            .admin-pro-actions { flex-direction: column; align-items: stretch; }
+            .admin-pro-head .admin-pro-btn { width: 100%; }
+        }
 
         .dynamic-block-container { padding-top: 30px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 20px; padding-left: 5%; padding-right: 5%; }
         .dynamic-block-inner { max-width: 800px; width: 100%; margin: 0 auto; background: var(--bg-card); padding: 40px 30px; border-radius: var(--global-radius); text-align: center; position: relative; box-sizing: border-box; box-shadow: var(--card-shadow); }
@@ -4139,14 +4178,24 @@
 <!-- HAUPTANSICHT: STARTSEITE -->
     <div id="view-home" class="view-section active">
 
-        <div class="admin-workspace-box mod-prices" style="max-width:800px; margin: 15px auto 0; text-align:center; padding: 0 5%;">
-            <button class="btn-primary" style="background:#25D366; color:#000; font-size:13px;" onclick="window.addNewServiceCard()"><i class="fa-solid fa-plus"></i> Neue Leistungskarte hinzufügen</button>
-            <p style="color:var(--text-muted); font-size:11px; margin-top:8px;">Nutzen Sie den grünen Stift auf den Leistungskarten, im Header & im Schnell-Kalkulator, um Preise (standardmäßig "-") und Designs jederzeit anzupassen.</p>
+        <div class="admin-workspace-box admin-pro-wrap mod-prices" style="margin-top: 14px;">
+            <div class="admin-pro-card">
+                <div class="admin-pro-head">
+                    <div>
+                        <div class="admin-pro-title-row">
+                            <span class="admin-pro-badge">CMS</span>
+                            <h4 class="admin-pro-title"><i class="fa-solid fa-layer-group"></i> Leistungskarten &amp; Preise verwalten</h4>
+                        </div>
+                        <p class="admin-pro-sub">Bestehende Karten, Header-Elemente und den Kalkulator direkt über das Stift-Symbol bearbeiten.</p>
+                    </div>
+                    <button type="button" class="admin-pro-btn admin-pro-btn-primary" onclick="window.addNewServiceCard()"><i class="fa-solid fa-plus"></i> Neue Leistungskarte</button>
+                </div>
+            </div>
         </div>
 
-        <div class="admin-workspace-box mod-blocks" style="max-width:800px; margin: 15px auto 0; padding: 0 5%;">
-            <details class="admin-details">
-                <summary><span style="color:#007aff;"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span></summary>
+        <div class="admin-workspace-box admin-pro-wrap mod-blocks">
+            <details class="admin-details admin-pro-accordion">
+                <summary><span class="admin-pro-summary-title"><i class="fa-solid fa-pen-ruler"></i> Eigener Infoblock (Baustein) erstellen</span></summary>
                 <div class="admin-details-content">
                     <div class="form-row">
                         <div class="form-group"><input type="text" id="cbTitle" class="form-control" placeholder="Titel (z.B. Wichtige Kundeninfo)"></div>
@@ -4283,33 +4332,39 @@
                         </div>
                     </div>
 
-                    <button class="btn-primary" id="btnSaveCustomBlock" style="background:#007aff; width:100%; justify-content:center; margin-top:10px;" onclick="window.saveCustomBlock(event)">Baustein Erstellen & Veröffentlichen</button>
-                    <button class="btn-primary" id="btnCancelEditBlock" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-light); width:100%; justify-content:center; margin-top:10px; display:none;" onclick="window.cancelEditBlock()">Bearbeitung Abbrechen</button>
+                    <div class="admin-pro-actions">
+                        <button type="button" class="admin-pro-btn admin-pro-btn-secondary" id="btnCancelEditBlock" style="display:none;" onclick="window.cancelEditBlock()">Abbrechen</button>
+                        <button type="button" class="admin-pro-btn admin-pro-btn-primary" id="btnSaveCustomBlock" onclick="window.saveCustomBlock(event)"><i class="fa-solid fa-check"></i> Baustein veröffentlichen</button>
+                    </div>
                 </div>
             </details>
+        </div>
 
-            <details class="admin-details mod-data">
-                <summary><span style="color:var(--gold-accent);"><i class="fa-solid fa-address-card"></i> Firmendaten & Webhook API anpassen</span></summary>
+        <div class="admin-workspace-box admin-pro-wrap mod-data">
+            <details class="admin-details admin-pro-accordion">
+                <summary><span class="admin-pro-summary-title"><i class="fa-solid fa-address-card"></i> Firmendaten &amp; Webhook-Schnittstelle</span></summary>
                 <div class="admin-details-content">
                     <div class="form-row">
                         <div class="form-group"><label>Telefonnummer</label><input type="text" id="adminPhone" class="form-control" value="0178 378 38 75"></div>
-                        <div class="form-group"><label>E-Mail Adresse</label><input type="email" id="adminEmail" class="form-control" value="Redzulassungsdienst@gmail.com"></div>
+                        <div class="form-group"><label>E-Mail-Adresse</label><input type="email" id="adminEmail" class="form-control" value="Redzulassungsdienst@gmail.com"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>Umsatzsteuer-ID (Impressum)</label><input type="text" id="adminUstid" class="form-control" placeholder="Ihre USt-ID"></div>
+                        <div class="form-group"><label>Umsatzsteuer-ID (Impressum)</label><input type="text" id="adminUstid" class="form-control" placeholder="DE..."></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>Instagram Link</label><input type="text" id="adminIg" class="form-control" value="https://instagram.com/red_zulassungsdienst"></div>
-                        <div class="form-group"><label>Facebook Link</label><input type="text" id="adminFb" class="form-control" value="#"></div>
+                        <div class="form-group"><label>Instagram-Link</label><input type="text" id="adminIg" class="form-control" value="https://instagram.com/red_zulassungsdienst"></div>
+                        <div class="form-group"><label>Facebook-Link</label><input type="text" id="adminFb" class="form-control" value="#"></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label style="color:var(--green-accent);"><i class="fa-solid fa-plug"></i> Webhook URL (Automatisierte Termin-Benachrichtigung)</label>
-                            <input type="text" id="adminWebhook" class="form-control" placeholder="https://script.google.com/..." style="border-color: var(--green-border);">
-                            <p style="font-size:10px; color:var(--text-muted); margin-top:5px;">Optionale Schnittstelle zur automatisierten Weiterleitung neuer Buchungen.</p>
+                            <label><i class="fa-solid fa-plug" style="color:var(--primary-red);"></i> Webhook-URL (Automatisierte Termin-Benachrichtigung)</label>
+                            <input type="text" id="adminWebhook" class="form-control" placeholder="https://script.google.com/...">
+                            <p style="font-size:11px; color:var(--text-muted); margin-top:5px;">Optionale Schnittstelle zur automatisierten Weiterleitung neuer Buchungen.</p>
                         </div>
                     </div>
-                    <button class="btn-primary" style="background:var(--gold-border); color:#fff; width:100%; justify-content:center; margin-top:10px;" onclick="window.saveContactInfo()">Daten Speichern</button>
+                    <div class="admin-pro-actions">
+                        <button type="button" class="admin-pro-btn admin-pro-btn-primary" onclick="window.saveContactInfo()"><i class="fa-solid fa-floppy-disk"></i> Firmendaten speichern</button>
+                    </div>
                 </div>
             </details>
         </div>
@@ -4994,20 +5049,27 @@
             </div>
         </div>
         
-        <div id="adminFormSection" class="admin-workspace-box mod-forms" style="max-width:850px; margin: 0 auto 30px; background: rgba(230,0,0,0.04); border: 1px solid rgba(230,0,0,0.25); border-radius: 18px; padding: 22px;">
-            <h4 style="color:var(--primary-red); margin-bottom:8px; font-size:14px;"><i class="fa-solid fa-cloud-arrow-up"></i> Admin: Neues Formular hinzufügen oder bestehende Formulare verwalten</h4>
-            <p style="font-size:11px; color:var(--text-muted); margin-bottom:14px;">Sie können beliebig viele neue Formulare mit dem Plus-Button hinzufügen, bestehende Karten per Papierkorb entfernen oder über das <strong>Upload-Icon (⬆️)</strong> bzw. den <strong>Stift (✏️)</strong> Ihre Original-PDF hinterlegen.</p>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; align-items:center;">
-                <input type="text" id="newFormTitle" class="form-control" placeholder="Formular-Titel (z.B. Zusatzantrag)" style="margin-bottom:0;">
-                <input type="text" id="newFormUrl" class="form-control" placeholder="Direkt-Link (oder Datei rechts wählen ->)" style="margin-bottom:0;">
-                <label class="noble-file-upload" style="margin-top:0;">
+        <div id="adminFormSection" class="admin-workspace-box admin-pro-wrap admin-pro-card mod-forms" style="margin-bottom: 26px;">
+            <div class="admin-pro-head">
+                <div>
+                    <div class="admin-pro-title-row">
+                        <span class="admin-pro-badge">CMS</span>
+                        <h4 class="admin-pro-title"><i class="fa-solid fa-file-circle-plus"></i> Formularverwaltung</h4>
+                    </div>
+                    <p class="admin-pro-sub">Neue PDF-Anträge hinzufügen oder bestehende Dokumente direkt auf den Karten bearbeiten und ersetzen.</p>
+                </div>
+                <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.restoreDefaultFormsList()"><i class="fa-solid fa-rotate-left"></i> Standard-Anträge wiederherstellen</button>
+            </div>
+            <div class="admin-pro-grid-3">
+                <input type="text" id="newFormTitle" class="form-control" placeholder="Titel des Formulars">
+                <input type="text" id="newFormUrl" class="form-control" placeholder="Direkt-Link (optional)">
+                <label class="noble-file-upload">
                     <input type="file" id="newFormFile" accept=".pdf,.doc,.docx,application/pdf" onchange="window.updateNewFormFileLabel(this)">
-                    <span class="noble-file-trigger" id="newFormFileLabel"><i class="fa-solid fa-file-arrow-up"></i> PDF/Datei vom Gerät wählen</span>
+                    <span class="noble-file-trigger" id="newFormFileLabel"><i class="fa-solid fa-file-arrow-up"></i> PDF auswählen</span>
                 </label>
             </div>
-            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
-                <button class="btn-primary" style="flex:2; justify-content:center;" onclick="window.addNewFormItem()"><i class="fa-solid fa-plus"></i> Neues Formular zur Liste hinzufügen</button>
-                <button class="btn-primary" style="flex:1; background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); justify-content:center; box-shadow:none;" onclick="window.restoreDefaultFormsList()"><i class="fa-solid fa-rotate-left" style="color:var(--primary-red);"></i> Standard-Anträge wiederherstellen</button>
+            <div class="admin-pro-actions">
+                <button type="button" class="admin-pro-btn admin-pro-btn-primary" onclick="window.addNewFormItem()"><i class="fa-solid fa-plus"></i> Formular hinzufügen</button>
             </div>
         </div>
         
@@ -5031,17 +5093,23 @@
             </div>
         </div>
         
-        <div id="adminAnkaufSection" class="admin-workspace-box mod-cars" style="max-width:800px; margin: 0 auto 30px; background: var(--gold-bg-soft); border: 1px solid var(--gold-border); border-radius: 15px; padding: 20px;">
-            <h4 style="color:var(--gold-accent); margin-bottom:10px; font-size:13px;"><i class="fa-solid fa-photo-film"></i> Admin: Medien Upload (Auto Galerie)</h4>
-            <div class="config-row" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="newCarTitle" class="form-control" placeholder="Modellname" style="flex:1; margin-bottom:0;">
-                
-                <label class="noble-file-upload" style="flex:1; margin-top:0;">
+        <div id="adminAnkaufSection" class="admin-workspace-box admin-pro-wrap admin-pro-card mod-cars" style="margin-bottom: 26px;">
+            <div class="admin-pro-head">
+                <div>
+                    <div class="admin-pro-title-row">
+                        <span class="admin-pro-badge">Medien</span>
+                        <h4 class="admin-pro-title"><i class="fa-solid fa-photo-film"></i> Fahrzeug-Galerie verwalten</h4>
+                    </div>
+                    <p class="admin-pro-sub">Neue Fahrzeugbilder oder kurze Videos (max. 700 KB) direkt in der Ankauf-Galerie veröffentlichen.</p>
+                </div>
+            </div>
+            <div class="admin-pro-grid-2">
+                <input type="text" id="newCarTitle" class="form-control" placeholder="Modellname (z. B. Mercedes C 220 d)">
+                <label class="noble-file-upload">
                     <input type="file" id="newCarFile" accept="image/*,video/*" onchange="window.updateFileLabel(this)">
                     <span class="noble-file-trigger" id="fileLabelText"><i class="fa-solid fa-folder-open"></i> Datei auswählen</span>
                 </label>
-                
-                <button class="btn-primary" style="background:var(--gold-border); color:#fff;" onclick="window.uploadNewCarMedia(event)">Veröffentlichen</button>
+                <button type="button" class="admin-pro-btn admin-pro-btn-primary" onclick="window.uploadNewCarMedia(event)"><i class="fa-solid fa-upload"></i> Veröffentlichen</button>
             </div>
         </div>
 
@@ -5224,9 +5292,9 @@
                 <option value="abyss">🌌 Abyss</option>
                 <option value="custom">🛠️ Custom (Eigenes Design)</option>
             </select>
-            <button class="btn-primary" style="padding: 6px 12px; font-size:10px;" onclick="window.applySelectedTheme()">✔️ Global anwenden</button>
-            <button class="btn-primary" style="padding: 6px 12px; font-size:10px; background: transparent; border: 1px solid var(--text-muted); color: var(--text-light); box-shadow:none;" onclick="window.resetCustomTheme()">Standard (Hell)</button>
-            <button class="btn-primary" style="padding: 6px 12px; font-size:10px;" onclick="window.openThemeEditor()">🎨 Design anpassen</button> 
+            <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.applySelectedTheme()"><i class="fa-solid fa-check"></i> Global anwenden</button>
+            <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.resetCustomTheme()">Standard (Hell)</button>
+            <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.openThemeEditor()"><i class="fa-solid fa-palette"></i> Design anpassen</button> 
         </div>
     </footer>
     
