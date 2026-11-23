@@ -9028,20 +9028,34 @@
             window.showToast('Auswahl in das Buchungsformular übertragen!', 'success');
         };
 
+        window.normalizeDateDE = function(dateStr) {
+            const s = String(dateStr || '').trim();
+            if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+                const p = s.substring(0, 10).split('-');
+                return `${p[2]}.${p[1]}.${p[0]}`;
+            }
+            if (/^\d{1,2}\.\d{1,2}\.\d{4}/.test(s)) {
+                const p = s.split('.');
+                return `${p[0].padStart(2, '0')}.${p[1].padStart(2, '0')}.${p[2].substring(0, 4)}`;
+            }
+            return s;
+        };
+
         // --- KALENDER (.ICS) DOWNLOAD ---
         window.lastBookedApt = null;
         window.downloadBookingICS = function() {
             const apt = window.lastBookedApt;
             if(!apt) { window.showToast('Kein aktueller Termin ausgewählt.', 'error'); return; }
 
-            const parts = apt.date.split('.');
+            const cleanDate = window.normalizeDateDE(apt.date);
+            const parts = cleanDate.split('.');
             let y = window.getDynamicSystemYear(), m = '01', d = '01';
             if(parts.length === 3) { d = parts[0].padStart(2,'0'); m = parts[1].padStart(2,'0'); y = parts[2]; }
 
             let startH = '09', startM = '00', endH = '10', endM = '00';
-            const tMatch = apt.time.match(/(\d{2}):(\d{2})/);
+            const tMatch = String(apt.time || '').match(/(\d{1,2}):(\d{2})/);
             if(tMatch) {
-                startH = tMatch[1]; startM = tMatch[2];
+                startH = tMatch[1].padStart(2, '0'); startM = tMatch[2];
                 endH = String(Math.min(23, parseInt(startH, 10) + 1)).padStart(2, '0');
                 endM = startM;
             }
@@ -9066,10 +9080,11 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `RED_Termin_${apt.date}.ics`;
+            a.download = `RED_Termin_${cleanDate}.ics`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            URL.revokeObjectURL(url);
             window.showToast('Kalendereintrag heruntergeladen!', 'success');
         };
 
@@ -9595,8 +9610,18 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             };
             document.querySelectorAll('.live-phone').forEach(el => el.innerText = data.phone);
             document.querySelectorAll('.live-email').forEach(el => el.innerText = data.email);
-            document.getElementById('link-ig').href = data.ig;
-            document.getElementById('link-fb').href = data.fb;
+            const igEl = document.getElementById('link-ig');
+            const fbEl = document.getElementById('link-fb');
+            const igVal = (data.ig || '').trim();
+            const fbVal = (data.fb || '').trim();
+            if (igEl) {
+                igEl.href = igVal || '#';
+                igEl.style.display = (igVal && igVal !== '#') ? 'flex' : 'none';
+            }
+            if (fbEl) {
+                fbEl.href = fbVal || '#';
+                fbEl.style.display = (fbVal && fbVal !== '#') ? 'flex' : 'none';
+            }
             let waPhone = data.phone.replace(/\D/g,'');
             if(waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
             const telLink = document.getElementById('tel-contact-link');
@@ -10342,7 +10367,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             try {
                 flatpickr("#datePicker", {
-                    locale: "de", 
+                    locale: "de",
+                    dateFormat: "d.m.Y",
                     minDate: "today", 
                     disableMobile: "true", 
                     disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6 || !!window.getBerlinHolidayName(d); } ],
@@ -10354,7 +10380,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         document.getElementById('submitBtn').disabled = true;
                         window.updateBookingLiveSummary();
                         
-                        const bookedTimes = (window.bookedSlotsList || []).filter(s => s.date === dateStr).map(s => (s.time || '').replace(' Uhr','').trim());
+                        const normTarget = window.normalizeDateDE(dateStr);
+                        const bookedTimes = (window.bookedSlotsList || [])
+                            .filter(s => window.normalizeDateDE(s.date) === normTarget)
+                            .map(s => (s.time || '').replace(' Uhr','').trim());
 
                         for(let h = 9; h <= 19; h++) {
                             for(let m of ['00', '30']) {
@@ -10381,7 +10410,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 });
 
                 flatpickr("#editAptDate", {
-                    locale: "de", 
+                    locale: "de",
+                    dateFormat: "d.m.Y",
                     minDate: "today", 
                     disableMobile: "true",
                     disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6 || !!window.getBerlinHolidayName(d); } ],
@@ -10389,7 +10419,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         const selectTime = document.getElementById('editAptTime');
                         selectTime.innerHTML = '<option value="Ganztägig">Ganztägig</option>';
                         
-                        const bookedTimes = (window.redApts || []).filter(a => a.date === dateStr && a.id !== window.editingAptId).map(a => a.timeLabel.replace(' Uhr','').trim());
+                        const normTarget = window.normalizeDateDE(dateStr);
+                        const bookedTimes = (window.redApts || [])
+                            .filter(a => window.normalizeDateDE(a.date) === normTarget && a.id !== window.editingAptId && Number(a.orderStatus) !== 4)
+                            .map(a => (a.timeLabel || '').replace(' Uhr','').trim());
 
                         for(let h = 9; h <= 19; h++) {
                             for(let m of ['00', '30']) {
@@ -12554,16 +12587,30 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
         };
         
+        async function releaseBookedSlot(dateStr, timeStr) {
+            const normDate = window.normalizeDateDE(dateStr);
+            const normTime = String(timeStr || '').replace(' Uhr', '').trim();
+            if (!normDate || !normTime || normTime === 'Ganztägig') return;
+            const matches = (window.bookedSlotsList || []).filter(s =>
+                window.normalizeDateDE(s.date) === normDate &&
+                String(s.time || '').replace(' Uhr', '').trim() === normTime
+            );
+            for (const slot of matches) {
+                try { await deleteDoc(doc(db, "booked_slots", slot.id)); } catch (e) {}
+            }
+        }
+
         window.openEditAptModal = function(id) {
             window.editingAptId = id;
             const apt = window.redApts.find(a => a.id === id);
             if(!apt) return;
             
-            document.getElementById('editAptDate').value = apt.date;
-            try { document.getElementById('editAptDate')._flatpickr.setDate(apt.date, true); } catch(e){}
+            const niceDate = window.normalizeDateDE(apt.date);
+            document.getElementById('editAptDate').value = niceDate;
+            try { document.getElementById('editAptDate')._flatpickr.setDate(niceDate, true); } catch(e){}
             
             const timeSelect = document.getElementById('editAptTime');
-            timeSelect.value = apt.timeLabel.includes('Uhr') ? apt.timeLabel : apt.timeLabel + ' Uhr';
+            timeSelect.value = (apt.timeLabel || '').includes('Uhr') ? apt.timeLabel : (apt.timeLabel || '') + ' Uhr';
             if(timeSelect.selectedIndex === -1) timeSelect.value = 'Ganztägig';
 
             document.getElementById('editAptOverlay').classList.add('open');
@@ -12576,12 +12623,34 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         window.saveEditedApt = async function() {
             if(!window.editingAptId) return;
-            const newDate = document.getElementById('editAptDate').value;
+            const newDate = window.normalizeDateDE(document.getElementById('editAptDate').value);
             const newTime = document.getElementById('editAptTime').value;
+            const oldApt = (window.redApts || localAppointments || []).find(a => a.id === window.editingAptId);
 
             try {
                 await updateDoc(doc(db, "appointments", window.editingAptId), { date: newDate, timeLabel: newTime });
-                window.showToast('Termin erfolgreich verschoben!', 'success');
+
+                if (oldApt) {
+                    await releaseBookedSlot(oldApt.date, oldApt.timeLabel);
+                }
+                if (newDate && newTime && newTime !== 'Ganztägig') {
+                    await addDoc(collection(db, "booked_slots"), {
+                        date: newDate,
+                        time: newTime,
+                        timestamp: Date.now()
+                    }).catch(() => {});
+                }
+
+                const resolvedCode = oldApt?.trackingCode || ((oldApt?.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '';
+                if (resolvedCode) {
+                    await setDoc(doc(db, "order_tracking", resolvedCode), {
+                        date: newDate,
+                        timeLabel: newTime,
+                        updatedAt: Date.now()
+                    }, { merge: true }).catch(() => {});
+                }
+
+                window.showToast('Termin verschoben & Zeitslot aktualisiert!', 'success');
             } catch(e) {
                 const index = localAppointments.findIndex(a => a.id === window.editingAptId);
                 if(index > -1) {
@@ -12686,6 +12755,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 window.showToast('Notiz gelöscht.', 'success');
             }
             else if(window.deleteTargetId) {
+                const targetApt = (window.redApts || localAppointments || []).find(a => a.id === window.deleteTargetId);
                 const cardElement = document.getElementById(window.deleteTargetId);
                 const pinnedElement = document.getElementById('pinned-' + window.deleteTargetId);
                 if(cardElement) cardElement.remove();
@@ -12693,13 +12763,21 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
                 try {
                     await deleteDoc(doc(db, "appointments", window.deleteTargetId));
+
+                    if (targetApt) {
+                        await releaseBookedSlot(targetApt.date, targetApt.timeLabel);
+                        const resolvedCode = targetApt.trackingCode || ((targetApt.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '';
+                        if (resolvedCode) {
+                            await deleteDoc(doc(db, "order_tracking", resolvedCode)).catch(() => {});
+                        }
+                    }
                     
                     let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
                     if(positions[window.deleteTargetId]) {
                         delete positions[window.deleteTargetId];
                         localStorage.setItem('pin_positions', JSON.stringify(positions));
                     }
-                    window.showToast('Termin gelöscht.', 'success');
+                    window.showToast('Termin gelöscht & Zeitfenster wieder freigegeben.', 'success');
                 } catch(e) {
                     window.showToast('Lokal gelöscht.', 'success');
                 }
@@ -13465,24 +13543,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
         };
 
-        window.deleteAppointment = async function(id) {
-            if (confirm('Möchten Sie diesen Termin wirklich unwiderruflich aus dem System löschen?')) {
-                try {
-                    await deleteDoc(doc(db, "appointments", id));
-                    window.showToast('Termin erfolgreich gelöscht!', 'success');
-                } catch (err) {
-                    let localApts = JSON.parse(localStorage.getItem('red_local_apts')) || [];
-                    localApts = localApts.filter(a => a.id !== id);
-                    localStorage.setItem('red_local_apts', JSON.stringify(localApts));
-                    
-                    if (typeof renderAppointments === "function") {
-                        renderAppointments(localApts);
-                    }
-                    window.showToast('Termin lokal entfernt.', 'success');
-                }
-            }
-        };
-    </script>
+        </script>
 
 </body>
 </html>
