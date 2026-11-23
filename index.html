@@ -4314,24 +4314,37 @@
         </div>
     </div>
 
-    <!-- BESTÄTIGUNGS-MODAL MIT KALENDER-DOWNLOAD (.ICS) & WHATSAPP-BESTÄTIGUNG -->
+    <!-- BESTÄTIGUNGS-MODAL MIT AUFTRAGSCODE-WARNHINWEIS, KALENDER (.ICS) & WHATSAPP -->
     <div class="custom-dialog-overlay" id="confirmModalOverlay">
         <div class="custom-dialog-window">
-            <i class="fa-solid fa-circle-check" style="font-size:45px; color:#25D366; margin-bottom:15px;"></i>
+            <i class="fa-solid fa-circle-check" style="font-size:42px; color:#25D366; margin-bottom:10px;"></i>
             <h3 style="color:var(--text-light); font-weight:900;" id="confirmModalTitle">Termin Reserviert!</h3>
-            <p style="color:var(--text-muted); font-size:13px; margin:10px 0 15px;" id="confirmModalText"></p>
+            <div style="color:var(--text-muted); font-size:13px; margin:10px 0 14px; line-height:1.5;" id="confirmModalText"></div>
+
+            <!-- WARNHINWEIS-BOX FÜR DEN AUFTRAGSCODE -->
+            <div id="confirmCodeWarningBox" style="background:rgba(217,0,0,0.07); border:2px solid var(--primary-red); border-radius:14px; padding:14px 12px; margin-bottom:14px; text-align:center;">
+                <div style="color:var(--primary-red); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> WICHTIG: Auftrags-Code bitte sofort notieren!
+                </div>
+                <div style="display:inline-flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin:4px 0 8px;">
+                    <span id="confirmTrackingCodeVal" style="font-family:'Courier New', monospace; font-size:20px; font-weight:900; color:var(--text-light); background:var(--bg-card); border:1.5px dashed var(--primary-red); padding:5px 14px; border-radius:10px; letter-spacing:1px;">RED-000000</span>
+                    <button type="button" onclick="window.copyCurrentTrackingCode()" style="background:var(--primary-red); color:#fff; border:none; border-radius:8px; padding:8px 13px; font-size:11.5px !important; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                        <i class="fa-regular fa-copy"></i> Code kopieren
+                    </button>
+                </div>
+                <p style="font-size:11px; color:var(--text-light); font-weight:700; margin:0; line-height:1.45;">
+                    Bitte machen Sie einen Screenshot oder schreiben Sie diesen Code auf – nur damit können Sie Ihren Status jederzeit im <strong>Live-Tracker</strong> abfragen.
+                </p>
+            </div>
             
             <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); width:100%; justify-content:center; margin-bottom:10px; box-shadow:none;" onclick="window.downloadBookingICS()">
                 <i class="fa-regular fa-calendar-plus" style="color:var(--primary-red);"></i> In Smartphone-Kalender speichern (.ics)
             </button>
             <button type="button" class="btn-primary btn-green-adaptive" style="width:100%; justify-content:center; margin-bottom:12px;" onclick="window.sendLastBookingViaWhatsApp()">
-                <i class="fa-brands fa-whatsapp"></i> Termin-Daten zusätzlich per WhatsApp senden
+                <i class="fa-brands fa-whatsapp"></i> Termin &amp; Code per WhatsApp sichern
             </button>
 
-            <p style="color:var(--text-muted); font-size: 11px; margin-bottom: 18px; font-style: italic;">
-                Tipp: Sie können den Bearbeitungsstatus Ihres Auftrags jederzeit über unseren Live-Tracker auf der Startseite abrufen.
-            </p>
-            <button class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.closeCustomConfirm()">Fertig & Schließen</button>
+            <button class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.closeCustomConfirm()"><i class="fa-solid fa-check"></i> Code notiert – Fertig &amp; Schließen</button>
         </div>
     </div>
 
@@ -5394,7 +5407,13 @@
                             <strong id="summaryServiceText" style="color:var(--text-light);">Privatkunde • Anmeldung</strong>
                         </div>
                         <div style="text-align:right;">
-                            <span id="summaryDateTimeText" style="font-weight:800; color:var(--primary-red);">Bitte Datum & Uhrzeit wählen</span>
+                            <span id="summaryDateTimeText" style="font-weight:800; color:var(--primary-red);">Bitte Datum &amp; Uhrzeit wählen</span>
+                        </div>
+                        <div style="width:100%; border-top:1px dashed var(--glass-border); padding-top:8px; margin-top:2px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <span style="font-size:11px; color:var(--text-light); font-weight:700;">
+                                <i class="fa-solid fa-triangle-exclamation" style="color:var(--primary-red);"></i> Ihr Live-Tracker Auftrags-Code <span style="color:var(--text-muted); font-weight:600;">(bitte nach Buchung notieren):</span>
+                            </span>
+                            <span id="summaryTrackingCodeBadge" style="font-family:'Courier New', monospace; font-weight:900; font-size:13px; color:var(--primary-red); background:var(--bg-card); border:1.5px solid var(--primary-red); padding:2px 10px; border-radius:8px; letter-spacing:0.6px;">RED-000000</span>
                         </div>
                     </div>
 
@@ -7178,9 +7197,35 @@
             window.updateBookingLiveSummary();
         };
 
+        window.getOrCreatePendingTrackingCode = function(forceNew = false) {
+            if (forceNew || !window.pendingTrackingCode || !/^RED-\d{6}$/.test(window.pendingTrackingCode)) {
+                window.pendingTrackingCode = 'RED-' + Math.floor(100000 + Math.random() * 900000);
+            }
+            const badge = document.getElementById('summaryTrackingCodeBadge');
+            if (badge) badge.innerText = window.pendingTrackingCode;
+            return window.pendingTrackingCode;
+        };
+
+        window.copyCurrentTrackingCode = function() {
+            const code = (window.lastBookedApt && window.lastBookedApt.trackingCode)
+                || document.getElementById('confirmTrackingCodeVal')?.innerText
+                || window.getOrCreatePendingTrackingCode(false);
+            if (!code) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    window.showToast(`Auftrags-Code ${code} kopiert!`, 'success');
+                }).catch(() => {
+                    window.showToast(`Bitte manuell notieren: ${code}`, 'success');
+                });
+            } else {
+                window.showToast(`Bitte manuell notieren: ${code}`, 'success');
+            }
+        };
+
         window.updateBookingLiveSummary = function() {
             const srvTextEl = document.getElementById('summaryServiceText');
             const dtTextEl = document.getElementById('summaryDateTimeText');
+            window.getOrCreatePendingTrackingCode(false);
             if(!srvTextEl || !dtTextEl) return;
 
             const cat = window.selectedClientCategory || 'Privatkunde';
@@ -7199,6 +7244,7 @@
                 dtTextEl.innerText = 'Bitte Datum & Uhrzeit wählen';
             }
         };
+        document.addEventListener('DOMContentLoaded', () => window.getOrCreatePendingTrackingCode(false));
 
         window.sendLastBookingViaWhatsApp = function() {
             const apt = window.lastBookedApt;
@@ -11304,7 +11350,9 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
             if (!timeString.includes("Uhr")) timeString += " Uhr";
 
-            const trackingCode = 'RED-' + Math.floor(100000 + Math.random() * 900000);
+            const trackingCode = typeof window.getOrCreatePendingTrackingCode === 'function'
+                ? window.getOrCreatePendingTrackingCode(false)
+                : ('RED-' + Math.floor(100000 + Math.random() * 900000));
 
             window.lastBookedApt = {
                 name: n, phone: p, email: e, date: d, time: timeString,
@@ -11328,22 +11376,18 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 marked: false, orderStatus: 1, notes: initialNotes, timestamp: Date.now()
             };
 
+            const trackingPayload = {
+                code: trackingCode,
+                date: d,
+                timeLabel: timeString,
+                service: window.selectedServiceVal,
+                wunschkennzeichen: wunschkennzeichen || '',
+                orderStatus: 1,
+                timestamp: Date.now()
+            };
+
             try {
                 await addDoc(collection(db, "appointments"), appointmentData);
-                await addDoc(collection(db, "booked_slots"), {
-                    date: d,
-                    time: timeString,
-                    timestamp: Date.now()
-                });
-                await setDoc(doc(db, "order_tracking", trackingCode), {
-                    code: trackingCode,
-                    date: d,
-                    timeLabel: timeString,
-                    service: window.selectedServiceVal,
-                    wunschkennzeichen: wunschkennzeichen || '',
-                    orderStatus: 1,
-                    timestamp: Date.now()
-                });
             } catch(err) {
                 console.error("Buchungs-Fehler:", err);
                 window.showToast('Buchung konnte nicht gespeichert werden. Bitte erneut versuchen.', 'error');
@@ -11352,7 +11396,29 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 return;
             }
 
-            await window.sendToMakeWebhook({
+            // Zeitfenster & Live-Tracker getrennt speichern, damit das Warn-Popup garantiert öffnet
+            addDoc(collection(db, "booked_slots"), { date: d, time: timeString, timestamp: Date.now() }).catch(() => {});
+            setDoc(doc(db, "order_tracking", trackingCode), trackingPayload).catch((err) => {
+                console.error("Order-Tracking Schreibfehler:", err);
+            });
+            try {
+                const localMap = JSON.parse(localStorage.getItem('red_local_tracking_map') || '{}');
+                localMap[trackingCode] = trackingPayload;
+                localStorage.setItem('red_local_tracking_map', JSON.stringify(localMap));
+            } catch (err) {}
+
+            // Bestätigungs-Popup mit Auftrags-Code & Warnhinweis SOFORT öffnen
+            const plateInfo = wunschkennzeichen ? ` | Wunschkennzeichen: ${wunschkennzeichen}` : '';
+            const titleEl = document.getElementById('confirmModalTitle');
+            if (titleEl) titleEl.innerText = 'Termin Reserviert!';
+            document.getElementById('confirmModalText').innerHTML = `Vielen Dank, <strong>${window.escHtml(n)}</strong>! Ihr Termin (${window.escHtml(category)}) am <strong>${window.escHtml(d)}</strong> um <strong>${window.escHtml(timeString)}</strong> für „${window.escHtml(window.selectedServiceVal)}“${window.escHtml(plateInfo)} wurde verbindlich eingetragen.`;
+            const codeValEl = document.getElementById('confirmTrackingCodeVal');
+            if (codeValEl) codeValEl.innerText = trackingCode;
+            document.getElementById('confirmModalOverlay').classList.add('open');
+            window.showToast(`WICHTIG: Ihr Auftrags-Code lautet ${trackingCode} – bitte notieren!`, 'success');
+
+            // Benachrichtigung im Hintergrund senden
+            window.sendToMakeWebhook({
                 type: 'new_booking',
                 trackingCode: trackingCode,
                 clientName: n,
@@ -11364,20 +11430,17 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 service: window.selectedServiceVal,
                 wunschkennzeichen: wunschkennzeichen || 'Kein Wunschkennzeichen angegeben',
                 customNote: customNote || '-'
-            });
+            }).catch(() => {});
             try { sessionStorage.removeItem('red_pending_plate'); } catch (err) {}
-
-            const plateInfo = wunschkennzeichen ? ` | Wunschkennzeichen: ${wunschkennzeichen}` : '';
-            document.getElementById('confirmModalTitle').innerText = 'Termin Reserviert & Prüfcode erstellt!';
-            document.getElementById('confirmModalText').innerHTML = `Vielen Dank, <strong>${window.escHtml(n)}</strong>! Ihr Termin (${window.escHtml(category)}) am <strong>${window.escHtml(d)}</strong> um <strong>${window.escHtml(timeString)}</strong> für „${window.escHtml(window.selectedServiceVal)}“${window.escHtml(plateInfo)} wurde verbindlich eingetragen.<br><br><div style="background:var(--bg-input); border:2px solid var(--primary-red); padding:12px 14px; border-radius:14px; text-align:center;"><div style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.6px; margin-bottom:4px;">Wichtiger Hinweis – Bitte notieren oder kopieren:</div><div style="display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;"><span style="font-weight:900; color:var(--primary-red); font-size:17px; font-family:'Courier New', monospace;">${trackingCode}</span><button type="button" onclick="navigator.clipboard?.writeText('${trackingCode}'); window.showToast('Prüfcode ${trackingCode} kopiert!', 'success');" style="background:var(--primary-red); color:#fff; border:none; border-radius:8px; padding:6px 11px; font-size:11px !important; font-weight:800; cursor:pointer;"><i class="fa-regular fa-copy"></i> Code kopieren</button></div><div style="font-size:11px; color:var(--text-light); font-weight:700; margin-top:6px;">Mit diesem Code können Sie Ihren Bearbeitungsstatus jederzeit im <strong>Live-Tracker</strong> auf der Startseite abfragen.</div></div><br><small style="color:var(--text-muted); display:inline-block;">Zusätzlich wird Ihnen der Code an <strong>${window.escHtml(e)}</strong> übermittelt.</small>`;
-            document.getElementById('confirmModalOverlay').classList.add('open');
-            window.showToast(`Hinweis: Ihr Prüfcode lautet ${trackingCode} – bitte notieren!`, 'success');
             
             document.getElementById('bookingForm').reset();
             document.getElementById('timeWrapper').style.display = 'none';
             btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Termin jetzt verbindlich reservieren';
             btn.disabled = true;
             window.chosenHour = null;
+            if (typeof window.getOrCreatePendingTrackingCode === 'function') {
+                window.getOrCreatePendingTrackingCode(true);
+            }
             window.updateBookingLiveSummary();
         };
         
