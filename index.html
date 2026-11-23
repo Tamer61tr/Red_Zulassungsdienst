@@ -7605,44 +7605,104 @@
             window.submitAnkaufInquiry(true);
         };
 
+        window._activeTrackerUnsub = null;
+
+        window.renderTrackerStatusData = function(data, fallbackCode) {
+            const resBox = document.getElementById('liveTrackerResultBox');
+            if (!resBox) return;
+            resBox.style.display = 'block';
+            const step = Number(data.orderStatus) || 1;
+            const stepLabels = {
+                1: '1. Unterlagen & Termin erfasst',
+                2: '2. In Bearbeitung beim LABO',
+                3: '3. Schilder geprägt & Siegel',
+                4: '4. Fertig & Abholbereit!'
+            };
+            const codeText = data.code || fallbackCode || '';
+            const timeInfo = data.timeLabel ? ` • ${data.timeLabel}` : '';
+            const dateInfo = data.date ? ` (${data.date}${timeInfo})` : '';
+            const plateInfo = data.wunschkennzeichen ? ` | Kennz.: ${data.wunschkennzeichen}` : '';
+
+            document.getElementById('trackerClientTitle').innerText = `Auftrag ${codeText}${dateInfo} – ${stepLabels[step] || stepLabels[1]}`;
+            document.getElementById('trackerServiceBadge').innerText = (data.service || 'Kfz-Zulassung') + plateInfo;
+
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById('tStep' + i);
+                if (!stepEl) continue;
+                stepEl.classList.remove('active', 'completed');
+                if (i < step) stepEl.classList.add('completed');
+                else if (i === step) stepEl.classList.add('active');
+            }
+        };
+
         window.checkLiveOrderStatus = async function() {
             const inputEl = document.getElementById('liveTrackerInput');
-            let code = (inputEl?.value || '').trim().toUpperCase().replace(/\s+/g, '');
+            let code = (inputEl?.value || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
             if (/^\d{6}$/.test(code)) {
                 code = 'RED-' + code;
                 if (inputEl) inputEl.value = code;
             }
             if (!/^RED-\d{6}$/.test(code)) {
-                window.showToast('Bitte gültigen Auftrags-Code eingeben (z.B. RED-123456).', 'error');
+                window.showToast('Bitte gültigen Prüfcode eingeben (z.B. RED-123456).', 'error');
                 return;
             }
+
+            if (typeof window._activeTrackerUnsub === 'function') {
+                window._activeTrackerUnsub();
+                window._activeTrackerUnsub = null;
+            }
+
             const resBox = document.getElementById('liveTrackerResultBox');
             try {
-                const snap = await window.firebaseGetDoc(window.firebaseDoc(window.firebaseDb, "order_tracking", code));
+                const docRef = window.firebaseDoc(window.firebaseDb, "order_tracking", code);
+                const snap = await window.firebaseGetDoc(docRef);
+
                 if (!snap.exists()) {
+                    const localMatch = (window.redApts || []).find(a => a.trackingCode === code);
+                    if (localMatch) {
+                        window.renderTrackerStatusData({
+                            code: code,
+                            date: localMatch.date,
+                            timeLabel: localMatch.timeLabel,
+                            service: localMatch.service,
+                            wunschkennzeichen: localMatch.wunschkennzeichen,
+                            orderStatus: localMatch.orderStatus || 1
+                        }, code);
+                        window.showToast('Auftragsstatus geladen!', 'success');
+                        return;
+                    }
                     if (resBox) resBox.style.display = 'none';
-                    window.showToast('Kein Auftrag unter diesem Code gefunden.', 'error');
+                    window.showToast(`Code ${code} nicht gefunden. Bitte Schreibweise prüfen oder neu buchen.`, 'error');
                     return;
                 }
-                const data = snap.data();
-                resBox.style.display = 'block';
-                const step = Number(data.orderStatus) || 1;
-                const timeInfo = data.timeLabel ? ` • ${data.timeLabel}` : '';
-                const plateInfo = data.wunschkennzeichen ? ` | Kennz.: ${data.wunschkennzeichen}` : '';
-                document.getElementById('trackerClientTitle').innerText = `Auftrag ${data.code} (${data.date}${timeInfo})`;
-                document.getElementById('trackerServiceBadge').innerText = (data.service || 'Kfz-Zulassung') + plateInfo;
 
-                for (let i = 1; i <= 4; i++) {
-                    const stepEl = document.getElementById('tStep' + i);
-                    if (!stepEl) continue;
-                    stepEl.classList.remove('active', 'completed');
-                    if (i < step) stepEl.classList.add('completed');
-                    else if (i === step) stepEl.classList.add('active');
-                }
+                window.renderTrackerStatusData(snap.data(), code);
                 window.showToast('Auftragsstatus erfolgreich geladen!', 'success');
+
+                // Live-Updates bei Statusänderungen im Admin-Bereich
+                if (typeof window.firebaseOnSnapshot === 'function') {
+                    window._activeTrackerUnsub = window.firebaseOnSnapshot(docRef, (liveSnap) => {
+                        if (liveSnap.exists()) {
+                            window.renderTrackerStatusData(liveSnap.data(), code);
+                        }
+                    }, () => {});
+                }
             } catch (err) {
+                console.error('Tracker-Abfrage Fehler:', err);
+                const localMatch = (window.redApts || []).find(a => a.trackingCode === code);
+                if (localMatch) {
+                    window.renderTrackerStatusData({
+                        code: code,
+                        date: localMatch.date,
+                        timeLabel: localMatch.timeLabel,
+                        service: localMatch.service,
+                        wunschkennzeichen: localMatch.wunschkennzeichen,
+                        orderStatus: localMatch.orderStatus || 1
+                    }, code);
+                    return;
+                }
                 if (resBox) resBox.style.display = 'none';
-                window.showToast('Status konnte gerade nicht abgerufen werden.', 'error');
+                window.showToast('Prüfung fehlgeschlagen: Bitte Firestore-Leserechte für order_tracking prüfen.', 'error');
             }
         };
 
@@ -9846,6 +9906,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.firebaseAuth = auth;
         window.firebaseDoc = doc;
         window.firebaseGetDoc = getDoc;
+        window.firebaseOnSnapshot = onSnapshot;
         window.firebaseCollection = collection;
         window.firebaseAddDoc = addDoc;
         window.firebaseUpdateDoc = updateDoc;
@@ -11307,8 +11368,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             try { sessionStorage.removeItem('red_pending_plate'); } catch (err) {}
 
             const plateInfo = wunschkennzeichen ? ` | Wunschkennzeichen: ${wunschkennzeichen}` : '';
-            document.getElementById('confirmModalText').innerHTML = `Vielen Dank ${window.escHtml(n)}! Ihr Termin (${window.escHtml(category)}) am <strong>${window.escHtml(d)}</strong> um <strong>${window.escHtml(timeString)}</strong> für „${window.escHtml(window.selectedServiceVal)}“${window.escHtml(plateInfo)} wurde verbindlich eingetragen.<br><br><div style="display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; background:var(--bg-input); border:1.5px dashed var(--primary-red); padding:9px 14px; border-radius:12px;"><span style="font-weight:900; color:var(--primary-red); font-size:15px;">Ihr Auftrags-Code: ${trackingCode}</span><button type="button" onclick="navigator.clipboard?.writeText('${trackingCode}'); window.showToast('Auftrags-Code ${trackingCode} kopiert!', 'success');" style="background:var(--primary-red); color:#fff; border:none; border-radius:8px; padding:5px 10px; font-size:11px !important; font-weight:800; cursor:pointer;"><i class="fa-regular fa-copy"></i> Kopieren</button></div><br><small style="color:var(--text-muted); display:inline-block; margin-top:6px;">Wir haben Ihnen diesen Code zusätzlich an <strong>${window.escHtml(e)}</strong> gesendet.</small>`;
+            document.getElementById('confirmModalTitle').innerText = 'Termin Reserviert & Prüfcode erstellt!';
+            document.getElementById('confirmModalText').innerHTML = `Vielen Dank, <strong>${window.escHtml(n)}</strong>! Ihr Termin (${window.escHtml(category)}) am <strong>${window.escHtml(d)}</strong> um <strong>${window.escHtml(timeString)}</strong> für „${window.escHtml(window.selectedServiceVal)}“${window.escHtml(plateInfo)} wurde verbindlich eingetragen.<br><br><div style="background:var(--bg-input); border:2px solid var(--primary-red); padding:12px 14px; border-radius:14px; text-align:center;"><div style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.6px; margin-bottom:4px;">Wichtiger Hinweis – Bitte notieren oder kopieren:</div><div style="display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;"><span style="font-weight:900; color:var(--primary-red); font-size:17px; font-family:'Courier New', monospace;">${trackingCode}</span><button type="button" onclick="navigator.clipboard?.writeText('${trackingCode}'); window.showToast('Prüfcode ${trackingCode} kopiert!', 'success');" style="background:var(--primary-red); color:#fff; border:none; border-radius:8px; padding:6px 11px; font-size:11px !important; font-weight:800; cursor:pointer;"><i class="fa-regular fa-copy"></i> Code kopieren</button></div><div style="font-size:11px; color:var(--text-light); font-weight:700; margin-top:6px;">Mit diesem Code können Sie Ihren Bearbeitungsstatus jederzeit im <strong>Live-Tracker</strong> auf der Startseite abfragen.</div></div><br><small style="color:var(--text-muted); display:inline-block;">Zusätzlich wird Ihnen der Code an <strong>${window.escHtml(e)}</strong> übermittelt.</small>`;
             document.getElementById('confirmModalOverlay').classList.add('open');
+            window.showToast(`Hinweis: Ihr Prüfcode lautet ${trackingCode} – bitte notieren!`, 'success');
             
             document.getElementById('bookingForm').reset();
             document.getElementById('timeWrapper').style.display = 'none';
