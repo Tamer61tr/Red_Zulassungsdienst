@@ -3072,7 +3072,7 @@
             <div id="authBox">
                 <h3 style="color:var(--primary-red); font-weight:900; margin-bottom:20px;"><i class="fa-solid fa-lock"></i> Admin Systemzugang</h3>
                 <div class="form-group">
-                    <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="Benutzername eingeben">
+                    <input type="text" id="adminUser" class="form-control" style="text-align:center;" placeholder="E-Mail (z.B. admin@red-berlin.de)">
                 </div>
                 <div class="form-group">
                     <input type="password" id="adminPass" class="form-control" style="text-align:center;" placeholder="Passwort eingeben" onkeypress="if(event.key==='Enter') window.tryLogin()">
@@ -4745,9 +4745,9 @@
         <section class="compass-wrapper" style="margin-top:25px;">
             <div class="tool-box" style="border-top: 3px solid var(--primary-red);">
                 <h3><i class="fa-solid fa-satellite-dish"></i> Live Auftrags- & Zulassungs-Tracker</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Prüfen Sie hier jederzeit live den Bearbeitungsstatus Ihrer Zulassung (Name oder Telefonnummer eingeben):</p>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Prüfen Sie hier jederzeit live den Bearbeitungsstatus Ihrer Zulassung (Auftrags-Code eingeben, z.B. RED-123456):</p>
                 <div style="display:flex; gap:8px;">
-                    <input type="text" id="liveTrackerInput" class="form-control" placeholder="Ihr Name oder Telefonnummer..." onkeypress="if(event.key==='Enter') window.checkLiveOrderStatus()">
+                    <input type="text" id="liveTrackerInput" class="form-control" placeholder="Auftrags-Code (z.B. RED-123456)..." style="text-transform:uppercase;" onkeypress="if(event.key==='Enter') window.checkLiveOrderStatus()">
                     <button type="button" class="btn-primary" onclick="window.checkLiveOrderStatus()" style="padding:0 18px; white-space:nowrap;"><i class="fa-solid fa-magnifying-glass"></i> Prüfen</button>
                 </div>
 
@@ -6983,41 +6983,38 @@
             window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
         };
 
-        window.checkLiveOrderStatus = function() {
-            const queryStr = (document.getElementById('liveTrackerInput')?.value || '').trim().toLowerCase();
-            if (queryStr.length < 3) {
-                window.showToast('Bitte mindestens 3 Zeichen (Name oder Telefonnummer) eingeben.', 'error');
+        window.checkLiveOrderStatus = async function() {
+            const code = (document.getElementById('liveTrackerInput')?.value || '').trim().toUpperCase();
+            if (!/^RED-\d{6}$/.test(code)) {
+                window.showToast('Bitte gültigen Auftrags-Code eingeben (z.B. RED-123456).', 'error');
                 return;
             }
-
-            const cleanDigits = queryStr.replace(/\D/g, '');
-            const foundApt = (window.redApts || []).find(a => {
-                const nameMatch = (a.name || '').toLowerCase().includes(queryStr);
-                const phoneClean = (a.phone || '').replace(/\D/g, '');
-                const phoneMatch = cleanDigits.length >= 4 && phoneClean.includes(cleanDigits);
-                return nameMatch || phoneMatch;
-            });
-
             const resBox = document.getElementById('liveTrackerResultBox');
-            if (!foundApt) {
+            try {
+                const snap = await window.firebaseGetDoc(window.firebaseDoc(window.firebaseDb, "order_tracking", code));
+                if (!snap.exists()) {
+                    if (resBox) resBox.style.display = 'none';
+                    window.showToast('Kein Auftrag unter diesem Code gefunden.', 'error');
+                    return;
+                }
+                const data = snap.data();
+                resBox.style.display = 'block';
+                const step = Number(data.orderStatus) || 1;
+                document.getElementById('trackerClientTitle').innerText = `Auftrag ${data.code} (${data.date})`;
+                document.getElementById('trackerServiceBadge').innerText = data.service || 'Kfz-Zulassung';
+
+                for (let i = 1; i <= 4; i++) {
+                    const stepEl = document.getElementById('tStep' + i);
+                    if (!stepEl) continue;
+                    stepEl.classList.remove('active', 'completed');
+                    if (i < step) stepEl.classList.add('completed');
+                    else if (i === step) stepEl.classList.add('active');
+                }
+                window.showToast('Auftragsstatus erfolgreich geladen!', 'success');
+            } catch (err) {
                 if (resBox) resBox.style.display = 'none';
-                window.showToast('Aktuell kein offener Auftrag unter dieser Angabe hinterlegt.', 'error');
-                return;
+                window.showToast('Status konnte gerade nicht abgerufen werden.', 'error');
             }
-
-            resBox.style.display = 'block';
-            const step = Number(foundApt.orderStatus) || 1;
-            document.getElementById('trackerClientTitle').innerText = `Auftrag für: ${foundApt.name} (${foundApt.date})`;
-            document.getElementById('trackerServiceBadge').innerText = foundApt.service || 'Kfz-Zulassung';
-
-            for (let i = 1; i <= 4; i++) {
-                const stepEl = document.getElementById('tStep' + i);
-                if (!stepEl) continue;
-                stepEl.classList.remove('active', 'completed');
-                if (i < step) stepEl.classList.add('completed');
-                else if (i === step) stepEl.classList.add('active');
-            }
-            window.showToast('Auftragsstatus erfolgreich geladen!', 'success');
         };
 
         // --- DATEI-UPLOAD LABEL HELFER ---
@@ -8401,7 +8398,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         document.getElementById('submitBtn').disabled = true;
                         window.updateBookingLiveSummary();
                         
-                        const bookedTimes = (window.redApts || []).filter(a => a.date === dateStr).map(a => a.timeLabel.replace(' Uhr','').trim());
+                        const bookedTimes = (window.bookedSlotsList || []).filter(s => s.date === dateStr).map(s => (s.time || '').replace(' Uhr','').trim());
 
                         for(let h = 9; h <= 19; h++) {
                             for(let m of ['00', '30']) {
@@ -9151,7 +9148,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 <!-- TEIL 6 VON 6: FIREBASE ECHTZEIT-DATENBANK, GELB-GOLDENE PIN-MARKIERUNG, FORMULARE & DATEI-ABSCHLUSS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDoc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDa10ia02K0vsHgzj-iTf4S6BwKzQruqyY",
@@ -9164,14 +9162,24 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
         
         window.firebaseDb = db;
+        window.firebaseAuth = auth;
         window.firebaseDoc = doc;
+        window.firebaseGetDoc = getDoc;
         window.firebaseCollection = collection;
         window.firebaseAddDoc = addDoc;
         window.firebaseUpdateDoc = updateDoc;
         window.firebaseDeleteDoc = deleteDoc;
         window.firebaseSetDoc = setDoc;
+
+        window.bookedSlotsList = [];
+        onSnapshot(collection(db, "booked_slots"), (snapshot) => {
+            const slots = [];
+            snapshot.forEach(d => slots.push({ id: d.id, ...d.data() }));
+            window.bookedSlotsList = slots;
+        });
 
         window.crmClientsDetail = {};
         
@@ -9275,134 +9283,129 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
         };
 
-        window.sysAuth = {
-            "Tamer Yazici": { pass: "616161", role: "admin" },
-            "musadmin": { pass: "25361980", role: "supervisor" }
+        const ADMIN_AUTH_EMAILS = ['admin@red-berlin.de', 'supervisor@red-berlin.de'];
+        const USER_LOGIN_ALIASES = {
+            'tamer yazici': 'admin@red-berlin.de',
+            'admin': 'admin@red-berlin.de',
+            'musadmin': 'supervisor@red-berlin.de',
+            'supervisor': 'supervisor@red-berlin.de'
         };
-        
-        if(db) {
-            onSnapshot(doc(db, "settings", "auth"), (docSnap) => {
-                if(docSnap.exists()) {
-                    const data = docSnap.data();
-                    if(data["Tamer Yazici"]) window.sysAuth["Tamer Yazici"].pass = data["Tamer Yazici"];
-                    if(data["musadmin"]) window.sysAuth["musadmin"].pass = data["musadmin"];
-                }
-            });
-        }
 
         window.isAuthorized = false;
         window.loggedInUser = null;
 
-        if(localStorage.getItem('red_admin_saved') === 'true') {
-            const savedUser = localStorage.getItem('red_logged_in_user') || "Tamer Yazici";
-            
-            window.isAuthorized = true;
-            window.loggedInUser = savedUser;
-            document.body.classList.add('is-admin');
-            
-            if(window.sysAuth[savedUser] && window.sysAuth[savedUser].role === "supervisor") {
-                document.body.classList.add('is-supervisor');
-            }
-            
-            document.getElementById('authBox').style.display = 'none';
-            document.getElementById('dashboardBox').style.display = 'block';
-            
-            window.startAdminCrmListener();
-            document.addEventListener('DOMContentLoaded', () => {
-                if(document.getElementById('loggedInUser')) {
-                    document.getElementById('loggedInUser').innerText = savedUser;
-                }
-                let localPerms = JSON.parse(localStorage.getItem('red_admin_perms'));
-                if(localPerms) window.applyAdminModulePermissions(localPerms);
-                setTimeout(window.syncHeaderHeight, 80);
-            });
-        }
-
-        window.tryLogin = function() {
-            const u = document.getElementById('adminUser').value.trim();
-            const p = document.getElementById('adminPass').value;
-            const remember = document.getElementById('rememberMe').checked;
-            
-            if(window.sysAuth[u] && window.sysAuth[u].pass === p) {
+        onAuthStateChanged(auth, (user) => {
+            const email = (user?.email || '').toLowerCase();
+            if (user && ADMIN_AUTH_EMAILS.includes(email)) {
+                const isSupervisor = (email === 'supervisor@red-berlin.de');
                 window.isAuthorized = true;
-                window.loggedInUser = u;
+                window.loggedInUser = isSupervisor ? 'Supervisor' : 'Tamer Yazici';
+
                 document.body.classList.add('is-admin');
-                
-                if(window.sysAuth[u].role === "supervisor") {
-                    document.body.classList.add('is-supervisor');
-                }
-                
-                if(remember) {
-                    localStorage.setItem('red_admin_saved', 'true');
-                    localStorage.setItem('red_logged_in_user', u);
-                }
-                
+                document.body.classList.toggle('is-supervisor', isSupervisor);
+
                 document.getElementById('authBox').style.display = 'none';
                 document.getElementById('dashboardBox').style.display = 'block';
-                document.getElementById('loggedInUser').innerText = u;
-                
-                let localPerms = JSON.parse(localStorage.getItem('red_admin_perms'));
-                if(localPerms) window.applyAdminModulePermissions(localPerms);
+                if (document.getElementById('loggedInUser')) {
+                    document.getElementById('loggedInUser').innerText = `${window.loggedInUser} (${email})`;
+                }
+
+                const localPerms = JSON.parse(localStorage.getItem('red_admin_perms') || 'null');
+                window.applyAdminModulePermissions(localPerms || window.adminPermissions);
 
                 window.startAdminCrmListener();
-                if (typeof window.refreshAdminAppointmentsView === 'function') window.refreshAdminAppointmentsView();
-                setTimeout(window.syncHeaderHeight, 60);
-                window.showToast('Erfolgreich angemeldet.', 'success');
+                if (typeof window.startAdminAppointmentsListener === 'function') {
+                    window.startAdminAppointmentsListener();
+                }
+                setTimeout(window.syncHeaderHeight, 80);
             } else {
-                window.showToast('Zugriff verweigert! Falscher Name oder Passwort.', 'error');
+                window.isAuthorized = false;
+                window.loggedInUser = null;
+                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme');
+
+                if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
+                if (typeof window.stopAdminAppointmentsListener === 'function') {
+                    window.stopAdminAppointmentsListener();
+                }
+                window.crmClientsDetail = {};
+                window.redApts = [];
+                localStorage.removeItem('red_crm_details');
+                localStorage.removeItem('red_local_apts');
+                localStorage.removeItem('red_admin_saved');
+                localStorage.removeItem('red_logged_in_user');
+
+                if (document.getElementById('dashboardBox')) document.getElementById('dashboardBox').style.display = 'none';
+                if (document.getElementById('authBox')) document.getElementById('authBox').style.display = 'block';
+                setTimeout(window.syncHeaderHeight, 80);
+            }
+        });
+
+        window.tryLogin = async function() {
+            const rawUser = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value;
+            const remember = document.getElementById('rememberMe').checked;
+
+            if (!rawUser || !pass) {
+                window.showToast('Bitte E-Mail und Passwort eingeben.', 'error');
+                return;
+            }
+
+            const email = USER_LOGIN_ALIASES[rawUser.toLowerCase()] || rawUser.toLowerCase();
+            if (!ADMIN_AUTH_EMAILS.includes(email)) {
+                window.showToast('Zugriff verweigert! Konto nicht freigeschaltet.', 'error');
+                return;
+            }
+
+            try {
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                await signInWithEmailAndPassword(auth, email, pass);
+                document.getElementById('adminPass').value = '';
+                window.showToast('Sicher über Firebase angemeldet!', 'success');
+            } catch (err) {
+                console.error('Firebase Login Fehler:', err.code, err.message);
+                if (err.code === 'auth/too-many-requests') {
+                    window.showToast('Zu viele Versuche – bitte kurz warten.', 'error');
+                } else {
+                    window.showToast('E-Mail oder Passwort ist falsch!', 'error');
+                }
             }
         };
-        
+
         window.triggerLogoutConfirm = function() { document.getElementById('logoutConfirmOverlay').classList.add('open'); };
         window.cancelLogout = function() { document.getElementById('logoutConfirmOverlay').classList.remove('open'); };
-        window.executeLogout = function() {
-            window.isAuthorized = false;
-            window.loggedInUser = null;
-            document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme');
-            
-            if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
-            window.crmClientsDetail = {};
-            localStorage.removeItem('red_crm_details');
-            localStorage.removeItem('red_admin_saved');
-            localStorage.removeItem('red_logged_in_user');
-            
+        window.executeLogout = async function() {
+            try { await signOut(auth); } catch (e) {}
             document.getElementById('adminUser').value = '';
             document.getElementById('adminPass').value = '';
-            document.getElementById('dashboardBox').style.display = 'none';
-            document.getElementById('authBox').style.display = 'block';
-            
             window.cancelLogout();
-            setTimeout(window.syncHeaderHeight, 60);
             window.showToast('Erfolgreich abgemeldet.', 'success');
         };
 
         window.changePassPrompt = function() {
-            if(!window.isAuthorized) return;
+            if (!window.isAuthorized) return;
             document.getElementById('passChangeOverlay').classList.add('open');
         };
         window.closePassPrompt = function() {
             document.getElementById('passChangeOverlay').classList.remove('open');
             document.getElementById('newPassInput').value = '';
         };
-        window.confirmPassChange = function() {
-            const newP = document.getElementById('newPassInput').value;
-            if(newP && newP.trim().length > 3) {
-                window.sysAuth[window.loggedInUser].pass = newP;
-                
-                if(db) {
-                    try {
-                        setDoc(doc(db, "settings", "auth"), { [window.loggedInUser]: newP }, { merge: true });
-                    } catch(e) {} 
-                }
-                        
-                let savedPasswords = JSON.parse(localStorage.getItem('red_admin_passwords')) || {};
-                savedPasswords[window.loggedInUser] = newP;
-                localStorage.setItem('red_admin_passwords', JSON.stringify(savedPasswords));
-                
+        window.confirmPassChange = async function() {
+            const newP = document.getElementById('newPassInput').value.trim();
+            if (!auth.currentUser) return;
+            if (newP.length < 6) {
+                window.showToast('Passwort muss mindestens 6 Zeichen lang sein!', 'error');
+                return;
+            }
+            try {
+                await updatePassword(auth.currentUser, newP);
                 window.closePassPrompt();
-                window.showToast('Passwort erfolgreich geändert!', 'success');
-            } else {
-                window.showToast('Ungültiges Passwort!', 'error');
+                window.showToast('Firebase-Passwort erfolgreich geändert!', 'success');
+            } catch (err) {
+                if (err.code === 'auth/requires-recent-login') {
+                    window.showToast('Bitte kurz abmelden und neu einloggen, um das Passwort zu ändern.', 'error');
+                } else {
+                    window.showToast('Fehler beim Ändern: ' + err.message, 'error');
+                }
             }
         };
 
@@ -10032,15 +10035,13 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.setAptOrderStatus = async function(id, step) {
             try {
                 await updateDoc(doc(db, "appointments", id), { orderStatus: step });
+                const apt = (window.redApts || []).find(a => a.id === id);
+                if (apt && apt.trackingCode) {
+                    await updateDoc(doc(db, "order_tracking", apt.trackingCode), { orderStatus: step }).catch(() => {});
+                }
                 window.showToast(step === 4 ? '✅ Auftrag als abgeschlossen markiert!' : `Auftragsstatus auf Stufe ${step} gesetzt!`, 'success');
             } catch(e) {
-                const idx = localAppointments.findIndex(a => a.id === id);
-                if(idx > -1) {
-                    localAppointments[idx].orderStatus = step;
-                    localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                    renderAppointments(localAppointments);
-                    window.showToast(`Status lokal aktualisiert.`, 'success');
-                }
+                window.showToast('Status konnte nicht gespeichert werden.', 'error');
             }
         };
 
@@ -10259,11 +10260,22 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
         }, 60000);
 
-        onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
-            if (!snapshot.empty) {
+        let aptsUnsubscribe = null;
+        window.stopAdminAppointmentsListener = function() {
+            if (aptsUnsubscribe) { aptsUnsubscribe(); aptsUnsubscribe = null; }
+            isFirstLoadApts = true;
+            const list = document.getElementById('admin-list');
+            if (list) list.innerHTML = '';
+            const pinContainer = document.getElementById('pinned-container');
+            if (pinContainer) pinContainer.innerHTML = '';
+        };
+
+        window.startAdminAppointmentsListener = function() {
+            if (!window.isAuthorized || aptsUnsubscribe) return;
+            aptsUnsubscribe = onSnapshot(query(collection(db, "appointments"), orderBy("timestamp", "desc")), (snapshot) => {
                 const fbApts = [];
                 snapshot.forEach((docSnap) => fbApts.push({ id: docSnap.id, ...docSnap.data() }));
-                
+
                 if (!isFirstLoadApts && window.isAuthorized) {
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added") {
@@ -10277,15 +10289,12 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     });
                 }
                 isFirstLoadApts = false;
-
-                localStorage.setItem('red_local_apts', JSON.stringify(fbApts));
+                localAppointments = fbApts;
                 renderAppointments(fbApts);
-            } else {
-                renderAppointments(localAppointments);
-            }
-        }, () => {
-            renderAppointments(localAppointments);
-        });
+            }, (err) => {
+                console.error('Termine konnten nicht geladen werden:', err);
+            });
+        };
 
         window.markApt = async function(id, newState) {
             try { 
@@ -10545,37 +10554,57 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 customNote
             ].filter(Boolean).join(' | ');
 
-            await addClientToCRM(n, p, e, category, crmNoteCombined);
+            if (window.isAuthorized) {
+                await addClientToCRM(n, p, e, category, crmNoteCombined);
+            }
 
             let timeString = window.chosenHour ? window.chosenHour : "Ganztägig";
             if (!timeString.includes("Uhr")) timeString += " Uhr";
 
+            const trackingCode = 'RED-' + Math.floor(100000 + Math.random() * 900000);
+
             window.lastBookedApt = {
                 name: n, phone: p, email: e, date: d, time: timeString,
-                service: window.selectedServiceVal, category, wunschkennzeichen, customNote
+                service: window.selectedServiceVal, category, wunschkennzeichen, customNote, trackingCode
             };
 
-            const initialNotes = [];
+            const initialNotes = [
+                { id: String(Date.now()), text: `📡 Live-Tracker-Code: ${trackingCode}`, timeStr: 'Automatisch vergeben' }
+            ];
             if (wunschkennzeichen) {
-                initialNotes.push({ id: String(Date.now()), text: `🪪 Wunschkennzeichen: ${wunschkennzeichen}`, timeStr: 'Bei Buchung gewählt' });
+                initialNotes.push({ id: String(Date.now() + 1), text: `🪪 Wunschkennzeichen: ${wunschkennzeichen}`, timeStr: 'Bei Buchung gewählt' });
             }
             if (customNote) {
-                initialNotes.push({ id: String(Date.now() + 1), text: `Kunden-Hinweis: ${customNote}`, timeStr: 'Bei Buchung angegeben' });
+                initialNotes.push({ id: String(Date.now() + 2), text: `Kunden-Hinweis: ${customNote}`, timeStr: 'Bei Buchung angegeben' });
             }
 
             const appointmentData = {
                 name: n, phone: p, email: e, date: d, timeLabel: timeString,
                 service: window.selectedServiceVal, category,
-                wunschkennzeichen, customNote,
+                wunschkennzeichen, customNote, trackingCode,
                 marked: false, orderStatus: 1, notes: initialNotes, timestamp: Date.now()
             };
 
             try {
-                await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "appointments"), appointmentData);
+                await addDoc(collection(db, "appointments"), appointmentData);
+                await addDoc(collection(db, "booked_slots"), {
+                    date: d,
+                    time: timeString,
+                    timestamp: Date.now()
+                });
+                await setDoc(doc(db, "order_tracking", trackingCode), {
+                    code: trackingCode,
+                    date: d,
+                    service: window.selectedServiceVal,
+                    orderStatus: 1,
+                    timestamp: Date.now()
+                });
             } catch(err) {
-                localAppointments.unshift({ id: 'local-' + Date.now(), ...appointmentData });
-                localStorage.setItem('red_local_apts', JSON.stringify(localAppointments));
-                renderAppointments(localAppointments);
+                console.error("Buchungs-Fehler:", err);
+                window.showToast('Buchung konnte nicht gespeichert werden. Bitte erneut versuchen.', 'error');
+                btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Termin jetzt verbindlich reservieren';
+                btn.disabled = false;
+                return;
             }
 
             const ownerEmail = window.dynamicContactData?.email || "Redzulassungsdienst@gmail.com";
@@ -10588,6 +10617,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({
                             type: 'new_booking',
+                            trackingCode: trackingCode,
                             clientName: n,
                             clientCategory: category,
                             clientPhone: p,
@@ -10606,7 +10636,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
 
             const plateInfo = wunschkennzeichen ? ` | Wunschkennzeichen: ${wunschkennzeichen}` : '';
-            document.getElementById('confirmModalText').innerText = `Vielen Dank ${n}! Ihr Termin (${category}) am ${d} um ${timeString} für "${window.selectedServiceVal}"${plateInfo} wurde verbindlich im System eingetragen.`;
+            document.getElementById('confirmModalText').innerHTML = `Vielen Dank ${window.escHtml(n)}! Ihr Termin (${window.escHtml(category)}) am <strong>${window.escHtml(d)}</strong> um <strong>${window.escHtml(timeString)}</strong> für „${window.escHtml(window.selectedServiceVal)}“${window.escHtml(plateInfo)} wurde verbindlich eingetragen.<br><br><span style="display:inline-block; background:var(--bg-input); border:1.5px dashed var(--primary-red); padding:8px 14px; border-radius:10px; font-weight:900; color:var(--primary-red); font-size:15px;">Ihr Live-Tracker-Code: ${trackingCode}</span>`;
             document.getElementById('confirmModalOverlay').classList.add('open');
             
             document.getElementById('bookingForm').reset();
