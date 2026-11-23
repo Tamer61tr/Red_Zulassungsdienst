@@ -4987,9 +4987,12 @@
                     <!-- EIGENES WUNSCHKENNZEICHEN-FELD & ZUSATZHINWEIS -->
                     <div class="form-row" style="position: relative; z-index: 20;">
                         <div class="form-group">
-                            <label style="display:flex; justify-content:space-between; align-items:center;">
+                            <label style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                                 <span>Wunschkennzeichen (Optional)</span>
-                                <a href="javascript:void(0)" onclick="window.switchOnlineToolTab('plate'); document.getElementById('wunschkennzeichen-section').scrollIntoView({behavior:'smooth'});" style="color:var(--primary-red); text-decoration:none; font-size:9.5px;"><i class="fa-solid fa-wand-magic-sparkles"></i> Im Studio testen</a>
+                                <span style="display:inline-flex; gap:10px; align-items:center;">
+                                    <a href="javascript:void(0)" onclick="window.applyPlateToBooking(false);" style="color:var(--green-accent); text-decoration:none; font-size:9.5px; font-weight:800;"><i class="fa-solid fa-download"></i> Aus Studio übernehmen</a>
+                                    <a href="javascript:void(0)" onclick="window.switchOnlineToolTab('plate'); document.getElementById('wunschkennzeichen-section').scrollIntoView({behavior:'smooth'});" style="color:var(--primary-red); text-decoration:none; font-size:9.5px; font-weight:800;"><i class="fa-solid fa-wand-magic-sparkles"></i> Studio öffnen</a>
+                                </span>
                             </label>
                             <input type="text" id="formWunschkennzeichen" class="form-control" placeholder="z.B. B - TY 2026 (E / H / Saison)" style="text-transform:uppercase; font-weight:800; letter-spacing:0.5px;" oninput="window.updateBookingLiveSummary()">
                         </div>
@@ -6182,29 +6185,20 @@
                 } catch (e) {}
             }
 
-            const cbWebhookUrl = window.dynamicContactData?.webhook || "";
-            if (cbWebhookUrl.startsWith('https://')) {
-                try {
-                    await fetch(cbWebhookUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({
-                            type: 'callback_request',
-                            clientName: name,
-                            clientCategory: '60s Express-Rückruf',
-                            clientPhone: phone,
-                            clientEmail: '',
-                            date: todayDate,
-                            time: timeSlot,
-                            service: `RÜCKRUF-ANFRAGE: ${topic}`,
-                            wunschkennzeichen: '-',
-                            customNote: `Bitte zurückrufen (${timeSlot})`,
-                            adminEmail: window.dynamicContactData?.email || 'Redzulassungsdienst@gmail.com'
-                        })
-                    });
-                } catch (err) {}
-            }
+            await window.sendToMakeWebhook({
+                type: 'new_booking',
+                trackingCode: typeof trackingCode !== 'undefined' ? trackingCode : '',
+                clientName: n,
+                clientCategory: category,
+                clientPhone: p || '-',
+                clientEmail: e,
+                date: d,
+                time: timeString,
+                service: window.selectedServiceVal,
+                wunschkennzeichen: wunschkennzeichen || 'Kein Wunschkennzeichen angegeben',
+                customNote: customNote || '-'
+            });
+            try { sessionStorage.removeItem('red_pending_plate'); } catch (err) {}
 
             if (viaWhatsApp) {
                 let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
@@ -6659,25 +6653,38 @@
             }
         };
 
-        window.applyPlateToBooking = function() {
-            const l = document.getElementById('platePreviewLetters').innerText;
-            const n = document.getElementById('platePreviewNumbers').innerText;
-            const s = document.getElementById('platePreviewSuffix').innerText;
+        window.buildCurrentStudioPlate = function() {
+            window.updateLivePlatePreview();
+            const l = (document.getElementById('wkLetters')?.value || document.getElementById('platePreviewLetters')?.innerText || 'TY').trim().toUpperCase();
+            const n = (document.getElementById('wkNumbers')?.value || document.getElementById('platePreviewNumbers')?.innerText || String(window.getDynamicSystemYear())).trim();
+            const s = (document.getElementById('wkType')?.value || '').trim();
             const season = document.getElementById('wkSeason')?.value || '';
             const style = document.getElementById('wkStyle')?.value || 'std';
             const styleLabel = style === 'carbon' ? ' [3D-Carbon]' : (style === 'short' ? ' [Kurzes Schild]' : '');
-            const fullPlate = `B - ${l} ${n}${s ? ' ' + s : ''}${season ? ' (Saison ' + season + ')' : ''}${styleLabel}`;
-            
+            return `B - ${l} ${n}${s ? ' ' + s : ''}${season ? ' (Saison ' + season + ')' : ''}${styleLabel}`;
+        };
+
+        window.applyPlateToBooking = function(shouldScroll = true) {
+            const fullPlate = window.buildCurrentStudioPlate();
+            if (typeof window.switchView === 'function' && document.querySelector('.view-section.active')?.id !== 'view-home') {
+                window.switchView('view-home');
+            }
             const plateInput = document.getElementById('formWunschkennzeichen');
-            if(plateInput) {
+            if (plateInput) {
                 plateInput.value = fullPlate;
                 plateInput.style.borderColor = 'var(--green-border)';
-                plateInput.style.boxShadow = '0 0 0 3px rgba(18, 140, 65, 0.22)';
-                setTimeout(() => { plateInput.style.borderColor = ''; plateInput.style.boxShadow = ''; }, 2200);
+                plateInput.style.boxShadow = '0 0 0 3px rgba(18, 140, 65, 0.28)';
+                setTimeout(() => { plateInput.style.borderColor = ''; plateInput.style.boxShadow = ''; }, 2800);
             }
+            try { sessionStorage.setItem('red_pending_plate', fullPlate); } catch (e) {}
             window.updateBookingLiveSummary();
-            document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
-            window.showToast(`Wunschkennzeichen "${fullPlate}" in den Termin übernommen!`, 'success');
+            if (shouldScroll) {
+                setTimeout(() => {
+                    const terminEl = document.getElementById('termin');
+                    if (terminEl) terminEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 60);
+            }
+            window.showToast(`Wunschkennzeichen „${fullPlate}“ direkt für den Termin übernommen!`, 'success');
         };
 
         window.selectedClientCategory = 'Privatkunde';
@@ -7528,13 +7535,59 @@
         window.redApts = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
         window.currentWeatherData = null;
         window.modalClockInterval = null;
+        window.DEFAULT_MAKE_WEBHOOK = 'https://hook.eu1.make.com/p8vf3nbla06ywkawuiitomd4kyrpwqmx';
         window.dynamicContactData = { 
             phone: '0178 378 38 75', 
             email: 'Redzulassungsdienst@gmail.com', 
             ustid: '(Hier Steuernummer eintragen)', 
             ig: 'https://instagram.com/red_zulassungsdienst', 
             fb: '#',
-            webhook: '' 
+            webhook: window.DEFAULT_MAKE_WEBHOOK
+        };
+
+        window.sendToMakeWebhook = async function(payload) {
+            const webhookUrl = ((window.dynamicContactData?.webhook || '').trim()) || window.DEFAULT_MAKE_WEBHOOK;
+            if (!webhookUrl.startsWith('https://')) return;
+
+            const cleanPhone = String(payload.clientPhone || '').replace(/\D/g, '').replace(/^0/, '49');
+            const waReplyLink = cleanPhone ? `https://wa.me/${cleanPhone}` : '';
+            const isCallback = payload.type === 'callback_request';
+
+            const messageText = [
+                isCallback ? '📞 NEUE 60s RÜCKRUF-ANFRAGE (RED BERLIN)' : '📅 NEUER TERMIN – RED ZULASSUNGSDIENST BERLIN',
+                '',
+                `• Kunde: ${payload.clientName || '-'} (${payload.clientCategory || 'Privatkunde'})`,
+                `• Telefon: ${payload.clientPhone || '-'}`,
+                `• E-Mail: ${payload.clientEmail || '-'}`,
+                `• Datum & Zeit: ${payload.date || '-'} um ${payload.time || '-'}`,
+                `• Leistung: ${payload.service || '-'}`,
+                `• Wunschkennzeichen: ${payload.wunschkennzeichen || '-'}`,
+                `• Hinweis: ${payload.customNote || '-'}`,
+                payload.trackingCode ? `• Tracker-Code: ${payload.trackingCode}` : '',
+                waReplyLink ? `• Direkt-Antwort WhatsApp: ${waReplyLink}` : ''
+            ].filter(Boolean).join('\n');
+
+            const formBody = new URLSearchParams();
+            const fullData = {
+                ...payload,
+                adminEmail: window.dynamicContactData?.email || 'Redzulassungsdienst@gmail.com',
+                adminWhatsapp: '491783783875',
+                waReplyLink: waReplyLink,
+                messageText: messageText,
+                sentAt: new Date().toLocaleString('de-DE')
+            };
+            Object.entries(fullData).forEach(([k, v]) => formBody.append(k, v == null ? '' : String(v)));
+
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    keepalive: true,
+                    body: formBody
+                });
+            } catch (err) {
+                console.error('Make Webhook Fehler:', err);
+            }
         };
 
         window.adminPermissions = {
@@ -7751,7 +7804,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         window.applyContactInfo = function(data) {
             if(!data) return;
-            window.dynamicContactData = data;
+            window.dynamicContactData = {
+                ...data,
+                webhook: (data.webhook || '').trim() || window.DEFAULT_MAKE_WEBHOOK
+            };
             document.querySelectorAll('.live-phone').forEach(el => el.innerText = data.phone);
             document.querySelectorAll('.live-email').forEach(el => el.innerText = data.email);
             document.getElementById('link-ig').href = data.ig;
