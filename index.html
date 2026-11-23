@@ -3707,6 +3707,356 @@
             .ankauf-cond-pill { font-size: 10.2px !important; padding: 6px 10px; }
         }
 
+        /* =========================================================================
+           MOBIL-OPTIMIERUNG (NUR HANDY <= 768px – DESKTOP BLEIBT UNVERÄNDERT)
+           ========================================================================= */
+        @media (max-width: 768px) {
+            /* 1. FIX FÜR TICKER-STUDIO, LEISTUNGSKARTEN-CONFIG & INFOBLOCK (KEIN RECHTS-VERSATZ) */
+            .admin-pro-accordion .form-row,
+            .service-config-section .form-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0 !important;
+            }
+            .admin-pro-accordion .form-group,
+            .service-config-section .form-group {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                margin-bottom: 10px !important;
+            }
+            .admin-pro-accordion .red-select-wrap,
+            .service-config-section .red-select-wrap,
+            .admin-pro-accordion .form-control,
+            .service-config-section .form-control,
+            .admin-pro-accordion .mobile-select-display,
+            .service-config-section .mobile-select-display {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .service-config-section {
+                padding: 12px 11px 6px !important;
+                margin-bottom: 10px !important;
+            }
+            .service-config-section .mobile-select-display {
+                min-height: 38px !important;
+                padding: 7px 11px !important;
+                font-size: 12px !important;
+            }
+            .ticker-live-preview-box {
+                padding: 8px 10px !important;
+                margin-bottom: 10px !important;
+            }
+            #tickerStudioLivePreview {
+                font-size: 11px !important;
+                line-height: 1.35 !important;
+            }
+            #tickerConfigOverlay .symbol-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 5px !important;
+                padding: 7px !important;
+            }
+            #tickerConfigOverlay .symbol-grid .noble-checkbox-label {
+                padding: 5px 7px !important;
+                font-size: 10px !important;
+                gap: 6px !important;
+            }
+            #tickerConfigOverlay .symbol-grid .noble-checkbox-box {
+                width: 15px !important;
+                height: 15px !important;
+            }
+
+            /* 2. MAXIMALE BREITE & KOMPAKTER RAHMEN FÜR ADMIN-FENSTER AM HANDY */
+            #adminModal,
+            #crmOverlay,
+            #tickerConfigOverlay {
+                padding: 8px !important;
+            }
+            #adminModal .custom-dialog-window,
+            #crmOverlay .custom-dialog-window,
+            #tickerConfigOverlay .custom-dialog-window {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 94dvh !important;
+                height: auto !important;
+                padding: 13px 10px 16px !important;
+                border-radius: 16px !important;
+            }
+
+            /* 3. LIVE-LEADS & MONITORING TERMINAL KOMPAKT NACH OBEN RÜCKEN */
+            #adminModal .admin-term-header {
+                padding-right: 34px !important;
+                padding-bottom: 8px !important;
+                gap: 6px !important;
+            }
+            #adminModal .admin-term-title-wrap {
+                gap: 7px !important;
+            }
+            #adminModal .admin-term-title-wrap h3 {
+                font-size: 13px !important;
+                padding: 0 !important;
+            }
+            #adminModal .admin-term-title-wrap span:not(.admin-term-live-dot) {
+                display: none !important;
+            }
+            #adminModal .admin-term-header-controls {
+                gap: 4px !important;
+                width: 100%;
+            }
+            #adminModal .admin-hdr-chip,
+            #adminModal .admin-role-pill {
+                font-size: 9px !important;
+                padding: 3px 7px !important;
+                gap: 4px !important;
+            }
+            #adminModal .admin-role-pill {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            /* 8 Monitoring-Kacheln extrem platzsparend (4x2) */
+            #adminModal .admin-kpi-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 4px !important;
+                margin: 7px 0 6px !important;
+            }
+            #adminModal .admin-kpi-box {
+                min-height: 38px !important;
+                padding: 4px 2px !important;
+                border-radius: 8px !important;
+                border-top-width: 2.5px !important;
+            }
+            #adminModal .admin-kpi-val {
+                font-size: 12.5px !important;
+            }
+            #adminModal .admin-kpi-lbl {
+                font-size: 6.8px !important;
+                margin-top: 2px !important;
+            }
+            /* Werkzeugleiste kompakt in 2 Reihen statt 3 */
+            #adminModal .admin-quick-toolbar {
+                gap: 4px !important;
+                padding-bottom: 7px !important;
+                margin-top: 2px !important;
+            }
+            #adminModal .admin-tool-btn {
+                flex: 1 1 30% !important;
+                padding: 5px 4px !important;
+                font-size: 8.8px !important;
+                border-radius: 8px !important;
+                gap: 4px !important;
+            }
+            /* Filter-Pills in 1 einzige wischbare Zeile */
+            #adminModal .admin-filter-pills {
+                flex-wrap: nowrap !important;
+                justify-content: flex-start !important;
+                overflow-x: auto !important;
+                scrollbar-width: none;
+                margin: 6px 0 6px !important;
+                padding-bottom: 2px;
+                gap: 4px !important;
+            }
+            #adminModal .admin-filter-pills::-webkit-scrollbar { display: none; }
+            #adminModal .admin-filter-pill {
+                padding: 4px 9px !important;
+                font-size: 8.8px !important;
+                flex-shrink: 0;
+            }
+            /* Suche & Sortierung nebeneinander in 1 kompakten Zeile */
+            #adminModal .admin-search-sort-row {
+                display: grid !important;
+                grid-template-columns: 1fr 122px !important;
+                gap: 5px !important;
+                align-items: center !important;
+            }
+            #adminModal .admin-search-sort-row input {
+                height: 34px !important;
+                padding: 5px 9px !important;
+                font-size: 11.5px !important;
+                min-width: 0 !important;
+            }
+            #adminModal .admin-search-sort-row .red-select-wrap {
+                width: 100% !important;
+                flex: unset !important;
+            }
+            #adminModal .admin-search-sort-row .mobile-select-display {
+                min-height: 34px !important;
+                height: 34px !important;
+                padding: 4px 8px !important;
+                font-size: 10px !important;
+                border-radius: 10px !important;
+            }
+            /* Kein doppelter Scrollbalken – voller Scrollbereich für alle Auftragskarten */
+            #adminModal .admin-list-wrapper {
+                max-height: none !important;
+                overflow: visible !important;
+                padding-right: 0 !important;
+                margin-top: 8px !important;
+            }
+            #adminModal .admin-apt-card {
+                padding: 10px 10px !important;
+                gap: 6px !important;
+            }
+            #adminModal .apt-grid-info {
+                padding: 7px 9px !important;
+                gap: 4px 8px !important;
+            }
+            #adminModal .apt-grid-info div {
+                font-size: 10.8px !important;
+            }
+
+            /* 4. RED KUNDENDATENBANK & CRM: KOMPAKT OBEN + MOBILE KUNDENKARTEN OHNE ABSCHNEIDEN */
+            #crmOverlay .custom-dialog-window > div:first-of-type {
+                padding-right: 34px !important;
+                padding-bottom: 8px !important;
+                margin-bottom: 8px !important;
+                gap: 6px !important;
+            }
+            #crmOverlay .custom-dialog-window > div:first-of-type h3 {
+                font-size: 13.5px !important;
+            }
+            #crmOverlay .custom-dialog-window > div:first-of-type p {
+                display: none !important;
+            }
+            #crmOverlay .custom-dialog-window > div:first-of-type > div:last-child {
+                width: 100%;
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 4px !important;
+            }
+            #crmOverlay .crm-toolbar-btn {
+                height: 30px !important;
+                padding: 0 4px !important;
+                font-size: 8.5px !important;
+                border-radius: 8px !important;
+                gap: 3px !important;
+                white-space: nowrap !important;
+            }
+            /* 4 CRM-Statistik-Kacheln in 1 einziger Reihe */
+            #crmOverlay .crm-kpi-strip {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 4px !important;
+                margin-bottom: 8px !important;
+            }
+            #crmOverlay .crm-kpi-tile {
+                padding: 5px 2px !important;
+                border-radius: 8px !important;
+            }
+            #crmOverlay .crm-kpi-tile strong {
+                font-size: 13px !important;
+            }
+            #crmOverlay .crm-kpi-tile span {
+                font-size: 6.8px !important;
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            /* Kategorie-Pills in 1 wischbarer Zeile + Suche/Sortierung nebeneinander */
+            #crmOverlay .crm-filter-bar {
+                gap: 6px !important;
+                margin-bottom: 8px !important;
+            }
+            #crmOverlay .crm-cat-pills {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scrollbar-width: none;
+                width: 100%;
+                gap: 4px !important;
+            }
+            #crmOverlay .crm-cat-pills::-webkit-scrollbar { display: none; }
+            #crmOverlay .crm-cat-pill {
+                padding: 4px 9px !important;
+                font-size: 9.2px !important;
+                flex-shrink: 0;
+            }
+            #crmOverlay .crm-filter-bar > div:last-child {
+                display: grid !important;
+                grid-template-columns: 1fr 118px !important;
+                gap: 5px !important;
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                align-items: center !important;
+            }
+            #crmOverlay #crmSearch {
+                height: 34px !important;
+                padding: 5px 9px !important;
+                font-size: 11.5px !important;
+                min-width: 0 !important;
+            }
+            #crmOverlay .crm-filter-bar .red-select-wrap {
+                width: 100% !important;
+                flex: unset !important;
+            }
+            #crmOverlay .crm-filter-bar .mobile-select-display {
+                min-height: 34px !important;
+                height: 34px !important;
+                padding: 4px 8px !important;
+                font-size: 10px !important;
+                border-radius: 10px !important;
+            }
+            /* CRM-Tabelle am Handy als saubere Vollansicht-Karten (nichts mehr abgeschnitten!) */
+            #crmOverlay .table-responsive {
+                max-height: none !important;
+                overflow: visible !important;
+                border: none !important;
+                margin-top: 6px !important;
+            }
+            #crmTable, #crmTable tbody {
+                display: block !important;
+                width: 100% !important;
+            }
+            #crmTable thead {
+                display: none !important;
+            }
+            #crmTable tbody tr {
+                display: grid !important;
+                grid-template-columns: 1fr auto !important;
+                gap: 4px 8px !important;
+                padding: 9px 10px !important;
+                margin-bottom: 8px !important;
+                background: var(--bg-card) !important;
+                border: 1px solid var(--glass-border) !important;
+                border-left: 3.5px solid var(--primary-red) !important;
+                border-radius: 11px !important;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            }
+            #crmTable tbody td {
+                display: block !important;
+                padding: 0 !important;
+                border: none !important;
+                white-space: normal !important;
+                text-align: left !important;
+                font-size: 11px !important;
+            }
+            #crmTable tbody td:nth-child(1) { grid-column: 1; grid-row: 1; align-self: center; }
+            #crmTable tbody td:nth-child(6) { grid-column: 2; grid-row: 1; justify-self: end; align-self: center; }
+            #crmTable tbody td:nth-child(6)::before { content: 'Buchungen: '; font-size: 9px; color: var(--text-muted); font-weight: 700; margin-right: 4px; }
+            #crmTable tbody td:nth-child(2) { grid-column: 1 / -1; grid-row: 2; padding-top: 2px !important; }
+            #crmTable tbody td:nth-child(3) { grid-column: 1; grid-row: 3; font-size: 11px !important; }
+            #crmTable tbody td:nth-child(3)::before { content: '📞 '; font-size: 10px; }
+            #crmTable tbody td:nth-child(5) { grid-column: 2; grid-row: 3; justify-self: end; font-size: 10px !important; color: var(--text-muted); }
+            #crmTable tbody td:nth-child(4) { grid-column: 1 / -1; grid-row: 4; font-size: 10.5px !important; color: var(--text-muted); word-break: break-all; }
+            #crmTable tbody td:nth-child(4)::before { content: '✉️ '; font-size: 10px; }
+            #crmTable tbody td.crm-action-cell {
+                grid-column: 1 / -1 !important;
+                grid-row: 5 !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                gap: 6px !important;
+                padding-top: 7px !important;
+                margin-top: 3px !important;
+                border-top: 1px solid var(--glass-border) !important;
+            }
+            #crmTable tbody td[colspan] {
+                grid-column: 1 / -1 !important;
+                grid-row: 1 !important;
+                text-align: center !important;
+                padding: 16px 8px !important;
+            }
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
