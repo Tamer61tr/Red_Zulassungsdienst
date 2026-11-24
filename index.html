@@ -103,8 +103,9 @@
     </script>
     
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230e0e12'/%3E%3Crect x='16' y='16' width='480' height='480' rx='96' fill='none' stroke='%23e60000' stroke-width='12'/%3E%3Ctext x='256' y='230' font-family='Arial,sans-serif' font-size='135' font-weight='900' fill='%23e60000' text-anchor='middle'%3ERED%3C/text%3E%3Ctext x='256' y='325' font-family='Arial,sans-serif' font-size='54' font-weight='800' fill='%23ffffff' text-anchor='middle' letter-spacing='4'%3EBERLIN%3C/text%3E%3Cpath d='M395 390 C375 375 330 355 295 345 C255 332 210 325 160 325 C115 325 90 332 75 340 C55 352 40 368 25 388 C18 396 14 405 18 412 C22 417 30 422 42 425 L385 425 C398 422 404 410 395 390 Z' fill='%23e60000' transform='translate(48, 10)'/%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230e0e12'/%3E%3Crect x='16' y='16' width='480' height='480' rx='96' fill='none' stroke='%23e60000' stroke-width='12'/%3E%3Ctext x='256' y='230' font-family='Arial,sans-serif' font-size='135' font-weight='900' fill='%23e60000' text-anchor='middle'%3ERED%3C/text%3E%3Ctext x='256' y='325' font-family='Arial,sans-serif' font-size='54' font-weight='800' fill='%23ffffff' text-anchor='middle' letter-spacing='4'%3EBERLIN%3C/text%3E%3C/svg%3E">
-    <link rel="manifest" id="pwaManifestLink">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+    <link rel="manifest" href="./manifest.json" id="pwaManifestLink">
     
     <title>RED Zulassungsdienst Berlin | Schnell. Zuverlässig. Kompetent.</title>
     
@@ -5808,6 +5809,10 @@
                             <div class="form-group"><label>Instagram-Link</label><input type="text" id="adminIg" class="form-control" value="https://instagram.com/red_zulassungsdienst"></div>
                             <div class="form-group"><label>Facebook-Link</label><input type="text" id="adminFb" class="form-control" value="#"></div>
                         </div>
+                        <div class="form-group">
+                            <label>Google-Bewertungslink (für 1-Klick-WhatsApp im Admin-Terminal)</label>
+                            <input type="text" id="adminGoogleReview" class="form-control" placeholder="https://g.page/r/.../review">
+                        </div>
                     </div>
                     <div class="admin-pro-section-box">
                         <div class="admin-pro-section-label"><i class="fa-solid fa-plug"></i> 2. Automatisierung (Google Apps Script)</div>
@@ -7518,31 +7523,11 @@
         window.deferredPwaPrompt = null;
 
         window.initPwaSystem = function() {
-            try {
-                const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#0e0e12"/><rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#e60000" stroke-width="14"/><text x="256" y="235" font-family="Arial,sans-serif" font-size="140" font-weight="900" fill="#e60000" text-anchor="middle">RED</text><text x="256" y="335" font-family="Arial,sans-serif" font-size="56" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="4">BERLIN</text></svg>`;
-                const iconUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
-
-                const manifestObj = {
-                    name: "RED Zulassungsdienst Berlin",
-                    short_name: "RED Berlin",
-                    description: "Kfz-Zulassung in Bestzeit, Sofortkennzeichen, Digitale Vollmacht & Auto Ankauf Berlin.",
-                    start_url: window.location.href.split('#')[0],
-                    display: "standalone",
-                    background_color: "#f2f2f7",
-                    theme_color: "#d90000",
-                    orientation: "portrait-primary",
-                    icons: [
-                        { src: iconUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
-                        { src: iconUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
-                    ]
-                };
-
-                const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
-                const manifestEl = document.getElementById('pwaManifestLink');
-                if (manifestEl) {
-                    manifestEl.setAttribute('href', URL.createObjectURL(manifestBlob));
-                }
-            } catch (e) {}
+            if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js').catch(() => {});
+                });
+            }
 
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
@@ -11502,6 +11487,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     document.getElementById('adminUstid').value = data.ustid || '';
                     document.getElementById('adminIg').value = data.ig || '';
                     document.getElementById('adminFb').value = data.fb || '';
+                    if (document.getElementById('adminGoogleReview')) document.getElementById('adminGoogleReview').value = data.googleReview || '';
                     document.getElementById('adminWebhook').value = data.webhook || '';
                 }
             });
@@ -11530,9 +11516,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const ustid = document.getElementById('adminUstid').value;
             const ig = document.getElementById('adminIg').value;
             const fb = document.getElementById('adminFb').value;
+            const googleReview = (document.getElementById('adminGoogleReview')?.value || '').trim();
             const webhook = document.getElementById('adminWebhook').value;
             
-            const data = { phone, email, ustid, ig, fb, webhook, timestamp: Date.now() };
+            const data = { phone, email, ustid, ig, fb, googleReview, webhook, timestamp: Date.now() };
 
             try {
                 await setDoc(doc(db, "settings", "contact"), data);
@@ -12232,6 +12219,24 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
         };
 
+        window.sendGoogleReviewWhatsApp = function(aptId) {
+            const apt = (window.redApts || []).find(a => a.id === aptId);
+            if (!apt) return;
+            const cleanDigits = (apt.phone || '').replace(/\D/g, '');
+            if (cleanDigits.length < 5) {
+                window.showToast('Keine gültige Telefonnummer hinterlegt.', 'error');
+                return;
+            }
+            const reviewUrl = (window.dynamicContactData?.googleReview || '').trim();
+            if (!reviewUrl || !reviewUrl.startsWith('http')) {
+                window.showToast('Bitte zuerst unter „Firmendaten“ deinen Google-Bewertungslink eintragen & speichern!', 'error');
+                return;
+            }
+            const waNumber = cleanDigits.replace(/^0/, '49');
+            const msg = `Hallo ${apt.name}, vielen Dank für Ihr Vertrauen in den RED Zulassungsdienst Berlin! 🚗✨\n\nWenn Sie mit unserem Service zufrieden waren, freuen wir uns riesig über eine kurze 5-Sterne-Bewertung auf Google (dauert nur 20 Sekunden):\n👉 ${reviewUrl}\n\nAllzeit gute Fahrt wünscht Ihnen Tamer Yazici & Team!`;
+            window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+        };
+
         function buildAdminAppointmentCard(apt, ctx) {
             const id = apt.id;
             const curStep = Number(apt.orderStatus) || 1;
@@ -12322,6 +12327,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             let callBtn = '';
             let waConfirmBtn = '';
+            let reviewBtn = '';
             const cleanDigits = (apt.phone || '').replace(/\D/g, '');
             if (cleanDigits.length >= 5) {
                 const waNumber = cleanDigits.replace(/^0/, '49');
@@ -12332,6 +12338,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     ? `Hallo ${apt.name}, gute Nachricht von Ihrem RED Zulassungsdienst Berlin! Ihre Zulassung (${apt.service}${platePart}) ist fertig und abholbereit in der Kienitzer Str. 6, 12053 Berlin (Mo–Fr 09:00–20:00 Uhr).`
                     : `Hallo ${apt.name}, hier ist Ihr RED Zulassungsdienst Berlin. Wir bestätigen Ihren Termin am ${niceDate} um ${displayTime} (${apt.service}${platePart}${codePart}). Bitte bringen Sie alle Originalunterlagen mit. Adresse: Kienitzer Str. 6, 12053 Berlin.`;
                 waConfirmBtn = `<a href="https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}" target="_blank" rel="noopener noreferrer" class="apt-btn wa-confirm" title="${curStep >= 3 ? 'Abholbereit per WhatsApp melden' : 'Termin per WhatsApp bestätigen'}"><i class="fa-brands fa-whatsapp"></i></a>`;
+                reviewBtn = `<button type="button" class="apt-btn" style="color:#d97706; border-color:rgba(217,119,6,0.45);" onclick="window.sendGoogleReviewWhatsApp('${id}')" title="Google-Bewertung per WhatsApp anfragen"><i class="fa-solid fa-star"></i></button>`;
             }
 
             const emailCell = (apt.email && apt.email.includes('@'))
@@ -12352,6 +12359,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     <div class="apt-actions-horizontal">
                         ${callBtn}
                         ${waConfirmBtn}
+                        ${reviewBtn}
                         <button type="button" class="apt-btn crm-sync mod-crm" onclick="window.openClientInCrmFromApt('${id}')" title="Kundenakte im CRM öffnen / sichern"><i class="fa-solid fa-address-book"></i></button>
                         <button type="button" class="apt-btn done-btn" onclick="window.setAptOrderStatus('${id}', ${isDone ? 1 : 4})" title="${isDone ? 'Wieder als Offen zurückholen' : 'Als Erledigt abschließen & ins Archiv verschieben'}"><i class="fa-solid ${isDone ? 'fa-rotate-left' : 'fa-check'}"></i></button>
                         <button type="button" class="apt-btn mark ${apt.marked ? 'is-pinned' : ''}" onclick="window.markApt('${id}', ${!apt.marked})" title="${apt.marked ? 'Von Pinnwand lösen' : 'Auf Bildschirm anheften'}"><i class="fa-solid fa-thumbtack"></i></button>
