@@ -5819,7 +5819,7 @@
                         <div class="form-group" style="margin-bottom:8px;">
                             <label>Google Apps Script Web-App-URL (/exec)</label>
                             <input type="text" id="adminWebhook" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
-                            <p style="font-size:11px; color:var(--text-muted); margin-top:5px;">Sendet neue Termine, Auftrags-Codes und Rückrufe automatisch parallel per E-Mail und WhatsApp.</p>
+                            <p style="font-size:11px; color:var(--text-muted); margin-top:5px;">Sendet neue Termine, Auftrags-Codes und Rückrufe automatisch parallel per Telegram (+ 1-Klick-WhatsApp) und E-Mail.</p>
                         </div>
                     </div>
                     <div class="admin-pro-actions">
@@ -10325,17 +10325,6 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 }
             };
             
-            function updateHeaderWidgets() {
-                const el = document.getElementById('liveHeaderDate');
-                if (!el) return;
-                const now = new Date();
-                const h = String(now.getHours()).padStart(2, '0');
-                const m = String(now.getMinutes()).padStart(2, '0');
-                const dateStr = now.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
-                el.innerHTML = `<i class="fa-regular fa-clock"></i> ${dateStr} • <span>${h}:${m}</span>`;
-            }
-            updateHeaderWidgets();
-
             document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
                 overlay.addEventListener('click', function(e) {
                     if(e.target === this) {
@@ -11589,24 +11578,47 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             window.closeContentEditor();
         };
 
+        function resolveHexColor(val, fallback) {
+            let c = String(val || '').trim();
+            if (c.startsWith('var(')) {
+                const varName = c.slice(4, -1).split(',')[0].trim();
+                c = getComputedStyle(document.body).getPropertyValue(varName).trim();
+            }
+            if (/^#[0-9a-f]{6}$/i.test(c)) return c;
+            if (/^#[0-9a-f]{3}$/i.test(c)) {
+                return '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+            }
+            const rgbaMatch = c.match(/rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\s*\)/i);
+            if (rgbaMatch && parseFloat(rgbaMatch[4]) < 0.45) {
+                return (document.body.getAttribute('data-theme') || 'light').startsWith('light') ? '#d0d0d8' : '#2c2c38';
+            }
+            const rgbMatch = c.match(/rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)/i);
+            if (rgbMatch) {
+                const toHex = (n) => Math.max(0, Math.min(255, parseInt(n, 10))).toString(16).padStart(2, '0');
+                return '#' + toHex(rgbMatch[1]) + toHex(rgbMatch[2]) + toHex(rgbMatch[3]);
+            }
+            return fallback;
+        }
+
         window.openServiceConfig = function(id) {
             window.editingServiceId = id;
             const srv = window.servicesData.find(s => s.id === id);
             if(!srv) return;
+            const isLight = (document.body.getAttribute('data-theme') || 'light').startsWith('light');
             
             document.getElementById('scTitle').value = srv.title;
             document.getElementById('scIcon').value = srv.icon;
-            document.getElementById('scIconColor').value = srv.iconColor || '#e60000';
+            document.getElementById('scIconColor').value = resolveHexColor(srv.iconColor, '#d90000');
             
-            document.getElementById('scTitleColor').value = srv.titleColor || '#ffffff';
+            document.getElementById('scTitleColor').value = resolveHexColor(srv.titleColor, isLight ? '#141417' : '#ffffff');
             document.getElementById('scTitleFont').value = srv.titleFont || "'Montserrat', sans-serif";
             document.getElementById('scTitleSize').value = srv.titleSize || "18px";
             
             document.getElementById('scBorderSize').value = srv.borderSize || '1px';
-            document.getElementById('scBorderColor').value = srv.borderColor || 'rgba(255, 255, 255, 0.08)';
+            document.getElementById('scBorderColor').value = resolveHexColor(srv.borderColor, isLight ? '#d0d0d8' : '#2c2c38');
 
             document.getElementById('scPriceVal').value = srv.price || '-';
-            document.getElementById('scPriceColor').value = srv.priceColor || '#e60000';
+            document.getElementById('scPriceColor').value = resolveHexColor(srv.priceColor, '#d90000');
             document.getElementById('scEuroStyle').value = srv.euroStyle || 'euro-standard';
             document.getElementById('scBadge').value = srv.badge || '';
             
@@ -12237,6 +12249,153 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
         };
 
+        window.printOrderSlip = function(aptId) {
+            const apt = (window.redApts || []).find(a => a.id === aptId);
+            if (!apt) return;
+
+            const esc = window.escHtml;
+            const niceDate = formatAptDateDE(apt.date);
+            const displayTime = apt.timeLabel === "Ganztägig"
+                ? "Ganztägig"
+                : (apt.timeLabel && apt.timeLabel.includes("Uhr") ? apt.timeLabel : (apt.timeLabel || '-') + " Uhr");
+            const resolvedCode = apt.trackingCode || ((apt.notes || []).map(nt => (String(nt.text || '').match(/RED-\d{6}/) || [])[0]).find(Boolean)) || '—';
+            const printDate = new Date().toLocaleDateString('de-DE');
+
+            const extraNotes = (apt.notes || [])
+                .filter(n => {
+                    const t = String(n.text || '');
+                    return !(resolvedCode !== '—' && t.includes(resolvedCode) && n.timeStr === 'Automatisch vergeben')
+                        && !(apt.wunschkennzeichen && t.includes(apt.wunschkennzeichen) && n.timeStr === 'Bei Buchung gewählt')
+                        && !(apt.customNote && t.includes(apt.customNote) && n.timeStr === 'Bei Buchung angegeben');
+                })
+                .map(n => `• ${esc(n.text)}`)
+                .join('<br>');
+
+            const win = window.open('', '_blank');
+            if (!win) {
+                window.showToast('Bitte Pop-ups erlauben, um den Laufzettel zu drucken.', 'error');
+                return;
+            }
+
+            win.document.write(`
+                <!DOCTYPE html>
+                <html lang="de">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Laufzettel ${esc(resolvedCode)} – ${esc(apt.name)}</title>
+                    <style>
+                        @page { margin: 12mm; }
+                        * { box-sizing: border-box; }
+                        body { font-family: Arial, sans-serif; color: #111; margin: 0; padding: 20px; max-width: 760px; margin-left: auto; margin-right: auto; font-size: 12.5px; line-height: 1.45; }
+                        .top-tools { background: #14141c; color: #fff; padding: 10px 16px; border-radius: 8px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+                        .top-tools button { background: #d90000; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size: 12px; }
+                        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #d90000; padding-bottom: 10px; margin-bottom: 14px; }
+                        .brand { font-size: 20px; font-weight: 900; color: #d90000; letter-spacing: 0.5px; }
+                        .brand span { color: #111; font-size: 13px; display: block; font-weight: 800; letter-spacing: 1px; }
+                        .code-badge { border: 2px dashed #d90000; padding: 6px 14px; border-radius: 8px; text-align: right; background: #fff7f7; }
+                        .code-badge small { display: block; font-size: 9px; text-transform: uppercase; color: #555; font-weight: 700; }
+                        .code-badge strong { font-family: 'Courier New', monospace; font-size: 18px; color: #d90000; letter-spacing: 1px; }
+                        .box { border: 1.5px solid #222; border-radius: 8px; padding: 11px 14px; margin-bottom: 12px; }
+                        .box-title { font-size: 10.5px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.6px; color: #d90000; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 8px; }
+                        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; }
+                        .field small { display: block; font-size: 9.5px; text-transform: uppercase; color: #666; font-weight: 700; }
+                        .field strong { font-size: 13.5px; color: #111; }
+                        .plate-box { display: inline-flex; align-items: center; border: 2.5px solid #111; border-radius: 5px; overflow: hidden; font-family: 'Courier New', monospace; font-weight: 900; font-size: 16px; margin-top: 3px; background: #fff; }
+                        .plate-box .eu { background: #003399; color: #fff; padding: 3px 6px; font-size: 10px; font-family: Arial, sans-serif; }
+                        .plate-box .val { padding: 2px 10px; letter-spacing: 1px; }
+                        .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 14px; font-size: 12px; }
+                        .chk-item { display: flex; align-items: center; gap: 8px; }
+                        .chk-sq { width: 15px; height: 15px; border: 1.8px solid #111; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+                        .pay-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 4px; }
+                        .pay-cell { border: 1px solid #bbb; border-radius: 6px; padding: 7px 10px; background: #fafafa; }
+                        .pay-cell small { display: block; font-size: 9.5px; text-transform: uppercase; color: #555; font-weight: 700; }
+                        .pay-cell .line { margin-top: 10px; border-bottom: 1.2px solid #222; text-align: right; font-weight: 800; }
+                        .notes-lines { margin-top: 6px; }
+                        .notes-lines div { border-bottom: 1px dotted #888; height: 22px; }
+                        .sig-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 22px; }
+                        .sig-col { border-top: 1.5px solid #111; padding-top: 4px; font-size: 10.5px; text-align: center; color: #333; }
+                        @media print { .top-tools { display: none !important; } body { padding: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="top-tools">
+                        <span><strong>RED Mappen-Laufzettel:</strong> Optimiert für DIN A4 &amp; DIN A5</span>
+                        <button onclick="window.print()">🖨️ Jetzt drucken</button>
+                    </div>
+
+                    <div class="header">
+                        <div class="brand">
+                            RED ZULASSUNGSDIENST BERLIN
+                            <span>AUFTRAGS-LAUFZETTEL / KUNDENMAPPE • Kienitzer Str. 6, 12053 Berlin</span>
+                        </div>
+                        <div class="code-badge">
+                            <small>Auftrags-Code (Live-Tracker)</small>
+                            <strong>${esc(resolvedCode)}</strong>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title">1. Kunden- &amp; Auftragsdaten</div>
+                        <div class="grid-2">
+                            <div class="field"><small>Kunde / Auftraggeber (${esc(apt.category || 'Privatkunde')})</small><strong>${esc(apt.name || '-')}</strong></div>
+                            <div class="field"><small>Termin / Abgabe</small><strong>${esc(niceDate)} • ${esc(displayTime)}</strong></div>
+                            <div class="field"><small>Telefon / WhatsApp</small><strong>${esc(apt.phone || '-')}</strong></div>
+                            <div class="field"><small>E-Mail</small><strong>${esc(apt.email || '-')}</strong></div>
+                            <div class="field"><small>Gewünschte Leistung</small><strong>${esc(apt.service || '-')}</strong></div>
+                            <div class="field">
+                                <small>Wunschkennzeichen</small>
+                                ${apt.wunschkennzeichen
+                                    ? `<div class="plate-box"><span class="eu">D</span><span class="val">${esc(apt.wunschkennzeichen)}</span></div>`
+                                    : `<strong>— (Kein Wunschkennzeichen)</strong>`}
+                            </div>
+                        </div>
+                        ${apt.customNote ? `<div style="margin-top:8px; padding:6px 10px; background:#fff4f4; border-left:3px solid #d90000; font-size:11.5px;"><strong>Kunden-Hinweis:</strong> ${esc(apt.customNote)}</div>` : ''}
+                        ${extraNotes ? `<div style="margin-top:6px; padding:6px 10px; background:#f6f6f9; border-left:3px solid #555; font-size:11.5px;"><strong>Interne Notizen:</strong><br>${extraNotes}</div>` : ''}
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title">2. Eingereichte Original-Unterlagen &amp; Schilder (Abgabecheck)</div>
+                        <div class="check-grid">
+                            <div class="chk-item"><span class="chk-sq"></span> ZB Teil I (Fahrzeugschein)</div>
+                            <div class="chk-item"><span class="chk-sq"></span> ZB Teil II (Fahrzeugbrief)</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Ausweis / Pass (+ Meldebesch. / Gewerbe)</div>
+                            <div class="chk-item"><span class="chk-sq"></span> eVB-Nr.: _______________________</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Gültiger TÜV / HU-Bericht</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Vollmacht &amp; SEPA-Mandat unterschrieben</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Alte Kennzeichen (Anzahl: _____)</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Neue Schilder (Anz.: ___) &nbsp;<span class="chk-sq"></span> Plakette</div>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-title">3. Abrechnung (Barzahlung) &amp; LABO-Status</div>
+                        <div class="pay-row">
+                            <div class="pay-cell"><small>LABO Behördengebühr</small><div class="line">€</div></div>
+                            <div class="pay-cell"><small>Service &amp; Schilder</small><div class="line">€</div></div>
+                            <div class="pay-cell" style="border-color:#d90000; background:#fff7f7;"><small style="color:#d90000;">Gesamtbetrag (Bar)</small><div class="line">€</div></div>
+                        </div>
+                        <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-size:11.5px; font-weight:700;">
+                            <div class="chk-item"><span class="chk-sq"></span> Bezahlt bei Abgabe</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Zahlung bei Abholung</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Beim LABO eingereicht</div>
+                            <div class="chk-item"><span class="chk-sq"></span> Abholbereit gemeldet</div>
+                        </div>
+                        <div class="notes-lines">
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <div class="sig-row">
+                        <div class="sig-col">Berlin, ${printDate} – Annahme RED (Tamer Yazici)</div>
+                        <div class="sig-col">Datum &amp; Unterschrift Kunde (Papiere &amp; Schilder erhalten)</div>
+                    </div>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        };
+
         function buildAdminAppointmentCard(apt, ctx) {
             const id = apt.id;
             const curStep = Number(apt.orderStatus) || 1;
@@ -12360,6 +12519,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         ${callBtn}
                         ${waConfirmBtn}
                         ${reviewBtn}
+                        <button type="button" class="apt-btn" onclick="window.printOrderSlip('${id}')" title="Laufzettel / Mappen-Deckblatt drucken"><i class="fa-solid fa-print"></i></button>
                         <button type="button" class="apt-btn crm-sync mod-crm" onclick="window.openClientInCrmFromApt('${id}')" title="Kundenakte im CRM öffnen / sichern"><i class="fa-solid fa-address-book"></i></button>
                         <button type="button" class="apt-btn done-btn" onclick="window.setAptOrderStatus('${id}', ${isDone ? 1 : 4})" title="${isDone ? 'Wieder als Offen zurückholen' : 'Als Erledigt abschließen & ins Archiv verschieben'}"><i class="fa-solid ${isDone ? 'fa-rotate-left' : 'fa-check'}"></i></button>
                         <button type="button" class="apt-btn mark ${apt.marked ? 'is-pinned' : ''}" onclick="window.markApt('${id}', ${!apt.marked})" title="${apt.marked ? 'Von Pinnwand lösen' : 'Auf Bildschirm anheften'}"><i class="fa-solid fa-thumbtack"></i></button>
@@ -13484,23 +13644,28 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             carsList.forEach(car => {
                 const card = document.createElement('div');
                 card.className = 'gallery-card';
-                card.id = car.id; 
+                card.id = car.id;
+                card.addEventListener('click', () => window.openLightbox(car.title || '', car.mediaUrl || ''));
                 
-                let mediaHtml = '';
-                if (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage')) {
-                   mediaHtml = `<video src="${car.mediaUrl}" playsinline muted onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`;
-                   if(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp|svg)/) || car.mediaUrl.includes('alt=')) {
-                       mediaHtml = `<img src="${car.mediaUrl}" loading="lazy" decoding="async" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${window.escHtml(car.title)}">`;
-                   }
-                } else {
-                    mediaHtml = `<img src="${car.mediaUrl}" loading="lazy" decoding="async" onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')" alt="${window.escHtml(car.title)}">`;
-                }
+                const isVideo = (car.mediaUrl.includes('video/') || car.mediaUrl.endsWith('.mp4') || car.mediaUrl.startsWith('blob:') || car.mediaUrl.includes('firebasestorage'))
+                    && !(car.mediaUrl.toLowerCase().match(/\.(jpeg|jpg|gif|png|webp|svg)/) || car.mediaUrl.includes('alt='));
+
+                const mediaHtml = isVideo
+                    ? `<video src="${car.mediaUrl}" playsinline muted style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6; z-index:1;"></video>`
+                    : `<img src="${car.mediaUrl}" loading="lazy" decoding="async" alt="${window.escHtml(car.title)}">`;
                 
                 card.innerHTML = `
-                    <div class="admin-del-img-btn action-cars" onclick="event.stopPropagation(); window.deleteGalleryImage('${car.id}')" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
+                    <div class="admin-del-img-btn action-cars" title="Bild Löschen"><i class="fa-solid fa-trash-can"></i></div>
                     ${mediaHtml}
-                    <span onclick="window.openLightbox('${car.title}', '${car.mediaUrl}')">${car.title}</span>
+                    <span>${window.escHtml(car.title)}</span>
                 `;
+                const delBtn = card.querySelector('.admin-del-img-btn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        window.deleteGalleryImage(car.id);
+                    });
+                }
                 grid.appendChild(card);
             });
         }
