@@ -6421,8 +6421,8 @@
                             <input type="text" id="formName" class="form-control" placeholder="Ihr vollständiger Name" required oninput="window.updateBookingLiveSummary()">
                         </div>
                         <div class="form-group">
-                            <label>Telefonnummer (Für Rückfragen & Live-Tracker)</label>
-                            <input type="tel" id="formPhone" class="form-control" placeholder="z.B. 0178 ...">
+                            <label>Telefonnummer / WhatsApp (Für Bestätigung & Rückfragen) *</label>
+                            <input type="tel" id="formPhone" class="form-control" placeholder="z.B. 0178 ..." required minlength="6">
                         </div>
                     </div>
                     <div class="form-row" style="position: relative; z-index: 40;">
@@ -8766,22 +8766,34 @@
                 window._activeTrackerUnsub = null;
             }
 
+            const getLocalTrackerFallback = (targetCode) => {
+                const fromApts = (window.redApts || []).find(a => a.trackingCode === targetCode);
+                if (fromApts) {
+                    return {
+                        code: targetCode,
+                        date: fromApts.date,
+                        timeLabel: fromApts.timeLabel,
+                        service: fromApts.service,
+                        wunschkennzeichen: fromApts.wunschkennzeichen,
+                        orderStatus: fromApts.orderStatus || 1
+                    };
+                }
+                try {
+                    const localMap = JSON.parse(localStorage.getItem('red_local_tracking_map') || '{}');
+                    if (localMap[targetCode]) return localMap[targetCode];
+                } catch (e) {}
+                return null;
+            };
+
             const resBox = document.getElementById('liveTrackerResultBox');
             try {
                 const docRef = window.firebaseDoc(window.firebaseDb, "order_tracking", code);
                 const snap = await window.firebaseGetDoc(docRef);
 
                 if (!snap.exists()) {
-                    const localMatch = (window.redApts || []).find(a => a.trackingCode === code);
-                    if (localMatch) {
-                        window.renderTrackerStatusData({
-                            code: code,
-                            date: localMatch.date,
-                            timeLabel: localMatch.timeLabel,
-                            service: localMatch.service,
-                            wunschkennzeichen: localMatch.wunschkennzeichen,
-                            orderStatus: localMatch.orderStatus || 1
-                        }, code);
+                    const localFallback = getLocalTrackerFallback(code);
+                    if (localFallback) {
+                        window.renderTrackerStatusData(localFallback, code);
                         window.showToast('Auftragsstatus geladen!', 'success');
                         return;
                     }
@@ -8803,16 +8815,10 @@
                 }
             } catch (err) {
                 console.error('Tracker-Abfrage Fehler:', err);
-                const localMatch = (window.redApts || []).find(a => a.trackingCode === code);
-                if (localMatch) {
-                    window.renderTrackerStatusData({
-                        code: code,
-                        date: localMatch.date,
-                        timeLabel: localMatch.timeLabel,
-                        service: localMatch.service,
-                        wunschkennzeichen: localMatch.wunschkennzeichen,
-                        orderStatus: localMatch.orderStatus || 1
-                    }, code);
+                const localFallback = getLocalTrackerFallback(code);
+                if (localFallback) {
+                    window.renderTrackerStatusData(localFallback, code);
+                    window.showToast('Auftragsstatus geladen!', 'success');
                     return;
                 }
                 if (resBox) resBox.style.display = 'none';
@@ -10190,7 +10196,12 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 
                 if(type === 'impressum') {
                     title.innerText = 'Impressum';
-                    content.innerHTML = `<strong>Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz):</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6<br>12053 Berlin<br><br><strong>Kontakt:</strong><br>Telefon: ${window.dynamicContactData.phone}<br>E-Mail: ${window.dynamicContactData.email}<br><br><strong>Umsatzsteuer-ID:</strong><br>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br><em>${window.dynamicContactData.ustid}</em><br><br><strong>Verbraucherstreitbeilegung / Universalschlichtungsstelle (§ 36 VSBG):</strong><br>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.<br><br><strong>Haftung für Inhalte & Links:</strong><br>Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.`;
+                    const rawUstid = (window.dynamicContactData.ustid || '').trim();
+                    const hasValidUstid = rawUstid !== '' && !rawUstid.toLowerCase().includes('hier steuernummer');
+                    const ustidBlock = hasValidUstid
+                        ? `<br><br><strong>Umsatzsteuer-ID:</strong><br>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br>${window.escHtml(rawUstid)}`
+                        : '';
+                    content.innerHTML = `<strong>Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz):</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6<br>12053 Berlin<br><br><strong>Kontakt:</strong><br>Telefon: ${window.escHtml(window.dynamicContactData.phone)}<br>E-Mail: ${window.escHtml(window.dynamicContactData.email)}${ustidBlock}<br><br><strong>Verbraucherstreitbeilegung / Universalschlichtungsstelle (§ 36 VSBG):</strong><br>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.<br><br><strong>Haftung für Inhalte & Links:</strong><br>Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.`;
                 } else {
                     title.innerText = 'Datenschutzerklärung (DSGVO / TDDDG)';
                     content.innerHTML = `<strong>1. Datenschutz auf einen Blick</strong><br>Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst und behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften (DSGVO, BDSG sowie TDDDG).<br><br><strong>2. Verantwortliche Stelle</strong><br>RED Zulassungsdienst Berlin, Inhaber: Tamer Yazici, Kienitzer Str. 6, 12053 Berlin, E-Mail: ${window.dynamicContactData.email}, Telefon: ${window.dynamicContactData.phone}.<br><br><strong>3. Lokale Schriftarten (Kein externes Font-Tracking)</strong><br>Zum Schutz Ihrer Privatsphäre nutzt diese Seite lokal optimierte Systemschriftarten. Es erfolgt beim Seitenaufruf keine unbefugte Übertragung Ihrer IP-Adresse an externe Schriftarten-Server.<br><br><strong>4. Terminbuchung & Auftragsabwicklung (Art. 6 Abs. 1 lit. b DSGVO)</strong><br>${extraDsgvo}<br><br><strong>5. Externe Medien (2-Klick-Schutz für Standortkarte)</strong><br>Externe Karteninhalte werden erst nach Ihrer ausdrücklichen Aktivierung geladen (Art. 6 Abs. 1 lit. a DSGVO).<br><br><strong>6. Ihre Rechte (Auskunft, Berichtigung, Löschung, Widerruf)</strong><br>Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten sowie ein Recht auf Berichtigung, Einschränkung der Verarbeitung oder Löschung dieser Daten (Art. 15–21 DSGVO).`;
@@ -10381,20 +10392,31 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         window.updateBookingLiveSummary();
                         
                         const normTarget = window.normalizeDateDE(dateStr);
+                        const bn = window.getBerlinNowParts();
+                        const todayDE = `${String(bn.day).padStart(2, '0')}.${String(bn.month).padStart(2, '0')}.${bn.year}`;
+                        const isSelectedToday = (normTarget === todayDE);
+                        const minSelectableMins = (bn.h * 60) + bn.m + 30;
+
                         const bookedTimes = (window.bookedSlotsList || [])
                             .filter(s => window.normalizeDateDE(s.date) === normTarget)
                             .map(s => (s.time || '').replace(' Uhr','').trim());
 
+                        let freeSlotsCount = 0;
+
                         for(let h = 9; h <= 19; h++) {
                             for(let m of ['00', '30']) {
                                 const tStr = `${h.toString().padStart(2, '0')}:${m}`;
+                                const slotMins = (h * 60) + parseInt(m, 10);
+                                const isPastSlot = isSelectedToday && (slotMins < minSelectableMins);
+
                                 const div = document.createElement('div');
                                 div.className = 'time-slot'; div.innerText = tStr + " Uhr";
                                 
-                                if(bookedTimes.includes(tStr)) {
+                                if(bookedTimes.includes(tStr) || isPastSlot) {
                                     div.classList.add('booked');
-                                    div.title = "Bereits vergeben";
+                                    div.title = isPastSlot ? "Zeitfenster bereits vergangen" : "Bereits vergeben";
                                 } else {
+                                    freeSlotsCount++;
                                     div.addEventListener('click', () => {
                                         Array.from(container.children).forEach(c => c.classList.remove('active'));
                                         div.classList.add('active');
@@ -10405,6 +10427,13 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                                 }
                                 container.appendChild(div);
                             }
+                        }
+
+                        if (freeSlotsCount === 0) {
+                            const hint = document.createElement('div');
+                            hint.style.cssText = 'grid-column:1/-1; text-align:center; font-size:11.5px; font-weight:700; color:var(--primary-red); padding:8px; background:var(--bg-input); border-radius:10px;';
+                            hint.innerText = 'Für heute sind keine Zeitfenster mehr frei – bitte wählen Sie den nächsten Werktag.';
+                            container.appendChild(hint);
                         }
                     }
                 });
