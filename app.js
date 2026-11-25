@@ -1,0 +1,4251 @@
+window.escHtml = function(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        };
+
+        // =========================================================================
+        // 0. DYNAMISCHER ÜBERLAPPUNGS-SCHUTZ (ECHTZEIT HEADER-HÖHENMESSUNG)
+        // =========================================================================
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        window._userHasScrolledPage = false;
+        window.addEventListener('touchmove', () => { window._userHasScrolledPage = true; }, { once: true, passive: true });
+        window.addEventListener('wheel', () => { window._userHasScrolledPage = true; }, { once: true, passive: true });
+
+        window.forceStartAtTop = function() {
+            if (window._userHasScrolledPage) return;
+            const prevBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = 'auto';
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            document.documentElement.style.scrollBehavior = prevBehavior;
+        };
+
+        window.syncHeaderHeight = function() {
+            const headerEl = document.getElementById('header-wrapper');
+            if (!headerEl || headerEl.classList.contains('header-compact')) return;
+            const measuredHeight = Math.ceil(headerEl.getBoundingClientRect().height || headerEl.offsetHeight);
+            if (measuredHeight > 40) {
+                document.documentElement.style.setProperty('--dynamic-header-h', (measuredHeight + 14) + 'px');
+            }
+        };
+
+        // =========================================================================
+        // SMART-SCROLL-KOMPAKTMODUS, FORTSCHRITTSLINIE & DESKTOP-NAVIGATION
+        // =========================================================================
+        window._lastHeaderScrollY = 0;
+        window._headerScrollTicking = false;
+
+        window.updateHeaderNavActiveState = function(forcedViewId) {
+            const links = document.querySelectorAll('#desktopHeaderNav .dhn-link');
+            if (!links.length) return;
+
+            const activeView = forcedViewId || (document.querySelector('.view-section.active')?.id || 'view-home');
+            let activeKey = '';
+
+            if (activeView === 'view-formulare' || activeView === 'view-ankauf') {
+                activeKey = activeView;
+            } else if (activeView === 'view-home') {
+                const y = window.scrollY + 180;
+                const terminEl = document.getElementById('termin');
+                const toolsEl = document.getElementById('wunschkennzeichen-section');
+                const leistEl = document.getElementById('leistungen');
+
+                if (terminEl && y >= terminEl.offsetTop) activeKey = '';
+                else if (toolsEl && y >= toolsEl.offsetTop) activeKey = 'tools';
+                else if (leistEl && y >= leistEl.offsetTop) activeKey = 'leistungen';
+            }
+
+            links.forEach(a => {
+                a.classList.toggle('is-active', a.getAttribute('data-nav-key') === activeKey);
+            });
+        };
+
+        window.updateHeaderOnScroll = function() {
+            window._headerScrollTicking = false;
+            const y = window.scrollY || window.pageYOffset || 0;
+            const headerEl = document.getElementById('header-wrapper');
+            const bar = document.getElementById('headerScrollProgress');
+
+            // 1. Rote Fortschrittslinie (0..100%)
+            if (bar) {
+                const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+                const progress = maxScroll > 20 ? Math.min(1, Math.max(0, y / maxScroll)) : 0;
+                bar.style.transform = `scaleX(${progress.toFixed(4)})`;
+            }
+
+            // 2. Smart-Scroll-Kompaktmodus (ab 120px beim Runterscrollen ein, beim Hochscrollen sofort aus)
+            if (headerEl) {
+                const delta = y - window._lastHeaderScrollY;
+                if (y <= 65 || window._isBodyScrollLocked) {
+                    headerEl.classList.remove('header-compact');
+                } else if (y > 120 && delta > 6) {
+                    headerEl.classList.add('header-compact');
+                } else if (delta < -10) {
+                    headerEl.classList.remove('header-compact');
+                }
+            }
+            window._lastHeaderScrollY = y;
+
+            // 3. Aktiven Desktop-Nav-Punkt aktualisieren
+            window.updateHeaderNavActiveState();
+        };
+
+        window.addEventListener('scroll', () => {
+            if (!window._headerScrollTicking) {
+                window._headerScrollTicking = true;
+                requestAnimationFrame(window.updateHeaderOnScroll);
+            }
+        }, { passive: true });
+
+        window.desktopNavGo = function(targetId) {
+            const headerEl = document.getElementById('header-wrapper');
+            if (headerEl) headerEl.classList.remove('header-compact');
+            const isHome = (document.querySelector('.view-section.active')?.id === 'view-home');
+            if (!isHome) window.switchView('view-home');
+            setTimeout(() => {
+                const target = document.getElementById(targetId);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, isHome ? 20 : 120);
+        };
+
+        window.jumpToBookingFromTicker = function() {
+            window.desktopNavGo('termin');
+        };
+
+        // =========================================================================
+        // HINTERGRUND-SCROLLSPERRE BEI GEÖFFNETEN FENSTERN / MENÜS / SHEETS
+        // =========================================================================
+        window._isBodyScrollLocked = false;
+        window._lockTouchStartY = 0;
+        window._lockTouchStartX = 0;
+
+        window.hasOpenBlockingOverlay = function() {
+            if (document.querySelector('.custom-dialog-overlay.open')) return true;
+            const qMenu = document.getElementById('quickMenu');
+            if (qMenu && qMenu.classList.contains('active')) return true;
+            const mSel = document.getElementById('mobileSelectOverlay');
+            if (mSel && mSel.classList.contains('open')) return true;
+            const fBack = document.getElementById('fabBackdrop');
+            if (fBack && fBack.classList.contains('open')) return true;
+            const intro = document.getElementById('intro-preloader');
+            if (intro && !intro.classList.contains('intro-preloader-done') && getComputedStyle(intro).display !== 'none') return true;
+            return false;
+        };
+
+        window.syncBodyScrollLock = function() {
+            const shouldLock = window.hasOpenBlockingOverlay();
+            if (shouldLock && !window._isBodyScrollLocked) {
+                window._isBodyScrollLocked = true;
+                document.documentElement.classList.add('modal-scroll-lock');
+                document.body.classList.add('modal-scroll-lock');
+            } else if (!shouldLock && window._isBodyScrollLocked) {
+                window._isBodyScrollLocked = false;
+                document.documentElement.classList.remove('modal-scroll-lock');
+                document.body.classList.remove('modal-scroll-lock');
+            }
+        };
+
+        window.findActiveScrollableInsideOverlay = function(startNode) {
+            let el = startNode;
+            const overlayRoot = startNode && startNode.closest
+                ? startNode.closest('.custom-dialog-overlay.open, #quickMenu.active, #mobileSelectOverlay.open')
+                : null;
+            if (!overlayRoot) return null;
+
+            while (el && el !== overlayRoot && el !== document.body) {
+                if (el.nodeType === 1) {
+                    const style = getComputedStyle(el);
+                    const canScrollY = (style.overflowY === 'auto' || style.overflowY === 'scroll') && (el.scrollHeight > el.clientHeight + 1);
+                    const canScrollX = (style.overflowX === 'auto' || style.overflowX === 'scroll') && (el.scrollWidth > el.clientWidth + 1);
+                    if (canScrollY || canScrollX) return { el, canScrollY, canScrollX };
+                }
+                el = el.parentElement;
+            }
+            if (overlayRoot.id === 'quickMenu' && overlayRoot.scrollHeight > overlayRoot.clientHeight + 1) {
+                return { el: overlayRoot, canScrollY: true, canScrollX: false };
+            }
+            return null;
+        };
+
+        document.addEventListener('touchstart', (e) => {
+            if (!window._isBodyScrollLocked || !e.touches || !e.touches[0]) return;
+            window._lockTouchStartY = e.touches[0].clientY;
+            window._lockTouchStartX = e.touches[0].clientX;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!window._isBodyScrollLocked) return;
+            if (e.target && e.target.closest && e.target.closest('.signature-pad-wrapper')) return;
+            const scrollInfo = window.findActiveScrollableInsideOverlay(e.target);
+            if (!scrollInfo) {
+                e.preventDefault();
+                return;
+            }
+            if (!e.touches || !e.touches[0]) return;
+            const dy = e.touches[0].clientY - window._lockTouchStartY;
+            const dx = e.touches[0].clientX - window._lockTouchStartX;
+            if (scrollInfo.canScrollX && Math.abs(dx) > Math.abs(dy)) return;
+            if (!scrollInfo.canScrollY) {
+                e.preventDefault();
+                return;
+            }
+            const { el } = scrollInfo;
+            const atTop = el.scrollTop <= 0 && dy > 0;
+            const atBottom = (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) && dy < 0;
+            if (atTop || atBottom) e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('wheel', (e) => {
+            if (!window._isBodyScrollLocked) return;
+            const scrollInfo = window.findActiveScrollableInsideOverlay(e.target);
+            if (!scrollInfo || !scrollInfo.canScrollY) {
+                e.preventDefault();
+                return;
+            }
+            const { el } = scrollInfo;
+            const atTop = el.scrollTop <= 0 && e.deltaY < 0;
+            const atBottom = (el.scrollTop + el.clientHeight >= el.scrollHeight - 1) && e.deltaY > 0;
+            if (atTop || atBottom) e.preventDefault();
+        }, { passive: false });
+
+        // =========================================================================
+        // BERLINER FEIERTAGS-ENGINE (INKL. 8. MÄRZ & DYNAMISCHER OSTERBERECHNUNG)
+        // =========================================================================
+        window._berlinHolidayCache = {};
+
+        window.getBerlinHolidaysForYear = function(year) {
+            if (window._berlinHolidayCache[year]) return window._berlinHolidayCache[year];
+            const pad = (n) => String(n).padStart(2, '0');
+            const toKey = (utcDate) => `${utcDate.getUTCFullYear()}-${pad(utcDate.getUTCMonth() + 1)}-${pad(utcDate.getUTCDate())}`;
+            const addDays = (base, days) => new Date(base.getTime() + days * 86400000);
+
+            // Gaußsche Osterformel (funktioniert dauerhaft für jedes Jahr)
+            const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+            const d = Math.floor(b / 4), e = b % 4;
+            const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+            const h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4;
+            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const easterMonth = Math.floor((h + l - 7 * m + 114) / 31);
+            const easterDay = ((h + l - 7 * m + 114) % 31) + 1;
+            const easter = new Date(Date.UTC(year, easterMonth - 1, easterDay));
+
+            const holidays = {};
+            holidays[`${year}-01-01`] = 'Neujahr';
+            holidays[`${year}-03-08`] = 'Weltfrauentag';
+            holidays[toKey(addDays(easter, -2))] = 'Karfreitag';
+            holidays[toKey(addDays(easter, 1))] = 'Ostermontag';
+            holidays[`${year}-05-01`] = 'Tag der Arbeit';
+            holidays[toKey(addDays(easter, 39))] = 'Christi Himmelfahrt';
+            holidays[toKey(addDays(easter, 50))] = 'Pfingstmontag';
+            holidays[`${year}-10-03`] = 'Tag der Deutschen Einheit';
+            holidays[`${year}-12-25`] = '1. Weihnachtstag';
+            holidays[`${year}-12-26`] = '2. Weihnachtstag';
+
+            window._berlinHolidayCache[year] = holidays;
+            return holidays;
+        };
+
+        window.isBerlinHolidayYMD = function(year, month, day) {
+            const key = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            return window.getBerlinHolidaysForYear(year)[key] || null;
+        };
+
+        window.getBerlinHolidayName = function(dateObj) {
+            if (!dateObj) return null;
+            return window.isBerlinHolidayYMD(dateObj.getFullYear(), dateObj.getMonth() + 1, dateObj.getDate());
+        };
+
+        window.getBerlinNowParts = function() {
+            try {
+                const parts = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: 'Europe/Berlin',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    weekday: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).formatToParts(new Date());
+                const map = {};
+                parts.forEach(p => { map[p.type] = p.value; });
+                const dayLookup = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+                return {
+                    year: parseInt(map.year, 10),
+                    month: parseInt(map.month, 10),
+                    day: parseInt(map.day, 10),
+                    dayNum: dayLookup[map.weekday],
+                    h: parseInt(map.hour, 10) % 24,
+                    m: parseInt(map.minute, 10),
+                    s: parseInt(map.second, 10)
+                };
+            } catch (e) {
+                const now = new Date();
+                return {
+                    year: now.getFullYear(),
+                    month: now.getMonth() + 1,
+                    day: now.getDate(),
+                    dayNum: now.getDay(),
+                    h: now.getHours(),
+                    m: now.getMinutes(),
+                    s: now.getSeconds()
+                };
+            }
+        };
+
+        // Direkt-Sprung zum Live-Tracker aus der Header-Leiste
+        window.jumpToLiveTracker = function() {
+            const isHome = (document.querySelector('.view-section.active')?.id === 'view-home');
+            if (!isHome) window.switchView('view-home');
+            setTimeout(() => {
+                const input = document.getElementById('liveTrackerInput');
+                const section = input ? input.closest('section') : null;
+                if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (input) setTimeout(() => input.focus({ preventScroll: true }), 420);
+            }, isHome ? 20 : 120);
+        };
+
+        // =========================================================================
+        // MINI ÖFFNUNGSZEITEN-COUNTDOWN IM HEADER (BERLINER ZEIT + FEIERTAGE)
+        // =========================================================================
+        window.updateHeaderHoursCountdown = function() {
+            const box = document.getElementById('headerHoursCountdown');
+            const lbl = document.getElementById('hhcHoursLabel');
+            const timer = document.getElementById('hhcCountdownText');
+            if (!box || !lbl || !timer) return;
+
+            const bn = window.getBerlinNowParts();
+            const todayHoliday = window.isBerlinHolidayYMD(bn.year, bn.month, bn.day);
+            const nowSec = bn.h * 3600 + bn.m * 60 + bn.s;
+            const openSec = 9 * 3600;
+            const closeSec = 20 * 3600;
+            const isWorkday = (bn.dayNum >= 1 && bn.dayNum <= 5) && !todayHoliday;
+            const isOpen = isWorkday && nowSec >= openSec && nowSec < closeSec;
+            const pad = (n) => String(n).padStart(2, '0');
+
+            if (isOpen) {
+                const remSec = closeSec - nowSec;
+                const rh = Math.floor(remSec / 3600);
+                const rm = Math.floor((remSec % 3600) / 60);
+                const rs = remSec % 60;
+                box.classList.add('is-open');
+                box.classList.remove('is-closed');
+                box.title = 'Geöffnet (Mo–Fr 09:00–20:00 Uhr, Berlin)';
+                lbl.innerText = 'Offen • 09–20';
+                timer.innerText = `Noch ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+            } else {
+                let remSec = 0;
+                if (isWorkday && nowSec < openSec) {
+                    remSec = openSec - nowSec;
+                } else {
+                    for (let offsetDays = 1; offsetDays <= 14; offsetDays++) {
+                        const nextUtc = new Date(Date.UTC(bn.year, bn.month - 1, bn.day + offsetDays));
+                        const wd = nextUtc.getUTCDay();
+                        const ny = nextUtc.getUTCFullYear();
+                        const nm = nextUtc.getUTCMonth() + 1;
+                        const nd = nextUtc.getUTCDate();
+                        if (wd >= 1 && wd <= 5 && !window.isBerlinHolidayYMD(ny, nm, nd)) {
+                            remSec = (86400 - nowSec) + ((offsetDays - 1) * 86400) + openSec;
+                            break;
+                        }
+                    }
+                }
+
+                const days = Math.floor(remSec / 86400);
+                const rh = Math.floor((remSec % 86400) / 3600);
+                const rm = Math.floor((remSec % 3600) / 60);
+                const rs = remSec % 60;
+
+                box.classList.remove('is-open');
+                box.classList.add('is-closed');
+                box.title = todayHoliday
+                    ? `Feiertag in Berlin (${todayHoliday}) – Regulär Mo–Fr 09:00–20:00 Uhr`
+                    : 'Öffnungszeiten Mo–Fr 09:00–20:00 Uhr (Berlin)';
+                lbl.innerText = todayHoliday ? 'Feiertag • Zu' : 'Mo–Fr 09–20';
+                timer.innerText = days > 0
+                    ? `In ${days}T ${pad(rh)}:${pad(rm)}:${pad(rs)}`
+                    : `Öffnet ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+            }
+        };
+
+        window.addEventListener('resize', window.syncHeaderHeight, { passive: true });
+        window.addEventListener('orientationchange', () => setTimeout(window.syncHeaderHeight, 150), { passive: true });
+        window.addEventListener('load', () => {
+            window.syncHeaderHeight();
+            window.forceStartAtTop();
+            setTimeout(window.forceStartAtTop, 120);
+        });
+        window.addEventListener('pageshow', () => {
+            window.syncHeaderHeight();
+            window.forceStartAtTop();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.syncHeaderHeight();
+            window.forceStartAtTop();
+            setTimeout(() => { window.syncHeaderHeight(); window.forceStartAtTop(); }, 180);
+            setTimeout(() => { window.syncHeaderHeight(); window.forceStartAtTop(); }, 450);
+
+            const headerEl = document.getElementById('header-wrapper');
+            if (headerEl && typeof ResizeObserver !== 'undefined') {
+                const ro = new ResizeObserver(() => window.syncHeaderHeight());
+                ro.observe(headerEl);
+            }
+
+            // Öffnungszeiten-Countdown live jede Sekunde (pausiert bei inaktivem Tab)
+            window.updateHeaderHoursCountdown();
+            setInterval(() => { if (!document.hidden) window.updateHeaderHoursCountdown(); }, 1000);
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) window.updateHeaderHoursCountdown(); });
+
+            // Scroll-Lock automatisch an alle Overlays, Menüs & Sheets koppeln
+            const lockTargets = [
+                ...Array.from(document.querySelectorAll('.custom-dialog-overlay')),
+                document.getElementById('quickMenu'),
+                document.getElementById('mobileSelectOverlay'),
+                document.getElementById('fabBackdrop'),
+                document.getElementById('intro-preloader')
+            ].filter(Boolean);
+
+            const lockObs = new MutationObserver(() => {
+                window.syncBodyScrollLock();
+                const intro = document.getElementById('intro-preloader');
+                if (intro && intro.classList.contains('intro-preloader-done')) {
+                    window.forceStartAtTop();
+                }
+            });
+            lockTargets.forEach(el => lockObs.observe(el, { attributes: true, attributeFilter: ['class', 'style'] }));
+            window.syncBodyScrollLock();
+        });
+
+        // =========================================================================
+        // NEUHEIT 1, 2 & 3: LIVE ABHOL-PROGNOSE, MERKZETTEL AUFS HANDY & ADRESS-KOPIERER
+        // =========================================================================
+        window.updatePickupForecast = function() {
+            const dropoff = document.getElementById('pickupDropoffSelect')?.value || 'morning';
+            const srv = document.getElementById('pickupServiceSelect')?.value || 'express';
+            const resEl = document.getElementById('pickupForecastResult');
+            if (!resEl) return;
+
+            if (srv === 'plates_only') {
+             resEl.innerHTML = `<i class="fa-solid fa-id-card" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Sofort zum Mitnehmen (ca. 3–5 Minuten):</strong> Ihre Kennzeichenschilder (Alu, 3D-Carbon oder Kurzkennzeichen) sowie die grüne Umweltplakette prägen wir direkt bei Ihrem Besuch.`;
+             return;
+         }
+         if (srv === 'kurzzeit') {
+             if (dropoff === 'morning' || dropoff === 'noon') {
+                 resEl.innerHTML = `<i class="fa-solid fa-stopwatch" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Gleicher Werktag / Sofort-Service:</strong> Bei Abgabe bis 15:00 Uhr sind Ihre 5-Tage-Kurzzeit- oder Zollkennzeichen inkl. Papieren meist noch <strong>am selben Tag abholbereit</strong>.`;
+             } else {
+                 resEl.innerHTML = `<i class="fa-solid fa-stopwatch" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Nächster Werktag:</strong> Ihre Unterlagen gehen direkt in den ersten Morgen-Lauf und sind <strong>am nächsten Werktag ab Mittag abholbereit</strong>.`;
+             }
+             return;
+         }
+         if (srv === 'express') {
+             if (dropoff === 'morning') {
+                 resEl.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Express-Priorisierung (Gleicher Tag / 24h):</strong> Direkte Einreichung im ersten Behörden-Lauf – Fertigstellung meist noch <strong>heute am Spätnachmittag oder morgen Vormittag</strong>.`;
+             } else {
+                 resEl.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Express-Priorisierung (ca. 24 Stunden):</strong> Priorisierte Einreichung beim LABO Berlin – Ihre fertigen Papiere & Schilder sind in der Regel <strong>innerhalb von 24h abholbereit</strong>.`;
+             }
+             return;
+         }
+         resEl.innerHTML = `<i class="fa-solid fa-car" style="color:var(--primary-red); margin-right:5px;"></i><strong style="color:var(--primary-red);">Reguläre Bearbeitungszeit (1–2 Werktage):</strong> Wir übernehmen den kompletten Behördengang inkl. Schilderprägung. Sobald im Live-Tracker „Abholbereit“ leuchtet, können Sie alles abholen.`;
+        };
+
+        window.sendCompassDocsToWhatsApp = function() {
+            const caseTitle = document.getElementById('compassCaseTitle')?.innerText || 'Kfz-Zulassung Berlin';
+            const docItems = Array.from(document.querySelectorAll('#compassDocList li')).map(li => '✅ ' + li.innerText.trim());
+            const listText = docItems.length > 0
+                ? docItems.join('\n')
+                : '✅ Fahrzeugschein (ZB I) & Fahrzeugbrief (ZB II)\n✅ Gültiger Ausweis / Reisepass + Meldebescheinigung\n✅ 7-stellige eVB-Nummer\n✅ Gültiger TÜV / HU-Bericht & IBAN';
+
+            const msg = encodeURIComponent(`📋 *MEINE UNTERLAGEN-CHECKLISTE (RED BERLIN)*\n*Vorgang:* ${caseTitle}\n\n${listText}\n\n📍 *Abgabe-Adresse:*\nRED Zulassungsdienst Berlin\nKienitzer Str. 6, 12053 Berlin (U8 Boddinstraße)\n📞 Tel: 0178 378 38 75`);
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+        };
+
+        window.copyOfficeAddress = function() {
+            const addr = 'RED Zulassungsdienst Berlin, Kienitzer Str. 6, 12053 Berlin';
+            navigator.clipboard.writeText(addr).then(() => {
+                window.showToast('📍 Adresse (Kienitzer Str. 6, 12053 Berlin) kopiert!', 'success');
+            }).catch(() => {
+                window.showToast('📍 Kienitzer Str. 6, 12053 Berlin', 'success');
+            });
+        };
+
+        // =========================================================================
+        // DYNAMISCHE KALENDERWOCHEN (KW) BEIM MONATS- & WOCHENWECHSEL
+        // =========================================================================
+        window.getISOWeekNumber = function(d) {
+            const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            const dayNum = date.getUTCDay() || 7;
+            date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+            return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+        };
+
+        window.updateHeaderCalendarChip = function() {
+            const el = document.getElementById('headerCalendarKwText');
+            if (!el) return;
+            const now = new Date();
+            const kw = window.getISOWeekNumber(now);
+            const monthShort = now.toLocaleDateString('de-DE', { month: 'short' });
+            el.innerText = `KW ${kw} • ${monthShort}`;
+        };
+
+        window.calModalYear = new Date().getFullYear();
+        window.calModalMonth = new Date().getMonth();
+
+        window.changeHeaderCalMonth = function(delta) {
+            window.calModalMonth += delta;
+            if (window.calModalMonth > 11) { window.calModalMonth = 0; window.calModalYear++; }
+            if (window.calModalMonth < 0) { window.calModalMonth = 11; window.calModalYear--; }
+            window.renderHeaderInteractiveCalendar();
+        };
+
+        window.jumpToCurrentCalMonth = function() {
+            const now = new Date();
+            window.calModalYear = now.getFullYear();
+            window.calModalMonth = now.getMonth();
+            window.renderHeaderInteractiveCalendar();
+        };
+
+        window.renderHeaderInteractiveCalendar = function() {
+            const content = document.getElementById('widgetModalContent');
+            if (!content) return;
+
+            const now = new Date();
+            const yr = window.calModalYear;
+            const mo = window.calModalMonth;
+            const firstDay = new Date(yr, mo, 1);
+            const lastDay = new Date(yr, mo + 1, 0);
+            const daysInMonth = lastDay.getDate();
+
+            const startKw = window.getISOWeekNumber(firstDay);
+            const endKw = window.getISOWeekNumber(lastDay);
+            const kwSpanText = startKw === endKw ? `KW ${startKw}` : `KW ${startKw} – KW ${endKw}`;
+
+            const headerChip = document.getElementById('headerCalendarKwText');
+            if (headerChip) {
+                const mShort = firstDay.toLocaleDateString('de-DE', { month: 'short' });
+                headerChip.innerText = (yr === now.getFullYear() && mo === now.getMonth())
+                    ? `KW ${window.getISOWeekNumber(now)} • ${mShort}`
+                    : `${kwSpanText} • ${mShort}`;
+            }
+
+            let startWeekday = firstDay.getDay() - 1;
+            if (startWeekday < 0) startWeekday = 6;
+
+            const monthTitle = firstDay.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+
+            let gridHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:var(--bg-input); padding:8px 10px; border-radius:12px; border:1px solid var(--glass-border); gap:6px;">
+                    <button type="button" onclick="window.changeHeaderCalMonth(-1)" style="background:var(--bg-card); border:1px solid var(--glass-border); color:var(--text-light); width:32px; height:32px; border-radius:8px; cursor:pointer; font-weight:900;">‹</button>
+                    <div style="text-align:center;">
+                        <strong style="color:var(--primary-red); font-size:14px; text-transform:uppercase; display:block;">${monthTitle}</strong>
+                        <span style="font-size:10.5px; color:var(--text-light); font-weight:800; background:rgba(230,0,0,0.1); padding:2px 8px; border-radius:10px; display:inline-block; margin-top:2px;">📅 ${kwSpanText}</span>
+                    </div>
+                    <div style="display:flex; gap:4px;">
+                        <button type="button" onclick="window.jumpToCurrentCalMonth()" title="Zu Heute springen" style="background:var(--bg-card); border:1px solid var(--primary-red); color:var(--primary-red); padding:0 8px; height:32px; border-radius:8px; cursor:pointer; font-size:10px !important; font-weight:800;">Heute</button>
+                        <button type="button" onclick="window.changeHeaderCalMonth(1)" style="background:var(--bg-card); border:1px solid var(--glass-border); color:var(--text-light); width:32px; height:32px; border-radius:8px; cursor:pointer; font-weight:900;">›</button>
+                    </div>
+                </div>
+                <div class="mini-cal-grid">
+                    <div class="mini-cal-weekday" style="color:var(--text-muted);">KW</div>
+                    <div class="mini-cal-weekday">Mo</div>
+                    <div class="mini-cal-weekday">Di</div>
+                    <div class="mini-cal-weekday">Mi</div>
+                    <div class="mini-cal-weekday">Do</div>
+                    <div class="mini-cal-weekday">Fr</div>
+                    <div class="mini-cal-weekday" style="color:var(--text-muted);">Sa</div>
+                    <div class="mini-cal-weekday" style="color:var(--text-muted);">So</div>
+            `;
+
+            let currentCell = 0;
+            gridHtml += `<div class="mini-cal-kw-badge">KW ${window.getISOWeekNumber(firstDay)}</div>`;
+
+            for (let i = 0; i < startWeekday; i++) {
+                gridHtml += `<div class="mini-cal-day empty"></div>`;
+                currentCell++;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const curDate = new Date(yr, mo, d);
+                if (currentCell > 0 && currentCell % 7 === 0) {
+                    const rowKw = window.getISOWeekNumber(curDate);
+                    gridHtml += `<div class="mini-cal-kw-badge">KW ${rowKw}</div>`;
+                }
+
+                const wDay = curDate.getDay();
+                const isWeekend = (wDay === 0 || wDay === 6);
+                const holidayName = window.getBerlinHolidayName(curDate);
+                const isToday = (d === now.getDate() && mo === now.getMonth() && yr === now.getFullYear());
+                const isPast = curDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const isBlocked = isWeekend || !!holidayName || isPast;
+                const formattedDate = `${String(d).padStart(2, '0')}.${String(mo + 1).padStart(2, '0')}.${yr}`;
+                const dayKw = window.getISOWeekNumber(curDate);
+
+                let cls = 'mini-cal-day';
+                if (isToday) cls += ' today';
+                if (isBlocked) cls += ' weekend';
+
+                const blockedReason = holidayName ? `Feiertag: ${holidayName}` : (isWeekend ? 'Wochenende' : 'Vergangener Tag');
+                const clickAttr = !isBlocked
+                    ? `onclick="window.selectDayFromHeaderCalendar('${formattedDate}', ${dayKw})" title="KW ${dayKw}: Klicken, um am ${formattedDate} einen Termin zu buchen"`
+                    : `title="KW ${dayKw} (${blockedReason})"`;
+
+                gridHtml += `<div class="${cls}" ${clickAttr}>${d}</div>`;
+                currentCell++;
+            }
+
+            gridHtml += `</div>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:12px;">
+                    💡 <strong>Direkt-Auswahl:</strong> Tippen Sie auf einen freien Werktag (Mo–Fr), um dieses Datum direkt im Terminformular zu öffnen!
+                </p>
+            `;
+            content.innerHTML = gridHtml;
+        };
+
+        window.selectDayFromHeaderCalendar = function(dateStr, kwNum) {
+            if (kwNum && document.getElementById('headerCalendarKwText')) {
+                document.getElementById('headerCalendarKwText').innerText = `KW ${kwNum} • ${dateStr.substring(0, 5)}`;
+            }
+            window.closeWidgetModal();
+            window.switchView('view-home');
+            setTimeout(() => {
+                const dp = document.getElementById('datePicker');
+                if (dp) {
+                    dp.value = dateStr;
+                    if (dp._flatpickr) {
+                        dp._flatpickr.setDate(dateStr, true);
+                    }
+                }
+                document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
+                window.showToast(`📅 Wunschdatum ${dateStr} (KW ${kwNum || ''}) gewählt!`, 'success');
+            }, 250);
+        };
+
+        // =========================================================================
+        // PROGRESSIVE WEB APP (PWA) INSTALLATIONS-ENGINE (iOS & ANDROID/SAMSUNG)
+        // =========================================================================
+        window.deferredPwaPrompt = null;
+
+        window.initPwaSystem = function() {
+            if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js').catch(() => {});
+                });
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                window.deferredPwaPrompt = e;
+                const nativeBox = document.getElementById('pwaNativeBtnContainer');
+                if (nativeBox) nativeBox.style.display = 'block';
+            });
+
+            window.addEventListener('appinstalled', () => {
+                window.deferredPwaPrompt = null;
+                window.closePwaInstallModal();
+                window.showToast('🎉 RED Berlin App erfolgreich installiert!', 'success');
+            });
+        };
+
+        window.triggerAppInstall = async function() {
+            if (window.deferredPwaPrompt) {
+                try {
+                    window.deferredPwaPrompt.prompt();
+                    const { outcome } = await window.deferredPwaPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        window.deferredPwaPrompt = null;
+                        return;
+                    }
+                } catch (err) {}
+            }
+            const nativeBox = document.getElementById('pwaNativeBtnContainer');
+            if (nativeBox) nativeBox.style.display = window.deferredPwaPrompt ? 'block' : 'none';
+            document.getElementById('pwaInstallOverlay').classList.add('open');
+        };
+
+        window.executeNativePwaPrompt = async function() {
+            if (!window.deferredPwaPrompt) return;
+            window.deferredPwaPrompt.prompt();
+            const { outcome } = await window.deferredPwaPrompt.userChoice;
+            if (outcome === 'accepted') {
+                window.deferredPwaPrompt = null;
+                window.closePwaInstallModal();
+            }
+        };
+
+        window.closePwaInstallModal = function() {
+            document.getElementById('pwaInstallOverlay').classList.remove('open');
+        };
+
+        // =========================================================================
+        // LIVE eVB-, IBAN- & FIN-PRÜFER (100% LOKAL IM BROWSER)
+        // =========================================================================
+        window.validateCustomerDocsLive = function() {
+            const evbEl = document.getElementById('chkEvbInput');
+            const finEl = document.getElementById('chkFinInput');
+            const ibanEl = document.getElementById('chkIbanInput');
+
+            const evbStat = document.getElementById('chkEvbStatus');
+            const finStat = document.getElementById('chkFinStatus');
+            const ibanStat = document.getElementById('chkIbanStatus');
+
+            if (evbEl && evbStat) {
+                const val = evbEl.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                evbEl.value = val;
+                if (val.length === 0) {
+                    evbStat.style.color = 'var(--text-muted)';
+                    evbStat.innerText = 'Noch 7 Zeichen eingeben';
+                } else if (val.length === 7) {
+                    evbStat.style.color = 'var(--green-accent)';
+                    evbStat.innerHTML = '✅ Gültiges 7-stelliges eVB-Format!';
+                } else {
+                    evbStat.style.color = '#ff9500';
+                    evbStat.innerText = `Aktuell ${val.length}/7 Zeichen`;
+                }
+            }
+
+            if (finEl && finStat) {
+                const rawVal = finEl.value.toUpperCase();
+                const hasForbidden = /[IOQ]/.test(rawVal);
+                const cleanVal = rawVal.replace(/[^A-Z0-9]/g, '');
+                finEl.value = cleanVal;
+
+                if (cleanVal.length === 0) {
+                    finStat.style.color = 'var(--text-muted)';
+                    finStat.innerText = 'Optional: 17-stellige FIN';
+                } else if (hasForbidden) {
+                    finStat.style.color = '#ff3b30';
+                    finStat.innerHTML = '⚠️ Hinweis: Buchstaben I, O, Q gibt es in keiner FIN (bitte 1 oder 0 prüfen)!';
+                } else if (cleanVal.length === 17) {
+                    finStat.style.color = 'var(--green-accent)';
+                    finStat.innerHTML = '✅ Exakt 17 Zeichen – FIN-Format korrekt!';
+                } else {
+                    finStat.style.color = '#ff9500';
+                    finStat.innerText = `Aktuell ${cleanVal.length}/17 Zeichen`;
+                }
+            }
+
+            if (ibanEl && ibanStat) {
+                const cleanIban = ibanEl.value.replace(/\s+/g, '').toUpperCase();
+                const formattedIban = cleanIban.replace(/(.{4})/g, '$1 ').trim();
+                ibanEl.value = formattedIban;
+
+                if (cleanIban.length === 0) {
+                    ibanStat.style.color = 'var(--text-muted)';
+                    ibanStat.innerText = 'Format: DE + 20 Ziffern';
+                } else if (cleanIban.startsWith('DE') && cleanIban.length === 22 && /^DE\d{20}$/.test(cleanIban)) {
+                    ibanStat.style.color = 'var(--green-accent)';
+                    ibanStat.innerHTML = '✅ Deutsche IBAN (22 Zeichen) formal vollständig!';
+                } else if (cleanIban.startsWith('DE')) {
+                    ibanStat.style.color = '#ff9500';
+                    ibanStat.innerText = `Deutsche IBAN: ${cleanIban.length}/22 Zeichen`;
+                } else {
+                    ibanStat.style.color = '#007aff';
+                    ibanStat.innerText = `Auslands-IBAN (${cleanIban.length} Zeichen)`;
+                }
+            }
+        };
+
+        window.transferCheckedDocsToVollmacht = function() {
+            const evb = document.getElementById('chkEvbInput')?.value.trim() || '';
+            const fin = document.getElementById('chkFinInput')?.value.trim() || '';
+            const iban = document.getElementById('chkIbanInput')?.value.trim() || '';
+
+            if (evb && document.getElementById('dvEvb')) {
+                document.getElementById('dvEvb').value = `eVB: ${evb}`;
+            }
+            if (fin && document.getElementById('dvVehicle')) {
+                document.getElementById('dvVehicle').value = fin;
+            }
+            if (iban && document.getElementById('dvIban')) {
+                document.getElementById('dvIban').value = iban;
+            }
+            window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat');
+            window.showToast('Geprüfte Daten direkt in die Vollmacht übernommen!', 'success');
+        };
+
+        // =========================================================================
+        // LABO-GEBÜHREN & BERLINER UMWELTPLAKETTEN-RECHNER
+        // =========================================================================
+        window.calculateLaboAndEnvGuide = function() {
+            const feeCase = document.getElementById('laboFeeCaseSelect')?.value || 'ummeldung_berlin';
+            const fuelType = document.getElementById('envBadgeFuelSelect')?.value || 'benzin_euro4';
+            const titleEl = document.getElementById('envBadgeResultTitle');
+            const descEl = document.getElementById('laboFeeResultDesc');
+            if (!titleEl || !descEl) return;
+
+            const feeMap = {
+                'ummeldung_berlin': { price: 'ca. 26,00&nbsp;€ – 31,00&nbsp;€', note: 'Halterwechsel innerhalb Berlins' },
+                'ummeldung_auswaerts': { price: 'ca. 30,00&nbsp;€ – 36,00&nbsp;€', note: 'Umschreibung von außerhalb nach Berlin' },
+                'neuzulassung': { price: 'ca. 28,00&nbsp;€ – 34,00&nbsp;€', note: 'Fabrikneues Fahrzeug inkl. Stempel' },
+                'wiederzulassung': { price: 'ca. 29,00&nbsp;€ – 35,00&nbsp;€', note: 'Wiederzulassung nach Stilllegung' },
+                'kurzzeit': { price: 'ca. 13,10&nbsp;€', note: 'Amtliche Gebühr für 5-Tage-Kurzzeitkennzeichen' },
+                'zoll': { price: 'ca. 34,00&nbsp;€ – 42,00&nbsp;€', note: 'Amtliche Gebühr für Ausfuhr-/Zollkennzeichen' },
+                'abmeldung': { price: 'ca. 16,50&nbsp;€', note: 'Amtliche Gebühr für Außerbetriebsetzung' }
+            };
+
+            if (fuelType === 'elektro') {
+                titleEl.style.color = 'var(--green-accent)';
+                titleEl.innerHTML = '<i class="fa-solid fa-bolt" style="margin-right:5px;"></i>E-Kennzeichen & Grüne Plakette (Stufe 4) – Volle Elektro-Privilegien in Berlin.';
+            } else if (fuelType === 'oldtimer') {
+                titleEl.style.color = 'var(--gold-accent)';
+                titleEl.innerHTML = '<i class="fa-solid fa-landmark" style="margin-right:5px;"></i>H-Oldtimer-Sonderrecht – Freie Fahrt in der gesamten Berliner Umweltzone (ohne Plakettenpflicht).';
+            } else if (fuelType === 'alt_diesel') {
+                titleEl.style.color = '#d97706';
+                titleEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="margin-right:5px;"></i>Hinweis: Ohne Partikelfilter keine grüne Plakette – wir beraten Sie gerne zu Nachrüstung oder Ausnahmen.';
+            } else {
+                titleEl.style.color = 'var(--green-accent)';
+                titleEl.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right:5px;"></i>Grüne Feinstaubplakette (Stufe 4) – Freie Fahrt in ganz Berlin!';
+            }
+
+            const selectedFee = feeMap[feeCase] || { price: 'ca. 28,00&nbsp;€', note: 'Amtlicher Richtwert' };
+            descEl.innerHTML = `Amtlicher LABO-Gebühren-Richtwert: <strong class="nowrap-unit">${selectedFee.price}</strong><span class="paren-sub">(${selectedFee.note} • zzgl. 12,80&nbsp;€ bei Wunschkennzeichen)</span>Grüne Umweltplakette stellen wir direkt vor Ort aus.`;
+        };
+
+        // =========================================================================
+        // 60-SEKUNDEN RÜCKRUF-SERVICE MODAL
+        // =========================================================================
+        window.openCallbackModal = function() {
+            document.getElementById('callbackRequestOverlay').classList.add('open');
+        };
+        window.closeCallbackModal = function() {
+            document.getElementById('callbackRequestOverlay').classList.remove('open');
+        };
+
+        window.submitCallbackRequest = async function(viaWhatsApp = false) {
+            const name = document.getElementById('cbReqName')?.value.trim() || '';
+            const phone = document.getElementById('cbReqPhone')?.value.trim() || '';
+            const timeSlot = document.getElementById('cbReqTime')?.value || 'Sofort / Schnellstmöglich';
+            const topic = document.getElementById('cbReqTopic')?.value || 'Kfz-Anmeldung';
+
+            if (!name || !phone) {
+                window.showToast('Bitte Ihren Namen und Ihre Telefonnummer eingeben.', 'error');
+                return;
+            }
+
+            const todayDate = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const cbAptData = {
+                name: name,
+                phone: phone,
+                email: 'Rückruf-Wunsch',
+                date: todayDate,
+                timeLabel: timeSlot,
+                service: `📞 RÜCKRUF: ${topic}`,
+                category: 'Express-Rückruf',
+                customNote: `Bitte zurückrufen (${timeSlot})`,
+                marked: true,
+                orderStatus: 1,
+                notes: [{ id: Date.now().toString(), text: `Rückruf angefordert für: ${topic} (${timeSlot})`, timeStr: '60s Rückruf-Service' }],
+                timestamp: Date.now()
+            };
+
+            if (window.firebaseDb && window.firebaseAddDoc) {
+                try {
+                    await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "appointments"), cbAptData);
+                } catch (e) {}
+            }
+
+            await window.sendToMakeWebhook({
+                type: 'callback_request',
+                clientName: name,
+                clientCategory: 'Express-Rückruf',
+                clientPhone: phone,
+                clientEmail: '-',
+                date: todayDate,
+                time: timeSlot,
+                service: `Rückruf: ${topic}`,
+                wunschkennzeichen: '-',
+                customNote: `Bitte zurückrufen (${timeSlot})`
+            });
+
+            if (viaWhatsApp) {
+                let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
+                if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+                const msg = encodeURIComponent(`📞 *60s EXPRESS-RÜCKRUF ANFRAGE*\n\n• *Name:* ${name}\n• *Telefon:* ${phone}\n• *Wunschzeit:* ${timeSlot}\n• *Thema:* ${topic}`);
+                window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+            }
+
+            window.closeCallbackModal();
+            document.getElementById('cbReqName').value = '';
+            document.getElementById('cbReqPhone').value = '';
+            window.showToast('📞 Rückruf-Wunsch eingetragen! Wir melden uns in Kürze.', 'success');
+        };
+
+        // =========================================================================
+        // 1-KLICK BERLINER WUNSCHKENNZEICHEN-IDEEN-GENERATOR
+        // =========================================================================
+        window.generatePlateIdea = function(mode) {
+            const lettersEl = document.getElementById('wkLetters');
+            const numbersEl = document.getElementById('wkNumbers');
+            const typeEl = document.getElementById('wkType');
+            const styleEl = document.getElementById('wkStyle');
+            if (!lettersEl || !numbersEl) return;
+
+            const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            const yr = String(window.getDynamicSystemYear());
+
+            if (mode === 'schnaps') {
+                lettersEl.value = pick(['TY', 'EX', 'VIP', 'AA', 'ZZ', 'MM', 'KK', 'BB']).substring(0, 2);
+                numbersEl.value = pick(['111', '222', '333', '555', '777', '888', '999', '8888', '77']);
+                if (typeEl) typeEl.value = '';
+                if (styleEl) styleEl.value = 'carbon';
+            } else if (mode === 'short') {
+                lettersEl.value = pick(['T', 'R', 'B', 'X', 'V', 'M', 'A', 'K']);
+                numbersEl.value = pick(['1', '7', '9', '10', '61', '88', '99']);
+                if (typeEl) typeEl.value = '';
+                if (styleEl) styleEl.value = 'short';
+            } else if (mode === 'berlin') {
+                lettersEl.value = pick(['BE', 'TY', 'BL', 'NK', 'KB', 'SP', 'CH']);
+                numbersEl.value = pick([yr, '30', '36', '44', '61', '100', '361']);
+                if (typeEl) typeEl.value = '';
+                if (styleEl) styleEl.value = 'std';
+            } else if (mode === 'elektro') {
+                lettersEl.value = pick(['EL', 'EQ', 'EV', 'TY', 'GO']);
+                numbersEl.value = pick(['100', '500', yr, '800', '77']);
+                if (typeEl) typeEl.value = 'E';
+                if (styleEl) styleEl.value = 'carbon';
+            } else {
+                const alphabet = 'ABCDEFGHJKLMNPRSTUVWXYZ';
+                const l1 = alphabet[Math.floor(Math.random() * alphabet.length)];
+                const l2 = alphabet[Math.floor(Math.random() * alphabet.length)];
+                lettersEl.value = l1 + l2;
+                numbersEl.value = String(Math.floor(100 + Math.random() * 8900));
+                if (typeEl) typeEl.value = '';
+            }
+            window.updateLivePlatePreview();
+            window.showToast(`Kennzeichen-Idee "B - ${lettersEl.value} ${numbersEl.value}" geladen!`, 'success');
+        };
+
+        // =========================================================================
+        // TAGES-AGENDA DRUCKEN & WEB-AUDIO SIGNALTON FÜR ADMIN
+        // =========================================================================
+        window.adminSoundEnabled = localStorage.getItem('red_admin_sound') !== 'false';
+
+        window.toggleAdminSoundAlert = function() {
+            window.adminSoundEnabled = !window.adminSoundEnabled;
+            localStorage.setItem('red_admin_sound', window.adminSoundEnabled ? 'true' : 'false');
+            const btn = document.getElementById('adminSoundToggleBtn');
+            if (btn) {
+                btn.style.color = window.adminSoundEnabled ? 'var(--green-accent)' : 'var(--text-muted)';
+                btn.innerHTML = window.adminSoundEnabled
+                    ? '<i class="fa-solid fa-volume-high"></i> Ton: An'
+                    : '<i class="fa-solid fa-volume-xmark"></i> Ton: Aus';
+            }
+            if (window.adminSoundEnabled) window.playAdminNotificationSound();
+            window.showToast(window.adminSoundEnabled ? '🔊 Signalton für neue Buchungen aktiviert' : '🔇 Signalton stummgeschaltet', 'success');
+        };
+
+        window.playAdminNotificationSound = function() {
+            if (!window.adminSoundEnabled) return;
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.14);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.46);
+            } catch (e) {}
+        };
+
+        window.printTodayAgenda = function() {
+            const apts = window.redApts || [];
+            const todayStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const todayAlt = new Date().toLocaleDateString('de-DE');
+
+            const relevantApts = apts.filter(a => a.date === todayStr || a.date === todayAlt || Number(a.orderStatus) !== 4);
+            const win = window.open('', '_blank');
+            if (!win) {
+                window.showToast('Bitte Pop-ups für die Druckansicht erlauben.', 'error');
+                return;
+            }
+
+            let rowsHtml = '';
+            if (relevantApts.length === 0) {
+                rowsHtml = `<tr><td colspan="6" style="text-align:center; padding:18px;">Keine offenen Termine für heute eingetragen.</td></tr>`;
+            } else {
+                relevantApts.forEach((a, idx) => {
+                    const stepMap = { 1: '1. Erfasst', 2: '2. Beim LABO', 3: '3. Schilder geprägt', 4: '4. Erledigt' };
+                    rowsHtml += `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td><strong>${window.escHtml(a.date)}</strong><br>${window.escHtml(a.timeLabel || '')}${a.trackingCode ? '<br><small style="color:#d90000;font-weight:bold;">Code: ' + window.escHtml(a.trackingCode) + '</small>' : ''}</td>
+                            <td><strong>${window.escHtml(a.name)}</strong><br><small>${window.escHtml(a.category || 'Privatkunde')}</small></td>
+                            <td>${window.escHtml(a.phone || '-')}</td>
+                            <td><strong>${window.escHtml(a.service)}</strong>${a.wunschkennzeichen ? '<br><small style="color:#0055cc;font-weight:bold;">Kennz.: ' + window.escHtml(a.wunschkennzeichen) + '</small>' : ''}${a.customNote ? '<br><small>' + window.escHtml(a.customNote) + '</small>' : ''}</td>
+                            <td>${stepMap[Number(a.orderStatus) || 1]}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            win.document.write(`
+                <!DOCTYPE html>
+                <html lang="de">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Tages-Agenda ${todayStr} - RED Zulassungsdienst Berlin</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 25px; color: #111; font-size: 12px; }
+                        h1 { color: #d90000; font-size: 18px; margin: 0 0 4px; text-transform: uppercase; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        th, td { border: 1px solid #bbb; padding: 8px 10px; text-align: left; vertical-align: top; }
+                        th { background: #f2f2f7; font-weight: bold; text-transform: uppercase; font-size: 10.5px; }
+                        .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d90000; padding-bottom: 10px; }
+                        .print-btn { background: #d90000; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+                        @media print { .print-btn { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="top-bar">
+                        <div>
+                            <h1>Tages-Agenda & Offene Aufträge (${todayStr})</h1>
+                            <small>RED Zulassungsdienst Berlin • Inh. Tamer Yazici • Kienitzer Str. 6, 12053 Berlin</small>
+                        </div>
+                        <button class="print-btn" onclick="window.print()">🖨️ Jetzt ausdrucken</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Datum / Uhrzeit</th>
+                                <th>Kunde / Art</th>
+                                <th>Telefon</th>
+                                <th>Leistung / Wunschkennzeichen</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        };
+
+        // =========================================================================
+        // AUTOMATISCHER JAHRESWECHSEL (2026 -> 2027+ AUTOPILOT & 3D-ANIMATION)
+        // =========================================================================
+        window.getDynamicSystemYear = function() {
+            return new Date().getFullYear();
+        };
+
+        window.initAutomaticYearSystem = function() {
+            const currentYear = window.getDynamicSystemYear();
+            const now = new Date();
+            const nextOrCurrentYear = (now.getMonth() === 11 && currentYear === 2026) ? 2027 : (currentYear > 2026 ? currentYear : 2027);
+            const finalActiveYear = currentYear > 2026 ? currentYear : 2026;
+            const shortYear = String(finalActiveYear).slice(-2);
+
+            const introBadge = document.getElementById('introYearBadge');
+            if (introBadge) {
+                introBadge.innerText = '2026';
+                setTimeout(() => {
+                    introBadge.classList.add('flipping');
+                    setTimeout(() => {
+                        introBadge.innerText = String(nextOrCurrentYear);
+                    }, 310);
+                    if (currentYear === 2026 && now.getMonth() < 11) {
+                        setTimeout(() => {
+                            introBadge.classList.remove('flipping');
+                            void introBadge.offsetWidth;
+                            introBadge.classList.add('flipping');
+                            setTimeout(() => {
+                                introBadge.innerText = '2026';
+                            }, 310);
+                        }, 950);
+                    }
+                }, 850);
+            }
+
+            const huStamp = document.getElementById('livePlateHuStamp');
+            if (huStamp) huStamp.innerText = shortYear;
+
+            const wkNum = document.getElementById('wkNumbers');
+            const prevNum = document.getElementById('platePreviewNumbers');
+            if (wkNum && wkNum.value === '2026' && currentYear !== 2026) {
+                wkNum.value = String(currentYear);
+                if (prevNum) prevNum.innerText = String(currentYear);
+            }
+
+            const footerEl = document.getElementById('txt-footer-text');
+            if (footerEl && currentYear > 2026) {
+                footerEl.innerText = footerEl.innerText.replace('2026', String(currentYear));
+            }
+        };
+
+        window.initFloatingPlates = function() {};
+
+        // =========================================================================
+        // LABO-COUNTDOWN, KOMPASS, BEZIRKE & FORMULAR-DRUCK
+        // =========================================================================
+
+        window.updateDispatchCountdown = function() {
+            const el = document.getElementById('liveDispatchCountdown');
+            if (!el) return;
+            const bn = window.getBerlinNowParts();
+            const todayHoliday = window.isBerlinHolidayYMD(bn.year, bn.month, bn.day);
+            const day = bn.dayNum;
+            const h = bn.h;
+            const m = bn.m;
+
+            if (day === 0 || day === 6 || todayHoliday || h >= 18) {
+                el.innerHTML = `<strong style="display:block; color:var(--text-light); margin-bottom:2px;"><i class="fa-regular fa-clock" style="color:var(--primary-red); margin-right:5px;"></i>Express-Kontingent${todayHoliday ? ` (${todayHoliday})` : ''}</strong>Jetzt Online-Termin für den nächsten Werktag <span class="nowrap-unit">ab 09:00&nbsp;Uhr</span> sichern.`;
+                return;
+            }
+
+            let targetH = h < 11 ? 11 : 16;
+            let targetM = h < 11 ? 30 : 0;
+            let diffMins = ((targetH * 60) + targetM) - ((h * 60) + m);
+            if (diffMins <= 0) diffMins = ((18 * 60) - ((h * 60) + m));
+
+            const remH = Math.floor(diffMins / 60);
+            const remM = diffMins % 60;
+            el.innerHTML = `<strong style="display:block; color:var(--text-light); margin-bottom:2px;"><i class="fa-solid fa-bolt" style="color:var(--primary-red); margin-right:5px;"></i>Nächste Behörden-Abgabe <span class="paren-inline">(LABO&nbsp;Berlin)</span></strong>In <span class="nowrap-unit" style="color:var(--primary-red); font-weight:900;">${remH}&nbsp;Std. ${remM}&nbsp;Min.</span> – jetzt Unterlagen einreichen.`;
+        };
+        setInterval(() => { if (!document.hidden) window.updateDispatchCountdown(); }, 30000);
+
+        const compassData = {
+            "privat": {
+                title: "Privatperson: An-, Um- oder Neuanmeldung",
+                desc: "Für die reguläre Neuzulassung, Umschreibung (Halterwechsel) oder Wiederzulassung eines Fahrzeugs auf eine Privatperson in Berlin:",
+                docs: [
+                    "Zulassungsbescheinigung Teil I (Fahrzeugschein) & Teil II (Fahrzeugbrief) im Original",
+                    "Gültiger Personalausweis oder Reisepass mit aktueller Meldebescheinigung",
+                    "Elektronische Versicherungsbestätigung (7-stellige eVB-Nummer)",
+                    "Nachweis über gültige Hauptuntersuchung (TÜV / HU-Bericht im Original)",
+                    "Unterschriebene Vollmacht & SEPA-Lastschriftmandat für die Kfz-Steuer (IBAN)",
+                    "Bei zugelassenem Fahrzeug / Kennzeichenwechsel: Bisherige Kennzeichenschilder"
+                ]
+            },
+            "gewerbe": {
+                title: "Gewerbe / Firma / GmbH / UG",
+                desc: "Für die Zulassung von Firmenfahrzeugen auf ein Unternehmen mit Sitz oder Niederlassung in Berlin:",
+                docs: [
+                    "Gewerbeanmeldung und aktueller Handelsregisterauszug (bei GmbH / UG / AG)",
+                    "Original-Ausweis oder Reisepass des Geschäftsführers / Inhabers",
+                    "Zulassungsbescheinigung Teil I & Teil II (Schein & Brief im Original)",
+                    "7-stellige eVB-Nummer & gültiger TÜV / HU-Prüfbericht",
+                    "SEPA-Lastschriftmandat des Firmenkontos (IBAN) für die Kfz-Steuer",
+                    "Unterschriebene Vollmacht (mit Firmenstempel) & ggf. bisherige Schilder"
+                ]
+            },
+            "kurzzeit": {
+                title: "Kurzzeitkennzeichen (5 Tage für Überführung & Probefahrt)",
+                desc: "Zur sofortigen Überführung von abgemeldeten Fahrzeugen oder für Fahrten zur Prüfstelle:",
+                docs: [
+                    "Gültiger Personalausweis oder Reisepass mit Meldebescheinigung (oder Gewerbenachweis)",
+                    "Spezielle 7-stellige eVB-Nummer für Kurzzeitkennzeichen",
+                    "Zulassungsbescheinigung Teil I & II (Original oder gut lesbare Kopie)",
+                    "Nachweis einer gültigen Hauptuntersuchung (HU / TÜV)",
+                    "Unterschriebene Vollmacht für den RED Zulassungsdienst Berlin"
+                ]
+            },
+            "zoll": {
+                title: "Zoll- / Ausfuhrkennzeichen (Internationaler Export)",
+                desc: "Für den Export von Fahrzeugen ins Ausland (gültig wahlweise für 15 oder 30 Tage inkl. Versicherung):",
+                docs: [
+                    "Gültiger Reisepass oder Personalausweis mit Meldebescheinigung (Original)",
+                    "Zulassungsbescheinigung Teil I (Schein) & Teil II (Brief) im Original",
+                    "Gültiger HU / TÜV-Bericht für die gesamte Dauer des Ausfuhrkennzeichens",
+                    "Gelbe internationale Versicherungsbestätigung für Ausfuhrkennzeichen",
+                    "SEPA-Mandat / Kurzzeit-Steuerabrechnung & bisherige Kennzeichenschilder",
+                    "Wichtig: Fahrzeug-Ident-Nr. (FIN) wird geprüft – wir beraten Sie vorab!"
+                ]
+            },
+            "import": {
+                title: "EU- oder Auslands-Import (Zulassung in Deutschland)",
+                desc: "Für Fahrzeuge, die aus der EU oder einem Drittland importiert und in Berlin zugelassen werden sollen:",
+                docs: [
+                    "Original ausländische Fahrzeugpapiere & ggf. ausländische Kennzeichenschilder",
+                    "EG-Übereinstimmungsbescheinigung (COC-Papier im Original) oder Vollgutachten nach § 21 StVZO",
+                    "Kaufvertrag oder Original-Rechnung (Eigentumsnachweis)",
+                    "Bei Import außerhalb der EU: Zoll-Unbedenklichkeitsbescheinigung im Original",
+                    "Deutscher HU/AU-Bericht, 7-stellige eVB-Nummer, Ausweis, Vollmacht & SEPA-Mandat"
+                ]
+            },
+            "abmeldung": {
+                title: "Außerbetriebsetzung / Abmeldung (Sofort-Stilllegung)",
+                desc: "Für die schnelle und rechtssichere Abmeldung Ihres Fahrzeugs (Steuer & Versicherung enden sofort):",
+                docs: [
+                    "Zulassungsbescheinigung Teil I (Fahrzeugschein im Original)",
+                    "Beide bisherigen Kennzeichenschilder (zur Entstempelung)",
+                    "Hinweis: Es wird weder Ihr Personalausweis noch eine Vollmacht benötigt!"
+                ]
+            },
+            "verlust": {
+                title: "Ersatzdokumente bei Verlust (Schein, Brief oder Kennzeichen)",
+                desc: "Wenn Fahrzeugpapiere oder Schilder verloren gegangen oder gestohlen worden sind:",
+                docs: [
+                    "Gültiger Personalausweis oder Reisepass des eingetragenen Fahrzeughalters",
+                    "Bei Verlust Fahrzeugschein (ZB I): Fahrzeugbrief (ZB II) + gültiger TÜV-Bericht",
+                    "Bei Verlust Fahrzeugbrief (ZB II): Fahrzeugschein (ZB I) + Versicherung an Eides statt",
+                    "Bei Diebstahl von Kennzeichen: Polizeiliche Diebstahlsanzeige + Schein & Brief + TÜV",
+                    "Unterschriebene Vollmacht & Verlusterklärung (direkt über Digitale Vollmacht erstellbar)"
+                ]
+            }
+        };
+
+        window.selectCompassCase = function(caseKey, btnEl) {
+            document.querySelectorAll('.compass-tab-btn').forEach(b => b.classList.remove('active'));
+            if(btnEl) btnEl.classList.add('active');
+
+            const data = compassData[caseKey];
+            if(!data) return;
+
+            document.getElementById('compassCaseTitle').innerText = data.title;
+            document.getElementById('compassCaseDesc').innerText = data.desc;
+
+            const listEl = document.getElementById('compassDocList');
+            listEl.innerHTML = '';
+            data.docs.forEach(docText => {
+                listEl.innerHTML += `<li><i class="fa-solid fa-circle-check"></i> <span>${docText}</span></li>`;
+            });
+        };
+
+        window.applyCompassToBooking = function() {
+            const title = document.getElementById('compassCaseTitle').innerText;
+            window.selectedServiceVal = `Zulassung (${title.split(':')[0] || 'Beratung'})`;
+            document.getElementById('selectTriggerText').innerText = window.selectedServiceVal;
+            window.updateBookingLiveSummary();
+            document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
+            window.showToast('Fall in das Buchungsformular übernommen!', 'success');
+        };
+
+        const plateGuideDetails = {
+            "euro": `<strong style="display:block;"><i class="fa-solid fa-id-card" style="color:var(--primary-red); margin-right:5px;"></i>Euro-Standardkennzeichen</strong><span class="paren-sub">(520 × 110 mm)</span>Das offizielle Standardmaß für alle regulären PKW & LKW in Berlin. Sofortprägung bei uns vor Ort in hochwertiger Alu- oder 3D-Carbon-Optik inklusive grüner Umweltplakette.`,
+            "kurz": `<strong style="display:block;"><i class="fa-solid fa-ruler-horizontal" style="color:var(--primary-red); margin-right:5px;"></i>Kurzes Berliner Kennzeichen</strong><span class="paren-sub">(460 mm oder 420 × 110 mm)</span>Besonders beliebt für sportliche Optik bei kurzen Zeichenkombinationen <span class="paren-inline">(z.B. B - TY 1)</span>. Wir haben alle kurzen Rohlinge direkt vorrätig.`,
+            "elektro": `<strong style="display:block;"><i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i>E-Kennzeichen</strong><span class="paren-sub">(Elektro & Plug-In Hybrid)</span>Mit dem Zusatzbuchstaben „E“ am Ende profitieren Sie von Steuervorteilen und Bevorrechtigungen im Straßenverkehr. Sofort bei uns prägbar.`,
+            "oldtimer": `<strong style="display:block;"><i class="fa-solid fa-landmark" style="color:var(--primary-red); margin-right:5px;"></i>H-Kennzeichen</strong><span class="paren-sub">(Historische Oldtimer ab 30 Jahren)</span>Pauschalierter Kfz-Steuersatz und freie Fahrt in allen Umweltzonen ohne grüne Plakette <span class="paren-inline">(Gutachten nach § 23 StVZO erforderlich)</span>.`,
+            "saison": `<strong style="display:block;"><i class="fa-solid fa-calendar-days" style="color:var(--primary-red); margin-right:5px;"></i>Saisonkennzeichen</strong><span class="paren-sub">(z.B. 04/10 oder 03/10)</span>Ideal für Cabrios, Motorräder, Wohnmobile & Sommerfahrzeuge – Sie zahlen Steuer & Versicherung nur für den gewählten Zulassungszeitraum.`,
+            "kurzzeit": `<strong style="display:block;"><i class="fa-solid fa-stopwatch" style="color:var(--primary-red); margin-right:5px;"></i>Kurzzeitkennzeichen</strong><span class="paren-sub">(5 Tage mit gelbem Rand)</span>Perfekt für Probe-, Überführungs- und TÜV-Fahrten von abgemeldeten Fahrzeugen innerhalb Deutschlands. Sofort zum Mitnehmen.`,
+            "zoll": `<strong style="display:block;"><i class="fa-solid fa-globe" style="color:var(--primary-red); margin-right:5px;"></i>Zoll- / Ausfuhrkennzeichen</strong><span class="paren-sub">(Roter Rand, 15–30 Tage)</span>Für den sicheren Export von Fahrzeugen ins EU- und Nicht-EU-Ausland inklusive internationaler gelber Versicherungskarte.`,
+            "zweizeilig": `<strong style="display:block;"><i class="fa-solid fa-motorcycle" style="color:var(--primary-red); margin-right:5px;"></i>Motorrad- & Zweizeilige Schilder</strong><span class="paren-sub">(180×200 mm / 255×130 mm)</span>Offizielle Kraftrad-, Leichtkraftrad-, Quad- und US-Import-Kennzeichen sofort zum Mitnehmen vor Ort.`
+        };
+
+        window.selectPlateGuide = function(key, btnEl) {
+            const parent = btnEl.parentElement;
+            if(parent) parent.querySelectorAll('.district-pill').forEach(p => p.classList.remove('active'));
+            btnEl.classList.add('active');
+            const infoEl = document.getElementById('plateGuideInfoText');
+            if(infoEl && plateGuideDetails[key]) {
+                infoEl.innerHTML = plateGuideDetails[key];
+            }
+        };
+
+        const districtDetails = {
+            "neukoelln": "Direkt vor Ort in Neukölln / Britz (Kienitzer Str. 6, 12053 Berlin): Nur 2–8 Minuten Fahrzeit (U8 Boddinstr. / Hermannplatz / Stadtautobahn A100 Ausfahrt Britzer Damm). Sofort-Annahme ohne Wartezeit!",
+            "kreuzberg": "Ab Kreuzberg / Mitte: Nur ca. 8–12 Minuten über Hermannplatz, Kottbusser Damm oder Urbanstraße direkt zu unserer Annahmestelle in der Kienitzer Str. 6.",
+            "tempelhof": "Ab Tempelhof-Schöneberg: Über den Tempelhofer Damm / Columbiadamm oder die A100 (Ausfahrt Tempelhofer Damm / Britzer Damm) in nur ca. 8–10 Minuten direkt vor Ort.",
+            "charlottenburg": "Ab Charlottenburg-Wilmersdorf: Direkt über die Stadtautobahn A100 bis Ausfahrt Britzer Damm / Hermannstraße – Ihre Dokumente sind in 5 Minuten abgegeben!",
+            "spandau": "Ab Spandau: Schnelle Verbindung über den Stadtring A100 Richtung Neukölln (Ausfahrt Britzer Damm) oder mit der U7/U8. Tipp: Nutzen Sie vorab unseren kostenlosen WhatsApp-Foto-Check!",
+            "reinickendorf": "Ab Tegel / Reinickendorf: Direkte U-Bahn-Linie U8 (ohne Umsteigen bis Station Boddinstraße direkt an der Kienitzer Str.) oder schnell über die A111 / A100!",
+            "wedding": "Ab Wedding / Gesundbrunnen: Mit der U8 ab Osloer Str. / Gesundbrunnen in nur ca. 16 Minuten direkt bis U-Bhf Boddinstraße (Kienitzer Str. 6) – völlig staufrei!",
+            "pankow": "Ab Pankow / Weißensee: Über die B96a / Ringbahn (S41/S42 bis Hermannstraße) oder U8 direkt zu uns. Auf Wunsch prüfen wir alle Papiere vorab per Foto!",
+            "marzahn": "Ab Marzahn-Hellersdorf: Bequem über die B1/B5, Rhinstraße oder S-Bahn bis Ostkreuz/Ringbahn Richtung Neukölln. Wir erledigen Ihre Zulassung ohne langen Behörden-Stau!",
+            "lichtenberg": "Ab Friedrichshain / Lichtenberg: Über die Elsenbrücke / Treptower Park oder Ringbahn in ca. 12–15 Minuten direkt bei uns in der Kienitzer Str. 6.",
+            "treptow": "Ab Treptow-Köpenick: Schnell über die Sonnenallee, Baumschulenweg oder A113/A100 (Ausfahrt Grenzallee / Britzer Damm) in wenigen Minuten erreichbar!",
+            "steglitz": "Ab Steglitz-Zehlendorf: Über die A103 / A100 bis Britzer Damm in ca. 14 Minuten direkt vor unsere Tür – Sofortkennzeichen direkt zum Mitnehmen!"
+        };
+
+        window.selectBerlinDistrict = function(districtKey, btnEl) {
+            const parent = btnEl.parentElement;
+            if(parent) parent.querySelectorAll('.district-pill').forEach(p => p.classList.remove('active'));
+            if(btnEl) btnEl.classList.add('active');
+            const box = document.getElementById('districtResultBox');
+            if(box && districtDetails[districtKey]) {
+                box.innerHTML = `<strong style="color:var(--primary-red);"><i class="fa-solid fa-route"></i> Express-Anbindung (${btnEl.innerText.replace('📍 ','')}):</strong><span style="color:var(--text-light);">${districtDetails[districtKey]}</span>`;
+            }
+        };
+
+        window.switchOnlineToolTab = function(tabKey, btnEl) {
+            document.querySelectorAll('.tools-tab-btn').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-tool-tab') === tabKey);
+            });
+            document.querySelectorAll('.tool-tab-pane').forEach(p => {
+                p.classList.toggle('active', p.id === 'tool-pane-' + tabKey);
+            });
+        };
+
+        window.updateLivePlatePreview = function() {
+            const lettersInput = document.getElementById('wkLetters');
+            const numbersInput = document.getElementById('wkNumbers');
+            const typeSelect = document.getElementById('wkType');
+            const seasonSelect = document.getElementById('wkSeason');
+            const styleSelect = document.getElementById('wkStyle');
+            const plateBox = document.getElementById('liveGermanPlatePreview');
+            const seasonBox = document.getElementById('plateSeasonBox');
+            if(!lettersInput || !numbersInput) return;
+
+            const cleanLetters = lettersInput.value.replace(/[^a-zA-ZäöüÄÖÜ]/g, '').toUpperCase().substring(0, 2);
+            const cleanNumbers = numbersInput.value.replace(/\D/g, '').substring(0, 4);
+            lettersInput.value = cleanLetters;
+            numbersInput.value = cleanNumbers;
+
+            document.getElementById('platePreviewLetters').innerText = cleanLetters || 'RED';
+            document.getElementById('platePreviewNumbers').innerText = cleanNumbers || String(window.getDynamicSystemYear());
+            document.getElementById('platePreviewSuffix').innerText = typeSelect ? typeSelect.value : '';
+
+            if(seasonSelect && seasonBox) {
+                if(seasonSelect.value) {
+                    const parts = seasonSelect.value.split('/');
+                    document.getElementById('seasonStartTxt').innerText = parts[0] || '04';
+                    document.getElementById('seasonEndTxt').innerText = parts[1] || '10';
+                    seasonBox.style.display = 'flex';
+                } else {
+                    seasonBox.style.display = 'none';
+                }
+            }
+
+            if(plateBox && styleSelect) {
+                plateBox.classList.remove('plate-short', 'plate-carbon');
+                if(styleSelect.value === 'short') plateBox.classList.add('plate-short');
+                if(styleSelect.value === 'carbon') plateBox.classList.add('plate-carbon');
+            }
+        };
+
+        window.buildCurrentStudioPlate = function() {
+            window.updateLivePlatePreview();
+            const l = (document.getElementById('wkLetters')?.value || document.getElementById('platePreviewLetters')?.innerText || 'TY').trim().toUpperCase();
+            const n = (document.getElementById('wkNumbers')?.value || document.getElementById('platePreviewNumbers')?.innerText || String(window.getDynamicSystemYear())).trim();
+            const s = (document.getElementById('wkType')?.value || '').trim();
+            const season = document.getElementById('wkSeason')?.value || '';
+            const style = document.getElementById('wkStyle')?.value || 'std';
+            const styleLabel = style === 'carbon' ? ' [3D-Carbon]' : (style === 'short' ? ' [Kurzes Schild]' : '');
+            return `B - ${l} ${n}${s ? ' ' + s : ''}${season ? ' (Saison ' + season + ')' : ''}${styleLabel}`;
+        };
+
+        window.applyPlateToBooking = function(shouldScroll = true) {
+            const fullPlate = window.buildCurrentStudioPlate();
+            if (typeof window.switchView === 'function' && document.querySelector('.view-section.active')?.id !== 'view-home') {
+                window.switchView('view-home');
+            }
+            const plateInput = document.getElementById('formWunschkennzeichen');
+            if (plateInput) {
+                plateInput.value = fullPlate;
+                plateInput.style.borderColor = 'var(--green-border)';
+                plateInput.style.boxShadow = '0 0 0 3px rgba(18, 140, 65, 0.28)';
+                setTimeout(() => { plateInput.style.borderColor = ''; plateInput.style.boxShadow = ''; }, 2800);
+            }
+            try { sessionStorage.setItem('red_pending_plate', fullPlate); } catch (e) {}
+            window.updateBookingLiveSummary();
+            if (shouldScroll) {
+                setTimeout(() => {
+                    const terminEl = document.getElementById('termin');
+                    if (terminEl) terminEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 60);
+            }
+            window.showToast(`Wunschkennzeichen „${fullPlate}“ direkt für den Termin übernommen!`, 'success');
+        };
+
+        window.selectedClientCategory = 'Privatkunde';
+
+        window.selectBookingClientType = function(typeStr, el) {
+            window.selectedClientCategory = typeStr;
+            document.querySelectorAll('#bookingCustomerTypePills .booking-type-pill').forEach(p => p.classList.remove('active'));
+            if(el) el.classList.add('active');
+            window.updateBookingLiveSummary();
+        };
+
+        window.getOrCreatePendingTrackingCode = function(forceNew = false) {
+            if (forceNew || !window.pendingTrackingCode || !/^RED-\d{6}$/.test(window.pendingTrackingCode)) {
+                window.pendingTrackingCode = 'RED-' + Math.floor(100000 + Math.random() * 900000);
+            }
+            const badge = document.getElementById('summaryTrackingCodeBadge');
+            if (badge) badge.innerText = window.pendingTrackingCode;
+            return window.pendingTrackingCode;
+        };
+
+        window.copyCurrentTrackingCode = function() {
+            const code = (window.lastBookedApt && window.lastBookedApt.trackingCode)
+                || document.getElementById('confirmTrackingCodeVal')?.innerText
+                || window.getOrCreatePendingTrackingCode(false);
+            if (!code) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    window.showToast(`Auftrags-Code ${code} kopiert!`, 'success');
+                }).catch(() => {
+                    window.showToast(`Bitte manuell notieren: ${code}`, 'success');
+                });
+            } else {
+                window.showToast(`Bitte manuell notieren: ${code}`, 'success');
+            }
+        };
+
+        window.updateBookingLiveSummary = function() {
+            const srvTextEl = document.getElementById('summaryServiceText');
+            const dtTextEl = document.getElementById('summaryDateTimeText');
+            window.getOrCreatePendingTrackingCode(false);
+            if(!srvTextEl || !dtTextEl) return;
+
+            const cat = window.selectedClientCategory || 'Privatkunde';
+            const srv = window.selectedServiceVal || 'Anmeldung';
+            const plateVal = document.getElementById('formWunschkennzeichen')?.value.trim().toUpperCase() || '';
+            const note = document.getElementById('formCustomNote')?.value.trim() || '';
+            srvTextEl.innerText = `${cat} • ${srv}${plateVal ? ' • Kennz.: ' + plateVal : ''}${note ? ' (' + note + ')' : ''}`;
+
+            const d = document.getElementById('datePicker')?.value || '';
+            const t = window.chosenHour ? (window.chosenHour.includes('Uhr') ? window.chosenHour : window.chosenHour + ' Uhr') : '';
+            if(d && t) {
+                dtTextEl.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--green-accent);"></i> ${d} um ${t}`;
+            } else if(d) {
+                dtTextEl.innerText = `${d} (Bitte noch Uhrzeit wählen)`;
+            } else {
+                dtTextEl.innerText = 'Bitte Datum & Uhrzeit wählen';
+            }
+        };
+        document.addEventListener('DOMContentLoaded', () => window.getOrCreatePendingTrackingCode(false));
+
+        window.sendLastBookingViaWhatsApp = function() {
+            const apt = window.lastBookedApt;
+            if(!apt) return;
+            let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
+            if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+            const msg = encodeURIComponent(`📅 *NEUE TERMIN-RESERVIERUNG (RED BERLIN)*\n\n• *Auftrags-Code:* ${apt.trackingCode || '-'}\n• *Kunde:* ${apt.name} (${apt.category || 'Privatkunde'})\n• *Datum & Zeit:* ${apt.date} um ${apt.time}\n• *Anliegen:* ${apt.service}\n• *Wunschkennzeichen:* ${apt.wunschkennzeichen || '-'}\n• *Hinweis:* ${apt.customNote || '-'}\n• *Telefon:* ${apt.phone || '-'}`);
+            window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+        };
+
+        let sigCanvas = null, sigCtx = null, isDrawingSig = false, hasDrawnSig = false;
+
+        window.initSignaturePad = function() {
+            sigCanvas = document.getElementById('vollmachtSignatureCanvas');
+            if (!sigCanvas) return;
+            const rect = sigCanvas.parentElement.getBoundingClientRect();
+            sigCanvas.width = rect.width || 500;
+            sigCanvas.height = rect.height || 155;
+            sigCtx = sigCanvas.getContext('2d');
+            sigCtx.strokeStyle = '#001a66';
+            sigCtx.lineWidth = 2.6;
+            sigCtx.lineCap = 'round';
+            sigCtx.lineJoin = 'round';
+
+            const getPos = (e) => {
+                const r = sigCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - r.left, y: clientY - r.top };
+            };
+
+            const startDraw = (e) => {
+                e.preventDefault();
+                isDrawingSig = true;
+                hasDrawnSig = true;
+                const pos = getPos(e);
+                sigCtx.beginPath();
+                sigCtx.moveTo(pos.x, pos.y);
+            };
+            const moveDraw = (e) => {
+                if (!isDrawingSig) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                sigCtx.lineTo(pos.x, pos.y);
+                sigCtx.stroke();
+            };
+            const endDraw = () => { isDrawingSig = false; };
+
+            sigCanvas.onmousedown = startDraw;
+            sigCanvas.onmousemove = moveDraw;
+            if (!window._sigMouseUpBound) {
+                window._sigMouseUpBound = true;
+                window.addEventListener('mouseup', () => { isDrawingSig = false; });
+            }
+            sigCanvas.ontouchstart = startDraw;
+            sigCanvas.ontouchmove = moveDraw;
+            sigCanvas.ontouchend = endDraw;
+        };
+
+        window.openDigitalVollmachtModal = function(presetTitle) {
+            const sel = document.getElementById('dvDocType');
+            if (sel && presetTitle) {
+                for (let i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].value.toLowerCase().includes(presetTitle.toLowerCase().substring(0, 10))) {
+                        sel.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            document.getElementById('digitalVollmachtOverlay').classList.add('open');
+            setTimeout(() => window.initSignaturePad(), 150);
+        };
+
+        window.closeDigitalVollmachtModal = function() {
+            document.getElementById('digitalVollmachtOverlay').classList.remove('open');
+        };
+
+        window.toggleDvExtraFields = function() {};
+
+        window.clearVollmachtSignature = function() {
+            if (!sigCanvas || !sigCtx) return;
+            sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+            hasDrawnSig = false;
+        };
+
+        window.printDigitalVollmacht = function() {
+            const esc = window.escHtml;
+            const docType = esc(document.getElementById('dvDocType')?.value || 'Allgemeine Vollmacht & SEPA-Mandat');
+            const actionType = esc(document.getElementById('dvActionType')?.value || 'Neuzulassung / Anmeldung');
+            const name = esc(document.getElementById('dvName')?.value.trim() || '__________________________________________________');
+            const birth = esc(document.getElementById('dvBirth')?.value.trim() || '____________________________________');
+            const addr = esc(document.getElementById('dvAddress')?.value.trim() || '____________________________________________________________');
+            const idNum = esc(document.getElementById('dvIdNumber')?.value.trim() || '____________________________________');
+            const veh = esc(document.getElementById('dvVehicle')?.value.trim() || '____________________________________________________________');
+            const evb = esc(document.getElementById('dvEvb')?.value.trim() || '____________________________________________________________');
+            const iban = esc(document.getElementById('dvIban')?.value.trim() || 'DE____ | ______ | ______ | ______ | ______ | ____');
+            const accOwner = esc(document.getElementById('dvAccountOwner')?.value.trim() || '__________________________________________________');
+            const sigDataUrl = (sigCanvas && hasDrawnSig) ? sigCanvas.toDataURL('image/png') : '';
+            const todayStr = new Date().toLocaleDateString('de-DE');
+
+            let legalBodyText = `<p><strong>1. Vollmacht zur Vorlage bei der Kfz-Zulassungsbehörde (LABO Berlin / Brandenburg):</strong><br>Hiermit bevollmächtige ich den <strong>RED Zulassungsdienst Berlin (Inhaber: Tamer Yazici und Beauftragte, Kienitzer Str. 6, 12053 Berlin)</strong>, das unten bezeichnete Fahrzeug auf meinen Namen / unsere Firma zuzulassen, umzuschreiben oder abzumelden (Vorgang: <strong>${actionType}</strong>) sowie die Fahrzeugpapiere und Kennzeichenschilder entgegenzunehmen.</p>
+            <p style="font-size:12px;"><strong>2. Einverständniserklärung (Steuer- & Gebührenrückstände):</strong><br>Ich erkläre mein ausdrückliches Einverständnis, dass dem Bevollmächtigten mitgeteilt wird, ob Kraftfahrzeugsteuerrückstände oder rückständige Gebühren und Auslagen aus vorangegangenen Zulassungsvorgängen bestehen.</p>`;
+
+            if (docType.includes('Verlusterklärung')) {
+                legalBodyText += `<p style="font-size:12px; border:1px solid #111; padding:10px; background:#fff8f8;"><strong>Versicherung an Eides statt bei Verlust (§ 5 FZV / §§ 156, 161 StGB):</strong><br>Ich erkläre hiermit an Eides statt, dass das Fahrzeugdokument / Kennzeichenschild ([ &nbsp; ] ZB Teil I Schein &nbsp; [ &nbsp; ] ZB Teil II Brief &nbsp; [ &nbsp; ] Amtliches Kennzeichen) unauffindbar verloren gegangen ist und nicht verpfändet oder hinterlegt wurde.</p>`;
+            }
+
+            const printWin = window.open('', '_blank');
+            if (!printWin) {
+                window.showToast('Bitte Pop-ups erlauben, um das Dokument zu öffnen.', 'error');
+                return;
+            }
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="de">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${docType} - RED Zulassungsdienst Berlin</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 30px; color: #111; line-height: 1.5; max-width: 780px; margin: 0 auto; font-size: 12.5px; }
+                        .header { border-bottom: 3px solid #e60000; padding-bottom: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+                        h1 { font-size: 19px; margin: 0; color: #e60000; text-transform: uppercase; }
+                        .box { border: 1px solid #bbb; padding: 12px 15px; border-radius: 6px; margin-bottom: 14px; background: #fafafa; }
+                        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+                        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 22px; }
+                        .sig-box { border-bottom: 1.5px solid #000; min-height: 75px; display: flex; align-items: flex-end; padding-bottom: 4px; }
+                        .no-print-bar { background: #111; color: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+                        .no-print-btn { background: #e60000; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+                        @media print { .no-print-bar { display: none !important; } body { padding: 10px; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="no-print-bar">
+                        <span><strong>RED Dokumenten-Service:</strong> Ausgefüllt oder als Blanko-Vordruck druckbereit</span>
+                        <button class="no-print-btn" onclick="window.print()">🖨️ Jetzt Drucken / Als PDF speichern</button>
+                    </div>
+                    <div class="header">
+                        <div>
+                            <h1>${docType}</h1>
+                            <small>RED Zulassungsdienst Berlin • Inh. Tamer Yazici • Kienitzer Str. 6, 12053 Berlin • Tel: 0178 378 38 75</small>
+                        </div>
+                        <div style="font-weight:bold; font-size:12px;">Datum: ${todayStr}</div>
+                    </div>
+                    ${legalBodyText}
+                    <div class="box">
+                        <strong style="text-transform:uppercase; font-size:11px; color:#e60000;">3. Angaben zum Fahrzeughalter / Vollmachtgeber & Fahrzeug:</strong>
+                        <div class="grid-2" style="margin-top:8px;">
+                            <div>Name, Vorname / Firma:<br><strong>${name}</strong></div>
+                            <div>Geburtsdatum & Geburtsort:<br><strong>${birth}</strong></div>
+                            <div style="grid-column:1/-1;">Anschrift (Straße, Hausnr., PLZ, Ort):<br><strong>${addr}</strong></div>
+                            <div>Ausweis- / Pass-Nr. / HRB:<br><strong>${idNum}</strong></div>
+                            <div>Vorgangsart:<br><strong>${actionType}</strong></div>
+                            <div>Fahrzeug (FIN / Marke & Modell):<br><strong>${veh}</strong></div>
+                            <div>Kennzeichen / eVB-Versicherungs-Nr.:<br><strong>${evb}</strong></div>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <strong style="text-transform:uppercase; font-size:11px; color:#e60000;">4. SEPA-Lastschriftmandat zum Einzug der Kraftfahrzeugsteuer (Bundeszollverwaltung):</strong>
+                        <p style="font-size:11px; margin:6px 0;">Ich ermächtige die Bundeskasse, Zahlungen von meinem unten angegebenen Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Bundeskasse auf mein Konto gezogenen Lastschriften einzulösen.</p>
+                        <div class="grid-2" style="margin-top:8px;">
+                            <div>IBAN des Kontoinhabers:<br><strong>${iban}</strong></div>
+                            <div>Kontoinhaber & Kreditinstitut / BIC:<br><strong>${accOwner}</strong></div>
+                        </div>
+                    </div>
+                    <div class="sig-grid">
+                        <div>
+                            <div class="sig-box">${sigDataUrl ? `<img src="${sigDataUrl}" style="max-height:70px;">` : ''}</div>
+                            <small>Berlin, den ${todayStr} – <strong>Unterschrift Fahrzeughalter / Vollmachtgeber</strong></small>
+                        </div>
+                        <div>
+                            <div class="sig-box">${sigDataUrl ? `<img src="${sigDataUrl}" style="max-height:70px;">` : ''}</div>
+                            <small>Berlin, den ${todayStr} – <strong>Unterschrift Kontoinhaber (für SEPA-Kfz-Steuer)</strong></small>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        };
+
+        window.openKaufvertragModal = function() {
+            document.getElementById('kaufvertragOverlay').classList.add('open');
+        };
+
+        window.closeKaufvertragModal = function() {
+            document.getElementById('kaufvertragOverlay').classList.remove('open');
+        };
+
+        window.printKaufvertrag = function() {
+            const esc = window.escHtml;
+            const seller = esc(document.getElementById('kvSeller')?.value.trim() || '____________________________________________________________');
+            const sellerId = esc(document.getElementById('kvSellerId')?.value.trim() || '____________________________________');
+            const buyer = esc(document.getElementById('kvBuyer')?.value.trim() || '____________________________________________________________');
+            const buyerId = esc(document.getElementById('kvBuyerId')?.value.trim() || '____________________________________');
+            const car = esc(document.getElementById('kvCar')?.value.trim() || '________________________________________');
+            const vin = esc(document.getElementById('kvVin')?.value.trim() || '________________________________________');
+            const km = esc(document.getElementById('kvKm')?.value.trim() || 'EZ: ____________ • KM-Stand: ________________ km');
+            const plate = esc(document.getElementById('kvPlate')?.value.trim() || 'Kennz.: ______________ • HU/TÜV bis: ________');
+            const keys = esc(document.getElementById('kvKeys')?.value.trim() || '____ Vorbesitzer • ____ Schlüssel');
+            const accident = esc(document.getElementById('kvAccident')?.value.trim() || '[  ] Unfallfrei   [  ] Folgende Schäden: ________________________');
+            const price = esc(document.getElementById('kvPrice')?.value.trim() || '________________________ € (in Worten: ____________________________________)');
+            const handover = esc(document.getElementById('kvHandoverDate')?.value.trim() || 'Berlin, am ____.____.202__ um ____:____ Uhr');
+            const notes = esc(document.getElementById('kvNotes')?.value.trim() || 'Das Fahrzeug wird – soweit gesetzlich zulässig – unter Ausschluss jeglicher Sachmängelhaftung verkauft.').replace(/\n/g, '<br>');
+            const todayStr = new Date().toLocaleDateString('de-DE');
+
+            const printWin = window.open('', '_blank');
+            if (!printWin) {
+                window.showToast('Bitte Pop-ups erlauben, um den Kaufvertrag zu öffnen.', 'error');
+                return;
+            }
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="de">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Kfz-Kaufvertrag - RED Zulassungsdienst Berlin</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 28px; color: #111; line-height: 1.48; max-width: 800px; margin: 0 auto; font-size: 12px; }
+                        .header { border-bottom: 3px solid #9a6500; padding-bottom: 10px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+                        h1 { font-size: 18px; margin: 0; color: #111; text-transform: uppercase; }
+                        .box { border: 1px solid #bbb; padding: 10px 14px; border-radius: 6px; margin-bottom: 11px; background: #fafafa; }
+                        .box h4 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; color: #7a4f00; border-bottom: 1px solid #ddd; padding-bottom: 3px; }
+                        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; }
+                        .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 28px; }
+                        .sig-line { border-top: 1.5px solid #000; padding-top: 5px; text-align: center; font-weight: bold; font-size: 11px; }
+                        .no-print-bar { background: #111; color: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+                        .no-print-btn { background: #b38728; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+                        @media print { .no-print-bar { display: none !important; } body { padding: 8px; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="no-print-bar">
+                        <span><strong>RED Kfz-Kaufvertrag:</strong> Vollständige DIN-A4 Ausführung (Ausgefüllt & Blanko nutzbar)</span>
+                        <button class="no-print-btn" onclick="window.print()">🖨️ Jetzt Drucken / Als PDF speichern</button>
+                    </div>
+                    <div class="header">
+                        <div>
+                            <h1>Kaufvertrag für ein gebrauchtes Kraftfahrzeug</h1>
+                            <small>Bereitgestellt von RED Zulassungsdienst & Auto Ankauf Berlin • Kienitzer Str. 6, 12053 Berlin • Tel: 0178 378 38 75</small>
+                        </div>
+                        <div style="font-weight:bold;">Stand: ${todayStr}</div>
+                    </div>
+                    <div class="box">
+                        <h4>1. Vertragspartner (Verkäufer & Käufer)</h4>
+                        <div class="grid-2">
+                            <div><strong>Verkäufer (Name, Anschrift, Tel.):</strong><br>${seller}</div>
+                            <div><strong>Ausweis-/Pass-Nr. & Geburtsdatum (Verkäufer):</strong><br>${sellerId}</div>
+                            <div><strong>Käufer (Name, Anschrift, Tel.):</strong><br>${buyer}</div>
+                            <div><strong>Ausweis-/Pass-Nr. & Geburtsdatum (Käufer):</strong><br>${buyerId}</div>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <h4>2. Fahrzeugbeschreibung & Technische Daten</h4>
+                        <div class="grid-2">
+                            <div><strong>Hersteller / Modell / Typ:</strong><br>${car}</div>
+                            <div><strong>Fahrzeug-Ident-Nr. (FIN / 17-stellig):</strong><br>${vin}</div>
+                            <div><strong>Erstzulassung & Laufleistung:</strong><br>${km}</div>
+                            <div><strong>Letztes Kennzeichen & Nächste HU (TÜV):</strong><br>${plate}</div>
+                            <div><strong>Vorbesitzer & Schlüsselanzahl:</strong><br>${keys}</div>
+                            <div><strong>Unfallschäden / Vorschäden:</strong><br>${accident}</div>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <h4>3. Kaufpreis, Übergabeprotokoll & Ausgehändigte Unterlagen</h4>
+                        <div><strong>Gesamtkaufpreis:</strong> ${price}</div>
+                        <div style="margin-top:6px;"><strong>Ort, Datum & genaue Uhrzeit der Fahrzeugübergabe:</strong> ${handover}</div>
+                    </div>
+                    <div class="box">
+                        <h4>4. Sachmängelhaftung, Ummelde-Pflicht & Sondervereinbarungen</h4>
+                        <div style="font-size:11.5px;">${notes}</div>
+                    </div>
+                    <div class="sig-grid">
+                        <div class="sig-line">Ort, Datum & Unterschrift des Verkäufers</div>
+                        <div class="sig-line">Ort, Datum & Unterschrift des Käufers</div>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        };
+
+// =========================================================================
+
+// =========================================================================
+        // 8. WHATSAPP FOTO-VORABCHECK, VIRAL SHARE, TRACKER & KALKULATOR
+        // =========================================================================
+        window.startPhotoPreCheckWhatsApp = function() {
+            let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
+            if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+            const msg = encodeURIComponent(`Hallo RED-Team! 👋 Ich möchte meine Kfz-Papiere kurz per Foto von Ihnen vorab prüfen lassen.`);
+            window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+        };
+
+        window.openViralShareModal = function() {
+            document.getElementById('viralShareOverlay').classList.add('open');
+        };
+
+        window.loadExternalQrCode = function() {
+            const box = document.getElementById('viralQrBox');
+            if (!box) return;
+            const targetUrl = window.location.href.startsWith('http') ? window.location.href : 'https://wa.me/491783783875';
+            box.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(targetUrl)}" alt="RED Berlin QR Code" referrerpolicy="no-referrer" style="width:170px; height:170px; display:block;">`;
+        };
+
+        window.closeViralShareModal = function() {
+            document.getElementById('viralShareOverlay').classList.remove('open');
+        };
+
+        window.shareViaWhatsApp = function() {
+            const url = window.location.href.startsWith('http') ? window.location.href : 'Kienitzer Str. 6, 12053 Berlin (Tel: 0178 378 38 75)';
+            const text = encodeURIComponent(`🔥 Empfehlung für Kfz-Zulassung & Sofortkennzeichen in Berlin:\nRED Zulassungsdienst Berlin (Tamer Yazici) – Schnell, zuverlässig & ohne Wartezeit!\n👉 ${url}`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        };
+
+        window.copyWebsiteLink = function() {
+            const url = window.location.href.startsWith('http') ? window.location.href : 'RED Zulassungsdienst Berlin - Kienitzer Str. 6, 12053 Berlin - Tel: 0178 378 38 75';
+            navigator.clipboard.writeText(url).then(() => {
+                window.showToast('Link & Kontaktdaten kopiert!', 'success');
+            }).catch(() => {
+                window.showToast('Kopiert!', 'success');
+            });
+        };
+
+        window.ankaufSelectedCondition = 'Fahrbereit & Gepflegt';
+
+        window.selectAnkaufCondition = function(condLabel, btnEl) {
+            window.ankaufSelectedCondition = condLabel;
+            document.querySelectorAll('#ankaufConditionPills .ankauf-cond-pill').forEach(p => p.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+        };
+
+        window.submitAnkaufInquiry = async function(viaWhatsApp = true) {
+            const model = document.getElementById('ankaufModel')?.value.trim() || '';
+            const year = document.getElementById('ankaufYear')?.value.trim() || '';
+            const km = document.getElementById('ankaufKm')?.value.trim() || '';
+            const fuel = document.getElementById('ankaufFuel')?.value.trim() || '';
+            const price = document.getElementById('ankaufPrice')?.value.trim() || '';
+            const phone = document.getElementById('ankaufPhone')?.value.trim() || '';
+            const condition = window.ankaufSelectedCondition || 'Fahrbereit & Gepflegt';
+
+            if (!model) {
+                window.showToast('Bitte mindestens Marke & Modell eingeben.', 'error');
+                return;
+            }
+            if (!viaWhatsApp && !phone) {
+                window.showToast('Bitte Ihre Telefonnummer für unser Rückruf-Angebot eingeben.', 'error');
+                return;
+            }
+
+            const summaryNote = `Zustand: ${condition} | EZ: ${year || '-'} | KM: ${km || '-'} | ${fuel || '-'} | Preiswunsch: ${price || '-'}`;
+            const todayDate = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            if (window.firebaseDb && window.firebaseAddDoc) {
+                try {
+                    await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "appointments"), {
+                        name: `Ankauf: ${model}`,
+                        phone: phone || 'Über WhatsApp',
+                        email: 'Auto-Ankauf Anfrage',
+                        date: todayDate,
+                        timeLabel: 'Sofort-Bewertung',
+                        service: `🚗 AUTO ANKAUF: ${model}`,
+                        category: 'Auto Ankauf',
+                        customNote: summaryNote,
+                        marked: true,
+                        orderStatus: 1,
+                        notes: [{ id: Date.now().toString(), text: summaryNote, timeStr: 'Auto-Ankauf Formular' }],
+                        timestamp: Date.now()
+                    });
+                } catch (e) {}
+            }
+
+            if (typeof window.sendToMakeWebhook === 'function') {
+                window.sendToMakeWebhook({
+                    type: 'callback_request',
+                    clientName: `Auto-Ankauf (${model})`,
+                    clientCategory: 'Auto Ankauf',
+                    clientPhone: phone || 'Über WhatsApp',
+                    clientEmail: '-',
+                    date: todayDate,
+                    time: 'Sofort-Bewertung',
+                    service: `Auto Ankauf: ${model}`,
+                    wunschkennzeichen: '-',
+                    customNote: summaryNote
+                });
+            }
+
+            if (viaWhatsApp) {
+                let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
+                if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+                const msg = encodeURIComponent(`🚗 *AUTO-ANKAUF BLITZ-ANFRAGE (RED BERLIN)*\n\n• *Fahrzeug:* ${model}\n• *Zustand:* ${condition}\n• *Baujahr/EZ:* ${year || '-'}\n• *Kilometerstand:* ${km || '-'}\n• *Motor/Getriebe:* ${fuel || '-'}\n• *Preiswunsch / Info:* ${price || '-'}${phone ? '\n• *Rückruf-Nr.:* ' + phone : ''}\n\nBitte um ein unverbindliches Höchstpreis-Angebot inkl. kostenloser Abmeldung!`);
+                window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+            } else {
+                window.showToast('🚗 Ihre Ankauf-Anfrage wurde gesendet! Wir melden uns in Kürze.', 'success');
+                document.getElementById('ankaufModel').value = '';
+                document.getElementById('ankaufYear').value = '';
+                document.getElementById('ankaufKm').value = '';
+                document.getElementById('ankaufPrice').value = '';
+                document.getElementById('ankaufPhone').value = '';
+            }
+        };
+
+        window.sendAnkaufWhatsApp = function() {
+            window.submitAnkaufInquiry(true);
+        };
+
+        window._activeTrackerUnsub = null;
+
+        window.renderTrackerStatusData = function(data, fallbackCode) {
+            const resBox = document.getElementById('liveTrackerResultBox');
+            if (!resBox) return;
+            resBox.style.display = 'block';
+            const step = Number(data.orderStatus) || 1;
+            const stepLabels = {
+                1: '1. Unterlagen & Termin erfasst',
+                2: '2. In Bearbeitung beim LABO',
+                3: '3. Schilder geprägt & Siegel',
+                4: '4. Fertig & Abholbereit!'
+            };
+            const codeText = data.code || fallbackCode || '';
+            const timeInfo = data.timeLabel ? ` • ${data.timeLabel}` : '';
+            const dateInfo = data.date ? ` (${data.date}${timeInfo})` : '';
+            const plateInfo = data.wunschkennzeichen ? ` | Kennz.: ${data.wunschkennzeichen}` : '';
+
+            document.getElementById('trackerClientTitle').innerText = `Auftrag ${codeText}${dateInfo} – ${stepLabels[step] || stepLabels[1]}`;
+            document.getElementById('trackerServiceBadge').innerText = (data.service || 'Kfz-Zulassung') + plateInfo;
+
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById('tStep' + i);
+                if (!stepEl) continue;
+                stepEl.classList.remove('active', 'completed');
+                if (i < step) stepEl.classList.add('completed');
+                else if (i === step) stepEl.classList.add('active');
+            }
+        };
+
+        window.checkLiveOrderStatus = async function() {
+            const inputEl = document.getElementById('liveTrackerInput');
+            let code = (inputEl?.value || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+            if (/^\d{6}$/.test(code)) {
+                code = 'RED-' + code;
+                if (inputEl) inputEl.value = code;
+            }
+            if (!/^RED-\d{6}$/.test(code)) {
+                window.showToast('Bitte gültigen Prüfcode eingeben (z.B. RED-123456).', 'error');
+                return;
+            }
+
+            if (typeof window._activeTrackerUnsub === 'function') {
+                window._activeTrackerUnsub();
+                window._activeTrackerUnsub = null;
+            }
+
+            const getLocalTrackerFallback = (targetCode) => {
+                const fromApts = (window.redApts || []).find(a => a.trackingCode === targetCode);
+                if (fromApts) {
+                    return {
+                        code: targetCode,
+                        date: fromApts.date,
+                        timeLabel: fromApts.timeLabel,
+                        service: fromApts.service,
+                        wunschkennzeichen: fromApts.wunschkennzeichen,
+                        orderStatus: fromApts.orderStatus || 1
+                    };
+                }
+                try {
+                    const localMap = JSON.parse(localStorage.getItem('red_local_tracking_map') || '{}');
+                    if (localMap[targetCode]) return localMap[targetCode];
+                } catch (e) {}
+                return null;
+            };
+
+            const resBox = document.getElementById('liveTrackerResultBox');
+            try {
+                const docRef = window.firebaseDoc(window.firebaseDb, "order_tracking", code);
+                const snap = await window.firebaseGetDoc(docRef);
+
+                if (!snap.exists()) {
+                    const localFallback = getLocalTrackerFallback(code);
+                    if (localFallback) {
+                        window.renderTrackerStatusData(localFallback, code);
+                        window.showToast('Auftragsstatus geladen!', 'success');
+                        return;
+                    }
+                    if (resBox) resBox.style.display = 'none';
+                    window.showToast(`Code ${code} nicht gefunden. Bitte Schreibweise prüfen oder neu buchen.`, 'error');
+                    return;
+                }
+
+                window.renderTrackerStatusData(snap.data(), code);
+                window.showToast('Auftragsstatus erfolgreich geladen!', 'success');
+
+                // Live-Updates bei Statusänderungen im Admin-Bereich
+                if (typeof window.firebaseOnSnapshot === 'function') {
+                    window._activeTrackerUnsub = window.firebaseOnSnapshot(docRef, (liveSnap) => {
+                        if (liveSnap.exists()) {
+                            window.renderTrackerStatusData(liveSnap.data(), code);
+                        }
+                    }, () => {});
+                }
+            } catch (err) {
+                console.error('Tracker-Abfrage Fehler:', err);
+                const localFallback = getLocalTrackerFallback(code);
+                if (localFallback) {
+                    window.renderTrackerStatusData(localFallback, code);
+                    window.showToast('Auftragsstatus geladen!', 'success');
+                    return;
+                }
+                if (resBox) resBox.style.display = 'none';
+                window.showToast('Prüfung fehlgeschlagen: Bitte Firestore-Leserechte für order_tracking prüfen.', 'error');
+            }
+        };
+
+        // --- DATEI-UPLOAD LABEL HELFER ---
+        window.updateFileLabel = function(input) {
+            const label = document.getElementById('fileLabelText');
+            if(input.files && input.files[0]) {
+                label.innerHTML = `<i class="fa-solid fa-check" style="color:#25D366;"></i> ${input.files[0].name}`;
+            } else {
+                label.innerHTML = `<i class="fa-solid fa-folder-open"></i> Datei auswählen`;
+            }
+        };
+
+        window.updateCbFileLabel = function(input) {
+            const label = document.getElementById('cbFileLabelText');
+            if(input.files && input.files[0]) {
+                label.innerHTML = `<i class="fa-solid fa-check" style="color:#25D366;"></i> ${input.files[0].name}`;
+            } else {
+                label.innerHTML = `<i class="fa-solid fa-upload"></i> Durchsuchen`;
+            }
+        };
+
+        window.updateNewFormFileLabel = function(input) {
+            const label = document.getElementById('newFormFileLabel');
+            if(input.files && input.files[0]) {
+                label.innerHTML = `<i class="fa-solid fa-check" style="color:#25D366;"></i> ${input.files[0].name}`;
+            } else {
+                label.innerHTML = `<i class="fa-solid fa-file-arrow-up"></i> PDF/Datei vom Gerät wählen`;
+            }
+        };
+
+        window.updateEditFormFileLabel = function(input) {
+            const label = document.getElementById('editFormFileLabel');
+            if(input.files && input.files[0]) {
+                label.innerHTML = `<i class="fa-solid fa-check" style="color:#25D366;"></i> ${input.files[0].name}`;
+            } else {
+                label.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> PDF / Datei auswählen`;
+            }
+        };
+
+        window.enableGoogleMaps = function() {
+            const container = document.getElementById('googleMapContainer');
+            if(!container) return;
+            localStorage.setItem('red_maps_consent', 'true');
+            container.innerHTML = `<iframe src="https://maps.google.com/maps?q=Kienitzer%20Str.%206,%2012053%20Berlin&t=&z=15&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer"></iframe>`;
+        };
+
+        // --- SCHNELL-KALKULATOR (STANDARDMÄSSIG MIT STRICH "-" & MIT STIFT BEARBEITBAR) ---
+        const defaultCalcItems = [
+            { id: "c-1", name: "Zulassungsservice Basis (An-/Ummeldung)", price: "-", selected: true },
+            { id: "c-2", name: "Wunschkennzeichen & Reservierung", price: "-", selected: false },
+            { id: "c-3", name: "2x Euro-Kennzeichen-Schilder (Sofortprägung)", price: "-", selected: false },
+            { id: "c-4", name: "Grüne Feinstaubplakette (Umweltzone)", price: "-", selected: false },
+            { id: "c-5", name: "Express-Priorisierung (24h Service)", price: "-", selected: false }
+        ];
+
+        window.calcItemsData = JSON.parse(localStorage.getItem('red_calc_items_v2')) || defaultCalcItems;
+
+        window.renderCalcItems = function(items) {
+            const list = document.getElementById('calcOptionsList');
+            if(!list) return;
+            list.innerHTML = '';
+
+            items.forEach(item => {
+                const isSel = !!item.selected;
+                const priceText = (!item.price || item.price.trim() === '' || item.price.trim() === '-') 
+                    ? 'Auf Anfrage' 
+                    : (item.price.includes('€') ? item.price : `${item.price} €`);
+
+                const row = document.createElement('div');
+                row.className = `calc-item ${isSel ? 'selected' : ''}`;
+                row.setAttribute('data-id', item.id);
+                row.onclick = () => window.toggleCalcOption(item.id);
+
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px; flex:1; text-align:left;">
+                        <i class="${isSel ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}" style="color:${isSel ? 'var(--primary-red)' : 'var(--text-muted)'}; font-size:15px; flex-shrink:0;"></i>
+                        <span>${item.name}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <strong style="color:var(--primary-red); white-space:nowrap;">${priceText}</strong>
+                        <button type="button" class="mini-admin-btn edit action-prices" onclick="event.stopPropagation(); window.openCalcEditModal('${item.id}')" title="Mit Stift bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                        <button type="button" class="mini-admin-btn del action-prices" onclick="event.stopPropagation(); window.deleteCalcItem('${item.id}')" title="Position löschen"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+
+            window.recalculateTotal();
+        };
+
+        window.toggleCalcOption = function(id) {
+            const idx = window.calcItemsData.findIndex(i => i.id === id);
+            if(idx > -1) {
+                window.calcItemsData[idx].selected = !window.calcItemsData[idx].selected;
+                window.renderCalcItems(window.calcItemsData);
+            }
+        };
+
+        window.recalculateTotal = function() {
+            let sum = 0;
+            let hasNumericPrice = false;
+
+            window.calcItemsData.forEach(item => {
+                if(item.selected && item.price && item.price.trim() !== '-') {
+                    const numMatch = String(item.price).replace(',', '.').match(/\d+(\.\d+)?/);
+                    if(numMatch) {
+                        sum += parseFloat(numMatch[0]);
+                        hasNumericPrice = true;
+                    }
+                }
+            });
+
+            const totalEl = document.getElementById('calcTotalSum');
+            if(!totalEl) return;
+            if(!hasNumericPrice) {
+                totalEl.innerText = 'Auf Anfrage';
+            } else {
+                const formatted = Number.isInteger(sum) ? sum : sum.toFixed(2).replace('.', ',');
+                totalEl.innerText = `ab ${formatted} €`;
+            }
+        };
+
+        window.openCalcEditModal = function(id) {
+            const item = window.calcItemsData.find(i => i.id === id);
+            if(!item) return;
+            document.getElementById('calcEditId').value = item.id;
+            document.getElementById('calcEditName').value = item.name;
+            document.getElementById('calcEditPrice').value = item.price || '-';
+            document.getElementById('calcEditDefault').value = item.selected ? 'true' : 'false';
+            document.getElementById('calcItemEditOverlay').classList.add('open');
+        };
+
+        window.closeCalcEditModal = function() {
+            document.getElementById('calcItemEditOverlay').classList.remove('open');
+        };
+
+        window.saveCalcItemEdit = async function() {
+            const id = document.getElementById('calcEditId').value;
+            const name = document.getElementById('calcEditName').value.trim();
+            const price = document.getElementById('calcEditPrice').value.trim() || '-';
+            const selected = document.getElementById('calcEditDefault').value === 'true';
+
+            if(!name) { window.showToast('Bitte Bezeichnung eingeben.', 'error'); return; }
+
+            const idx = window.calcItemsData.findIndex(i => i.id === id);
+            if(idx > -1) {
+                window.calcItemsData[idx] = { id, name, price, selected };
+            }
+
+            localStorage.setItem('red_calc_items_v2', JSON.stringify(window.calcItemsData));
+            window.renderCalcItems(window.calcItemsData);
+
+            if(window.firebaseDb && window.firebaseSetDoc) {
+                try {
+                    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "calc_items"), { list: window.calcItemsData });
+                    window.showToast('Kalkulator-Position online gespeichert!', 'success');
+                } catch(e) {
+                    window.showToast('Lokal gespeichert.', 'success');
+                }
+            }
+            window.closeCalcEditModal();
+        };
+
+        window.addNewCalcItem = async function() {
+            const newItem = {
+                id: 'c-' + Date.now(),
+                name: 'Neue Zusatzoption',
+                price: '-',
+                selected: false
+            };
+            window.calcItemsData.push(newItem);
+            localStorage.setItem('red_calc_items_v2', JSON.stringify(window.calcItemsData));
+            window.renderCalcItems(window.calcItemsData);
+
+            if(window.firebaseDb && window.firebaseSetDoc) {
+                try {
+                    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "calc_items"), { list: window.calcItemsData });
+                } catch(e) {}
+            }
+            window.openCalcEditModal(newItem.id);
+        };
+
+        window.deleteCalcItem = async function(id) {
+            if(!confirm('Möchten Sie diese Kalkulator-Option wirklich löschen?')) return;
+            window.calcItemsData = window.calcItemsData.filter(i => i.id !== id);
+            localStorage.setItem('red_calc_items_v2', JSON.stringify(window.calcItemsData));
+            window.renderCalcItems(window.calcItemsData);
+
+            if(window.firebaseDb && window.firebaseSetDoc) {
+                try {
+                    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "calc_items"), { list: window.calcItemsData });
+                    window.showToast('Option gelöscht!', 'success');
+                } catch(e) {}
+            }
+        };
+
+        window.applyCalcToBooking = function() {
+            const selectedItems = window.calcItemsData.filter(i => i.selected).map(i => i.name);
+            if(selectedItems.length === 0) {
+                window.showToast('Bitte mindestens eine Option im Kalkulator auswählen.', 'error');
+                return;
+            }
+            const combined = selectedItems.join(' + ');
+            window.selectedServiceVal = combined;
+            document.getElementById('selectTriggerText').innerText = combined.length > 42 ? combined.substring(0, 42) + '...' : combined;
+            window.updateBookingLiveSummary();
+            document.getElementById('termin').scrollIntoView({ behavior: 'smooth' });
+            window.showToast('Auswahl in das Buchungsformular übertragen!', 'success');
+        };
+
+        window.normalizeDateDE = function(dateStr) {
+            const s = String(dateStr || '').trim();
+            if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+                const p = s.substring(0, 10).split('-');
+                return `${p[2]}.${p[1]}.${p[0]}`;
+            }
+            if (/^\d{1,2}\.\d{1,2}\.\d{4}/.test(s)) {
+                const p = s.split('.');
+                return `${p[0].padStart(2, '0')}.${p[1].padStart(2, '0')}.${p[2].substring(0, 4)}`;
+            }
+            return s;
+        };
+
+        // --- KALENDER (.ICS) DOWNLOAD ---
+        window.lastBookedApt = null;
+        window.downloadBookingICS = function() {
+            const apt = window.lastBookedApt;
+            if(!apt) { window.showToast('Kein aktueller Termin ausgewählt.', 'error'); return; }
+
+            const cleanDate = window.normalizeDateDE(apt.date);
+            const parts = cleanDate.split('.');
+            let y = window.getDynamicSystemYear(), m = '01', d = '01';
+            if(parts.length === 3) { d = parts[0].padStart(2,'0'); m = parts[1].padStart(2,'0'); y = parts[2]; }
+
+            let startH = '09', startM = '00', endH = '10', endM = '00';
+            const tMatch = String(apt.time || '').match(/(\d{1,2}):(\d{2})/);
+            if(tMatch) {
+                startH = tMatch[1].padStart(2, '0'); startM = tMatch[2];
+                endH = String(Math.min(23, parseInt(startH, 10) + 1)).padStart(2, '0');
+                endM = startM;
+            }
+
+            const dtStart = `${y}${m}${d}T${startH}${startM}00`;
+            const dtEnd = `${y}${m}${d}T${endH}${endM}00`;
+            const icsContent = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//RED Zulassungsdienst Berlin//DE",
+                "BEGIN:VEVENT",
+                `SUMMARY:Kfz-Termin: ${apt.service} (RED Zulassungsdienst)`,
+                `DTSTART:${dtStart}`,
+                `DTEND:${dtEnd}`,
+                "LOCATION:Kienitzer Str. 6\\, 12053 Berlin",
+                `DESCRIPTION:Ihr Termin bei RED Zulassungsdienst Berlin (Ansprechpartner: Tamer Yazici).${apt.trackingCode ? ' Auftrags-Code (Live-Tracker): ' + apt.trackingCode + '.' : ''}${apt.wunschkennzeichen ? ' Wunschkennzeichen: ' + apt.wunschkennzeichen + '.' : ''}${apt.customNote ? ' Hinweis: ' + apt.customNote + '.' : ''} Bitte alle Originaldokumente mitbringen.`,
+                "END:VEVENT",
+                "END:VCALENDAR"
+            ].join("\r\n");
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `RED_Termin_${cleanDate}.ics`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            window.showToast('Kalendereintrag heruntergeladen!', 'success');
+        };
+
+        // --- LIVE-LEADS MONITORING FILTER, SORTIERUNG & ARCHIV-STEUERUNG ---
+        window.currentLeadFilter = 'open';
+        window.adminLeadSortMode = 'priority';
+
+        window.safeOpenCRMFromTerminal = function() {
+            const isSup = document.body.classList.contains('is-supervisor');
+            if (isSup || window.adminPermissions?.crm) {
+                window.openCRM();
+            } else {
+                window.showToast('Der Supervisor hat das Kunden-CRM für dieses Konto gesperrt.', 'error');
+            }
+        };
+
+        window.changeAdminLeadSort = function(mode) {
+            window.adminLeadSortMode = mode || 'priority';
+            if (typeof window.refreshAdminAppointmentsView === 'function') {
+                window.refreshAdminAppointmentsView();
+            }
+        };
+
+        window.setLeadStatusFilter = function(filterKey, btnEl) {
+            window.currentLeadFilter = filterKey || 'open';
+            document.querySelectorAll('#adminLeadFilterPills .admin-filter-pill').forEach(p => {
+                p.classList.toggle('active', p.getAttribute('data-filter') === window.currentLeadFilter);
+            });
+            document.querySelectorAll('#adminKpiGrid .admin-kpi-box').forEach(box => {
+                box.classList.toggle('is-selected', box.getAttribute('data-kpi-filter') === window.currentLeadFilter);
+            });
+            window.filterAdminLeads();
+        };
+
+        window.filterAdminLeads = function() {
+            const q = (document.getElementById('adminLeadSearch')?.value || '').trim().toLowerCase();
+            const f = window.currentLeadFilter || 'open';
+            const openSection = document.getElementById('adminOpenSectionWrap');
+            const archiveDetails = document.getElementById('adminCompletedArchive');
+
+            let visibleOpen = 0;
+            let visibleDone = 0;
+
+            document.querySelectorAll('#admin-list .admin-apt-card').forEach(card => {
+                const textMatch = !q || card.innerText.toLowerCase().includes(q);
+                const statusAttr = card.getAttribute('data-status-cat') || 'planned';
+                const isPinned = card.getAttribute('data-pinned') === 'true';
+                const isLabo = card.getAttribute('data-labo') === 'true';
+                const isDone = (statusAttr === 'done');
+
+                let filterMatch = true;
+                if (f === 'open') filterMatch = !isDone;
+                else if (f === 'today') filterMatch = (statusAttr === 'today');
+                else if (f === 'planned') filterMatch = (statusAttr === 'planned');
+                else if (f === 'expired') filterMatch = (statusAttr === 'expired');
+                else if (f === 'done') filterMatch = isDone;
+                else if (f === 'labo') filterMatch = isLabo;
+                else if (f === 'pinned') filterMatch = isPinned;
+                else if (f === 'all') filterMatch = true;
+
+                // Im Standardfilter "open" bleiben erledigte Karten im eingeklappten Archiv erhalten (per Suche oder Klick ausklappbar)
+                const isInArchive = !!card.closest('#adminCompletedArchive');
+                let show = textMatch && filterMatch;
+                if (f === 'open' && isInArchive) {
+                    show = textMatch;
+                }
+
+                card.style.display = show ? 'flex' : 'none';
+                if (show) {
+                    if (isInArchive) visibleDone++;
+                    else visibleOpen++;
+                }
+            });
+
+            if (openSection) {
+                openSection.style.display = (f === 'done') ? 'none' : 'block';
+            }
+            if (archiveDetails) {
+                const showArchiveBlock = (f === 'open' || f === 'done' || f === 'all' || (q && visibleDone > 0) || (f === 'pinned' && visibleDone > 0));
+                archiveDetails.style.display = (showArchiveBlock && (visibleDone > 0 || f === 'done')) ? 'block' : 'none';
+                if (f === 'done' || f === 'all' || (q && visibleDone > 0)) {
+                    archiveDetails.open = true;
+                } else if (f === 'open' && !q) {
+                    archiveDetails.open = false;
+                }
+            }
+
+            const emptyOpenMsg = document.getElementById('adminOpenEmptyHint');
+            if (emptyOpenMsg) {
+                emptyOpenMsg.style.display = (visibleOpen === 0 && f !== 'done') ? 'block' : 'none';
+            }
+        };
+
+        // =========================================================================
+        // 9. ARGON DESIGN-SYSTEM: HELL-/DUNKELMODUS & KUNDEN-UMSCHALTER IM HEADER
+        // =========================================================================
+        window.updateCustomerThemeIcon = function(themeName) {
+            const icon = document.getElementById('customerThemeIcon');
+            const metaTheme = document.getElementById('metaThemeColor');
+            const isLight = !themeName || themeName.startsWith('light');
+            if(icon) {
+                icon.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+                icon.style.color = isLight ? '#ffffff' : '#ffcc00';
+            }
+            if(metaTheme) {
+                metaTheme.setAttribute('content', '#0b0b10');
+            }
+        };
+
+        window.toggleCustomerLightDark = function() {
+            const current = document.body.getAttribute('data-theme') || 'light';
+            const nextTheme = current.startsWith('light') ? 'dark' : 'light';
+            sessionStorage.setItem('red_customer_manual_theme', nextTheme);
+            window.changeTheme(nextTheme, false);
+            window.showToast(nextTheme === 'light' ? '☀️ Hellmodus aktiviert' : '🌙 Argon Dunkelmodus aktiviert', 'success');
+        };
+
+        window.changeTheme = async function(themeName, saveToFirebase = false) {
+            if(!themeName) themeName = 'light';
+            if (document.body.getAttribute('data-theme') !== themeName) {
+                document.body.classList.add('theme-transitioning');
+                clearTimeout(window._themeTransTimer);
+                window._themeTransTimer = setTimeout(() => {
+                    document.body.classList.remove('theme-transitioning');
+                }, 480);
+            }
+            document.body.setAttribute('data-theme', themeName);
+            localStorage.setItem('red_theme_v3', themeName);
+            window.updateCustomerThemeIcon(themeName);
+            
+            if (saveToFirebase && window.isAuthorized && window.firebaseSetDoc && window.firebaseDb) {
+                try {
+                    const customData = JSON.parse(localStorage.getItem('red_custom_theme') || 'null');
+                    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "global_theme_v3"), { activeTheme: themeName, customVars: customData }, { merge: true });
+                    window.showToast('Design global für alle Geräte gespeichert!', 'success');
+                } catch (e) {
+                    window.showToast('Konnte Design online nicht speichern.', 'error');
+                }
+            }
+            
+            document.documentElement.style.cssText = '';
+            window.syncHeaderHeight();
+            
+            if (themeName === 'custom') {
+                const customTheme = JSON.parse(localStorage.getItem('red_custom_theme'));
+                if (customTheme) {
+                    for (const [key, value] of Object.entries(customTheme)) {
+                        document.documentElement.style.setProperty(key, value);
+                    }
+                }
+            }
+        };
+
+        window.applySelectedTheme = function() {
+            const selector = document.getElementById('themeSelector');
+            if(selector) {
+                window.changeTheme(selector.value, true);
+            }
+        };
+
+        window.openThemeEditor = function() {
+            if(!window.isAuthorized) return;
+            document.getElementById('themeEditorOverlay').classList.add('open');
+            
+            const style = getComputedStyle(document.body);
+            document.getElementById('tePrimary').value = style.getPropertyValue('--primary-red').trim() || '#d90000';
+            document.getElementById('teText').value = style.getPropertyValue('--text-light').trim() || '#141417';
+            document.getElementById('teBg').value = style.getPropertyValue('--bg-dark').trim() || '#f2f2f7';
+            document.getElementById('teCard').value = style.getPropertyValue('--bg-card').trim() || '#ffffff';
+            if(document.getElementById('teInput')) {
+                document.getElementById('teInput').value = style.getPropertyValue('--bg-input').trim() || '#f0f0f5';
+            }
+        };
+
+        window.closeThemeEditor = function() {
+            document.getElementById('themeEditorOverlay').classList.remove('open');
+        };
+
+        window.saveCustomTheme = function() {
+            const pRed = document.getElementById('tePrimary').value;
+            const tLight = document.getElementById('teText').value;
+            const bDark = document.getElementById('teBg').value;
+            const bCard = document.getElementById('teCard').value;
+            const bInput = document.getElementById('teInput') ? document.getElementById('teInput').value : bCard;
+            const bRadius = document.getElementById('teRadius') ? document.getElementById('teRadius').value : '20px';
+            const btnRadius = document.getElementById('teBtnRadius') ? document.getElementById('teBtnRadius').value : '50px';
+            const glowStyle = document.getElementById('teGlowStyle') ? document.getElementById('teGlowStyle').value : '0 10px 25px rgba(0, 0, 0, 0.08)';
+
+            const glassBg = bDark + 'f0'; 
+            const glassBorder = tLight + '22';
+
+            const customTheme = {
+                '--primary-red': pRed,
+                '--text-light': tLight,
+                '--text-muted': tLight + 'b3', 
+                '--bg-dark': bDark,
+                '--bg-card': bCard,
+                '--bg-input': bInput,
+                '--glass-bg': glassBg,
+                '--glass-border': glassBorder,
+                '--border-hover': pRed,
+                '--global-radius': bRadius,
+                '--btn-radius': btnRadius,
+                '--card-shadow': glowStyle
+            };
+
+            localStorage.setItem('red_custom_theme', JSON.stringify(customTheme));
+            document.getElementById('themeSelector').value = 'custom';
+            window.changeTheme('custom', true);
+            window.showToast('Eigenes Design & Effekte erfolgreich angewendet!', 'success');
+            window.closeThemeEditor();
+        };
+
+        window.resetCustomTheme = function() {
+            localStorage.removeItem('red_custom_theme');
+            sessionStorage.removeItem('red_customer_manual_theme');
+            document.documentElement.style.cssText = '';
+            document.getElementById('themeSelector').value = 'light';
+            window.changeTheme('light', true);
+            window.showToast('Auf Standard-Design (Hellmodus) zurückgesetzt!', 'success');
+            window.closeThemeEditor();
+        };
+
+        const initialTheme = sessionStorage.getItem('red_customer_manual_theme') || localStorage.getItem('red_theme_v3') || 'light';
+        window.changeTheme(initialTheme, false);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.initPwaSystem();
+            window.initAutomaticYearSystem();
+            window.initFloatingPlates();
+            window.updateHeaderCalendarChip();
+            window.updateDispatchCountdown();
+            window.renderCalcItems(window.calcItemsData);
+            if(localStorage.getItem('red_maps_consent') === 'true') {
+                window.enableGoogleMaps();
+            }
+            if(document.getElementById('themeSelector')) {
+                document.getElementById('themeSelector').value = initialTheme;
+            }
+            window.updateCustomerThemeIcon(initialTheme);
+            const sndBtn = document.getElementById('adminSoundToggleBtn');
+            if(sndBtn && !window.adminSoundEnabled) {
+                sndBtn.style.color = 'var(--text-muted)';
+                sndBtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Ton: Aus';
+            }
+        });
+
+        window.redApts = JSON.parse(localStorage.getItem('red_local_apts') || '[]');
+        window.currentWeatherData = null;
+        window.modalClockInterval = null;
+        window.DEFAULT_MAKE_WEBHOOK = 'https://script.google.com/macros/s/AKfycbwjO812Bj4F3Mv3ETwf5BMrus72HPcbvX7Mtgy030KGSd7bgmP76Cm0hCBaEKyy0Z_v/exec';
+        window.dynamicContactData = { 
+            phone: '0178 378 38 75', 
+            email: 'Redzulassungsdienst@gmail.com', 
+            ustid: '(Hier Steuernummer eintragen)', 
+            ig: 'https://instagram.com/red_zulassungsdienst', 
+            fb: '#',
+            webhook: window.DEFAULT_MAKE_WEBHOOK
+        };
+
+        window.sendToMakeWebhook = async function(payload) {
+            const webhookUrl = ((window.dynamicContactData?.webhook || '').trim()) || window.DEFAULT_MAKE_WEBHOOK;
+            if (!webhookUrl.startsWith('https://')) return;
+
+            const cleanPhone = String(payload.clientPhone || '').replace(/\D/g, '').replace(/^0/, '49');
+            const waReplyLink = cleanPhone ? `https://wa.me/${cleanPhone}` : '';
+            const isCallback = payload.type === 'callback_request';
+
+            const messageText = [
+                isCallback ? '📞 NEUE 60s RÜCKRUF-ANFRAGE (RED BERLIN)' : '📅 NEUER TERMIN – RED ZULASSUNGSDIENST BERLIN',
+                '',
+                `• Kunde: ${payload.clientName || '-'} (${payload.clientCategory || 'Privatkunde'})`,
+                `• Telefon: ${payload.clientPhone || '-'}`,
+                `• E-Mail: ${payload.clientEmail || '-'}`,
+                `• Datum & Zeit: ${payload.date || '-'} um ${payload.time || '-'}`,
+                `• Leistung: ${payload.service || '-'}`,
+                `• Wunschkennzeichen: ${payload.wunschkennzeichen || '-'}`,
+                `• Hinweis: ${payload.customNote || '-'}`,
+                payload.trackingCode ? `• Tracker-Code: ${payload.trackingCode}` : '',
+                waReplyLink ? `• Direkt-Antwort WhatsApp: ${waReplyLink}` : ''
+            ].filter(Boolean).join('\n');
+
+            const formBody = new URLSearchParams();
+            const fullData = {
+                ...payload,
+                adminEmail: window.dynamicContactData?.email || 'Redzulassungsdienst@gmail.com',
+                adminWhatsapp: '491783783875',
+                waReplyLink: waReplyLink,
+                messageText: messageText,
+                sentAt: new Date().toLocaleString('de-DE')
+            };
+            Object.entries(fullData).forEach(([k, v]) => formBody.append(k, v == null ? '' : String(v)));
+
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    keepalive: true,
+                    body: formBody
+                });
+            } catch (err) {
+                console.error('Make Webhook Fehler:', err);
+            }
+        };
+
+        window.adminPermissions = {
+            leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true
+        };
+
+        window.toggleAllSupervisorPerms = function(state) {
+            ['permLeads','permCrm','permPages','permTheme','permPrices','permCustomblocks','permContent','permCompanydata','permForms','permCars','permTicker'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.checked = state;
+            });
+        };
+
+        // --- ALLE SEITENTEXTE MIT STIFT BEARBEITBAR ---
+        window.pageContentData = {
+            "header": {
+                "title_red": "RED",
+                "title_sub": "ZULASSUNGSDIENST & SCHILDER",
+                "icon_car": "svg-sport",
+                "car_anim": "car-anim-idle",
+                "car_color": "var(--text-light)",
+                "txt_crm": "KUNDEN",
+                "icon_crm": "fa-database",
+                "txt_visitors": "Besuche:",
+                "icon_visitors": "fa-users"
+            },
+            "hero": {
+                "badge": "Sofortkennzeichen zum Mitnehmen!",
+                "h1_1": "Schnell. Zuverlässig.",
+                "h1_2": "Kompetent.",
+                "desc": "Zulassungsservice in Bestzeit für ganz Berlin. Wir garantieren Ihnen eine zügige, zuverlässige und hochprofessionelle Abwicklung Ihrer Anliegen."
+            },
+            "leistungen": {
+                "title": "Unsere Leistungen",
+                "desc": "Klicken Sie direkt auf eine Karte für detaillierte Infos & benötigte Unterlagen"
+            },
+            "tools": {
+                "wk_title": "Berliner Wunschkennzeichen Studio",
+                "wk_desc": "Testen Sie Ihre Wunschkombination live (inkl. E-Auto, Oldtimer, Saison-Zeiträumen & 3D-Optik) und übernehmen Sie diese direkt in Ihren Termin.",
+                "calc_title": "Schnell-Kalkulator & Extras",
+                "calc_desc": "Wählen Sie Ihre gewünschten Leistungen & Zusatzoptionen für Ihren Termin:"
+            },
+            "checklist": {
+                "title": "Dokumenten-Check vorab",
+                "desc": "Haken Sie ab, was Sie bereits vorliegen haben – so geht vor Ort bei uns alles in wenigen Minuten:",
+                "item_1": "Zulassungsbescheinigung Teil I & II (Schein & Brief im Original)",
+                "item_2": "Gültiger Personalausweis oder Reisepass mit Meldebescheinigung",
+                "item_3": "7-stellige eVB-Nummer Ihrer Kfz-Versicherung",
+                "item_4": "Gültiger TÜV / HU-Bericht & IBAN für das SEPA-Mandat",
+                "item_5": "Unterschriebene Vollmacht (auch digital hier oder vor Ort ausfüllbar!)"
+            },
+            "faq": {
+                "title": "Häufige Fragen (Berlin FAQ)",
+                "q1": "1. Wie schnell bekomme ich meine Zulassung?",
+                "a1": "In der Regel dauert die reguläre Anmeldung beim LABO Berlin 1–2 Werktage. Mit unserem Express-Service sowie bei Kurzzeit- und Sofortkennzeichen oft noch am selben Tag!",
+                "q2": "2. Prägt ihr die Kennzeichenschilder direkt vor Ort?",
+                "a2": "Ja! In unserem Büro in der Kienitzer Str. 6 (12053 Berlin) prägen wir Ihre neuen Euro-, E-, Saison-, Kurzzeit- oder Zollkennzeichen sofort zum Mitnehmen.",
+                "q3": "3. Muss ich die Formulare vorher zu Hause ausdrucken?",
+                "a3": "Nein, nicht zwingend. Sie können unsere digitale Vollmacht direkt online ausfüllen oder alle Vordrucke ganz entspannt bei der Abgabe in unserem Büro unterschreiben.",
+                "q4": "4. Brauche ich selbst einen Termin bei der Zulassungsstelle (LABO)?",
+                "a4": "Nein! Als eingetragener Berliner Zulassungsdienst verfügen wir über direkte Behördenkontingente. Sie buchen nur Ihren kurzen Abgabetermin bei uns – den Behördengang erledigen wir komplett für Sie.",
+                "q5": "5. Kann auch eine andere Person meine Papiere bei euch abgeben?",
+                "a5": "Ja, jederzeit. Wichtig ist nur, dass die Vollmacht und das SEPA-Lastschriftmandat vom zukünftigen Fahrzeughalter unterschrieben sind und dessen Original-Ausweis vorliegt.",
+                "q6": "6. Was passiert, wenn mein TÜV abgelaufen ist oder Papiere fehlen?",
+                "a6": "Kein Problem: Für Fahrten zum TÜV können wir Ihnen ein Kurzzeitkennzeichen erstellen. Bei verlorenen Papieren (Schein/Brief) helfen wir Ihnen sofort mit der amtlichen Verlusterklärung und Ersatzbeantragung."
+            },
+            "termin": {
+                "title": "Wunschtermin Buchen",
+                "desc": "Schnelle Abgabe ohne Wartezeit • Ansprechpartner: <strong>Tamer Yazici</strong>"
+            },
+            "formulare": {
+                "title": "Formulare & Anträge",
+                "desc": "Alle wichtigen Zulassungsformulare und Anträge in der Übersicht"
+            },
+            "ankauf": {
+                "title": "AUTO ANKAUF",
+                "subtitle": "Jeglicher Art – Sofort Bargeld!",
+                "desc": "Faire Bewertung, diskrete Abwicklung und sofortige Barauszahlung direkt vor Ort. Inklusive kostenloser Abmeldung Ihres Fahrzeugs.",
+                "sign": "Ty"
+            },
+            "legal": {
+                "datenschutz_extra": "Sämtliche Terminbuchungsdaten werden nach DSGVO-Standard verschlüsselt übertragen und ausschließlich zur Durchführung Ihrer Kfz-Zulassung verwendet. Eine Weitergabe an unbefugte Dritte erfolgt nicht."
+            },
+            "footer": {
+                "text": `© ${window.getDynamicSystemYear()} RED Zulassungsdienst Berlin. Inhaber: Tamer Yazici.`
+            }
+        };
+
+        window.renderHeaderBrandWordmark = function(redText, subText) {
+            const redEl = document.getElementById('txt-header-title-red');
+            const subEl = document.getElementById('txt-header-title-sub');
+
+            if (redEl) {
+                const cleanRed = String(redText || 'RED').trim();
+                if (cleanRed.toUpperCase() === 'RED') {
+                    redEl.innerHTML = `<svg class="logo-red-svg" viewBox="0 0 134 28" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RED"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 2 H29 C36.2 2 40 5.1 40 10.2 C40 14.4 37.2 17.1 32 17.8 L40.5 26 H30.4 L22.2 18 H8 V26 H0 V4 C0 2.8 0.8 2 2 2 Z M8 7 V13 H27.2 C30.1 13 31.8 11.8 31.8 10 C31.8 8.2 30.1 7 27.2 7 Z" fill="var(--primary-red)"/><path d="M55 2 H85 V7.2 H56.2 C53.2 7.2 52.8 8.6 52.8 10.2 V11.5 H82 V16.5 H52.8 V17.8 C52.8 19.4 53.2 20.8 56.2 20.8 H85 V26 H55 C48.2 26 45 22.4 45 17.2 V10.8 C45 5.6 48.2 2 55 2 Z" fill="var(--primary-red)"/><path fill-rule="evenodd" clip-rule="evenodd" d="M93 2 H119 C128 2 133 6.8 133 14 C133 21.2 128 26 119 26 H91 V4 C91 2.8 91.8 2 93 2 Z M98.8 7.2 V20.8 H118.2 C122.6 20.8 125 18.2 125 14 C125 9.8 122.6 7.2 118.2 7.2 Z" fill="var(--primary-red)"/></svg>`;
+                } else {
+                    redEl.innerText = cleanRed;
+                }
+            }
+
+            if (subEl) {
+                let cleanSub = String(subText || 'ZULASSUNGSDIENST & SCHILDER').trim();
+                if (cleanSub.toUpperCase() === 'ZULASSUNGSDIENST') {
+                    cleanSub = 'ZULASSUNGSDIENST & SCHILDER';
+                }
+                if (cleanSub.includes('&')) {
+                    const parts = cleanSub.split('&');
+                    const line1 = window.escHtml(parts[0].trim());
+                    const line2 = window.escHtml(parts.slice(1).join('&').trim());
+                    subEl.innerHTML = `<span>${line1}</span><span class="logo-sub-line2"><span class="logo-amp">&amp;</span>${line2}</span>`;
+                } else {
+                    subEl.innerText = cleanSub;
+                }
+            }
+        };
+
+window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
+            const wrapper = document.getElementById('headerCarDisplayWrapper');
+            if(!wrapper) return;
+            wrapper.className = carAnim || 'car-anim-idle';
+            wrapper.style.color = carColor || 'var(--text-light)';
+
+            if(!carType || carType === 'svg-sport') {
+                wrapper.innerHTML = `<svg class="logo-car-svg" viewBox="8 0 444 132" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="hdrFrontBeam" x1="376" y1="78" x2="450" y2="86" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--car-front-light)" stop-opacity="0.52"/><stop offset="100%" stop-color="var(--car-front-light)" stop-opacity="0"/></linearGradient><linearGradient id="hdrRearGlow" x1="42" y1="63" x2="10" y2="63" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--car-rear-light)" stop-opacity="0.52"/><stop offset="100%" stop-color="var(--car-rear-light)" stop-opacity="0"/></linearGradient></defs><path class="logo-car-taillight-glow" d="M40 57 L10 51 L10 75 L41 68 Z" fill="url(#hdrRearGlow)"/><path class="logo-car-headlight-beam" d="M374 75 L450 58 L450 108 L382 86 Z" fill="url(#hdrFrontBeam)"/><path d="M40 50 C76 41, 118 21, 168 17 C210 14, 244 26, 276 49 L284 47 C324 48, 362 58, 393 84 C396 87, 396 90, 392 94 C388 99, 386 105, 391 110 C392 112, 390 114, 385 114 C376 114, 366 112, 356 110 C366 109, 376 109, 384 108 C380 103, 382 95, 389 87 C359 64, 321 55, 274 54 C242 32, 208 22, 168 24 C122 27, 82 45, 44 52 Z" fill="currentColor"/><path d="M108 42 C136 29, 174 25, 206 29 C226 32, 244 41, 260 53 L254 54 C238 43, 222 36, 203 33 C174 30, 140 34, 116 44 C128 50, 144 53, 162 54 C194 55, 226 55, 256 54 L254 57 C222 58, 188 57, 156 56 C135 55, 118 51, 108 42 Z" fill="currentColor"/><path d="M148 33 L154 55 L151 55 L145 34 Z" fill="currentColor" opacity="0.75"/><path d="M40 52 C68 47, 102 47, 136 60 C104 52, 70 53, 44 57 Z" fill="currentColor"/><path d="M40 52 C46 58, 48 67, 48 77 C48 82, 42 84, 36 84 C37 94, 45 103, 55 108 C42 106, 32 95, 31 82 C31 79, 34 77, 38 76 C36 73, 35 68, 38 63 C40 60, 40 56, 38 52 Z" fill="currentColor"/><path class="logo-car-taillight" d="M39 57 C44 58, 47 62, 46 68 C42 68, 38 66, 36 62 C36 59, 37 57, 39 57 Z"/><path d="M146 56 C139 67, 141 82, 154 97 C144 82, 143 68, 149 56 Z" fill="currentColor" opacity="0.85"/><path d="M158 72 C202 74, 248 77, 286 78 C293 78, 297 76, 292 74 C284 73, 276 74, 268 75 C234 74, 196 72, 158 72 Z" fill="currentColor"/><path d="M262 58 C266 72, 265 88, 260 100 C263 87, 264 72, 260 58 Z" fill="currentColor" opacity="0.7"/><path d="M138 103 C186 104, 238 105, 284 108 L284 114 C238 110, 186 106, 138 104 Z" fill="currentColor"/><path d="M126 117 C178 114, 232 115, 284 119 C232 118, 178 118, 126 117 Z" fill="currentColor" opacity="0.85"/><path d="M55 104 C55 68, 72 60, 92 60 C114 60, 128 74, 129 102 C125 79, 112 67, 92 67 C73 67, 61 78, 59 104 Z" fill="currentColor"/><path d="M284 103 C284 72, 300 60, 320 60 C342 60, 355 74, 356 105 C352 79, 340 67, 320 67 C301 67, 290 79, 288 103 Z" fill="currentColor"/><circle cx="92" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/><path d="M92 96 C95 89, 98 83, 102 78 C99 84, 97 90, 95 96 Z M92 96 C85 95, 79 96, 73 99 C79 94, 85 93, 92 93 Z M94 97 C100 98, 105 99, 111 98 C105 101, 99 101, 94 99 Z M91 98 L85 106 L88 97 Z" fill="currentColor"/><circle cx="320" cy="96" r="22.5" stroke="currentColor" stroke-width="2.7" fill="none"/><path d="M320 96 C323 89, 326 83, 330 78 C327 84, 325 90, 323 96 Z M320 96 C313 95, 307 96, 301 99 C307 94, 313 93, 320 93 Z M322 97 C328 98, 333 99, 339 98 C333 101, 327 101, 322 99 Z M319 98 L313 106 L316 97 Z" fill="currentColor"/><path class="logo-car-headlight" d="M346 69 C361 72, 373 78, 383 85 C370 84, 356 78, 346 72 Z"/><path d="M343 72 C356 79, 370 84, 384 86 C370 86, 355 81, 342 73 Z" fill="currentColor" opacity="0.8"/><path d="M366 111 C368 99, 374 92, 384 92 C376 95, 371 101, 370 109 L384 111 Z" fill="currentColor"/><path d="M354 117 C368 117, 380 115, 388 112 C380 117, 368 119, 354 117 Z" fill="currentColor"/></svg>`;
+            } else {
+                wrapper.innerHTML = `<i class="fa-solid ${carType} logo-car-icon"></i>`;
+            }
+        };
+
+        window.applyPageContent = function(data) {
+            if(!data) return;
+            for (const sec in data) {
+                window.pageContentData[sec] = Object.assign(window.pageContentData[sec] || {}, data[sec]);
+            }
+            
+            const d = window.pageContentData;
+            if(d.header) {
+                window.renderHeaderBrandWordmark(d.header.title_red, d.header.title_sub);                
+                if(document.getElementById('txt-header-crm')) document.getElementById('txt-header-crm').innerText = d.header.txt_crm;
+                if(document.getElementById('icon-header-crm')) document.getElementById('icon-header-crm').className = "fa-solid " + d.header.icon_crm;
+                if(document.getElementById('txt-header-visitors')) document.getElementById('txt-header-visitors').innerText = d.header.txt_visitors + " ";
+                if(document.getElementById('icon-header-visitors')) document.getElementById('icon-header-visitors').className = "fa-solid " + d.header.icon_visitors;
+                window.renderHeaderCarIcon(d.header.icon_car, d.header.car_anim, d.header.car_color);
+            }
+            if(d.hero) {
+                if(document.getElementById('txt-hero-badge')) document.getElementById('txt-hero-badge').innerText = d.hero.badge;
+                if(document.getElementById('txt-hero-h1-1')) document.getElementById('txt-hero-h1-1').innerText = d.hero.h1_1;
+                if(document.getElementById('txt-hero-h1-2')) document.getElementById('txt-hero-h1-2').innerText = d.hero.h1_2;
+                if(document.getElementById('txt-hero-desc')) document.getElementById('txt-hero-desc').innerText = d.hero.desc;
+            }
+            if(d.leistungen) {
+                if(document.getElementById('txt-leist-title')) document.getElementById('txt-leist-title').innerText = d.leistungen.title;
+                if(document.getElementById('txt-leist-desc')) document.getElementById('txt-leist-desc').innerText = d.leistungen.desc;
+            }
+            if(d.tools) {
+                if(document.getElementById('txt-wk-title')) document.getElementById('txt-wk-title').innerText = d.tools.wk_title;
+                if(document.getElementById('txt-wk-desc')) document.getElementById('txt-wk-desc').innerText = d.tools.wk_desc;
+                if(document.getElementById('txt-calc-title')) document.getElementById('txt-calc-title').innerText = d.tools.calc_title;
+                if(document.getElementById('txt-calc-desc')) document.getElementById('txt-calc-desc').innerText = d.tools.calc_desc;
+            }
+            if(d.checklist) {
+                if(document.getElementById('txt-check-title')) document.getElementById('txt-check-title').innerText = d.checklist.title;
+                if(document.getElementById('txt-check-desc')) document.getElementById('txt-check-desc').innerText = d.checklist.desc;
+                for(let i=1; i<=5; i++) {
+                    if(document.getElementById('txt-check-'+i) && d.checklist['item_'+i]) {
+                        document.getElementById('txt-check-'+i).innerText = d.checklist['item_'+i];
+                    }
+                }
+            }
+            if(d.faq) {
+                if(document.getElementById('txt-faq-title')) document.getElementById('txt-faq-title').innerText = d.faq.title;
+                for(let i=1; i<=6; i++) {
+                    if(document.getElementById('txt-faq-q'+i) && d.faq['q'+i]) document.getElementById('txt-faq-q'+i).innerText = d.faq['q'+i];
+                    if(document.getElementById('txt-faq-a'+i) && d.faq['a'+i]) document.getElementById('txt-faq-a'+i).innerText = d.faq['a'+i];
+                }
+            }
+            if(d.termin) {
+                if(document.getElementById('txt-termin-title')) document.getElementById('txt-termin-title').innerText = d.termin.title;
+                if(document.getElementById('txt-termin-desc')) document.getElementById('txt-termin-desc').innerHTML = d.termin.desc;
+            }
+            if(d.formulare) {
+                if(document.getElementById('txt-form-title')) document.getElementById('txt-form-title').innerText = d.formulare.title;
+                if(document.getElementById('txt-form-desc')) document.getElementById('txt-form-desc').innerText = d.formulare.desc;
+            }
+            if(d.ankauf) {
+                if(document.getElementById('txt-ankauf-title')) document.getElementById('txt-ankauf-title').innerText = d.ankauf.title;
+                if(document.getElementById('txt-ankauf-subtitle')) document.getElementById('txt-ankauf-subtitle').innerText = d.ankauf.subtitle;
+                if(document.getElementById('txt-ankauf-desc')) document.getElementById('txt-ankauf-desc').innerText = d.ankauf.desc;
+                if(document.getElementById('txt-ankauf-sign')) document.getElementById('txt-ankauf-sign').innerText = d.ankauf.sign;
+            }
+            if(d.footer) {
+                if(document.getElementById('txt-footer-text')) document.getElementById('txt-footer-text').innerText = d.footer.text;
+            }
+        };
+
+        // --- LEISTUNGSKARTEN ---
+        const defaultServices = [
+            { id: "s-1", icon: "fa-file-signature", title: "Anmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Neuzulassung in 1-2 Tagen.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Fahrzeugbrief & Schein\n• Ausweis / Aufenthaltstitel\n• TÜV-Bericht & eVB-Nr.\n• Kontodaten (IBAN)", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-2", icon: "fa-exchange-alt", title: "Ummeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Halterwechsel ohne Stress.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Fahrzeugpapiere I & II\n• Gültige HU / AU Bescheinigung\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-3", icon: "fa-file-circle-xmark", title: "Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Sichere Außerbetriebsetzung.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Zulassungsbescheinigung I\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-4", icon: "fa-stopwatch", title: "Kurzzeitkennz.", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Nach Wahl (5/6 Tage).", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Ausweis / Pass\n• eVB-Nummer für Kurzzeit\n• Fahrzeugpapiere\n• Gültige HU", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-5", icon: "fa-globe", title: "Zollkennzeichen", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-gold-3d", badge: "badge-topseller", desc: "30 Tage Gültigkeit.", descAnim: "anim-pulse", hoverInfo: "Mitzubringen (Original):\n• Ausweis / Pass\n• Fahrzeugpapiere\n• Gültige HU\n• Gelbes Versicherungskärtchen", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-6", icon: "fa-bolt", title: "Express Zulassung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-neon-blue", badge: "badge-express-tipp", desc: "Priorisierte Abwicklung.", descAnim: "", hoverInfo: "Express Service:\nDirekte Vorgangseinreichung bei der Behördenstellenleitung. Fertigstellung meist innerhalb 24h.", borderSize: "1px", borderColor: "var(--glass-border)" }
+        ];
+
+        window.servicesData = JSON.parse(localStorage.getItem('red_services_v2')) || defaultServices;
+
+        const badgeLabels = {
+            "badge-neu": "NEU", "badge-angebot": "ANGEBOT", "badge-aktion": "AKTION", 
+            "badge-topseller": "TOPSELLER", "badge-kurze-zeit": "NUR KURZE ZEIT", 
+            "badge-ostern": "OSTERN-SPECIAL", "badge-express-tipp": "EXPRESS TIPP"
+        };
+
+        window.applyContactInfo = function(data) {
+            if(!data) return;
+            window.dynamicContactData = {
+                ...data,
+                webhook: (data.webhook || '').trim() || window.DEFAULT_MAKE_WEBHOOK
+            };
+            document.querySelectorAll('.live-phone').forEach(el => el.innerText = data.phone);
+            document.querySelectorAll('.live-email').forEach(el => el.innerText = data.email);
+            const igEl = document.getElementById('link-ig');
+            const fbEl = document.getElementById('link-fb');
+            const igVal = (data.ig || '').trim();
+            const fbVal = (data.fb || '').trim();
+            if (igEl) {
+                igEl.href = igVal || '#';
+                igEl.style.display = (igVal && igVal !== '#') ? 'flex' : 'none';
+            }
+            if (fbEl) {
+                fbEl.href = fbVal || '#';
+                fbEl.style.display = (fbVal && fbVal !== '#') ? 'flex' : 'none';
+            }
+            let waPhone = data.phone.replace(/\D/g,'');
+            if(waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
+            const telLink = document.getElementById('tel-contact-link');
+            if(telLink && waPhone) telLink.href = "tel:+" + waPhone;
+            document.getElementById('wa-contact-btn').href = "https://wa.me/" + waPhone;
+            document.getElementById('menu-wa-link').href = "https://wa.me/" + waPhone;
+            if(document.getElementById('fab-wa-link')) document.getElementById('fab-wa-link').href = "https://wa.me/" + waPhone;
+            document.getElementById('email-contact-btn').href = "mailto:" + data.email;
+        };
+
+        window.renderServices = function(data) {
+            const grid = document.getElementById('servicesGridContainer');
+            const selectDropdown = document.getElementById('serviceSelectDropdown');
+            if(!grid || !selectDropdown) return;
+            grid.innerHTML = '';
+            selectDropdown.innerHTML = '';
+            
+            data.forEach(srv => {
+                let badgeHtml = '';
+                if(srv.badge && badgeLabels[srv.badge]) {
+                    badgeHtml = `<div class="card-badge ${srv.badge}">${badgeLabels[srv.badge]}</div>`;
+                }
+                
+                const hoverHtml = (srv.hoverInfo || '').replace(/\n/g, '<br>');
+                const displayPrice = (!srv.price || srv.price.trim() === '') ? '-' : srv.price;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.border = `${srv.borderSize || '1px'} solid ${srv.borderColor || 'var(--glass-border)'}`;
+                card.setAttribute('onclick', 'window.toggleCardSlide(this, event)');
+                
+                let titleCol = srv.titleColor === '#ffffff' ? 'var(--text-light)' : srv.titleColor;
+
+                card.innerHTML = `
+                    <div class="admin-action-btn btn-edit-green action-prices" onclick="event.stopPropagation(); window.openServiceConfig('${srv.id}')" title="Leistungskarte mit Stift bearbeiten"><i class="fa-solid fa-pencil"></i></div>
+                    <div class="admin-action-btn btn-del-red action-prices" onclick="event.stopPropagation(); window.deleteServiceCard('${srv.id}')" title="Karte löschen"><i class="fa-solid fa-trash"></i></div>
+                    ${badgeHtml}
+                    <i class="fa-solid ${srv.icon} main-icon" style="color: ${srv.iconColor || 'var(--primary-red)'};"></i>
+                    <h3 style="color:${titleCol || 'var(--text-light)'}; font-family:${srv.titleFont || "'Montserrat', sans-serif"}; font-size:${srv.titleSize || '18px'}; margin-bottom:0;">${srv.title}</h3>
+                    <div class="price-wrapper">
+                        ${displayPrice === '-'
+                            ? `<span style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.6px; background:var(--bg-input); padding:4px 12px; border-radius:20px; border:1px solid var(--glass-border);">Preis auf Anfrage</span>`
+                            : `<span class="service-price" style="color:${srv.priceColor || 'var(--primary-red)'};">${displayPrice}</span><span class="service-price ${srv.euroStyle}" style="font-size:24px;">€</span>`
+                        }
+                    </div>
+                    <p class="${srv.descAnim}" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${srv.desc}</p>
+                    <div class="card-info-slide">
+                        <p>${hoverHtml}</p>
+                        <button type="button" class="card-slide-book-btn" onclick="event.stopPropagation(); window.bookServiceFromCard('${srv.id}')">Termin wählen <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                `;
+                grid.appendChild(card);
+
+                const opt = document.createElement('div');
+                opt.className = 'noble-option';
+                opt.setAttribute('data-value', srv.title);
+                opt.innerText = srv.title;
+                opt.onclick = (e) => {
+                    e.stopPropagation();
+                    window.selectedServiceVal = srv.title;
+                    document.getElementById('selectTriggerText').innerText = srv.title;
+                    document.getElementById('serviceSelectBox').classList.remove('open');
+                    window.updateBookingLiveSummary();
+                };
+                selectDropdown.appendChild(opt);
+            });
+        };
+
+        window.renderCustomBlocks = function(blocksData) {
+            document.querySelectorAll('.dynamic-block-container').forEach(c => c.innerHTML = '');
+            
+            blocksData.sort((a,b) => b.timestamp - a.timestamp).forEach(block => {
+                const container = document.getElementById('dynamic-client-section-' + block.page);
+                if(!container) return;
+
+                let mediaHtml = '';
+                if(block.mediaUrl) {
+                    if(block.mediaUrl.includes('video/') || block.mediaUrl.endsWith('.mp4') || block.mediaUrl.startsWith('data:video')) {
+                        mediaHtml = `<video src="${block.mediaUrl}" controls autoplay loop playsinline class="dynamic-block-media"></video>`;
+                    } else {
+                        mediaHtml = `<img src="${block.mediaUrl}" class="dynamic-block-media" loading="lazy" decoding="async" alt="${window.escHtml(block.title)}">`;
+                    }
+                }
+
+                let bannerHtml = '';
+                if(block.bannerText) {
+                    const emoji = block.bannerEmoji ? `<span class="pulse-emoji">${block.bannerEmoji}</span> ` : '';
+                    bannerHtml = `
+                        <div style="background:${block.bannerColor || 'var(--primary-red)'}; color:#fff; padding:8px 20px; border-radius:50px; display:inline-flex; align-items:center; font-weight:900; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.3);">
+                            ${emoji}${block.bannerText}${emoji ? ' ' + emoji.replace('style="margin-right:8px;"', 'style="margin-left:8px;"') : ''}
+                        </div>
+                    `;
+                }
+
+                const blockEl = document.createElement('div');
+                blockEl.className = 'dynamic-block-inner';
+                blockEl.style.border = `${block.borderSize || '1px'} solid ${block.borderColor || 'var(--primary-red)'}`;
+                blockEl.style.position = 'relative';
+
+                blockEl.innerHTML = `
+                    <div class="admin-action-btn btn-edit-green action-blocks" onclick="window.openEditBlock('${block.id}')" title="Baustein bearbeiten"><i class="fa-solid fa-pencil"></i></div>
+                    <div class="admin-action-btn btn-del-red action-blocks" onclick="window.deleteCustomBlock('${block.id}')" title="Baustein löschen"><i class="fa-solid fa-trash-can"></i></div>
+                    ${bannerHtml}
+                    <h2 style="color:${block.titleColor || 'var(--primary-red)'}; font-family:${block.titleFont || "'Montserrat', sans-serif"}; font-size:${block.titleSize || 'clamp(20px, 3vw, 28px)'}; margin-bottom:15px;">
+                        ${block.icon ? `<i class="${block.icon.includes('fa-') ? block.icon : 'fa-solid ' + block.icon}" style="margin-right:8px;"></i>` : ''}${block.title}
+                    </h2>
+                    <p style="color:${block.textColor === '#cccccc' ? 'var(--text-light)' : (block.textColor || 'var(--text-light)')}; font-family:${block.textFont || "'Montserrat', sans-serif"}; font-size:${block.textSize || '14px'}; line-height:1.8; margin-bottom:15px; white-space:pre-wrap;">${block.text}</p>
+                    ${mediaHtml}
+                `;
+                container.appendChild(blockEl);
+            });
+        };
+
+        window.applyAdminModulePermissions = function(perms) {
+            if(!perms) perms = { leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true };
+            window.adminPermissions = perms;
+            if(!window.loggedInUser) return;
+            
+            if(document.getElementById('permLeads')) {
+                document.getElementById('permLeads').checked = perms.leads;
+                document.getElementById('permPrices').checked = perms.prices;
+                document.getElementById('permCustomblocks').checked = perms.customblocks;
+                document.getElementById('permContent').checked = perms.content;
+                document.getElementById('permCompanydata').checked = perms.companydata;
+                document.getElementById('permForms').checked = perms.forms;
+                document.getElementById('permCars').checked = perms.cars;
+                document.getElementById('permTicker').checked = perms.ticker;
+                document.getElementById('permCrm').checked = perms.crm;
+                document.getElementById('permPages').checked = perms.pages;
+                document.getElementById('permTheme').checked = perms.theme;
+            }
+
+            document.body.classList.toggle('perm-leads', perms.leads);
+            document.body.classList.toggle('perm-prices', perms.prices);
+            document.body.classList.toggle('perm-blocks', perms.customblocks);
+            document.body.classList.toggle('perm-content', perms.content);
+            document.body.classList.toggle('perm-data', perms.companydata);
+            document.body.classList.toggle('perm-forms', perms.forms);
+            document.body.classList.toggle('perm-cars', perms.cars);
+            document.body.classList.toggle('perm-ticker', perms.ticker);
+            document.body.classList.toggle('perm-crm', perms.crm);
+            document.body.classList.toggle('perm-pages', perms.pages);
+            document.body.classList.toggle('perm-theme', perms.theme);
+            setTimeout(window.syncHeaderHeight, 80);
+        };
+
+        // --- RED KUNDEN (CRM) FUNKTIONEN ---
+        window.openCRM = function() {
+            document.getElementById('crmOverlay').classList.add('open');
+            window.renderCRM();
+        };
+
+        window.closeCRM = function() {
+            document.getElementById('crmOverlay').classList.remove('open');
+        };
+
+        window.printCRM = function() { window.print(); };
+
+        window.createNewCRMClientManual = function() {
+            let maxIdNumber = 0;
+            for (let key in window.crmClientsDetail) {
+                let client = window.crmClientsDetail[key];
+                if (client.clientId && client.clientId.startsWith('RED-')) {
+                    let numVal = parseInt(client.clientId.replace(/\D/g, ''), 10);
+                    if (!isNaN(numVal) && numVal > maxIdNumber) maxIdNumber = numVal;
+                }
+            }
+            maxIdNumber++;
+            let paddedNum = maxIdNumber.toString().padStart(9, '0');
+            let formattedNum = paddedNum.replace(/(\d{3})(?=\d)/g, '$1 ');
+            const newId = 'RED-' + formattedNum;
+
+            document.getElementById('crmEditClientId').value = newId;
+            document.getElementById('crmEditClientIdView').value = newId;
+            if(document.getElementById('crmEditCategory')) document.getElementById('crmEditCategory').value = 'Privatkunde';
+            document.getElementById('crmEditName').value = '';
+            document.getElementById('crmEditPhone').value = '';
+            document.getElementById('crmEditEmail').value = '';
+            document.getElementById('crmEditBirthday').value = '';
+            document.getElementById('crmEditAddress').value = '';
+            document.getElementById('crmEditCity').value = '';
+            document.getElementById('crmEditNotes').value = '';
+            document.getElementById('crmDetailOverlay').classList.add('open');
+        };
+
+        window.exportCRMToCSV = function() {
+            const clients = Object.values(window.crmClientsDetail || {});
+            if(clients.length === 0) {
+                window.showToast('Keine Kundendaten zum Exportieren vorhanden.', 'error');
+                return;
+            }
+            let csv = '\uFEFFKunden-ID;Name;Kategorie;Telefon;E-Mail;Geburtstag;Adresse;PLZ/Ort;Notizen;Buchungen;Registriert am\n';
+            clients.forEach(c => {
+                const reg = c.timestamp ? new Date(c.timestamp).toLocaleDateString('de-DE') : '-';
+                const clean = (val) => `"${String(val || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`;
+                csv += `${clean(c.clientId)};${clean(c.name)};${clean(c.category || 'Privatkunde')};${clean(c.phone)};${clean(c.email)};${clean(c.birthday)};${clean(c.address)};${clean(c.city)};${clean(c.notes)};${c.bookings || 1};${reg}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `RED_Kundendatenbank_${new Date().toLocaleDateString('de-DE')}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.showToast('CSV-Datei erfolgreich exportiert!', 'success');
+        };
+
+        window.rebookClient = function(clientId) {
+            const client = window.crmClientsDetail[clientId];
+            if(!client) return;
+            window.closeCRM();
+            window.closeAdmin();
+            window.switchView('view-home');
+            setTimeout(() => {
+                document.getElementById('termin').scrollIntoView({behavior: 'smooth'});
+                document.getElementById('formName').value = client.name || '';
+                document.getElementById('formPhone').value = client.phone || '';
+                document.getElementById('formEmail').value = client.email || '';
+                window.updateBookingLiveSummary();
+                window.showToast('Kunde geladen. Bitte Wunschtermin wählen.', 'success');
+            }, 600);
+        };
+
+        window.openCRMDetail = function(clientId) {
+            const detail = window.crmClientsDetail[clientId] || {};
+            document.getElementById('crmEditClientId').value = clientId;
+            document.getElementById('crmEditClientIdView').value = clientId !== 'N/A' ? clientId : 'Nicht vergeben';
+            if(document.getElementById('crmEditCategory')) document.getElementById('crmEditCategory').value = detail.category || 'Privatkunde';
+            document.getElementById('crmEditName').value = detail.name !== 'undefined' ? (detail.name || '') : '';
+            document.getElementById('crmEditPhone').value = detail.phone !== 'undefined' ? (detail.phone || '') : '';
+            document.getElementById('crmEditEmail').value = detail.email !== 'undefined' ? (detail.email || '') : '';
+
+            document.getElementById('crmEditBirthday').value = detail.birthday || '';
+            document.getElementById('crmEditAddress').value = detail.address || '';
+            document.getElementById('crmEditCity').value = detail.city || '';
+            document.getElementById('crmEditNotes').value = detail.notes || '';
+
+            document.getElementById('crmDetailOverlay').classList.add('open');
+        };
+
+        window.closeCRMDetail = function() { document.getElementById('crmDetailOverlay').classList.remove('open'); };
+
+        window.crmCategoryFilter = 'all';
+        window.crmSortMode = 'newest';
+
+        window.setCrmCategoryFilter = function(catKey) {
+            window.crmCategoryFilter = catKey || 'all';
+            document.querySelectorAll('#crmCatPills .crm-cat-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-cat') === window.crmCategoryFilter);
+            });
+            window.renderCRM();
+        };
+
+        window.changeCrmSort = function(mode) {
+            window.crmSortMode = mode || 'newest';
+            window.renderCRM();
+        };
+
+        window.renderCRM = function() {
+            const list = document.getElementById('crmList');
+            if(!list) return;
+            list.innerHTML = '';
+            
+            const allClients = Object.values(window.crmClientsDetail || {});
+            const vipCount = allClients.filter(c => (c.bookings || 1) > 1 || (c.category && c.category.includes('VIP'))).length;
+            const businessCount = allClients.filter(c => c.category && (c.category.includes('Gewerbe') || c.category.includes('Händler'))).length;
+            const totalBookings = allClients.reduce((acc, c) => acc + (Number(c.bookings) || 1), 0);
+
+            if(document.getElementById('kpiTotalCrm')) document.getElementById('kpiTotalCrm').innerText = allClients.length;
+            if(document.getElementById('crmStatTotal')) document.getElementById('crmStatTotal').innerText = allClients.length;
+            if(document.getElementById('crmStatVip')) document.getElementById('crmStatVip').innerText = vipCount;
+            if(document.getElementById('crmStatBusiness')) document.getElementById('crmStatBusiness').innerText = businessCount;
+            if(document.getElementById('crmStatBookings')) document.getElementById('crmStatBookings').innerText = totalBookings;
+
+            const q = (document.getElementById('crmSearch')?.value || '').trim().toLowerCase();
+            const catFilter = window.crmCategoryFilter || 'all';
+
+            let clients = allClients.filter(c => {
+                const catStr = String(c.category || 'Privatkunde');
+                let catMatch = true;
+                if (catFilter === 'VIP') catMatch = catStr.includes('VIP') || (Number(c.bookings) || 1) > 1;
+                else if (catFilter !== 'all') catMatch = catStr.toLowerCase().includes(catFilter.toLowerCase());
+
+                const searchHay = `${c.clientId || ''} ${c.name || ''} ${c.phone || ''} ${c.email || ''} ${catStr} ${c.notes || ''}`.toLowerCase();
+                return catMatch && (!q || searchHay.includes(q));
+            });
+
+            if (window.crmSortMode === 'bookings') {
+                clients.sort((a, b) => (Number(b.bookings) || 1) - (Number(a.bookings) || 1));
+            } else if (window.crmSortMode === 'name') {
+                clients.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'de'));
+            } else {
+                clients.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            }
+            
+            if(clients.length === 0) {
+                list.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 24px; color:var(--text-muted);">Keine passenden Kunden gefunden.</td></tr>';
+                return;
+            }
+            
+            clients.forEach(c => {
+                const cleanDigits = (c.phone || '').replace(/\D/g, '');
+                const waLink = cleanDigits ? `https://wa.me/${cleanDigits.replace(/^0/, '49')}` : '#';
+                const regDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString('de-DE') : '-';
+                const catStr = c.category || 'Privatkunde';
+                let catClass = '';
+                if (catStr.includes('VIP')) catClass = 'cat-vip';
+                else if (catStr.includes('Gewerbe')) catClass = 'cat-gewerbe';
+                else if (catStr.includes('Händler')) catClass = 'cat-haendler';
+
+                const lastNoteLine = c.notes ? String(c.notes).split('\n').filter(Boolean).pop() : '';
+                const notePreviewHtml = lastNoteLine
+                    ? `<span class="crm-note-preview" title="${window.escHtml(c.notes)}"><i class="fa-regular fa-note-sticky" style="color:var(--primary-red);"></i> ${window.escHtml(lastNoteLine)}</span>`
+                    : '';
+                
+                list.innerHTML += `
+                    <tr>
+                        <td><span class="crm-badge">${window.escHtml(c.clientId)}</span></td>
+                        <td>
+                            <strong style="display:block; font-size:12.5px; color:var(--text-light);">${window.escHtml(c.name || 'Unbekannt')}</strong>
+                            <span class="crm-cat-tag ${catClass}">${window.escHtml(catStr)}</span>
+                            ${notePreviewHtml}
+                        </td>
+                        <td>${cleanDigits ? `<a href="tel:${window.escHtml(c.phone)}" style="color:inherit; text-decoration:none; font-weight:600;">${window.escHtml(c.phone)}</a>` : '-'}</td>
+                        <td>${c.email && c.email.includes('@') ? `<a href="mailto:${window.escHtml(c.email)}" style="color:inherit; text-decoration:none;">${window.escHtml(c.email)}</a>` : '-'}</td>
+                        <td style="font-variant-numeric:tabular-nums;">${regDate}</td>
+                        <td style="text-align:center;"><span style="display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:24px; padding:0 7px; border-radius:20px; background:var(--bg-input); border:1px solid var(--glass-border); font-weight:900; color:${(c.bookings || 1) > 1 ? 'var(--green-accent)' : 'var(--text-light)'};">${c.bookings || 1}</span></td>
+                        <td class="crm-action-cell" style="white-space:nowrap;">
+                            ${cleanDigits ? `
+                                <a href="tel:${window.escHtml(c.phone)}" class="apt-btn call-btn" style="display:inline-flex;" title="Anrufen"><i class="fa-solid fa-phone"></i></a>
+                                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="apt-btn wa-confirm" style="display:inline-flex;" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                            ` : ''}
+                            <button type="button" class="apt-btn crm-sync" style="display:inline-flex;" onclick="window.openCRMDetail('${c.clientId}')" title="Kundenakte &amp; Historie bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="apt-btn" style="display:inline-flex; color:var(--primary-red); border-color:rgba(217,0,0,0.35);" onclick="window.rebookClient('${c.clientId}')" title="Neuen Termin für diesen Kunden buchen"><i class="fa-solid fa-calendar-plus"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        };
+
+        window.openCRMViewAll = function() {
+            document.getElementById('crmViewAllOverlay').classList.add('open');
+            window.renderCRMViewAll();
+        };
+
+        window.closeCRMViewAll = function() {
+            document.getElementById('crmViewAllOverlay').classList.remove('open');
+        };
+
+        window.renderCRMViewAll = function() {
+            const list = document.getElementById('crmViewAllList');
+            list.innerHTML = '';
+            
+            let clients = Object.values(window.crmClientsDetail || {});
+            clients.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+            
+            if(clients.length === 0) {
+                list.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 20px; color:var(--text-muted);">Noch keine Kunden erfasst.</td></tr>';
+                return;
+            }
+            
+            clients.forEach(c => {
+                let regDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString('de-DE') : '-';
+                list.innerHTML += `
+                    <tr>
+                        <td><span class="crm-badge">${c.clientId}</span></td>
+                        <td style="font-weight:700;">${window.escHtml(c.name || '-')}</td>
+                        <td>${window.escHtml(c.category || 'Privatkunde')}</td>
+                        <td>${window.escHtml(c.phone || '-')}</td>
+                        <td>${window.escHtml(c.email || '-')}</td>
+                        <td>${window.escHtml(c.birthday || '-')}</td>
+                        <td>${window.escHtml(c.address || '-')}</td>
+                        <td>${window.escHtml(c.city || '-')}</td>
+                        <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis;" title="${window.escHtml(c.notes || '')}">${window.escHtml(c.notes || '-')}</td>
+                        <td>${regDate}</td>
+                        <td style="text-align:center;">${c.bookings || 1}</td>
+                    </tr>
+                `;
+            });
+        };
+
+        window.filterCRM = function() {
+            window.renderCRM();
+        };
+
+        // --- PAGE BUILDER ---
+        window.customPagesData = [];
+        window.openPageManager = function() {
+            document.getElementById('pageManagerOverlay').classList.add('open');
+            window.renderPageManagerList();
+        };
+        window.closePageManager = function() {
+            document.getElementById('pageManagerOverlay').classList.remove('open');
+            document.getElementById('pmEditingPageId').value = '';
+            document.getElementById('pmPageTitle').value = '';
+            document.getElementById('pmPageContent').value = '';
+        };
+
+        window.saveCustomPage = async function() {
+            const title = document.getElementById('pmPageTitle').value.trim();
+            const content = document.getElementById('pmPageContent').value;
+            const editId = document.getElementById('pmEditingPageId').value;
+
+            if(!title) { window.showToast('Bitte einen Seitentitel eingeben.', 'error'); return; }
+
+            const pageData = { title: title, content: content, timestamp: Date.now() };
+
+            try {
+                if(editId) {
+                    await window.firebaseUpdateDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", editId), pageData);
+                    window.showToast('Seite aktualisiert!', 'success');
+                } else {
+                    await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "custom_pages"), pageData);
+                    window.showToast('Seite erstellt!', 'success');
+                }
+            } catch(e) {
+                let localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
+                if(editId) {
+                    let idx = localPages.findIndex(p => p.id === editId);
+                    if(idx > -1) localPages[idx] = {id: editId, ...pageData};
+                } else {
+                    localPages.push({id: 'page-' + Date.now(), ...pageData});
+                }
+                localStorage.setItem('red_custom_pages', JSON.stringify(localPages));
+                window.customPagesData = localPages;
+                window.renderCustomPagesToDOM();
+                window.showToast('Seite lokal gespeichert.', 'success');
+            }
+
+            document.getElementById('pmEditingPageId').value = '';
+            document.getElementById('pmPageTitle').value = '';
+            document.getElementById('pmPageContent').value = '';
+            window.renderPageManagerList();
+        };
+
+        window.editCustomPage = function(id) {
+            const page = window.customPagesData.find(p => p.id === id);
+            if(!page) return;
+            document.getElementById('pmEditingPageId').value = page.id;
+            document.getElementById('pmPageTitle').value = page.title;
+            document.getElementById('pmPageContent').value = page.content;
+        };
+
+        window.deleteCustomPage = async function(id) {
+            if(!confirm('Möchten Sie diese Seite wirklich komplett löschen?')) return;
+            try {
+                await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", id));
+                window.showToast('Seite gelöscht!', 'success');
+            } catch(e) {
+                let localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
+                localPages = localPages.filter(p => p.id !== id);
+                localStorage.setItem('red_custom_pages', JSON.stringify(localPages));
+                window.customPagesData = localPages;
+                window.renderCustomPagesToDOM();
+                window.showToast('Seite lokal gelöscht.', 'success');
+            }
+            window.renderPageManagerList();
+        };
+
+        window.renderPageManagerList = function() {
+            const list = document.getElementById('pmPagesList');
+            list.innerHTML = '';
+            if(window.customPagesData.length === 0) {
+                list.innerHTML = '<tr><td colspan="2" style="color:var(--text-muted);">Keine benutzerdefinierten Seiten vorhanden.</td></tr>';
+                return;
+            }
+            window.customPagesData.forEach(p => {
+                list.innerHTML += `
+                    <tr>
+                        <td style="font-weight:bold;">${p.title}</td>
+                        <td style="text-align:right;">
+                            <button class="btn-primary" style="padding:4px 8px; background:transparent; border:1px solid #ff9500; color:#ff9500; font-size:11px;" onclick="window.editCustomPage('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-primary" style="padding:4px 8px; background:#ff3b30; font-size:11px;" onclick="window.deleteCustomPage('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        };
+
+        window.renderCustomPagesToDOM = function() {
+            document.querySelectorAll('.dynamic-custom-page').forEach(e => e.remove());
+            document.querySelectorAll('.dynamic-menu-item').forEach(e => e.remove());
+
+            const menuContainer = document.getElementById('dynamicMenuItemsContainer');
+            const footerLinks = document.getElementById('dynamicFooterLinks');
+            
+            menuContainer.innerHTML = '';
+            document.querySelectorAll('.dynamic-footer-item').forEach(e => e.remove());
+
+            window.customPagesData.forEach(page => {
+                const view = document.createElement('div');
+                view.id = 'view-' + page.id;
+                view.className = 'view-section dynamic-custom-page';
+                view.innerHTML = `
+                    <div class="subpage-nav-bar">
+                     <button type="button" class="subpage-back-btn" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
+                 </div>
+                    <div class="booking-wrapper" style="margin-top:15px;">
+                        <h2 style="color:var(--primary-red); margin-bottom:20px; font-weight:900; text-transform:uppercase;">${page.title}</h2>
+                        <div style="white-space:pre-wrap; color:var(--text-light); line-height:1.8;">${page.content}</div>
+                    </div>
+                `;
+                document.body.appendChild(view);
+
+                const aMenu = document.createElement('a');
+                aMenu.className = 'dynamic-menu-item';
+                aMenu.href = "javascript:void(0)";
+                aMenu.onclick = () => { window.toggleMenu(); window.switchView('view-' + page.id); };
+                aMenu.innerHTML = `<i class="fa-solid fa-file-lines" style="color:var(--primary-red);"></i> ${page.title}`;
+                menuContainer.appendChild(aMenu);
+
+                const aFooter = document.createElement('a');
+                aFooter.className = 'dynamic-footer-item';
+                aFooter.href = "javascript:void(0)";
+                aFooter.onclick = () => { window.switchView('view-' + page.id); };
+                aFooter.innerText = page.title;
+                footerLinks.insertBefore(aFooter, footerLinks.children[3]); 
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedContact = JSON.parse(localStorage.getItem('red_contact'));
+            if(savedContact) window.applyContactInfo(savedContact);
+
+            const savedContent = JSON.parse(localStorage.getItem('red_page_content'));
+            if(savedContent) window.applyPageContent(savedContent);
+            else window.applyPageContent(window.pageContentData);
+
+            window.renderServices(window.servicesData);
+
+            window.showCookieBannerIfNeeded(450);
+
+            if (typeof window.initStepByStepBackNavigation === 'function') {
+                window.initStepByStepBackNavigation();
+            }
+
+            window.acceptAllCookies = function() {
+                if(document.getElementById('cookieExternalMedia')) document.getElementById('cookieExternalMedia').checked = true;
+                if(document.getElementById('cookieAnalytics')) document.getElementById('cookieAnalytics').checked = true;
+                try {
+                    localStorage.setItem('cookie_consent', 'all');
+                    sessionStorage.setItem('cookie_consent', 'all');
+                } catch(e) {}
+                window.enableGoogleMaps();
+                document.getElementById('cookieConsentOverlay').classList.remove('show');
+                window.showToast('Alle Einstellungen gespeichert.', 'success');
+            };
+
+            window.acceptSelectedCookies = function() {
+                try {
+                    localStorage.setItem('cookie_consent', 'selected');
+                    sessionStorage.setItem('cookie_consent', 'selected');
+                } catch(e) {}
+                if(document.getElementById('cookieExternalMedia')?.checked) {
+                    window.enableGoogleMaps();
+                }
+                document.getElementById('cookieConsentOverlay').classList.remove('show');
+                window.showToast('Ihre Auswahl wurde gespeichert.', 'success');
+            };
+
+            window.openLegal = function(type) {
+                const title = document.getElementById('legalTitle');
+                const content = document.getElementById('legalContentText');
+                const extraDsgvo = window.pageContentData?.legal?.datenschutz_extra || '';
+                
+                if(type === 'impressum') {
+                    title.innerText = 'Impressum';
+                    const rawUstid = (window.dynamicContactData.ustid || '').trim();
+                    const hasValidUstid = rawUstid !== '' && !rawUstid.toLowerCase().includes('hier steuernummer');
+                    const ustidBlock = hasValidUstid
+                        ? `<br><br><strong>Umsatzsteuer-ID:</strong><br>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br>${window.escHtml(rawUstid)}`
+                        : '';
+                    content.innerHTML = `<strong>Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz):</strong><br><br>RED Zulassungsdienst Berlin<br>Inhaber: Tamer Yazici<br>Kienitzer Str. 6<br>12053 Berlin<br><br><strong>Kontakt:</strong><br>Telefon: ${window.escHtml(window.dynamicContactData.phone)}<br>E-Mail: ${window.escHtml(window.dynamicContactData.email)}${ustidBlock}<br><br><strong>Verbraucherstreitbeilegung / Universalschlichtungsstelle (§ 36 VSBG):</strong><br>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.<br><br><strong>Haftung für Inhalte & Links:</strong><br>Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.`;
+                } else {
+                    title.innerText = 'Datenschutzerklärung (DSGVO / TDDDG)';
+                    content.innerHTML = `<strong>1. Datenschutz auf einen Blick</strong><br>Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst und behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften (DSGVO, BDSG sowie TDDDG).<br><br><strong>2. Verantwortliche Stelle</strong><br>RED Zulassungsdienst Berlin, Inhaber: Tamer Yazici, Kienitzer Str. 6, 12053 Berlin, E-Mail: ${window.dynamicContactData.email}, Telefon: ${window.dynamicContactData.phone}.<br><br><strong>3. Lokale Schriftarten (Kein externes Font-Tracking)</strong><br>Zum Schutz Ihrer Privatsphäre nutzt diese Seite lokal optimierte Systemschriftarten. Es erfolgt beim Seitenaufruf keine unbefugte Übertragung Ihrer IP-Adresse an externe Schriftarten-Server.<br><br><strong>4. Terminbuchung & Auftragsabwicklung (Art. 6 Abs. 1 lit. b DSGVO)</strong><br>${extraDsgvo}<br><br><strong>5. Externe Medien (2-Klick-Schutz für Standortkarte)</strong><br>Externe Karteninhalte werden erst nach Ihrer ausdrücklichen Aktivierung geladen (Art. 6 Abs. 1 lit. a DSGVO).<br><br><strong>6. Ihre Rechte (Auskunft, Berichtigung, Löschung, Widerruf)</strong><br>Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten sowie ein Recht auf Berichtigung, Einschränkung der Verarbeitung oder Löschung dieser Daten (Art. 15–21 DSGVO).`;
+                }
+                document.getElementById('legalOverlay').classList.add('open');
+            };
+
+            window.closeLegal = function() { document.getElementById('legalOverlay').classList.remove('open'); };
+
+            window.openWidgetModal = function(type) {
+                const title = document.getElementById('widgetModalTitle');
+                const content = document.getElementById('widgetModalContent');
+                
+                if(type === 'calendar') {
+                    title.innerHTML = '<i class="fa-solid fa-calendar-days" style="color:var(--primary-red);"></i> Berliner Monats- & Terminkalender';
+                    window.calModalYear = new Date().getFullYear();
+                    window.calModalMonth = new Date().getMonth();
+                    window.renderHeaderInteractiveCalendar();
+                } else if(type === 'office') {
+                    title.innerHTML = '<i class="fa-solid fa-door-open" style="color:var(--primary-red);"></i> Büro- & Annahme-Status';
+                    const bn = window.getBerlinNowParts();
+                    const todayHoliday = window.isBerlinHolidayYMD(bn.year, bn.month, bn.day);
+                    const isWorkday = (bn.dayNum >= 1 && bn.dayNum <= 5) && !todayHoliday;
+                    const isOpen = isWorkday && (bn.h >= 9 && bn.h < 20);
+                    const statusHeadline = isOpen ? 'JETZT GEÖFFNET' : (todayHoliday ? `FEIERTAG (${todayHoliday})` : 'AKTUELL GESCHLOSSEN');
+                    content.innerHTML = `
+                        <div style="font-size: clamp(16px, 4.4vw, 19px); font-weight: 900; color: ${isOpen ? 'var(--green-accent)' : '#d97706'}; margin-bottom: 14px; line-height: 1.3;">
+                            <i class="fa-solid ${isOpen ? 'fa-circle-check' : 'fa-moon'}" style="margin-right:6px;"></i>${statusHeadline}
+                            <span class="paren-sub" style="color:var(--text-muted); font-size:12px;">${isOpen ? '(Sofort-Annahme vor Ort)' : '(Online-Termin 24/7 aktiv)'}</span>
+                        </div>
+                        <div style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:12px; padding:14px; text-align:left; font-size:12px; color:var(--text-light); margin-bottom:15px;">
+                            <strong>Unsere Servicezeiten vor Ort:</strong><br>
+                            • Montag – Freitag: <strong>09:00 – 20:00 Uhr</strong><br>
+                            • Standort: <strong>Kienitzer Str. 6, 12053 Berlin</strong><br>
+                            • Sofortkennzeichen & Dokumenten-Annahme ohne Wartezeit!
+                        </div>
+                        <button class="btn-primary" style="width:100%; justify-content:center;" onclick="window.closeWidgetModal(); window.switchView('view-home'); document.getElementById('termin').scrollIntoView({behavior:'smooth'});"><i class="fa-regular fa-calendar-check"></i> Jetzt Wunschtermin reservieren</button>
+                    `;
+                } else if(type === 'time') {
+                    title.innerHTML = '<i class="fa-regular fa-clock"></i> Datum & Uhrzeit';
+                    const renderTimeModal = () => {
+                        const now = new Date();
+                        const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        const dateStr = now.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+                        content.innerHTML = `
+                            <div style="font-size: 40px; font-weight: 900; color: var(--primary-red); margin-bottom: 10px;">${timeStr}</div>
+                            <div style="font-size: 16px; font-weight: 600; color: var(--text-light);">${dateStr}</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">Zeitzone: Mitteleuropäische Zeit (Berlin) • KW ${window.getISOWeekNumber(now)}</div>
+                        `;
+                    };
+                    renderTimeModal();
+                    window.modalClockInterval = setInterval(renderTimeModal, 1000); 
+                } else if (type === 'weather') {
+                    title.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> Live Wetter Berlin';
+                    if(window.currentWeatherData) {
+                        const temp = Math.round(window.currentWeatherData.temperature);
+                        const wind = window.currentWeatherData.windspeed;
+                        let icon = '<i class="fa-solid fa-cloud-sun" style="font-size:50px; color:#888;"></i>';
+                        if(temp > 22) icon = '<i class="fa-solid fa-sun" style="font-size:50px; color:#ff9500;"></i>';
+                        if(temp < 5) icon = '<i class="fa-solid fa-snowflake" style="font-size:50px; color:#00a8cc;"></i>';
+                        
+                        content.innerHTML = `
+                            <div style="margin-bottom: 15px;">${icon}</div>
+                            <div style="font-size: 35px; font-weight: 900; color: var(--text-light);">${temp} °C</div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--text-muted); margin-top: 10px;">Windgeschwindigkeit: ${wind} km/h</div>
+                        `;
+                    } else {
+                        content.innerHTML = '<p>Aktuelle Wetterdaten für Berlin sind geladen.</p>';
+                    }
+                } else if (type === 'visitors') {
+                    title.innerHTML = '<i class="fa-solid fa-chart-line"></i> System-Status';
+                    const v = document.getElementById('vCount').innerText;
+                    
+                    let adminBtnHtml = '';
+                    if(window.isAuthorized) {
+                        adminBtnHtml = `
+                            <div style="border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 20px;">
+                                <label style="font-size: 10px; color: var(--primary-red); text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px;">Zählerstand korrigieren</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="adminNewCountInput" class="form-control" style="flex: 1; text-align: center; font-weight: bold;" placeholder="Zahl (z.B. 744)">
+                                    <button class="btn-primary" style="background:#ff9500; color:#000; padding: 0 20px;" onclick="window.setCustomVisitorCount()"><i class="fa-solid fa-check"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    content.innerHTML = `
+                        <div style="width:54px; height:54px; margin:0 auto 12px; border-radius:14px; background:var(--green-bg-soft); border:1.5px solid var(--green-border); display:flex; align-items:center; justify-content:center; color:var(--green-accent); font-size:22px;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div style="font-size: 32px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">${v}</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px;">Verifizierte Seitenaufrufe</div>
+                        <div style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--green-accent); background:var(--green-bg-soft); padding:4px 12px; border-radius:20px;">
+                            <span style="width:7px; height:7px; border-radius:50%; background:var(--green-accent);"></span> System & Online-Terminbuchung aktiv
+                        </div>
+                        ${adminBtnHtml}
+                    `;
+                }
+                document.getElementById('widgetModalOverlay').classList.add('open');
+            };
+
+            window.closeWidgetModal = function() {
+                if(window.modalClockInterval) clearInterval(window.modalClockInterval);
+                window.updateHeaderCalendarChip();
+                document.getElementById('widgetModalOverlay').classList.remove('open');
+            };
+
+            window.setCustomVisitorCount = async function() {
+                const inputEl = document.getElementById('adminNewCountInput');
+                let rawVal = inputEl && inputEl.value.trim() !== "" ? inputEl.value.trim() : prompt("Bitte den neuen Zählerstand eingeben (z.B. 744):");
+                if(rawVal === null || rawVal.trim() === "") return;
+
+                const parsedCount = parseInt(rawVal.trim(), 10);
+                if(!isNaN(parsedCount) && parsedCount >= 0) {
+                    if(window.firebaseDb && window.firebaseSetDoc) {
+                        try {
+                            await window.firebaseSetDoc(
+                                window.firebaseDoc(window.firebaseDb, "settings", "visitors"), 
+                                { count: parsedCount }, 
+                                { merge: true }
+                            );
+                            sessionStorage.setItem('red_visited_counted', 'true');
+                            window.showToast("Zählerstand erfolgreich auf " + parsedCount + " aktualisiert!", "success");
+                            window.closeWidgetModal();
+                            document.querySelectorAll('#vCount').forEach(el => el.innerText = parsedCount.toLocaleString('de-DE'));
+                        } catch(e) {
+                            console.error("Firebase Zähler-Fehler:", e);
+                            window.showToast("Fehler beim Speichern: " + (e.message || "Keine Berechtigung"), "error");
+                        }
+                    } else {
+                        document.querySelectorAll('#vCount').forEach(el => el.innerText = parsedCount.toLocaleString('de-DE'));
+                        window.closeWidgetModal();
+                    }
+                } else {
+                    window.showToast("Bitte nur gültige Zahlen eingeben.", "error");
+                }
+            };
+            
+            document.querySelectorAll('.custom-dialog-overlay, .info-popup-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if(e.target === this) {
+                        this.classList.remove('open', 'active');
+                        if(this.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
+                        if(this.id === 'passChangeOverlay') document.getElementById('newPassInput').value = '';
+                        if(this.id === 'widgetModalOverlay') window.closeWidgetModal();
+                        if(this.id === 'serviceConfigOverlay') window.editingServiceId = null;
+                        if(this.id === 'pageManagerOverlay') window.closePageManager();
+                        if(this.id === 'themeEditorOverlay') window.closeThemeEditor();
+                        if(this.id === 'crmViewAllOverlay') window.closeCRMViewAll();
+                        if(this.id === 'calcItemEditOverlay') window.closeCalcEditModal();
+                        if(this.id === 'formEditModalOverlay') window.closeFormEditModal();
+                        if(this.id === 'digitalVollmachtOverlay') window.closeDigitalVollmachtModal();
+                        if(this.id === 'kaufvertragOverlay') window.closeKaufvertragModal();
+                        if(this.id === 'viralShareOverlay') window.closeViralShareModal();
+                        if(this.id === 'pwaInstallOverlay') window.closePwaInstallModal();
+                        if(this.id === 'callbackRequestOverlay') window.closeCallbackModal();
+                    }
+                });
+            });
+
+            window.chosenHour = null;
+            window.editModalChosenHour = null;
+
+            try {
+                flatpickr("#datePicker", {
+                    locale: "de",
+                    dateFormat: "d.m.Y",
+                    minDate: "today", 
+                    disableMobile: "true", 
+                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6 || !!window.getBerlinHolidayName(d); } ],
+                    onChange: function(selectedDates, dateStr, instance) {
+                        document.getElementById('timeWrapper').style.display = 'block';
+                        const container = document.getElementById('timeSlots');
+                        container.innerHTML = '';
+                        window.chosenHour = null;
+                        document.getElementById('submitBtn').disabled = true;
+                        window.updateBookingLiveSummary();
+                        
+                        const normTarget = window.normalizeDateDE(dateStr);
+                        const bn = window.getBerlinNowParts();
+                        const todayDE = `${String(bn.day).padStart(2, '0')}.${String(bn.month).padStart(2, '0')}.${bn.year}`;
+                        const isSelectedToday = (normTarget === todayDE);
+                        const minSelectableMins = (bn.h * 60) + bn.m + 30;
+
+                        const bookedTimes = (window.bookedSlotsList || [])
+                            .filter(s => window.normalizeDateDE(s.date) === normTarget)
+                            .map(s => (s.time || '').replace(' Uhr','').trim());
+
+                        let freeSlotsCount = 0;
+
+                        for(let h = 9; h <= 19; h++) {
+                            for(let m of ['00', '30']) {
+                                const tStr = `${h.toString().padStart(2, '0')}:${m}`;
+                                const slotMins = (h * 60) + parseInt(m, 10);
+                                const isPastSlot = isSelectedToday && (slotMins < minSelectableMins);
+
+                                const div = document.createElement('div');
+                                div.className = 'time-slot'; div.innerText = tStr + " Uhr";
+                                
+                                if(bookedTimes.includes(tStr) || isPastSlot) {
+                                    div.classList.add('booked');
+                                    div.title = isPastSlot ? "Zeitfenster bereits vergangen" : "Bereits vergeben";
+                                } else {
+                                    freeSlotsCount++;
+                                    div.addEventListener('click', () => {
+                                        Array.from(container.children).forEach(c => c.classList.remove('active'));
+                                        div.classList.add('active');
+                                        window.chosenHour = tStr;
+                                        document.getElementById('submitBtn').disabled = false;
+                                        window.updateBookingLiveSummary();
+                                    });
+                                }
+                                container.appendChild(div);
+                            }
+                        }
+
+                        if (freeSlotsCount === 0) {
+                            const hint = document.createElement('div');
+                            hint.style.cssText = 'grid-column:1/-1; text-align:center; font-size:11.5px; font-weight:700; color:var(--primary-red); padding:8px; background:var(--bg-input); border-radius:10px;';
+                            hint.innerText = 'Für heute sind keine Zeitfenster mehr frei – bitte wählen Sie den nächsten Werktag.';
+                            container.appendChild(hint);
+                        }
+                    }
+                });
+
+                flatpickr("#editAptDate", {
+                    locale: "de",
+                    dateFormat: "d.m.Y",
+                    minDate: "today", 
+                    disableMobile: "true",
+                    disable: [ function(d) { return d.getDay() === 0 || d.getDay() === 6 || !!window.getBerlinHolidayName(d); } ],
+                    onChange: function(selectedDates, dateStr, instance) {
+                        const selectTime = document.getElementById('editAptTime');
+                        selectTime.innerHTML = '<option value="Ganztägig">Ganztägig</option>';
+                        
+                        const normTarget = window.normalizeDateDE(dateStr);
+                        const bookedTimes = (window.redApts || [])
+                            .filter(a => window.normalizeDateDE(a.date) === normTarget && a.id !== window.editingAptId && Number(a.orderStatus) !== 4)
+                            .map(a => (a.timeLabel || '').replace(' Uhr','').trim());
+
+                        for(let h = 9; h <= 19; h++) {
+                            for(let m of ['00', '30']) {
+                                const tStr = `${h.toString().padStart(2, '0')}:${m}`;
+                                const opt = document.createElement('option');
+                                opt.value = tStr + ' Uhr';
+                                opt.innerText = tStr + ' Uhr';
+                                if(bookedTimes.includes(tStr)) {
+                                    opt.disabled = true;
+                                    opt.innerText += ' (Belegt)';
+                                }
+                                selectTime.appendChild(opt);
+                            }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                const dp = document.getElementById('datePicker');
+                dp.type = 'date';
+                dp.addEventListener('change', () => {
+                    document.getElementById('submitBtn').disabled = false;
+                    window.chosenHour = "Ganztägig";
+                    window.updateBookingLiveSummary();
+                });
+            }
+
+            const trigger = document.getElementById('serviceSelectBox');
+            window.selectedServiceVal = "Anmeldung";
+            trigger.addEventListener('click', (e) => { e.stopPropagation(); trigger.classList.toggle('open'); });
+            
+            document.addEventListener('click', () => trigger.classList.remove('open'));
+        });
+
+        window.showToast = function(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-msg toast-${type}`;
+            toast.innerHTML = (type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>') + ` <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        };
+
+        window.triggerLogoBubble = function(e) {
+            e.preventDefault();
+            const headerEl = document.getElementById('header-wrapper');
+            if (headerEl) headerEl.classList.remove('header-compact');
+            if (window.getCurrentViewId() === 'view-home') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.switchView('view-home');
+            }
+        };
+
+        window._openModalOrder = [];
+        window._lastHistoryState = null;
+        window._lastBackExitHint = 0;
+
+        window.getCurrentViewId = function() {
+            const active = document.querySelector('.view-section.active');
+            return active ? active.id : 'view-home';
+        };
+
+        window.pushAppHistoryState = function(stateObj, replaceOnly = false) {
+            const hashStr = '#' + (stateObj.view || 'view-home');
+            if (replaceOnly) {
+                history.replaceState(stateObj, '', hashStr);
+            } else {
+                history.pushState(stateObj, '', hashStr);
+            }
+            window._lastHistoryState = stateObj;
+        };
+
+        window.closeTopmostUiLayer = function() {
+            // 1. Mobiles Select-Sheet
+            const mobileSel = document.getElementById('mobileSelectOverlay');
+            if (mobileSel && mobileSel.classList.contains('open')) {
+                window.closeMobileSelectSheet();
+                return true;
+            }
+            // 2. Geöffneter Flatpickr-Kalender
+            const openFp = document.querySelector('.flatpickr-calendar.open');
+            if (openFp) {
+                ['datePicker', 'editAptDate'].forEach(id => {
+                    const fp = document.getElementById(id)?._flatpickr;
+                    if (fp && fp.isOpen) fp.close();
+                });
+                return true;
+            }
+            // 3. Vollbild-Menü
+            const qMenu = document.getElementById('quickMenu');
+            if (qMenu && qMenu.classList.contains('active')) {
+                window.toggleMenu();
+                return true;
+            }
+            // 4. Aufgeklappte Schnell-Service-Leiste
+            const qBar = document.getElementById('floatingQuickBar');
+            if (qBar && qBar.classList.contains('fab-open')) {
+                window.closeMobileQuickBar();
+                return true;
+            }
+            // 5. Oberstes offenes Modal / Dialogfenster
+            const openOverlays = Array.from(document.querySelectorAll('.custom-dialog-overlay.open'));
+            if (openOverlays.length > 0) {
+                let targetOv = null;
+                for (let i = window._openModalOrder.length - 1; i >= 0; i--) {
+                    const candidate = document.getElementById(window._openModalOrder[i]);
+                    if (candidate && candidate.classList.contains('open')) {
+                        targetOv = candidate;
+                        break;
+                    }
+                }
+                if (!targetOv) targetOv = openOverlays[openOverlays.length - 1];
+                targetOv.classList.remove('open');
+                if (targetOv.id === 'widgetModalOverlay') window.closeWidgetModal();
+                if (targetOv.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
+                return true;
+            }
+            return false;
+        };
+
+        window.initStepByStepBackNavigation = function() {
+            if (window._stepBackInitDone) return;
+            window._stepBackInitDone = true;
+
+            const hash = window.location.hash.substring(1);
+            const hasStartSubView = hash && hash !== 'view-home' && document.getElementById(hash) && document.getElementById(hash).classList.contains('view-section');
+
+            // Root-Basis auf Startseite setzen
+            window.pushAppHistoryState({ view: 'view-home', redRoot: true }, true);
+
+            if (hasStartSubView) {
+                window.pushAppHistoryState({ view: hash }, false);
+                window.switchView(hash, false);
+            } else {
+                // Beim ersten Fingertipp / Klick sanften Schutz-Schritt aktivieren
+                const armRootGuard = () => {
+                    if (history.state && history.state.redRoot) {
+                        window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                    }
+                };
+                document.addEventListener('pointerdown', armRootGuard, { once: true, passive: true });
+            }
+
+            // Jedes Öffnen von Modals, Menü, Select-Sheet oder Service-Leiste als Schritt merken
+            const layerSpecs = [
+                ...Array.from(document.querySelectorAll('.custom-dialog-overlay')).map(el => ({ el, cls: 'open' })),
+                { el: document.getElementById('quickMenu'), cls: 'active' },
+                { el: document.getElementById('mobileSelectOverlay'), cls: 'open' },
+                { el: document.getElementById('floatingQuickBar'), cls: 'fab-open' }
+            ];
+
+            const layerObs = new MutationObserver((mutations) => {
+                mutations.forEach(m => {
+                    const el = m.target;
+                    const cls = el.dataset.backCls;
+                    if (!cls) return;
+                    const isOpenNow = el.classList.contains(cls);
+                    const wasOpen = (m.oldValue || '').split(/\s+/).includes(cls);
+
+                    if (isOpenNow && !wasOpen) {
+                        window._openModalOrder = window._openModalOrder.filter(id => id !== el.id);
+                        window._openModalOrder.push(el.id);
+                        window.pushAppHistoryState({ view: window.getCurrentViewId(), redLayer: el.id, ts: Date.now() }, false);
+                    } else if (!isOpenNow && wasOpen) {
+                        window._openModalOrder = window._openModalOrder.filter(id => id !== el.id);
+                    }
+                });
+            });
+
+            layerSpecs.forEach(({ el, cls }) => {
+                if (!el || !el.id) return;
+                el.dataset.backCls = cls;
+                layerObs.observe(el, { attributes: true, attributeFilter: ['class'], attributeOldValue: true });
+            });
+        };
+
+        window.switchView = function(viewId, pushState = true) {
+            window.syncHeaderHeight();
+            const prevViewId = window.getCurrentViewId();
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById(viewId);
+            if(target) target.classList.add('active');
+            const headerEl = document.getElementById('header-wrapper');
+            if (headerEl) headerEl.classList.remove('header-compact');
+            if (viewId === 'view-formulare' && typeof window.ensureFormsLoaded === 'function') window.ensureFormsLoaded();
+            if (viewId === 'view-ankauf' && typeof window.ensureCarsLoaded === 'function') window.ensureCarsLoaded();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (typeof window.updateHeaderNavActiveState === 'function') window.updateHeaderNavActiveState(viewId);
+            const progBar = document.getElementById('headerScrollProgress');
+            if (progBar) progBar.style.transform = 'scaleX(0)';
+            
+            if(pushState && viewId !== prevViewId) {
+                const replaceMenuLayer = !!(history.state && history.state.redLayer);
+                window.pushAppHistoryState({ view: viewId, ts: Date.now() }, replaceMenuLayer);
+            }
+        };
+
+        window.addEventListener('popstate', (e) => {
+            const prevState = window._lastHistoryState;
+            window._lastHistoryState = e.state;
+
+            // Schritt 1: Erst oberstes offenes Fenster / Menü / Auswahl-Sheet schließen
+            if (window.closeTopmostUiLayer()) {
+                if (e.state && e.state.redRoot) {
+                    window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                }
+                return;
+            }
+
+            const currentView = window.getCurrentViewId();
+            const targetView = (e.state && e.state.view) ? e.state.view : 'view-home';
+
+            // Schritt 2: Falls das vorherige Fenster schon per X geschlossen wurde, leeren Zwischenschritt überspringen
+            if (prevState && prevState.redLayer && targetView === currentView && e.state && !e.state.redRoot) {
+                history.back();
+                return;
+            }
+
+            // Schritt 3: Zur vorherigen Unterseite bzw. Startseite wechseln
+            if (targetView !== currentView) {
+                window.switchView(targetView, false);
+                return;
+            }
+
+            // Schritt 4: Auf Startseite ganz unten -> erst sanft nach oben scrollen
+            if (currentView === 'view-home' && window.scrollY > 250) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (e.state && e.state.redRoot) {
+                    window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                }
+                return;
+            }
+
+            // Schritt 5: Ganz oben auf der Startseite -> 1× Hinweis statt sofortigem Rauswurf
+            if (e.state && e.state.redRoot) {
+                const now = Date.now();
+                if (now - window._lastBackExitHint > 2500) {
+                    window._lastBackExitHint = now;
+                    window.showToast('Zum Verlassen erneut Zurück tippen', 'success');
+                    clearTimeout(window._rearmGuardTimer);
+                    window._rearmGuardTimer = setTimeout(() => {
+                        if (history.state && history.state.redRoot && window.getCurrentViewId() === 'view-home') {
+                            window.pushAppHistoryState({ view: 'view-home', redGuard: true }, false);
+                        }
+                    }, 2600);
+                }
+            }
+        });
+        
+        window.toggleMenu = function() { document.getElementById('quickMenu').classList.toggle('active'); };
+        
+        window.openAdmin = function() { 
+            document.getElementById('adminKeyBtn').classList.remove('new-alert');
+
+            if(window.isAuthorized) {
+                document.getElementById('adminModal').classList.add('open'); 
+            } else {
+                document.getElementById('authBox').style.display = 'block';
+                document.getElementById('dashboardBox').style.display = 'none';
+                document.getElementById('adminModal').classList.add('open'); 
+            }
+        };
+        window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
+        
+        window.openSupervisorPanel = function() { document.getElementById('supervisorPermsOverlay').classList.add('open'); };
+        window.closeSupervisorPanel = function() { document.getElementById('supervisorPermsOverlay').classList.remove('open'); };
+
+        window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
+        window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
+
+        window.openLightbox = function(title, mediaUrl) {
+            document.getElementById('lightboxTitle').innerText = title;
+            const container = document.getElementById('lightboxImageContainer');
+            if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
+                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:cover; border-radius: 12px;"></video>`;
+            } else {
+                container.innerHTML = `<img src="${mediaUrl}" alt="${title}" style="width:100%; height:100%; object-fit:cover; border-radius: 12px;">`;
+            }
+            document.getElementById('lightboxOverlay').classList.add('open');
+        };
+        window.closeLightbox = function() { document.getElementById('lightboxOverlay').classList.remove('open'); };
+
+        window.toggleCardSlide = function(card, e) {
+            if(e) e.stopPropagation();
+            const isActive = card.classList.contains('reveal-active');
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
+            if(!isActive) card.classList.add('reveal-active');
+        };
+
+        window.bookServiceFromCard = function(srvId) {
+            const srv = (window.servicesData || []).find(s => s.id === srvId);
+            if (!srv) return;
+            window.selectedServiceVal = srv.title;
+            const trig = document.getElementById('selectTriggerText');
+            if (trig) trig.innerText = srv.title;
+            window.updateBookingLiveSummary();
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('reveal-active'));
+            document.getElementById('termin')?.scrollIntoView({ behavior: 'smooth' });
+            window.showToast(`Leistung „${srv.title}“ im Terminformular vorausgewählt!`, 'success');
+        };
+
+        // =========================================================================
+        // UNIVERSELLE DRAG-&-DROP ENGINE FÜR PINNWAND-KENNZEICHEN (MAUS + TOUCH)
+        // =========================================================================
+        window.makeDraggable = function(elmnt, id) {
+            let startX = 0, startY = 0, initialLeft = 0, initialTop = 0, isDragging = false;
+
+            const normalizePosition = () => {
+                const rect = elmnt.getBoundingClientRect();
+                elmnt.style.left = rect.left + 'px';
+                elmnt.style.top = rect.top + 'px';
+                elmnt.style.right = 'auto';
+                elmnt.style.bottom = 'auto';
+            };
+
+            const onStart = (clientX, clientY, target) => {
+                if (target && (target.classList.contains('unpin-plate-btn') || target.tagName === 'BUTTON' || target.tagName === 'I')) {
+                    return false;
+                }
+                normalizePosition();
+                isDragging = true;
+                startX = clientX;
+                startY = clientY;
+                initialLeft = parseFloat(elmnt.style.left) || 0;
+                initialTop = parseFloat(elmnt.style.top) || 0;
+                elmnt.style.zIndex = 9999;
+                return true;
+            };
+
+            const onMove = (clientX, clientY) => {
+                if (!isDragging) return;
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                const maxLeft = Math.max(10, window.innerWidth - elmnt.offsetWidth - 6);
+                const maxTop = Math.max(10, window.innerHeight - elmnt.offsetHeight - 6);
+                const newLeft = Math.min(Math.max(6, initialLeft + dx), maxLeft);
+                const newTop = Math.min(Math.max(6, initialTop + dy), maxTop);
+                elmnt.style.left = newLeft + 'px';
+                elmnt.style.top = newTop + 'px';
+            };
+
+            const onEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                elmnt.style.zIndex = 9501;
+                let positions = JSON.parse(localStorage.getItem('pin_positions') || '{}');
+                positions[id] = { top: elmnt.style.top, left: elmnt.style.left };
+                localStorage.setItem('pin_positions', JSON.stringify(positions));
+            };
+
+            // 1. Maus-Steuerung (PC / Mac)
+            elmnt.addEventListener('mousedown', function(e) {
+                if (!onStart(e.clientX, e.clientY, e.target)) return;
+                e.preventDefault();
+                const mouseMoveHandler = (ev) => onMove(ev.clientX, ev.clientY);
+                const mouseUpHandler = () => {
+                    document.removeEventListener('mousemove', mouseMoveHandler);
+                    document.removeEventListener('mouseup', mouseUpHandler);
+                    onEnd();
+                };
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+            });
+
+            // 2. Touch-Steuerung (iPhone / iPad / Samsung / Android)
+            elmnt.addEventListener('touchstart', function(e) {
+                if (!e.touches || !e.touches[0]) return;
+                if (!onStart(e.touches[0].clientX, e.touches[0].clientY, e.target)) return;
+                e.preventDefault();
+                const touchMoveHandler = (ev) => {
+                    if (!ev.touches || !ev.touches[0]) return;
+                    ev.preventDefault();
+                    onMove(ev.touches[0].clientX, ev.touches[0].clientY);
+                };
+                const touchEndHandler = () => {
+                    document.removeEventListener('touchmove', touchMoveHandler);
+                    document.removeEventListener('touchend', touchEndHandler);
+                    document.removeEventListener('touchcancel', touchEndHandler);
+                    onEnd();
+                };
+                document.addEventListener('touchmove', touchMoveHandler, { passive: false });
+                document.addEventListener('touchend', touchEndHandler);
+                document.addEventListener('touchcancel', touchEndHandler);
+            }, { passive: false });
+        };
+
+        // =========================================================================
+        // 10. THEME-ADAPTIVES MOBILE SELECT-SHEET & GLOBALE KLAMMER-FORMATIERUNG
+        // =========================================================================
+        window.formatParenTextHtml = function(rawText, asNewLine = true) {
+            const safe = window.escHtml(rawText || '')
+                .replace(/(\d)\s+€/g, '$1&nbsp;€')
+                .replace(/Britzer\s+Damm/g, 'Britzer&nbsp;Damm');
+
+            return safe.replace(/(\s*)(\([^)]+\))([:?!.,;]*)/g, (match, sp, paren, punct, offset, fullStr) => {
+                const isAtEnd = fullStr.slice(offset + match.length).trim() === '';
+                if (asNewLine && isAtEnd) {
+                    return `${punct}<span class="paren-sub">${paren}</span>`;
+                }
+                if (!asNewLine && paren.length > 14) {
+                    return `${punct}<span class="paren-sub">${paren}</span>`;
+                }
+                return `${sp}<span class="paren-inline">${paren}${punct}</span>`;
+            });
+        };
+
+        // GEHEIMER ADMIN-ZUGANG (FÜR KUNDEN UNSICHTBAR: 5× FOOTER-TIPP, STRG+ALT+A ODER #admin)
+        window.initSecretAdminAccess = function() {
+            const footerTxt = document.getElementById('txt-footer-text');
+            if (footerTxt && !footerTxt.dataset.secretBound) {
+                footerTxt.dataset.secretBound = '1';
+                footerTxt.style.userSelect = 'none';
+                let tapCount = 0;
+                let tapTimer = null;
+                footerTxt.addEventListener('click', () => {
+                    tapCount++;
+                    clearTimeout(tapTimer);
+                    if (tapCount >= 5) {
+                        tapCount = 0;
+                        window.openAdmin();
+                    } else {
+                        tapTimer = setTimeout(() => { tapCount = 0; }, 2200);
+                    }
+                });
+            }
+
+            if (!window._secretKeyBound) {
+                window._secretKeyBound = true;
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.altKey && (e.key === 'a' || e.key === 'A')) {
+                        e.preventDefault();
+                        window.openAdmin();
+                    }
+                });
+                const checkAdminHash = () => {
+                    if (window.location.hash.toLowerCase() === '#admin') {
+                        history.replaceState({ view: 'view-home' }, '', '#view-home');
+                        window.openAdmin();
+                    }
+                };
+                checkAdminHash();
+                window.addEventListener('hashchange', checkAdminHash);
+            }
+        };
+
+        window.activeMobileSelectEl = null;
+        window.activeMobileSelectBtn = null;
+
+        window.syncMobileSelectDisplay = function(selectEl) {
+            if (!selectEl || !selectEl._mobileDisplayBtn) return;
+            const opt = selectEl.options[selectEl.selectedIndex];
+            const valWrap = selectEl._mobileDisplayBtn.querySelector('.ms-val-wrap');
+            if (valWrap) {
+                valWrap.innerHTML = opt ? window.formatParenTextHtml(opt.textContent.trim(), true) : 'Bitte wählen';
+            }
+        };
+
+        window.syncAllMobileSelectDisplays = function() {
+            document.querySelectorAll('select.form-control, select.theme-selector').forEach(sel => {
+                window.syncMobileSelectDisplay(sel);
+            });
+        };
+
+        window.openMobileSelectSheet = function(selectEl, triggerBtn) {
+            const overlay = document.getElementById('mobileSelectOverlay');
+            const listEl = document.getElementById('mobileSelectList');
+            const titleEl = document.getElementById('mobileSelectTitle');
+            if (!overlay || !listEl || !selectEl) return;
+
+            window.activeMobileSelectEl = selectEl;
+            window.activeMobileSelectBtn = triggerBtn;
+            if (triggerBtn) triggerBtn.classList.add('active-open');
+
+            const formGroup = selectEl.closest('.form-group');
+            const lbl = formGroup ? formGroup.querySelector('label') : null;
+            titleEl.innerText = lbl ? lbl.innerText.replace(/\s+/g, ' ').trim() : 'Auswahl treffen';
+
+            listEl.innerHTML = '';
+            Array.from(selectEl.options).forEach((opt, idx) => {
+                const isSelected = idx === selectEl.selectedIndex;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `mobile-select-option${isSelected ? ' selected' : ''}${opt.disabled ? ' is-disabled' : ''}`;
+                btn.innerHTML = `
+                    <span class="ms-opt-text">${window.formatParenTextHtml(opt.textContent.trim(), true)}</span>
+                    <i class="${isSelected ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'} ms-opt-check"></i>
+                `;
+                if (!opt.disabled) {
+                    btn.onclick = () => {
+                        selectEl.selectedIndex = idx;
+                        selectEl.value = opt.value;
+                        window.syncMobileSelectDisplay(selectEl);
+                        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        window.closeMobileSelectSheet();
+                    };
+                }
+                listEl.appendChild(btn);
+            });
+
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
+            listEl.scrollTop = 0;
+            requestAnimationFrame(() => {
+                overlay.classList.add('open');
+            });
+        };
+
+        window.closeMobileSelectSheet = function() {
+            const overlay = document.getElementById('mobileSelectOverlay');
+            if (overlay) overlay.classList.remove('open');
+            if (window.activeMobileSelectBtn) window.activeMobileSelectBtn.classList.remove('active-open');
+            window.activeMobileSelectEl = null;
+            window.activeMobileSelectBtn = null;
+        };
+
+        window.initMobileThemeSelects = function() {
+            document.querySelectorAll('select.form-control, select.theme-selector').forEach(sel => {
+                if (sel.dataset.mobileSelectReady) return;
+                sel.dataset.mobileSelectReady = '1';
+
+                const wrap = document.createElement('div');
+                wrap.className = 'red-select-wrap';
+                if (sel.id === 'themeSelector') wrap.classList.add('is-theme-select');
+                else if (sel.style.flex) wrap.classList.add('is-flex-item');
+                else if (sel.style.width && sel.style.width.includes('px')) wrap.classList.add('is-compact-item');
+
+                sel.parentNode.insertBefore(wrap, sel);
+                wrap.appendChild(sel);
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mobile-select-display';
+                btn.innerHTML = `<span class="ms-val-wrap"></span><i class="fa-solid fa-chevron-down ms-chevron"></i>`;
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.openMobileSelectSheet(sel, btn);
+                };
+                wrap.appendChild(btn);
+                sel._mobileDisplayBtn = btn;
+
+                sel.addEventListener('change', () => window.syncMobileSelectDisplay(sel));
+                window.syncMobileSelectDisplay(sel);
+            });
+
+            // Synchronisiert dynamisch gesetzte Werte beim Öffnen beliebiger Modals (nur mobil nötig)
+            const modalObserver = new MutationObserver(() => {
+                if (window.innerWidth <= 768) setTimeout(window.syncAllMobileSelectDisplays, 30);
+            });
+            document.querySelectorAll('.custom-dialog-overlay').forEach(ov => {
+                modalObserver.observe(ov, { attributes: true, attributeFilter: ['class'] });
+            });
+        };
+
+        // Aufklappbare Mobile Service-Leiste inkl. Blur-Hintergrund
+        window.toggleMobileQuickBar = function(e) {
+            if (e) e.stopPropagation();
+            const bar = document.getElementById('floatingQuickBar');
+            const btn = document.getElementById('fabMainToggle');
+            const backdrop = document.getElementById('fabBackdrop');
+            if (!bar) return;
+            const isOpen = bar.classList.toggle('fab-open');
+            if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            if (backdrop) backdrop.classList.toggle('open', isOpen);
+        };
+        window.closeMobileQuickBar = function() {
+            const bar = document.getElementById('floatingQuickBar');
+            const btn = document.getElementById('fabMainToggle');
+            const backdrop = document.getElementById('fabBackdrop');
+            if (bar) bar.classList.remove('fab-open');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+            if (backdrop) backdrop.classList.remove('open');
+        };
+        document.addEventListener('click', (e) => {
+            const bar = document.getElementById('floatingQuickBar');
+            if (bar && bar.classList.contains('fab-open') && !bar.contains(e.target)) {
+                window.closeMobileQuickBar();
+            }
+        });
+
+        // Globale Klammer-Formatierung (überall klein, Doppelpunkte am Wort oben, kein einsames ? oder .)
+        window.formatParenthesesEverywhere = function(rootEl) {
+            const root = rootEl || document.body;
+            const blockTargets = root.querySelectorAll(
+                '.form-group > label, .compass-tab-btn, .district-pill, .checklist-row span, .compass-doc-list li, .calc-item span, .download-info span, .tool-box h3, .compass-box h2, .compass-box h3, .section-header h2, #districtResultBox strong, #laboEnvResultBox strong, #pickupForecastResult strong, .tool-box > div > div'
+            );
+            blockTargets.forEach(el => {
+                if (el.dataset.parenDone === '1' || el.closest('#adminModal') || el.closest('#liveGermanPlatePreview') || el.closest('#header-wrapper')) return;
+                const textNodes = [];
+                el.childNodes.forEach(n => {
+                    if (n.nodeType === 3 && /\([^)]+\)/.test(n.nodeValue)) textNodes.push(n);
+                });
+                if (textNodes.length === 0) return;
+
+                const isFlex = getComputedStyle(el).display.includes('flex');
+                textNodes.forEach(node => {
+                    const leadSpace = /^\s/.test(node.nodeValue) ? ' ' : '';
+                    const html = leadSpace + window.formatParenTextHtml(node.nodeValue.trim(), true);
+                    const holder = document.createElement('span');
+                    holder.className = isFlex ? 'paren-text-group' : '';
+                    holder.innerHTML = html;
+                    node.parentNode.replaceChild(holder, node);
+                });
+                el.dataset.parenDone = '1';
+            });
+
+            // Fließtext- & FAQ-Klammern kleiner direkt im Satzfluss (ohne abgebrochenes ? oder .)
+            root.querySelectorAll('p, .admin-details summary, .card-info-slide p, .admin-details-content, #districtResultBox span, #laboFeeResultDesc, #pickupForecastResult').forEach(p => {
+                if (p.dataset.parenDone === '1' || p.closest('#adminModal') || p.closest('#legalOverlay') || p.closest('.cookie-box') || p.classList.contains('paren-sub') || p.classList.contains('paren-inline')) return;
+                p.childNodes.forEach(node => {
+                    if (node.nodeType === 3 && /\([^)]+\)/.test(node.nodeValue)) {
+                        const span = document.createElement('span');
+                        span.innerHTML = window.formatParenTextHtml(node.nodeValue, false);
+                        node.parentNode.replaceChild(span, node);
+                    }
+                });
+                p.dataset.parenDone = '1';
+            });
+
+            // Globaler Umbruch-Schutz für zusammengehörige Preisspannen, Uhrzeiten, Einheiten & Ortsnamen
+            window.protectConnectedPhrases(root);
+        };
+
+        window.protectConnectedPhrases = function(rootEl) {
+            const root = rootEl || document.body;
+            const skipTags = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, SELECT: 1, OPTION: 1, CODE: 1, PRE: 1 };
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            let node;
+            while ((node = walker.nextNode())) {
+                const parent = node.parentElement;
+                if (!parent || skipTags[parent.tagName] || parent.closest('#adminModal') || parent.closest('#liveGermanPlatePreview')) continue;
+                const orig = node.nodeValue;
+                if (!orig || orig.trim().length < 3) continue;
+
+                const fixed = orig
+                    // Preisspannen & Beträge untrennbar (z.B. ca. 26,00 € – 31,00 €)
+                    .replace(/ca\.\s+(\d)/gi, 'ca.\u00A0$1')
+                    .replace(/(\d)\s+€/g, '$1\u00A0€')
+                    .replace(/€\s*([–-])\s*(\d)/g, '€\u00A0$1\u00A0$2')
+                    // Uhrzeiten & Zeitspannen untrennbar (z.B. ab 09:00 Uhr, 09:00 – 20:00 Uhr)
+                    .replace(/\b(ab|bis|um)\s+(\d{1,2}:\d{2})/gi, '$1\u00A0$2')
+                    .replace(/(\d{1,2}:\d{2})\s*([–-])\s*(\d{1,2}:\d{2})/g, '$1\u00A0$2\u00A0$3')
+                    .replace(/(\d{1,2}:\d{2})\s+Uhr\b/gi, '$1\u00A0Uhr')
+                    // Zahlen + Einheiten untrennbar (z.B. 1–2 Werktage, 24 Stunden, 5 Min., 100 %, § 23 StVZO)
+                    .replace(/(\d[\d.,–-]*)\s+(Werktage?n?|Tage?n?|Stunden?|Std\.|Minuten?|Min\.|Sekunden?|Zeichen|Jahre?n?|mm|km|%|Schritten?|Fahrzeuge?n?)\b/gi, '$1\u00A0$2')
+                    .replace(/(\d+)\s*×\s*(\d+)/g, '$1\u00A0×\u00A0$2')
+                    .replace(/§\s*(\d+)/g, '§\u00A0$1')
+                    .replace(/\bTeil\s+(I{1,2})\b/g, 'Teil\u00A0$1')
+                    .replace(/\bz\.\s?B\.\s+/g, 'z.\u00A0B.\u00A0')
+                    // Feste Berliner Orts- & Firmenbegriffe
+                    .replace(/Kienitzer\s+Str\.\s*6/g, 'Kienitzer\u00A0Str.\u00A06')
+                    .replace(/12053\s+Berlin/g, '12053\u00A0Berlin')
+                    .replace(/U8\s+(Boddinstraße|Boddinstr\.)/g, 'U8\u00A0$1')
+                    .replace(/Britzer\s+Damm/g, 'Britzer\u00A0Damm')
+                    .replace(/LABO\s+Berlin/g, 'LABO\u00A0Berlin')
+                    .replace(/RED\s+Berlin/g, 'RED\u00A0Berlin')
+                    .replace(/Tamer\s+Yazici/g, 'Tamer\u00A0Yazici');
+
+                if (fixed !== orig) {
+                    node.nodeValue = fixed;
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.initSecretAdminAccess();
+            window.initMobileThemeSelects();
+            window.formatParenthesesEverywhere(document.body);
+            setTimeout(() => {
+                window.syncAllMobileSelectDisplays();
+                window.formatParenthesesEverywhere(document.body);
+            }, 400);
+
+            // ESC-Taste schließt jederzeit sauber das oberste aktive Fenster / Menü / Select-Sheet
+            if (!window._escHandlerBound) {
+                window._escHandlerBound = true;
+                document.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Escape') return;
+                    const mobileSel = document.getElementById('mobileSelectOverlay');
+                    if (mobileSel && mobileSel.classList.contains('open')) { window.closeMobileSelectSheet(); return; }
+                    const qMenu = document.getElementById('quickMenu');
+                    if (qMenu && qMenu.classList.contains('active')) { window.toggleMenu(); return; }
+                    const qBar = document.getElementById('floatingQuickBar');
+                    if (qBar && qBar.classList.contains('fab-open')) { window.closeMobileQuickBar(); return; }
+                    document.querySelectorAll('.custom-dialog-overlay.open').forEach(ov => {
+                        ov.classList.remove('open');
+                        if (ov.id === 'widgetModalOverlay') window.closeWidgetModal();
+                    });
+                });
+            }
+
+            // Dynamische Ergebnis-Boxen automatisch nachformatieren, sobald der Nutzer klickt
+            const dynamicIds = ['districtResultBox', 'laboEnvResultBox', 'pickupForecastResult', 'compassCaseTitle', 'compassCaseDesc', 'compassDocList', 'calcOptionsList'];
+            const dynObs = new MutationObserver((mutations) => {
+                mutations.forEach(m => {
+                    if (m.target && m.target.nodeType === 1) {
+                        m.target.removeAttribute('data-paren-done');
+                        m.target.querySelectorAll('[data-paren-done]').forEach(c => c.removeAttribute('data-paren-done'));
+                        window.formatParenthesesEverywhere(m.target);
+                    }
+                });
+            });
+            dynamicIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) dynObs.observe(el, { childList: true, subtree: false });
+            });
+        });

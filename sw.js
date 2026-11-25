@@ -1,7 +1,10 @@
-const CACHE_NAME = 'red-berlin-pwa-v1';
+const CACHE_NAME = 'red-berlin-pwa-v2';
 const CORE_ASSETS = [
   './',
   './index.html',
+  './styles.css?v=2',
+  './app.js?v=2',
+  './firebase-app.js?v=2',
   './manifest.json',
   './icon-180.png',
   './icon-192.png',
@@ -31,25 +34,31 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-
-  // Firebase, Google Apps Script & fremde APIs immer direkt live durchlassen
   if (url.origin !== self.location.origin) return;
 
-  // Seitenaufrufe: Network-First (immer aktuell, Offline-Fallback aus Cache)
-  if (req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+  const isCodeOrPage = req.mode === 'navigate'
+    || url.pathname.endsWith('/')
+    || url.pathname.endsWith('.html')
+    || url.pathname.endsWith('.css')
+    || url.pathname.endsWith('.js');
+
+  // HTML, CSS & JS: Network-First (GitHub-Updates sofort sichtbar, Offline-Fallback aus Cache)
+  if (isCodeOrPage) {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          }
           return res;
         })
-        .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
+        .catch(() => caches.match(req).then((cached) => cached || (req.mode === 'navigate' ? caches.match('./index.html') : undefined)))
     );
     return;
   }
 
-  // Lokale Icons & Manifest: Cache-First mit Hintergrund-Update
+  // Icons, Bilder & Manifest: Cache-First mit Hintergrund-Update
   event.respondWith(
     caches.match(req).then((cached) => {
       const networkFetch = fetch(req).then((res) => {
