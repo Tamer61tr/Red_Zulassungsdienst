@@ -2769,8 +2769,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 let titleCol = srv.titleColor === '#ffffff' ? 'var(--text-light)' : srv.titleColor;
 
                 card.innerHTML = `
-                    <div class="admin-action-btn btn-edit-green action-prices" onclick="event.stopPropagation(); window.openServiceConfig('${srv.id}')" title="Leistungskarte mit Stift bearbeiten"><i class="fa-solid fa-pencil"></i></div>
-                    <div class="admin-action-btn btn-del-red action-prices" onclick="event.stopPropagation(); window.deleteServiceCard('${srv.id}')" title="Karte löschen"><i class="fa-solid fa-trash"></i></div>
+                    <div class="admin-action-btn btn-edit-green action-prices" style="z-index:25; pointer-events:auto;" onclick="event.stopPropagation(); window.openServiceConfig('${srv.id}')" title="Leistungskarte mit Stift bearbeiten"><i class="fa-solid fa-pencil"></i></div>
+                    <div class="admin-action-btn btn-del-red action-prices" style="z-index:25; pointer-events:auto;" onclick="event.stopPropagation(); window.deleteServiceCard('${srv.id}')" title="Karte löschen"><i class="fa-solid fa-trash"></i></div>
                     ${badgeHtml}
                     <i class="fa-solid ${srv.icon} main-icon" style="color: ${srv.iconColor || 'var(--primary-red)'};"></i>
                     <h3 style="color:${titleCol || 'var(--text-light)'}; font-family:${srv.titleFont || "'Montserrat', sans-serif"}; font-size:${srv.titleSize || '18px'}; margin-bottom:0;">${srv.title}</h3>
@@ -2780,7 +2780,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                             : `<span class="service-price" style="color:${srv.priceColor || 'var(--primary-red)'};">${displayPrice}</span><span class="service-price ${srv.euroStyle}" style="font-size:24px;">€</span>`
                         }
                     </div>
-                    <p class="${srv.descAnim}" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${srv.desc}</p>
+                    <p class="${srv.descAnim}" style="font-size:11px; color:var(--text-muted); margin-top:4px; pointer-events:none;">${srv.desc}</p>
                     <div class="card-info-slide">
                         <p>${hoverHtml}</p>
                         <button type="button" class="card-slide-book-btn" onclick="event.stopPropagation(); window.bookServiceFromCard('${srv.id}')">Termin wählen <i class="fa-solid fa-arrow-right"></i></button>
