@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.red-zulassungsdienst.de/sitemap.xml
