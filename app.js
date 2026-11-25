@@ -443,7 +443,7 @@ window.escHtml = function(str) {
          }
          if (srv === 'kurzzeit') {
              if (dropoff === 'morning' || dropoff === 'noon') {
-                 resEl.innerHTML = `<i class="fa-solid fa-stopwatch" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Gleicher Werktag / Sofort-Service:</strong> Bei Abgabe bis 15:00 Uhr sind Ihre 5-Tage-Kurzzeit- oder Zollkennzeichen inkl. Papieren meist noch <strong>am selben Tag abholbereit</strong>.`;
+                 resEl.innerHTML = `<i class="fa-solid fa-stopwatch" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Gleicher Werktag / Sofort-Service:</strong> Bei Abgabe bis 15:00 Uhr sind Ihre 6-Tage-Kurzzeit- oder Zollkennzeichen inkl. Papieren meist noch <strong>am selben Tag abholbereit</strong>.`;
              } else {
                  resEl.innerHTML = `<i class="fa-solid fa-stopwatch" style="color:var(--green-accent); margin-right:5px;"></i><strong style="color:var(--green-accent);">Nächster Werktag:</strong> Ihre Unterlagen gehen direkt in den ersten Morgen-Lauf und sind <strong>am nächsten Werktag ab Mittag abholbereit</strong>.`;
              }
@@ -790,7 +790,7 @@ window.escHtml = function(str) {
                 'ummeldung_auswaerts': { price: 'ca. 30,00&nbsp;€ – 36,00&nbsp;€', note: 'Umschreibung von außerhalb nach Berlin' },
                 'neuzulassung': { price: 'ca. 28,00&nbsp;€ – 34,00&nbsp;€', note: 'Fabrikneues Fahrzeug inkl. Stempel' },
                 'wiederzulassung': { price: 'ca. 29,00&nbsp;€ – 35,00&nbsp;€', note: 'Wiederzulassung nach Stilllegung' },
-                'kurzzeit': { price: 'ca. 13,10&nbsp;€', note: 'Amtliche Gebühr für 5-Tage-Kurzzeitkennzeichen' },
+                'kurzzeit': { price: 'ca. 13,10&nbsp;€', note: 'Amtliche Gebühr für 6-Tage-Kurzzeitkennzeichen' },
                 'zoll': { price: 'ca. 34,00&nbsp;€ – 42,00&nbsp;€', note: 'Amtliche Gebühr für Ausfuhr-/Zollkennzeichen' },
                 'abmeldung': { price: 'ca. 16,50&nbsp;€', note: 'Amtliche Gebühr für Außerbetriebsetzung' }
             };
@@ -1149,7 +1149,7 @@ window.escHtml = function(str) {
                 ]
             },
             "kurzzeit": {
-                title: "Kurzzeitkennzeichen (5 Tage für Überführung & Probefahrt)",
+                title: "Kurzzeitkennzeichen (6 Tage für Überführung & Probefahrt)",
                 desc: "Zur sofortigen Überführung von abgemeldeten Fahrzeugen oder für Fahrten zur Prüfstelle:",
                 docs: [
                     "Gültiger Personalausweis oder Reisepass mit Meldebescheinigung (oder Gewerbenachweis)",
@@ -1236,7 +1236,7 @@ window.escHtml = function(str) {
             "elektro": `<strong style="display:block;"><i class="fa-solid fa-bolt" style="color:var(--green-accent); margin-right:5px;"></i>E-Kennzeichen</strong><span class="paren-sub">(Elektro & Plug-In Hybrid)</span>Mit dem Zusatzbuchstaben „E“ am Ende profitieren Sie von Steuervorteilen und Bevorrechtigungen im Straßenverkehr. Sofort bei uns prägbar.`,
             "oldtimer": `<strong style="display:block;"><i class="fa-solid fa-landmark" style="color:var(--primary-red); margin-right:5px;"></i>H-Kennzeichen</strong><span class="paren-sub">(Historische Oldtimer ab 30 Jahren)</span>Pauschalierter Kfz-Steuersatz und freie Fahrt in allen Umweltzonen ohne grüne Plakette <span class="paren-inline">(Gutachten nach § 23 StVZO erforderlich)</span>.`,
             "saison": `<strong style="display:block;"><i class="fa-solid fa-calendar-days" style="color:var(--primary-red); margin-right:5px;"></i>Saisonkennzeichen</strong><span class="paren-sub">(z.B. 04/10 oder 03/10)</span>Ideal für Cabrios, Motorräder, Wohnmobile & Sommerfahrzeuge – Sie zahlen Steuer & Versicherung nur für den gewählten Zulassungszeitraum.`,
-            "kurzzeit": `<strong style="display:block;"><i class="fa-solid fa-stopwatch" style="color:var(--primary-red); margin-right:5px;"></i>Kurzzeitkennzeichen</strong><span class="paren-sub">(5 Tage mit gelbem Rand)</span>Perfekt für Probe-, Überführungs- und TÜV-Fahrten von abgemeldeten Fahrzeugen innerhalb Deutschlands. Sofort zum Mitnehmen.`,
+            "kurzzeit": `<strong style="display:block;"><i class="fa-solid fa-stopwatch" style="color:var(--primary-red); margin-right:5px;"></i>Kurzzeitkennzeichen</strong><span class="paren-sub">(6 Tage mit gelbem Rand)</span>Perfekt für Probe-, Überführungs- und TÜV-Fahrten von abgemeldeten Fahrzeugen innerhalb Deutschlands. Sofort zum Mitnehmen.`,
             "zoll": `<strong style="display:block;"><i class="fa-solid fa-globe" style="color:var(--primary-red); margin-right:5px;"></i>Zoll- / Ausfuhrkennzeichen</strong><span class="paren-sub">(Roter Rand, 15–30 Tage)</span>Für den sicheren Export von Fahrzeugen ins EU- und Nicht-EU-Ausland inklusive internationaler gelber Versicherungskarte.`,
             "zweizeilig": `<strong style="display:block;"><i class="fa-solid fa-motorcycle" style="color:var(--primary-red); margin-right:5px;"></i>Motorrad- & Zweizeilige Schilder</strong><span class="paren-sub">(180×200 mm / 255×130 mm)</span>Offizielle Kraftrad-, Leichtkraftrad-, Quad- und US-Import-Kennzeichen sofort zum Mitnehmen vor Ort.`
         };
@@ -1969,16 +1969,20 @@ window.escHtml = function(str) {
             container.innerHTML = `<iframe src="https://maps.google.com/maps?q=Kienitzer%20Str.%206,%2012053%20Berlin&t=&z=15&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer"></iframe>`;
         };
 
-        // --- SCHNELL-KALKULATOR (STANDARDMÄSSIG MIT STRICH "-" & MIT STIFT BEARBEITBAR) ---
+        // --- SCHNELL-KALKULATOR (MIT AKTUELLEN PREISEN & PER STIFT BEARBEITBAR) ---
         const defaultCalcItems = [
-            { id: "c-1", name: "Zulassungsservice Basis (An-/Ummeldung)", price: "-", selected: true },
-            { id: "c-2", name: "Wunschkennzeichen & Reservierung", price: "-", selected: false },
-            { id: "c-3", name: "2x Euro-Kennzeichen-Schilder (Sofortprägung)", price: "-", selected: false },
-            { id: "c-4", name: "Grüne Feinstaubplakette (Umweltzone)", price: "-", selected: false },
-            { id: "c-5", name: "Express-Priorisierung (24h Service)", price: "-", selected: false }
+            { id: "c-1", name: "Anmeldung mit Wunschkennzeichen (inkl. Gebühren, Schilder & Plakette)", price: "100", selected: true },
+            { id: "c-2", name: "Anmeldung mit Zufalls-/Listenkennzeichen (inkl. Gebühren, Schilder & Plakette)", price: "90", selected: false },
+            { id: "c-3", name: "Ummeldung mit gleichem Kennzeichen (angemeldetes Fahrzeug)", price: "70", selected: false },
+            { id: "c-4", name: "Abmeldung (regulär vor Ort)", price: "30", selected: false },
+            { id: "c-5", name: "Online-Abmeldung (digital)", price: "20", selected: false },
+            { id: "c-6", name: "Kurzzeitkennzeichen (6 Tage)", price: "120", selected: false },
+            { id: "c-7", name: "Zoll- / Ausfuhrkennzeichen (30 Tage)", price: "350", selected: false },
+            { id: "c-8", name: "1 Paar Kennzeichen (Sofortprägung vor Ort)", price: "30", selected: false },
+            { id: "c-9", name: "Einzelnes Kennzeichen (1 Stück Sofortprägung)", price: "15", selected: false }
         ];
 
-        window.calcItemsData = JSON.parse(localStorage.getItem('red_calc_items_v2')) || defaultCalcItems;
+        window.calcItemsData = JSON.parse(localStorage.getItem('red_calc_items_v3')) || defaultCalcItems;
 
         window.renderCalcItems = function(items) {
             const list = document.getElementById('calcOptionsList');
@@ -2691,15 +2695,19 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         // --- LEISTUNGSKARTEN ---
         const defaultServices = [
-            { id: "s-1", icon: "fa-file-signature", title: "Anmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Neuzulassung in 1-2 Tagen.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Fahrzeugbrief & Schein\n• Ausweis / Aufenthaltstitel\n• TÜV-Bericht & eVB-Nr.\n• Kontodaten (IBAN)", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-2", icon: "fa-exchange-alt", title: "Ummeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Halterwechsel ohne Stress.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Fahrzeugpapiere I & II\n• Gültige HU / AU Bescheinigung\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-3", icon: "fa-file-circle-xmark", title: "Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Sichere Außerbetriebsetzung.", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Zulassungsbescheinigung I\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-4", icon: "fa-stopwatch", title: "Kurzzeitkennz.", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Nach Wahl (5/6 Tage).", descAnim: "", hoverInfo: "Mitzubringen (Original):\n• Ausweis / Pass\n• eVB-Nummer für Kurzzeit\n• Fahrzeugpapiere\n• Gültige HU", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-5", icon: "fa-globe", title: "Zollkennzeichen", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-gold-3d", badge: "badge-topseller", desc: "30 Tage Gültigkeit.", descAnim: "anim-pulse", hoverInfo: "Mitzubringen (Original):\n• Ausweis / Pass\n• Fahrzeugpapiere\n• Gültige HU\n• Gelbes Versicherungskärtchen", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-6", icon: "fa-bolt", title: "Express Zulassung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "-", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-neon-blue", badge: "badge-express-tipp", desc: "Priorisierte Abwicklung.", descAnim: "", hoverInfo: "Express Service:\nDirekte Vorgangseinreichung bei der Behördenstellenleitung. Fertigstellung meist innerhalb 24h.", borderSize: "1px", borderColor: "var(--glass-border)" }
+            { id: "s-1", icon: "fa-file-signature", title: "Anmeldung (Wunsch)", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "100", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "badge-topseller", desc: "Inkl. Gebühren, Wunschkennz. & Plakette.", descAnim: "", hoverInfo: "Komplettpreis (100 € inkl. amtlicher Gebühren, Kennzeichen & grüner Umweltplakette).\n\nMitzubringen (Original):\n• Fahrzeugbrief & Schein\n• Ausweis / Aufenthaltstitel\n• TÜV-Bericht & eVB-Nr.\n• Kontodaten (IBAN)", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-2", icon: "fa-car", title: "Anmeldung (Zufall)", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "90", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Listenkennz. inkl. Gebühren, Schilder & Plakette.", descAnim: "", hoverInfo: "Komplettpreis (90 € mit Zufalls-/Listenkennzeichen inkl. amtlicher Gebühren, Kennzeichen & grüner Umweltplakette).\n\nMitzubringen (Original):\n• Fahrzeugbrief & Schein\n• Ausweis / Aufenthaltstitel\n• TÜV-Bericht & eVB-Nr.\n• Kontodaten (IBAN)", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-3", icon: "fa-exchange-alt", title: "Ummeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "70", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Mit gleichem Kennzeichen (angemeldet).", descAnim: "", hoverInfo: "Ummeldung bei bereits angemeldetem Fahrzeug mit Übernahme des Kennzeichens.\n\nMitzubringen (Original):\n• Fahrzeugpapiere I & II\n• Ausweis / Pass & eVB-Nr.\n• Gültige HU / AU Bescheinigung\n• IBAN für Kfz-Steuer", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-4", icon: "fa-file-circle-xmark", title: "Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "30", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Regulär 30 € • Online-Abmeldung 20 €.", descAnim: "", hoverInfo: "Sichere Außerbetriebsetzung vor Ort (30 €) oder digital als Online-Abmeldung (20 €).\n\nMitzubringen (Original):\n• Zulassungsbescheinigung I\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-5", icon: "fa-laptop", title: "Online-Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "20", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "badge-neu", desc: "Schnelle digitale Außerbetriebsetzung.", descAnim: "", hoverInfo: "Digitale Online-Abmeldung (sofortige Stilllegung).\n\nBenötigt:\n• Zulassungsbescheinigung I mit Sicherheitscode\n• Kennzeichen mit freigelegten Sicherheitscodes", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-6", icon: "fa-stopwatch", title: "Kurzzeitkennz.", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "120", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "6 Tage Gültigkeit – schnelle Abwicklung.", descAnim: "", hoverInfo: "Kurzzeitkennzeichen für 6 Tage.\n\nMitzubringen (Original):\n• Ausweis / Pass\n• eVB-Nummer für Kurzzeit\n• Fahrzeugpapiere\n• Gültige HU", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-7", icon: "fa-globe", title: "Zollkennzeichen", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "350", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-gold-3d", badge: "badge-topseller", desc: "30 Tage Gültigkeit für den Export.", descAnim: "anim-pulse", hoverInfo: "Ausfuhr-/Zollkennzeichen für 30 Tage.\n\nMitzubringen (Original):\n• Ausweis / Pass\n• Fahrzeugpapiere\n• Gültige HU\n• Gelbes Versicherungskärtchen", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-8", icon: "fa-id-card", title: "Kennzeichenprägung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "30", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "1 Paar 30 € • Einzelstück 15 € sofort vor Ort.", descAnim: "", hoverInfo: "Sofortprägung direkt vor Ort (ca. 3–5 Min.):\n• 1 Paar Kennzeichen (2 Stück): 30 €\n• Einzelnes Kennzeichen (1 Stück): 15 €\n• Euro-, Kurz-, E-, H-, Saison- & Motorradschilder", borderSize: "1px", borderColor: "var(--glass-border)" }
+            // Optional bei Bedarf aktivieren:
+            // ,{ id: "s-9", icon: "fa-bolt", title: "Express Zulassung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "300", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-neon-blue", badge: "badge-express-tipp", desc: "Priorisierte Abwicklung.", descAnim: "", hoverInfo: "Express Service (300 €):\nPriorisierte Abwicklung nach Absprache.", borderSize: "1px", borderColor: "var(--glass-border)" }
         ];
 
-        window.servicesData = JSON.parse(localStorage.getItem('red_services_v2')) || defaultServices;
+        window.servicesData = JSON.parse(localStorage.getItem('red_services_v3')) || defaultServices;
 
         const badgeLabels = {
             "badge-neu": "NEU", "badge-angebot": "ANGEBOT", "badge-aktion": "AKTION", 

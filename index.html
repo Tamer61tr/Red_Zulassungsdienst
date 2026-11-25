@@ -83,7 +83,7 @@
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Kfz-Anmeldung & Neuzulassung Berlin" } },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Kfz-Ummeldung & Halterwechsel Berlin" } },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Kfz-Abmeldung & Außerbetriebsetzung" } },
-          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "5-Tage Kurzzeitkennzeichen" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "6-Tage Kurzzeitkennzeichen" } },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Zoll- & Ausfuhrkennzeichen" } },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Sofortkennzeichen & Wunschkennzeichen-Prägung" } },
           { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Auto Ankauf Berlin" } }
@@ -475,7 +475,7 @@
                     <select id="cbReqTopic" class="form-control">
                         <option value="Kfz-Anmeldung / Ummeldung">Anmeldung / Ummeldung</option>
                         <option value="Express-Zulassung (Eilig)">Express-Zulassung (Eilig)</option>
-                        <option value="Kurzzeit- / 5-Tage-Kennzeichen">Kurzzeitkennzeichen (5 Tage)</option>
+                        <option value="Kurzzeit- / 6-Tage-Kennzeichen">Kurzzeitkennzeichen (6 Tage)</option>
                         <option value="Zoll- / Ausfuhrkennzeichen">Zoll- / Ausfuhrkennzeichen</option>
                         <option value="Auto Ankauf / Bargeld-Angebot">Auto Ankauf (Bargeld-Angebot)</option>
                         <option value="Frage zu fehlenden Papieren">Frage zu fehlenden Papieren</option>
@@ -681,7 +681,7 @@
                     <select id="dvDocType" class="form-control" onchange="window.toggleDvExtraFields()">
                         <option value="Allgemeine Vollmacht & SEPA-Mandat">Vollmacht zur Kfz-Zulassung (inkl. SEPA-Mandat)</option>
                         <option value="SEPA-Lastschriftmandat (Kfz-Steuer)">SEPA-Lastschriftmandat (Bundeszollverwaltung)</option>
-                        <option value="Vollmacht Kurzzeitkennzeichen">Vollmacht Kurzzeitkennzeichen (5 Tage)</option>
+                        <option value="Vollmacht Kurzzeitkennzeichen">Vollmacht Kurzzeitkennzeichen (6 Tage)</option>
                         <option value="Vollmacht Zoll- / Ausfuhrkennzeichen">Vollmacht Zoll- / Ausfuhrkennzeichen</option>
                         <option value="Empfangsbevollmächtigung">Empfangsbevollmächtigung (Fahrzeugdokumente)</option>
                         <option value="Verlusterklärung an Eides statt">Verlusterklärung (Schein / Brief / Schild)</option>
@@ -1952,7 +1952,7 @@
             </div>
             
             <div class="grid-container" id="servicesGridContainer"></div>
-            <p style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:20px; padding: 0 5%;">* Alle Preisangaben verstehen sich in Euro inkl. gesetzlicher MwSt., zuzüglich anfallender amtlicher Behördengebühren.</p>
+            <p style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:20px; padding: 0 5%;">* Alle Preisangaben in Euro inkl. gesetzlicher MwSt. Bei den Anmelde-Komplettpaketen (90 € / 100 €) sind amtliche Gebühren, Kennzeichen &amp; grüne Umweltplakette bereits inklusive.</p>
         </section>
 
         <!-- SO LÄUFT IHRE KFZ-ZULASSUNG IN 3 SCHRITTEN AB + NEUHEIT 1: LIVE ABHOL-PROGNOSE RECHNER -->
@@ -1997,7 +1997,7 @@
                             <label>Gewünschte Leistungsart:</label>
                             <select id="pickupServiceSelect" class="form-control" onchange="window.updatePickupForecast()">
                                 <option value="plates_only">Nur Kennzeichen & Umweltplakette (Sofortprägung)</option>
-                                <option value="kurzzeit">Kurzzeit- oder Zollkennzeichen (5–30 Tage)</option>
+                                <option value="kurzzeit">Kurzzeit- oder Zollkennzeichen (6–30 Tage)</option>
                                 <option value="express" selected>Express-Zulassung (Priorisierte Abwicklung)</option>
                                 <option value="standard">Reguläre An-, Um- oder Abmeldung (1–2 Werktage)</option>
                             </select>
@@ -2022,7 +2022,7 @@
                 <div class="compass-tabs" id="compassTabsContainer">
                     <button type="button" class="compass-tab-btn active" onclick="window.selectCompassCase('privat', this)"><i class="fa-solid fa-user-check"></i> Privatperson (An-/Ummeldung)</button>
                     <button type="button" class="compass-tab-btn" onclick="window.selectCompassCase('gewerbe', this)"><i class="fa-solid fa-building"></i> Gewerbe / GmbH / Firma</button>
-                    <button type="button" class="compass-tab-btn" onclick="window.selectCompassCase('kurzzeit', this)"><i class="fa-solid fa-stopwatch"></i> Kurzzeitkennzeichen (5 Tage)</button>
+                    <button type="button" class="compass-tab-btn" onclick="window.selectCompassCase('kurzzeit', this)"><i class="fa-solid fa-stopwatch"></i> Kurzzeitkennzeichen (6 Tage)</button>
                     <button type="button" class="compass-tab-btn" onclick="window.selectCompassCase('zoll', this)"><i class="fa-solid fa-globe"></i> Zoll- / Ausfuhrkennzeichen</button>
                     <button type="button" class="compass-tab-btn" onclick="window.selectCompassCase('import', this)"><i class="fa-solid fa-plane-arrival"></i> EU- / Auslands-Import</button>
                     <button type="button" class="compass-tab-btn" onclick="window.selectCompassCase('abmeldung', this)"><i class="fa-solid fa-file-circle-xmark"></i> Abmeldung / Stilllegung</button>
@@ -2212,7 +2212,7 @@
                                     <option value="ummeldung_auswaerts">Umschreibung von außerhalb nach Berlin</option>
                                     <option value="neuzulassung">Neuzulassung (Fabrikneues Fahrzeug)</option>
                                     <option value="wiederzulassung">Wiederzulassung eines abgemeldeten Kfz</option>
-                                    <option value="kurzzeit">Kurzzeitkennzeichen (5 Tage Überführung)</option>
+                                    <option value="kurzzeit">Kurzzeitkennzeichen (6 Tage Überführung)</option>
                                     <option value="zoll">Zoll- / Ausfuhrkennzeichen (Internationaler Export)</option>
                                     <option value="abmeldung">Außerbetriebsetzung / Abmeldung</option>
                                 </select>
@@ -2273,7 +2273,7 @@
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('elektro', this)">E-Kennzeichen</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('oldtimer', this)">H-Oldtimer</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('saison', this)">Saison (04/10)</button>
-                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurzzeit', this)">5-Tage Kurzzeit</button>
+                        <button type="button" class="district-pill" onclick="window.selectPlateGuide('kurzzeit', this)">6-Tage Kurzzeit</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('zoll', this)">Zoll / Export</button>
                         <button type="button" class="district-pill" onclick="window.selectPlateGuide('zweizeilig', this)">Motorrad / US</button>
                     </div>
@@ -2938,7 +2938,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-    <script src="./app.js?v=2" defer></script>
+    <script src="./app.js?v=3" defer></script>
     <script type="module" src="./firebase-app.js?v=2"></script>
 
 </body>
