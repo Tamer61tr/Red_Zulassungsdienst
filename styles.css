@@ -660,9 +660,12 @@
         .btn-del-red:hover { background: #e60000; color: #fff; transform: scale(1.08); }
 
         /* Auf Leistungskarten sitzen Stift (unten links) & Löschen (unten rechts), damit Badges oben rechts nie verdeckt werden */
-        .card .admin-action-btn.btn-edit-green { top: auto; bottom: 12px; left: 12px; width: 31px; height: 31px; font-size: 13px; }
-        .card .admin-action-btn.btn-del-red { top: auto; bottom: 12px; right: 12px; width: 31px; height: 31px; font-size: 13px; }
-        body.is-admin.perm-prices .card, body.is-supervisor .card { padding-bottom: 42px; }
+        .card .admin-action-btn.btn-edit-green { top: auto; bottom: 12px; left: 12px; width: 31px; height: 31px; font-size: 13px; z-index: 90 !important; pointer-events: auto !important; }
+        .card .admin-action-btn.btn-del-red { top: auto; bottom: 12px; right: 12px; width: 31px; height: 31px; font-size: 13px; z-index: 90 !important; pointer-events: auto !important; }
+        body.is-admin.perm-prices .card, body.is-supervisor .card { padding-bottom: 52px !important; }
+        body.is-admin.perm-prices .card .card-info-slide, body.is-supervisor .card .card-info-slide { padding-bottom: 48px; }
+        body.is-admin.perm-content .tool-box.editable-section h3,
+        body.is-supervisor .tool-box.editable-section h3 { padding-right: 40px; }
 
         .mini-admin-btn { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; transition: 0.2s; background: var(--bg-card); border: 1px solid var(--glass-border); }
         .mini-admin-btn.edit { color: #25D366; border-color: rgba(37,211,102,0.5); }
@@ -1428,22 +1431,25 @@
         /* Service Cards */
         .card { 
             position: relative; overflow: hidden;
-            background: var(--bg-card); padding: 35px 20px; border-radius: var(--global-radius); 
-            border: 1px solid var(--glass-border); transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); height: 205px;
+            background: var(--bg-card); padding: 32px 20px 26px; border-radius: var(--global-radius); 
+            border: 1px solid var(--glass-border); transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); min-height: 225px; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
             box-shadow: var(--card-shadow); cursor: pointer;
         }
         .card:hover { transform: translateY(-6px); border-color: var(--border-hover); box-shadow: var(--argon-glow); background: var(--bg-input); }
         .card i.main-icon { font-size: 36px; margin-bottom: 10px; transition: 0.3s; }
         .card:hover i.main-icon { transform: scale(1.12); }
+        .card > p { pointer-events: none; position: relative; z-index: 2; }
         
         .price-wrapper { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; }
         .service-price { font-size: 23px; font-weight: 900; }
         
         .card-badge {
             position: absolute; top: 12px; right: 12px; padding: 3px 9px; border-radius: 6px; font-size: 9px; font-weight: 800;
-            color: #fff; text-transform: uppercase; letter-spacing: 0.6px; pointer-events: none; z-index: 10;
+            color: #fff; text-transform: uppercase; letter-spacing: 0.6px; pointer-events: none; z-index: 6;
+            transition: opacity 0.2s ease;
         }
+        .card.reveal-active .card-badge { opacity: 0; visibility: hidden; }
         .badge-neu { background: #007aff; }
         .badge-angebot { background: #ff9500; }
         .badge-aktion { background: #ff00ff; }
@@ -1455,12 +1461,16 @@
         .card-info-slide { 
             position: absolute; top: 100%; left: 0; width: 100%; height: 100%; 
             background: var(--glass-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-            border-radius: var(--global-radius); padding: 18px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            text-align: center; transition: top 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); z-index: 5; box-sizing: border-box; 
+            border-radius: var(--global-radius); padding: 14px 16px; gap: 8px;
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
+            text-align: center; transition: top 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); z-index: 20; box-sizing: border-box;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
         }
         .card.reveal-active .card-info-slide { top: 0; }
-        .card-info-slide p { font-size: 12px; color: var(--text-light); line-height: 1.55; font-weight: 600; }
+        .card-info-slide > :first-child { margin-top: auto; }
+        .card-info-slide > :last-child { margin-bottom: auto; }
+        .card-info-slide p { margin: 0; width: 100%; font-size: 11.5px; color: var(--text-light); line-height: 1.42; font-weight: 600; }
+        .card-info-slide .paren-sub { margin: 1px 0 3px; line-height: 1.3; font-size: 0.85em; }
 
         .form-row { display: flex; gap: 15px; position: relative; }
         @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
@@ -2391,7 +2401,7 @@
             .hero { margin-top: 4px; padding: 12px 4%; } 
             .hero-content { padding: 24px 15px !important; border-radius: 20px !important; }
             .sofort-badge { padding: 10px 16px !important; font-size: 11px !important; margin-bottom: 16px !important; }
-            .card { padding: 25px 15px !important; height: 195px !important; }
+            .card { padding: 28px 16px 24px !important; height: auto !important; min-height: 220px !important; }
             .booking-wrapper { padding: 24px 15px !important; }
             .booking-type-pills { grid-template-columns: repeat(3, 1fr); gap: 6px; }
             .booking-type-pill { padding: 9px 4px; font-size: 10px !important; }
@@ -2947,13 +2957,12 @@
         .mobile-select-display .ms-val-wrap { text-wrap: balance; }
 
         /* Direkt-Buchen-Button auf der Rückseite jeder Leistungskarte */
-        .card-info-slide { padding: 14px 16px; gap: 8px; overflow-y: auto; }
         .card-slide-book-btn {
             background: var(--primary-red); color: #ffffff; border: none;
-            border-radius: 50px; padding: 6px 14px; font-size: 10.5px !important;
+            border-radius: 50px; padding: 8px 16px; font-size: 10.5px !important;
             font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
             cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-            flex-shrink: 0; transition: transform 0.2s ease, filter 0.2s ease;
+            flex-shrink: 0; margin-top: 2px; transition: transform 0.2s ease, filter 0.2s ease;
         }
         .card-slide-book-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
 
@@ -3146,10 +3155,15 @@
            1. SAUBERER START AB OBEN (KEIN ABSCHNEIDEN UNTER DEM FIXED HEADER)
            ========================================================================= */
         html {
-            scroll-padding-top: var(--dynamic-header-h, 130px);
+            scroll-padding-top: calc(var(--dynamic-header-h, 130px) + 12px);
         }
-        .view-section {
-            scroll-margin-top: var(--dynamic-header-h, 130px);
+        .view-section,
+        section[id] {
+            scroll-margin-top: calc(var(--dynamic-header-h, 130px) + 12px);
+        }
+        .compass-doc-list li span {
+            min-width: 0;
+            word-break: break-word;
         }
 
         /* =========================================================================

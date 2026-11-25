@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-    <link rel="stylesheet" href="./styles.css?v=2">
+    <link rel="stylesheet" href="./styles.css?v=3">
 </head>
 
 <body data-theme="light">
@@ -2031,24 +2031,19 @@
 
                 <div class="compass-detail-panel" id="compassDetailPanel">
                     <div>
-                        <h3 id="compassCaseTitle" style="font-size:17px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin-bottom:6px;">Privatperson: An- oder Ummeldung in Berlin</h3>
-                        <p id="compassCaseDesc" style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Für die reguläre Neuzulassung, Umschreibung oder Wiederzulassung auf eine Privatperson mit Wohnsitz in Berlin:</p>
-                        <ul class="compass-doc-list" id="compassDocList">
-                            <li><i class="fa-solid fa-circle-check"></i> Zulassungsbescheinigung Teil I (Fahrzeugschein) & Teil II (Fahrzeugbrief) im Original</li>
-                            <li><i class="fa-solid fa-circle-check"></i> Gültiger Personalausweis oder Reisepass + aktuelle Meldebescheinigung</li>
-                            <li><i class="fa-solid fa-circle-check"></i> Elektronische Versicherungsbestätigung (7-stellige eVB-Nummer)</li>
-                            <li><i class="fa-solid fa-circle-check"></i> Nachweis über gültige Hauptuntersuchung (TÜV / HU-Bericht)</li>
-                            <li><i class="fa-solid fa-circle-check"></i> Unterschriebene Vollmacht & SEPA-Lastschriftmandat für die Kfz-Steuer (IBAN)</li>
-                            <li><i class="fa-solid fa-circle-check"></i> Bei zugelassenem Fahrzeug: Bisherige Kennzeichenschilder</li>
-                        </ul>
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                            <h3 id="compassCaseTitle" style="font-size:17px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin:0;">Privatperson: An- oder Ummeldung in Berlin</h3>
+                            <span id="compassProgressBadge" style="font-size:11px; font-weight:800; padding:4px 11px; border-radius:20px; background:var(--bg-card); border:1px solid var(--glass-border); color:var(--text-muted);">0 / 6 abgehakt</span>
+                        </div>
+                        <p id="compassCaseDesc" style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Tippen Sie jedes vorhandene Dokument zum Abhaken an – so sehen Sie sofort, ob alles komplett ist:</p>
+                        <ul class="compass-doc-list" id="compassDocList"></ul>
                     </div>
                     <div style="background:var(--bg-card); border:1px solid var(--glass-border); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:9px;">
                         <div style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;"><i class="fa-solid fa-bolt" style="color:var(--primary-red);"></i> Direkt-Aktionen für diesen Fall:</div>
+                        <button type="button" class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center;" onclick="window.startPhotoPreCheckWhatsApp(true)"><i class="fa-brands fa-whatsapp" style="font-size:16px;"></i> Papiere kurz vorab per WhatsApp prüfen lassen</button>
                         <button type="button" class="btn-primary" style="width:100%; justify-content:center;" onclick="window.applyCompassToBooking()"><i class="fa-regular fa-calendar-check"></i> Diesen Fall jetzt als Termin buchen</button>
-                        <button type="button" class="btn-primary btn-green-adaptive" style="width:100%; justify-content:center;" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')"><i class="fa-solid fa-signature"></i> Passende Vollmacht & SEPA öffnen</button>
-                        <!-- NEUHEIT 2: 1-KLICK UNTERLAGEN-MERKZETTEL AUFS EIGENE HANDY SCHICKEN -->
+                        <button type="button" class="btn-primary btn-green-adaptive" style="width:100%; justify-content:center;" onclick="window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat')"><i class="fa-solid fa-signature"></i> Passende Vollmacht &amp; SEPA öffnen</button>
                         <button type="button" class="btn-primary btn-gold-adaptive" style="width:100%; justify-content:center;" onclick="window.sendCompassDocsToWhatsApp()"><i class="fa-solid fa-mobile-screen"></i> Checkliste als Merkzettel aufs Handy</button>
-                        <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); width:100%; justify-content:center; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp()"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Unterlagen-Foto vorab prüfen lassen</button>
                     </div>
                 </div>
             </div>
@@ -2445,6 +2440,104 @@
                         <div style="color:#d97706; font-size:11px; letter-spacing:2px; margin-bottom:8px;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
                         <p style="font-size:12px; color:var(--text-light); line-height:1.55; margin-bottom:10px;">„Für unseren Gebrauchtwagenhandel inzwischen unser fester Partner. Kurzzeit- und Zollkennzeichen klappen zuverlässig und termingerecht.“</p>
                         <strong style="font-size:11px; color:var(--text-muted);">Autohandel B. • Gewerbekunde (Berlin)</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOKALE LEISTUNGSABSCHNITTE BERLIN-NEUKÖLLN & ECHTE VERTRAUENSANKER -->
+        <section id="neukoelln-lokal" class="compass-wrapper" style="margin-top:32px;">
+            <div class="compass-box" style="text-align:left; border-top:3px solid var(--primary-red);">
+                <div style="text-align:center; margin-bottom:22px;">
+                    <span style="display:inline-block; background:rgba(217,0,0,0.09); color:var(--primary-red); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:4px 12px; border-radius:50px; margin-bottom:8px;">
+                        <i class="fa-solid fa-location-dot"></i> Berlin-Neukölln • Kienitzer Str. 6
+                    </span>
+                    <h2 style="font-size:clamp(19px, 2.8vw, 26px); font-weight:900; text-transform:uppercase; color:var(--text-light); margin:0;">
+                        Ihr Zulassungs- &amp; Schilderdienst direkt vor Ort in Neukölln
+                    </h2>
+                    <p style="font-size:12px; color:var(--text-muted); max-width:660px; margin:6px auto 0;">
+                        Persönlicher Service ohne Behörden-Wartezeit – direkt an der U8 Boddinstraße, nahe Hermannplatz und Stadtautobahn A100 (Ausfahrt Britzer Damm).
+                    </p>
+                </div>
+
+                <!-- 3 LOKALE SEO-LEISTUNGSABSCHNITTE -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:14px; margin-bottom:22px;">
+                    <article style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:18px;">
+                        <h3 style="font-size:14px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin-bottom:8px;">
+                            <i class="fa-solid fa-file-signature"></i> Kfz-Zulassung Berlin-Neukölln
+                        </h3>
+                        <p style="font-size:12px; color:var(--text-light); line-height:1.6; margin:0;">
+                            Wir übernehmen Ihre komplette <strong>Anmeldung</strong> (90 € mit Zufallskennzeichen / 100 € mit Wunschkennzeichen inkl. amtlicher Gebühren, Kennzeichen &amp; grüner Umweltplakette), <strong>Ummeldung</strong> (70 €) sowie <strong>Abmeldung</strong> (30 € vor Ort / 20 € online) beim LABO Berlin – ohne eigene Terminsuche.
+                        </p>
+                    </article>
+
+                    <article style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:18px;">
+                        <h3 style="font-size:14px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin-bottom:8px;">
+                            <i class="fa-solid fa-id-card"></i> Sofortprägung Kienitzer Str. 6
+                        </h3>
+                        <p style="font-size:12px; color:var(--text-light); line-height:1.6; margin:0;">
+                            Alle <strong>Kfz-Kennzeichen prägen wir in 3–5 Minuten sofort zum Mitnehmen</strong> direkt vor Ort (15 € / Stück, 30 € / Paar): Euro-Standard, kurze Schilder, E-, H-, Saison- &amp; Motorradschilder sowie <strong>6-Tage-Kurzzeitkennzeichen</strong> (120 €) und <strong>30-Tage-Zollkennzeichen</strong> (350 €).
+                        </p>
+                    </article>
+
+                    <article style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:18px;">
+                        <h3 style="font-size:14px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin-bottom:8px;">
+                            <i class="fa-solid fa-car"></i> Auto Ankauf Berlin-Neukölln
+                        </h3>
+                        <p style="font-size:12px; color:var(--text-light); line-height:1.6; margin:0;">
+                            Verkaufen Sie Ihr Fahrzeug direkt und unkompliziert in Berlin: <strong>Auto Ankauf jeglicher Art</strong> – auch ohne TÜV, mit hoher Laufleistung oder Schäden. Faire Bewertung vor Ort, <strong>sofortige Barauszahlung</strong> und kostenlose amtliche Abmeldung inklusive.
+                        </p>
+                    </article>
+                </div>
+
+                <!-- ECHTE VERTRAUENSANKER: ÖFFNUNGSZEITEN, SOFORT-MITNAHME & KONTAKT -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(185px, 1fr)); gap:10px; padding:16px; background:var(--bg-card); border:1px solid var(--glass-border); border-radius:14px;">
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <i class="fa-solid fa-clock" style="color:var(--green-accent); font-size:16px; margin-top:2px;"></i>
+                        <div>
+                            <strong style="display:block; font-size:12px; color:var(--text-light);">Mo–Fr 09:00–20:00 Uhr</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">Durchgehend für Sie vor Ort</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <i class="fa-solid fa-bolt" style="color:var(--primary-red); font-size:16px; margin-top:2px;"></i>
+                        <div>
+                            <strong style="display:block; font-size:12px; color:var(--text-light);">Sofort-Mitnahme</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">Ohne Behörden-Wartezeit</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <i class="fa-solid fa-user-tie" style="color:var(--primary-red); font-size:16px; margin-top:2px;"></i>
+                        <div>
+                            <strong style="display:block; font-size:12px; color:var(--text-light);">Inhaber: Tamer Yazici</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">Persönlich in der Kienitzer Str. 6</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <button type="button" class="btn-primary" style="background:#25D366; color:#000; width:100%; justify-content:center; padding:10px 12px; font-size:11px !important;" onclick="window.startPhotoPreCheckWhatsApp(false)">
+                            <i class="fa-brands fa-whatsapp" style="font-size:15px;"></i> 1-Klick Unterlagen-Check
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ECHTE GESCHÄFTSFOTOS (ERSCHEINEN AUTOMATISCH, SOBALD DU DIE JPGs HOCHLÄDST) -->
+                <div id="realShopGalleryWrap" style="display:none; margin-top:16px;">
+                    <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px;">
+                        <i class="fa-solid fa-camera" style="color:var(--primary-red);"></i> Einblick in unser Geschäft – Kienitzer Str. 6, Berlin-Neukölln
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+                        <figure class="real-shop-photo-card" style="display:none; margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--glass-border); background:var(--bg-input);">
+                            <img src="./laden-aussen.jpg" alt="RED Zulassungsdienst Berlin-Neukölln Außenansicht Kienitzer Str. 6" loading="lazy" style="width:100%; height:170px; object-fit:cover; display:block;" onload="this.parentElement.style.display='block'; document.getElementById('realShopGalleryWrap').style.display='block';" onerror="this.parentElement.remove();">
+                            <figcaption style="padding:8px 10px; font-size:11px; font-weight:700; color:var(--text-light);">Annahmestelle Kienitzer Str. 6</figcaption>
+                        </figure>
+                        <figure class="real-shop-photo-card" style="display:none; margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--glass-border); background:var(--bg-input);">
+                            <img src="./schilderpresse.jpg" alt="Kfz-Kennzeichen Sofortprägung in Berlin-Neukölln" loading="lazy" style="width:100%; height:170px; object-fit:cover; display:block;" onload="this.parentElement.style.display='block'; document.getElementById('realShopGalleryWrap').style.display='block';" onerror="this.parentElement.remove();">
+                            <figcaption style="padding:8px 10px; font-size:11px; font-weight:700; color:var(--text-light);">Kennzeichen-Sofortprägung vor Ort</figcaption>
+                        </figure>
+                        <figure class="real-shop-photo-card" style="display:none; margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--glass-border); background:var(--bg-input);">
+                            <img src="./laden-innen.jpg" alt="RED Zulassungsdienst Berlin Kundenempfang ohne Wartezeit" loading="lazy" style="width:100%; height:170px; object-fit:cover; display:block;" onload="this.parentElement.style.display='block'; document.getElementById('realShopGalleryWrap').style.display='block';" onerror="this.parentElement.remove();">
+                            <figcaption style="padding:8px 10px; font-size:11px; font-weight:700; color:var(--text-light);">Schnelle Abgabe ohne Wartezeit</figcaption>
+                        </figure>
                     </div>
                 </div>
             </div>
@@ -2938,7 +3031,7 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-    <script src="./app.js?v=4" defer></script>
+    <script src="./app.js?v=6" defer></script>
     <script type="module" src="./firebase-app.js?v=2"></script>
 
 </body>

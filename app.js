@@ -462,12 +462,15 @@ window.escHtml = function(str) {
 
         window.sendCompassDocsToWhatsApp = function() {
             const caseTitle = document.getElementById('compassCaseTitle')?.innerText || 'Kfz-Zulassung Berlin';
-            const docItems = Array.from(document.querySelectorAll('#compassDocList li')).map(li => '✅ ' + li.innerText.trim());
+            const docItems = Array.from(document.querySelectorAll('#compassDocList li')).map(li => {
+                const icon = li.getAttribute('data-checked') === '1' ? '✅' : '⬜';
+                return `${icon} ${li.innerText.trim()}`;
+            });
             const listText = docItems.length > 0
                 ? docItems.join('\n')
-                : '✅ Fahrzeugschein (ZB I) & Fahrzeugbrief (ZB II)\n✅ Gültiger Ausweis / Reisepass + Meldebescheinigung\n✅ 7-stellige eVB-Nummer\n✅ Gültiger TÜV / HU-Bericht & IBAN';
+                : '⬜ Fahrzeugschein (ZB I) & Fahrzeugbrief (ZB II)\n⬜ Gültiger Ausweis / Reisepass + Meldebescheinigung\n⬜ 7-stellige eVB-Nummer\n⬜ Gültiger TÜV / HU-Bericht & IBAN';
 
-            const msg = encodeURIComponent(`📋 *MEINE UNTERLAGEN-CHECKLISTE (RED BERLIN)*\n*Vorgang:* ${caseTitle}\n\n${listText}\n\n📍 *Abgabe-Adresse:*\nRED Zulassungsdienst Berlin\nKienitzer Str. 6, 12053 Berlin (U8 Boddinstraße)\n📞 Tel: 0178 378 38 75`);
+            const msg = encodeURIComponent(`📋 *MEINE UNTERLAGEN-CHECKLISTE (RED BERLIN)*\n*Vorgang:* ${caseTitle}\n\n${listText}\n\n📍 *Abgabe-Adresse:*\nRED Zulassungsdienst Berlin\nKienitzer Str. 6, 12053 Berlin (U8 Boddinstraße)\n🕒 Mo–Fr 09:00–20:00 Uhr\n📞 Tel: 0178 378 38 75`);
             window.open(`https://wa.me/?text=${msg}`, '_blank');
         };
 
@@ -1204,22 +1207,74 @@ window.escHtml = function(str) {
             }
         };
 
+        window.updateCompassProgress = function() {
+            const listEl = document.getElementById('compassDocList');
+            const badge = document.getElementById('compassProgressBadge');
+            if (!listEl || !badge) return;
+            const total = listEl.querySelectorAll('li').length;
+            const checked = listEl.querySelectorAll('li[data-checked="1"]').length;
+            if (total > 0 && checked === total) {
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> Alle ${total} bereit!`;
+                badge.style.background = 'var(--green-bg-soft)';
+                badge.style.borderColor = 'var(--green-border)';
+                badge.style.color = 'var(--green-accent)';
+            } else {
+                badge.innerText = `${checked} / ${total} abgehakt`;
+                badge.style.background = 'var(--bg-card)';
+                badge.style.borderColor = 'var(--glass-border)';
+                badge.style.color = 'var(--text-muted)';
+            }
+        };
+
+        window.toggleCompassDocItem = function(liEl) {
+            if (!liEl) return;
+            const isChecked = liEl.getAttribute('data-checked') === '1';
+            const nextState = !isChecked;
+            liEl.setAttribute('data-checked', nextState ? '1' : '0');
+            liEl.style.opacity = nextState ? '0.78' : '1';
+            liEl.style.borderColor = nextState ? 'var(--green-border)' : 'var(--glass-border)';
+            liEl.style.background = nextState ? 'var(--green-bg-soft)' : 'var(--bg-card)';
+            const icon = liEl.querySelector('i');
+            const span = liEl.querySelector('span');
+            if (icon) {
+                icon.className = nextState ? 'fa-solid fa-square-check' : 'fa-regular fa-square';
+                icon.style.color = nextState ? 'var(--green-accent)' : 'var(--primary-red)';
+            }
+            if (span) {
+                span.style.textDecoration = nextState ? 'line-through' : 'none';
+            }
+            window.updateCompassProgress();
+        };
+
         window.selectCompassCase = function(caseKey, btnEl) {
             document.querySelectorAll('.compass-tab-btn').forEach(b => b.classList.remove('active'));
-            if(btnEl) btnEl.classList.add('active');
+            if (btnEl) btnEl.classList.add('active');
 
             const data = compassData[caseKey];
-            if(!data) return;
+            if (!data) return;
 
             document.getElementById('compassCaseTitle').innerText = data.title;
-            document.getElementById('compassCaseDesc').innerText = data.desc;
+            document.getElementById('compassCaseDesc').innerText = data.desc + ' (Einfach zum Abhaken antippen)';
 
             const listEl = document.getElementById('compassDocList');
             listEl.innerHTML = '';
             data.docs.forEach(docText => {
-                listEl.innerHTML += `<li><i class="fa-solid fa-circle-check"></i> <span>${docText}</span></li>`;
+                const li = document.createElement('li');
+                li.setAttribute('data-checked', '0');
+                li.style.cssText = 'cursor:pointer; user-select:none; padding:9px 11px; border-radius:10px; border:1px solid var(--glass-border); background:var(--bg-card); transition:all 0.18s ease; margin-bottom:7px; display:flex; align-items:flex-start; gap:9px;';
+                li.onclick = () => window.toggleCompassDocItem(li);
+                li.innerHTML = `<i class="fa-regular fa-square" style="color:var(--primary-red); font-size:15px; margin-top:2px; flex-shrink:0;"></i> <span>${docText}</span>`;
+                listEl.appendChild(li);
             });
+            window.updateCompassProgress();
         };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('#compassTabsContainer .compass-tab-btn');
+            if (document.getElementById('compassDocList')) {
+                window.selectCompassCase('privat', firstTab);
+            }
+        });
 
         window.applyCompassToBooking = function() {
             const title = document.getElementById('compassCaseTitle').innerText;
@@ -1699,11 +1754,23 @@ window.escHtml = function(str) {
 // =========================================================================
         // 8. WHATSAPP FOTO-VORABCHECK, VIRAL SHARE, TRACKER & KALKULATOR
         // =========================================================================
-        window.startPhotoPreCheckWhatsApp = function() {
+        window.startPhotoPreCheckWhatsApp = function(includeCompassStatus = false) {
             let waPhone = (window.dynamicContactData?.phone || '01783783875').replace(/\D/g, '');
             if (waPhone.startsWith('0')) waPhone = '49' + waPhone.substring(1);
-            const msg = encodeURIComponent(`Hallo RED-Team! 👋 Ich möchte meine Kfz-Papiere kurz per Foto von Ihnen vorab prüfen lassen.`);
-            window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+
+            let text = 'Hallo RED-Team! 👋 Ich möchte meine Kfz-Papiere kurz vorab per WhatsApp prüfen lassen.';
+            if (includeCompassStatus) {
+                const caseTitle = document.getElementById('compassCaseTitle')?.innerText || '';
+                const items = Array.from(document.querySelectorAll('#compassDocList li'));
+                const checkedCount = items.filter(li => li.getAttribute('data-checked') === '1').length;
+                if (caseTitle) text += `\n\n*Anliegen:* ${caseTitle}`;
+                if (items.length > 0 && checkedCount > 0) {
+                    const summary = items.map(li => `${li.getAttribute('data-checked') === '1' ? '✅' : '⬜'} ${li.innerText.trim()}`).join('\n');
+                    text += `\n*Mein Unterlagen-Stand (${checkedCount}/${items.length}):*\n${summary}`;
+                }
+                text += '\n\nIch sende Ihnen gleich die Fotos der Papiere.';
+            }
+            window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(text)}`, '_blank');
         };
 
         window.openViralShareModal = function() {
@@ -2695,19 +2762,19 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         // --- LEISTUNGSKARTEN ---
         const defaultServices = [
-            { id: "s-1", icon: "fa-file-signature", title: "Anmeldung (Wunsch)", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "100", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "badge-topseller", desc: "Inkl. Gebühren, Wunschkennz. & Plakette.", descAnim: "", hoverInfo: "Komplettpreis (100 € inkl. amtlicher Gebühren, Kennzeichen & grüner Umweltplakette).\n\nMitzubringen (Original):\n• Fahrzeugbrief & Schein\n• Ausweis / Aufenthaltstitel\n• TÜV-Bericht & eVB-Nr.\n• Kontodaten (IBAN)", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-2", icon: "fa-car", title: "Anmeldung (Zufall)", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "90", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Listenkennz. inkl. Gebühren, Schilder & Plakette.", descAnim: "", hoverInfo: "Komplettpreis (90 € mit Zufalls-/Listenkennzeichen inkl. amtlicher Gebühren, Kennzeichen & grüner Umweltplakette).\n\nMitzubringen (Original):\n• Fahrzeugbrief & Schein\n• Ausweis / Aufenthaltstitel\n• TÜV-Bericht & eVB-Nr.\n• Kontodaten (IBAN)", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-3", icon: "fa-exchange-alt", title: "Ummeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "70", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Mit gleichem Kennzeichen (angemeldet).", descAnim: "", hoverInfo: "Ummeldung bei bereits angemeldetem Fahrzeug mit Übernahme des Kennzeichens.\n\nMitzubringen (Original):\n• Fahrzeugpapiere I & II\n• Ausweis / Pass & eVB-Nr.\n• Gültige HU / AU Bescheinigung\n• IBAN für Kfz-Steuer", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-4", icon: "fa-file-circle-xmark", title: "Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "30", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Regulär 30 € • Online-Abmeldung 20 €.", descAnim: "", hoverInfo: "Sichere Außerbetriebsetzung vor Ort (30 €) oder digital als Online-Abmeldung (20 €).\n\nMitzubringen (Original):\n• Zulassungsbescheinigung I\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-5", icon: "fa-laptop", title: "Online-Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "20", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "badge-neu", desc: "Schnelle digitale Außerbetriebsetzung.", descAnim: "", hoverInfo: "Digitale Online-Abmeldung (sofortige Stilllegung).\n\nBenötigt:\n• Zulassungsbescheinigung I mit Sicherheitscode\n• Kennzeichen mit freigelegten Sicherheitscodes", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-6", icon: "fa-stopwatch", title: "Kurzzeitkennz.", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "120", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "6 Tage Gültigkeit – schnelle Abwicklung.", descAnim: "", hoverInfo: "Kurzzeitkennzeichen für 6 Tage.\n\nMitzubringen (Original):\n• Ausweis / Pass\n• eVB-Nummer für Kurzzeit\n• Fahrzeugpapiere\n• Gültige HU", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-7", icon: "fa-globe", title: "Zollkennzeichen", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "350", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-gold-3d", badge: "badge-topseller", desc: "30 Tage Gültigkeit für den Export.", descAnim: "anim-pulse", hoverInfo: "Ausfuhr-/Zollkennzeichen für 30 Tage.\n\nMitzubringen (Original):\n• Ausweis / Pass\n• Fahrzeugpapiere\n• Gültige HU\n• Gelbes Versicherungskärtchen", borderSize: "1px", borderColor: "var(--glass-border)" },
-            { id: "s-8", icon: "fa-id-card", title: "Kennzeichenprägung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "30", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "1 Paar 30 € • Einzelstück 15 € sofort vor Ort.", descAnim: "", hoverInfo: "Sofortprägung direkt vor Ort (ca. 3–5 Min.):\n• 1 Paar Kennzeichen (2 Stück): 30 €\n• Einzelnes Kennzeichen (1 Stück): 15 €\n• Euro-, Kurz-, E-, H-, Saison- & Motorradschilder", borderSize: "1px", borderColor: "var(--glass-border)" }
+            { id: "s-1", icon: "fa-file-signature", title: "Anmeldung (Wunsch)", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "100", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "badge-topseller", desc: "Inkl. Gebühren, Wunschkennz. & Plakette.", descAnim: "", hoverInfo: "Komplettpreis: 100 € inkl. Gebühren, Schilder & Plakette.\nMitzubringen (Original):\n• Brief & Schein • Ausweis\n• TÜV-Bericht • eVB-Nr. • IBAN", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-2", icon: "fa-car", title: "Anmeldung (Zufall)", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "90", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Listenkennz. inkl. Gebühren, Schilder & Plakette.", descAnim: "", hoverInfo: "Komplettpreis: 90 € inkl. Gebühren, Schilder & Plakette.\nMitzubringen (Original):\n• Brief & Schein • Ausweis\n• TÜV-Bericht • eVB-Nr. • IBAN", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-3", icon: "fa-exchange-alt", title: "Ummeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "70", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Mit gleichem Kennzeichen (angemeldet).", descAnim: "", hoverInfo: "Ummeldung mit Kennzeichenübernahme.\nMitzubringen (Original):\n• Fahrzeugpapiere I & II\n• Ausweis / Pass • eVB-Nr.\n• Gültige HU / AU • IBAN", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-4", icon: "fa-file-circle-xmark", title: "Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "30", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "Regulär 30 € • Online-Abmeldung 20 €.", descAnim: "", hoverInfo: "Vor Ort 30 € • Online-Abmeldung 20 €.\nMitzubringen (Original):\n• Zulassungsbescheinigung I\n• Bisherige Kennzeichen", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-5", icon: "fa-laptop", title: "Online-Abmeldung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "20", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "badge-neu", desc: "Schnelle digitale Außerbetriebsetzung.", descAnim: "", hoverInfo: "Digitale Sofort-Stilllegung (20 €).\nBenötigt:\n• Fahrzeugschein (ZB I) mit Sicherheitscode\n• Kennzeichen mit Sicherheitscodes", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-6", icon: "fa-stopwatch", title: "Kurzzeitkennz.", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "120", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "6 Tage Gültigkeit – schnelle Abwicklung.", descAnim: "", hoverInfo: "Kurzzeitkennzeichen für 6 Tage.\nMitzubringen (Original):\n• Ausweis / Pass • eVB für Kurzzeit\n• Fahrzeugpapiere • Gültige HU", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-7", icon: "fa-globe", title: "Zollkennzeichen", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "350", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-gold-3d", badge: "badge-topseller", desc: "30 Tage Gültigkeit für den Export.", descAnim: "anim-pulse", hoverInfo: "Ausfuhr-/Zollkennzeichen für 30 Tage.\nMitzubringen (Original):\n• Ausweis / Pass • Fahrzeugpapiere\n• Gültige HU • Gelbe Versicherungskarte", borderSize: "1px", borderColor: "var(--glass-border)" },
+            { id: "s-8", icon: "fa-id-card", title: "Kennzeichenprägung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "30", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-standard", badge: "", desc: "1 Paar 30 € • Einzelstück 15 € sofort vor Ort.", descAnim: "", hoverInfo: "Sofortprägung vor Ort (3–5 Min.):\n• 1 Paar (2 Stück): 30 € • 1 Stück: 15 €\n• Euro-, Kurz-, E-, H-, Saison- & Motorradschilder", borderSize: "1px", borderColor: "var(--glass-border)" }
             // Optional bei Bedarf aktivieren:
             // ,{ id: "s-9", icon: "fa-bolt", title: "Express Zulassung", titleColor: "var(--text-light)", titleFont: "'Montserrat', sans-serif", titleSize: "18px", price: "300", priceColor: "var(--primary-red)", iconColor: "var(--primary-red)", euroStyle: "euro-neon-blue", badge: "badge-express-tipp", desc: "Priorisierte Abwicklung.", descAnim: "", hoverInfo: "Express Service (300 €):\nPriorisierte Abwicklung nach Absprache.", borderSize: "1px", borderColor: "var(--glass-border)" }
         ];
 
-        window.servicesData = JSON.parse(localStorage.getItem('red_services_v3')) || defaultServices;
+        window.servicesData = JSON.parse(localStorage.getItem('red_services_v4')) || defaultServices;
 
         const badgeLabels = {
             "badge-neu": "NEU", "badge-angebot": "ANGEBOT", "badge-aktion": "AKTION", 
