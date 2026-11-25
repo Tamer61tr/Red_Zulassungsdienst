@@ -220,7 +220,7 @@
         }
 
         /* Rollen-Management */
-        .mod-leads, .mod-blocks, .mod-data, .mod-ticker, .mod-prices, .mod-crm, .mod-pages, .mod-theme, .mod-forms, .mod-cars { display: none !important; }
+        .mod-leads, .mod-blocks, .mod-data, .mod-ticker, .mod-prices, .mod-crm, .mod-pages, .mod-theme, .mod-forms, .mod-cars, .mod-invoice { display: none !important; }
         .mod-leads-locked { display: none; }
         .action-forms, .action-cars, .action-content, .action-prices { display: none !important; }
 
@@ -237,6 +237,7 @@
         body.is-admin.perm-crm .mod-crm { display: inline-flex !important; }
         body.is-admin.perm-pages .mod-pages { display: inline-flex !important; }
         body.is-admin.perm-theme .mod-theme { display: inline-flex !important; }
+        body.is-admin.perm-invoice .mod-invoice { display: inline-flex !important; }
         body.is-admin.perm-forms .mod-forms { display: block !important; }
         body.is-admin.perm-forms .action-forms { display: inline-flex !important; }
         body.is-admin.perm-cars .mod-cars { display: block !important; }
@@ -247,7 +248,8 @@
 
         body.is-supervisor .mod-leads, body.is-supervisor .mod-blocks, body.is-supervisor .mod-data, body.is-supervisor .mod-prices, body.is-supervisor .mod-forms, body.is-supervisor .mod-cars { display: block !important; }
         body.is-supervisor .mod-crm, body.is-supervisor .mod-ticker, body.is-supervisor .mod-pages, body.is-supervisor .action-cars, body.is-supervisor .action-content { display: inline-flex !important; }
-        body.is-supervisor .mod-theme { display: inline-flex !important; }
+        body.is-supervisor .mod-theme,
+        body.is-supervisor .mod-invoice { display: inline-flex !important; }
         body.is-supervisor .action-forms, body.is-supervisor .action-prices { display: inline-flex !important; }
         body.is-supervisor .mod-leads-locked { display: none !important; }
 
@@ -719,6 +721,19 @@
         #formEditModalOverlay .custom-dialog-window { max-width: 460px; border-top-color: #ff9500; text-align: left; }
         #digitalVollmachtOverlay .custom-dialog-window { max-width: 680px; border-top-color: #25D366; text-align: left; }
         #kaufvertragOverlay .custom-dialog-window { max-width: 740px; border-top-color: var(--gold-border); text-align: left; }
+        #cashInvoiceOverlay .custom-dialog-window { max-width: 780px; border-top-color: #16a34a; text-align: left; }
+        .inv-quick-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .inv-quick-chip { background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-light); padding: 5px 10px; border-radius: 20px; font-size: 10.5px !important; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .inv-quick-chip:hover { border-color: var(--primary-red); color: var(--primary-red); }
+        .inv-item-row { display: grid; grid-template-columns: 1fr 68px 102px 34px; gap: 7px; align-items: center; margin-bottom: 8px; }
+        .inv-item-row input { padding: 9px 10px !important; font-size: 13px !important; }
+        .inv-del-row-btn { width: 34px; height: 38px; border-radius: 9px; border: 1px solid rgba(255,59,48,0.4); background: var(--bg-card); color: #ff3b30; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 13px !important; }
+        .inv-del-row-btn:hover { background: #ff3b30; color: #fff; }
+        .inv-total-summary { background: var(--bg-card); border: 1.5px solid #16a34a; border-radius: 12px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        @media (max-width: 640px) {
+            .inv-item-row { grid-template-columns: 1fr 56px 86px 32px; gap: 5px; }
+            .inv-item-row input { padding: 8px 7px !important; font-size: 12px !important; }
+        }
         #viralShareOverlay .custom-dialog-window { max-width: 430px; border-top-color: var(--primary-red); }
         #pwaInstallOverlay .custom-dialog-window { max-width: 460px; border-top-color: var(--primary-red); text-align: left; }
         

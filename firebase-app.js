@@ -173,7 +173,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             } else {
                 window.isAuthorized = false;
                 window.loggedInUser = null;
-                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme');
+                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme', 'perm-invoice');
 
                 if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
                 if (typeof window.stopAdminAppointmentsListener === 'function') {
@@ -274,6 +274,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 crm: document.getElementById('permCrm').checked,
                 pages: document.getElementById('permPages').checked,
                 theme: document.getElementById('permTheme').checked,
+                invoice: document.getElementById('permInvoice')?.checked === true,
                 timestamp: Date.now()
             };
 
@@ -1108,6 +1109,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
         };
 
+        window.openInvoiceFromApt = function(aptId) {
+            const idx = (window.redApts || []).findIndex(a => a.id === aptId);
+            if (idx === -1) return;
+            window.openCashInvoiceModal();
+            setTimeout(() => {
+                const pick = document.getElementById('invClientQuickPick');
+                if (pick) pick.value = `apt:${idx}`;
+                window.fillInvoiceFromQuickPick(`apt:${idx}`);
+            }, 80);
+        };
+
         window.printOrderSlip = function(aptId) {
             const apt = (window.redApts || []).find(a => a.id === aptId);
             if (!apt) return;
@@ -1379,6 +1391,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                         ${waConfirmBtn}
                         ${reviewBtn}
                         <button type="button" class="apt-btn" onclick="window.printOrderSlip('${id}')" title="Laufzettel / Mappen-Deckblatt drucken"><i class="fa-solid fa-print"></i></button>
+                        <button type="button" class="apt-btn mod-invoice" style="color:var(--green-accent); border-color:var(--green-border);" onclick="window.openInvoiceFromApt('${id}')" title="Bar-Rechnung (PDF) direkt für diesen Kunden erstellen"><i class="fa-solid fa-file-invoice-dollar"></i></button>
                         <button type="button" class="apt-btn crm-sync mod-crm" onclick="window.openClientInCrmFromApt('${id}')" title="Kundenakte im CRM öffnen / sichern"><i class="fa-solid fa-address-book"></i></button>
                         <button type="button" class="apt-btn done-btn" onclick="window.setAptOrderStatus('${id}', ${isDone ? 1 : 4})" title="${isDone ? 'Wieder als Offen zurückholen' : 'Als Erledigt abschließen & ins Archiv verschieben'}"><i class="fa-solid ${isDone ? 'fa-rotate-left' : 'fa-check'}"></i></button>
                         <button type="button" class="apt-btn mark ${apt.marked ? 'is-pinned' : ''}" onclick="window.markApt('${id}', ${!apt.marked})" title="${apt.marked ? 'Von Pinnwand lösen' : 'Auf Bildschirm anheften'}"><i class="fa-solid fa-thumbtack"></i></button>

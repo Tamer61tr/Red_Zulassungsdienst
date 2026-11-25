@@ -621,6 +621,9 @@
                     <button type="button" class="btn-primary admin-tool-btn mod-crm" style="background:rgba(217,0,0,0.08); border:1px solid var(--primary-red); color:var(--primary-red);" onclick="window.openCRM()">
                         <i class="fa-solid fa-database"></i> <span>RED Kunden</span>
                     </button>
+                    <button type="button" class="btn-primary admin-tool-btn mod-invoice" style="background:rgba(22,163,74,0.12); border:1px solid #16a34a; color:var(--green-accent);" onclick="window.openCashInvoiceModal()">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> <span>Bar-Rechnung</span>
+                    </button>
                     <button type="button" class="btn-primary admin-tool-btn supervisor-only-inline" style="background:rgba(192,38,211,0.1); border:1px solid #c026d3; color:#c026d3;" onclick="window.openSupervisorPanel()">
                         <i class="fa-solid fa-crown"></i> <span>Rechte</span>
                     </button>
@@ -842,6 +845,142 @@
             </div>
 
             <button type="button" class="btn-primary" style="background:var(--gold-border); color:#fff; width:100%; justify-content:center; margin-top:5px;" onclick="window.printKaufvertrag()"><i class="fa-solid fa-print"></i> Vollständigen Kaufvertrag (Ausgefüllt oder Blanko) als PDF / Druckansicht öffnen</button>
+        </div>
+    </div>
+
+    <!-- BAR-RECHNUNG & QUITTUNG GENERATOR (SUPERVISOR & FREIGESCHALTETER ADMIN) -->
+    <div class="custom-dialog-overlay" id="cashInvoiceOverlay">
+        <div class="custom-dialog-window">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCashInvoiceModal()"></i>
+            <h3 style="color:var(--green-accent); font-weight:900; margin-bottom:6px; text-align:center;">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Bar-Rechnung &amp; Quittung (PDF)
+            </h3>
+            <p style="color:var(--text-muted); font-size:11px; margin-bottom:14px; text-align:center;">
+                Erstellen Sie in Sekunden eine saubere DIN-A4 Barzahlungs-Rechnung optional mit Logo, Firmenstempel &amp; Unterschriftenfeld.
+            </p>
+
+            <div class="service-config-section">
+                <h4>1. Kopfdaten &amp; Kunde (optional aus Terminen/CRM laden)</h4>
+                <div class="form-group">
+                    <label>Kunde schnell aus Terminen / CRM übernehmen (Optional)</label>
+                    <select id="invClientQuickPick" class="form-control" onchange="window.fillInvoiceFromQuickPick(this.value)">
+                        <option value="">— Manuell eingeben —</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Beleg-Art</label>
+                        <select id="invDocTitle" class="form-control">
+                            <option value="RECHNUNG & BARQUITTUNG">Rechnung &amp; Barquittung</option>
+                            <option value="RECHNUNG">Rechnung</option>
+                            <option value="BARQUITTUNG">Barquittung</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Rechnungs-Nr.</label>
+                        <input type="text" id="invNumber" class="form-control" placeholder="RE-2026-0001">
+                    </div>
+                    <div class="form-group">
+                        <label>Datum</label>
+                        <input type="text" id="invDate" class="form-control" placeholder="TT.MM.JJJJ">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kundenname / Firma *</label>
+                        <input type="text" id="invCustomerName" class="form-control" placeholder="Vor- und Nachname oder Firma">
+                    </div>
+                    <div class="form-group">
+                        <label>Kennzeichen / Fahrzeug (Optional)</label>
+                        <input type="text" id="invPlate" class="form-control" placeholder="z.B. B - XY 1234" style="text-transform:uppercase;">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Kundenanschrift (Optional – leer = Schreiblinie oder ausgeblendet)</label>
+                    <input type="text" id="invCustomerAddress" class="form-control" placeholder="Straße, Hausnr., PLZ Berlin">
+                </div>
+            </div>
+
+            <div class="service-config-section">
+                <h4>2. Leistungen &amp; Beträge (1-Klick Schnellauswahl)</h4>
+                <div class="inv-quick-bar">
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Anmeldung mit Wunschkennzeichen (inkl. Gebühren, Schilder & Plakette)', 1, 100)">+ Anm. Wunsch 100 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Anmeldung mit Zufallskennzeichen (inkl. Gebühren, Schilder & Plakette)', 1, 90)">+ Anm. Zufall 90 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Ummeldung mit gleichem Kennzeichen', 1, 70)">+ Ummeldung 70 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Abmeldung (regulär)', 1, 30)">+ Abm. 30 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Online-Abmeldung', 1, 20)">+ Online-Abm. 20 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Kurzzeitkennzeichen (6 Tage)', 1, 120)">+ Kurzzeit 120 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Zoll- / Ausfuhrkennzeichen (30 Tage)', 1, 350)">+ Zoll 350 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('1 Paar Kfz-Kennzeichen (Sofortprägung)', 1, 30)">+ 1 Paar 30 €</button>
+                    <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Einzelnes Kfz-Kennzeichen (1 Stück)', 1, 15)">+ 1 Schild 15 €</button>
+                    <button type="button" class="inv-quick-chip" style="border-color:var(--primary-red); color:var(--primary-red);" onclick="window.addInvoiceRow('', 1, 0)">+ Freie Position</button>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 68px 102px 34px; gap:7px; font-size:9.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px; padding:0 2px;">
+                    <span>Leistung / Bezeichnung</span>
+                    <span>Menge</span>
+                    <span>Preis (€)</span>
+                    <span></span>
+                </div>
+                <div id="invItemsContainer"></div>
+
+                <div class="inv-total-summary">
+                    <div>
+                        <span style="font-size:10px; text-transform:uppercase; color:var(--text-muted); font-weight:800; display:block;">Gesamtbetrag (Brutto)</span>
+                        <strong id="invLiveTotal" style="font-size:20px; color:var(--green-accent);">0,00 €</strong>
+                        <span id="invLiveTaxHint" style="font-size:10.5px; color:var(--text-muted); display:block;"></span>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; flex:1; justify-content:flex-end; min-width:220px;">
+                        <select id="invTaxMode" class="form-control" style="max-width:290px; padding:9px 32px 9px 10px !important; font-size:11.5px !important;" onchange="window.recalcCashInvoice()">
+                            <option value="mwst19">Inkl. 19 % MwSt. (Netto + MwSt. ausweisen)</option>
+                            <option value="komplett">Komplettpreis inkl. MwSt. &amp; verauslagter Amtsgebühren</option>
+                            <option value="klein">Kleinunternehmer (§ 19 UStG – ohne MwSt.)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-config-section">
+                <h4>3. Zahlungsstatus, Logo, Stempel &amp; Unterschrift</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Zahlungsstatus</label>
+                        <select id="invPayStatus" class="form-control">
+                            <option value="paid">Betrag dankend in BAR erhalten (Bezahlt)</option>
+                            <option value="open">Zahlbar in BAR bei Übergabe / Abholung</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Zusatzhinweis auf der Rechnung (Optional)</label>
+                        <input type="text" id="invNote" class="form-control" placeholder="z.B. Papiere & Schilder vollständig übergeben">
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="invOptLogo" checked><span class="noble-checkbox-box"></span> Mit RED-Logo im Briefkopf</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="invOptStamp" checked><span class="noble-checkbox-box"></span> Mit Firmenstempel</label>
+                    <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="invOptSigLines" checked><span class="noble-checkbox-box"></span> Unterschriftenfelder (Kunde &amp; RED)</label>
+                </div>
+
+                <div class="form-group" style="margin-bottom:0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label>Optionale digitale Unterschrift (leer lassen für Handunterschrift mit Stift):</label>
+                        <button type="button" onclick="window.clearInvoiceSignature()" style="background:none; border:none; color:var(--primary-red); font-size:11px !important; font-weight:800; cursor:pointer;"><i class="fa-solid fa-eraser"></i> Löschen</button>
+                    </div>
+                    <div class="signature-pad-wrapper" style="height:120px;">
+                        <canvas id="invSignatureCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+                <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none;" onclick="window.resetCashInvoiceForm()">
+                    <i class="fa-solid fa-rotate-left"></i> Neu / Leeren
+                </button>
+                <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:2; justify-content:center;" onclick="window.printCashInvoice()">
+                    <i class="fa-solid fa-file-pdf"></i> PDF / Druckansicht zum Unterschreiben öffnen
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1207,6 +1346,7 @@
             <div style="text-align:left; background:var(--bg-input); padding:15px; border-radius:12px; border:1px solid var(--glass-border); margin-bottom:18px; display:grid; grid-template-columns:1fr; gap:8px;">
                 <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permLeads"><span class="noble-checkbox-box"></span> 📡 Live-Leads & Monitoring Terminal (Terminliste)</label>
                 <label class="noble-checkbox-label" style="display:flex; margin:0; color:var(--primary-red); font-weight:700;"><input type="checkbox" id="permCrm"><span class="noble-checkbox-box"></span> 🗂️ RED Kundendatenbank & CRM</label>
+                <label class="noble-checkbox-label" style="display:flex; margin:0; color:var(--green-accent); font-weight:700;"><input type="checkbox" id="permInvoice"><span class="noble-checkbox-box"></span> 🧾 Bar-Rechnung &amp; Quittung (PDF + Logo + Stempel)</label>
                 <label class="noble-checkbox-label" style="display:flex; margin:0; color:#ff9500;"><input type="checkbox" id="permPages"><span class="noble-checkbox-box"></span> 📄 Seiten Manager (Page Builder)</label>
                 <label class="noble-checkbox-label" style="display:flex; margin:0; color:var(--green-accent);"><input type="checkbox" id="permTheme"><span class="noble-checkbox-box"></span> 🎨 Design- & Farb-Manager (Themes)</label>
                 <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permPrices"><span class="noble-checkbox-box"></span> 💶 Leistungskarten, Preise & Schnellkalkulator</label>
