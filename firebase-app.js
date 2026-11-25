@@ -75,6 +75,21 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             });
         };
 
+        let invoicesUnsubscribe = null;
+        window.startAdminInvoicesListener = function() {
+            if (!window.isAuthorized || invoicesUnsubscribe) return;
+            invoicesUnsubscribe = onSnapshot(doc(db, "settings", "invoices_archive"), (docSnap) => {
+                if (docSnap.exists() && Array.isArray(docSnap.data().list)) {
+                    window.savedInvoicesData = docSnap.data().list;
+                    localStorage.setItem('red_saved_invoices_v1', JSON.stringify(window.savedInvoicesData));
+                    if (typeof window.updateInvoiceCountBadges === 'function') window.updateInvoiceCountBadges();
+                    if (document.getElementById('cashInvoiceOverlay')?.classList.contains('open')) {
+                        window.renderSavedInvoicesArchive();
+                    }
+                }
+            });
+        };
+
         onSnapshot(collection(db, "custom_pages"), (snapshot) => {
             if (!snapshot.empty) {
                 const pages = [];
@@ -166,6 +181,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 window.applyAdminModulePermissions(localPerms || window.adminPermissions);
 
                 window.startAdminCrmListener();
+                window.startAdminInvoicesListener();
                 if (typeof window.startAdminAppointmentsListener === 'function') {
                     window.startAdminAppointmentsListener();
                 }
@@ -176,12 +192,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme', 'perm-invoice');
 
                 if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
+                if (invoicesUnsubscribe) { invoicesUnsubscribe(); invoicesUnsubscribe = null; }
                 if (typeof window.stopAdminAppointmentsListener === 'function') {
                     window.stopAdminAppointmentsListener();
                 }
                 window.crmClientsDetail = {};
+                window.savedInvoicesData = [];
                 window.redApts = [];
                 localStorage.removeItem('red_crm_details');
+                localStorage.removeItem('red_saved_invoices_v1');
                 localStorage.removeItem('red_local_apts');
                 localStorage.removeItem('red_admin_saved');
                 localStorage.removeItem('red_logged_in_user');
@@ -1112,12 +1131,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
         window.openInvoiceFromApt = function(aptId) {
             const idx = (window.redApts || []).findIndex(a => a.id === aptId);
             if (idx === -1) return;
-            window.openCashInvoiceModal();
+            window.resetCashInvoiceForm();
+            window.openCashInvoiceModal('create');
             setTimeout(() => {
                 const pick = document.getElementById('invClientQuickPick');
                 if (pick) pick.value = `apt:${idx}`;
                 window.fillInvoiceFromQuickPick(`apt:${idx}`);
-            }, 80);
+                if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+            }, 90);
         };
 
         window.printOrderSlip = function(aptId) {
