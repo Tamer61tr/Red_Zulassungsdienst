@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-    <link rel="stylesheet" href="./styles.css?v=16">
+   <link rel="stylesheet" href="./styles.css?v=21">
 </head>
 
 <body data-theme="light">
@@ -1274,41 +1274,46 @@
         </div>
     </div>
 
-    <!-- ZENTRIERTER KINO-MEDIA-PLAYER (VERGRÖSSERTE ANSICHT MIT VOLLSTEUERUNG) -->
+<!-- ZENTRIERTER KINO-MEDIA-PLAYER (MIT INTRO/OUTRO-BÜHNE, HUD & SUPERVISOR-STIFT) -->
     <div class="custom-dialog-overlay" id="redVideoCenterOverlay">
         <div class="custom-dialog-window rvp-center-window">
             <div class="rvp-center-topbar">
                 <div class="rvp-center-title-wrap">
-                    <img id="rvpCenterBrandBadge" src="./red-logo-round.jpg" alt="RED" class="rvp-mini-brand" onerror="this.style.display='none'">
+                    <img id="rvpCenterBrandBadge" src="./red-logo-round.jpeg" alt="RED" class="rvp-mini-brand" onerror="this.style.display='none'">
                     <div style="min-width:0;">
                         <strong id="rvpCenterTitle">RED Zulassungsdienst Berlin</strong>
                         <span id="rvpCenterSub">Offizielles Info- &amp; Werbevideo</span>
                     </div>
                 </div>
-                <button type="button" class="lightbox-top-close" onclick="window.closeVideoCenterModal()" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+                <div style="display:flex; align-items:center; gap:7px; flex-shrink:0;">
+                    <button type="button" class="mini-admin-btn edit action-videos" onclick="window.editCurrentCenterVideo()" title="Dieses Video direkt bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                    <button type="button" class="lightbox-top-close" onclick="window.closeVideoCenterModal()" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
 
             <div class="rvp-center-stage" id="rvpCenterStage">
-                <video id="rvpCenterVideo" playsinline preload="metadata" onclick="window.rvpTogglePlay('center')"></video>
-                <button type="button" class="rvp-center-bigplay" id="rvpCenterBigPlay" onclick="window.rvpTogglePlay('center')" aria-label="Abspielen"><i class="fa-solid fa-play"></i></button>
+                <video id="rvpCenterVideo" playsinline preload="auto" onclick="event.stopPropagation(); window.rvpTogglePlay('center')"></video>
+                <div class="rvp-bumper-overlay" id="rvpBumper-center"></div>
+                <div class="rvp-hud-toast" id="rvpHud-center"></div>
+                <button type="button" class="rvp-center-bigplay" id="rvpCenterBigPlay" onclick="event.stopPropagation(); window.rvpTogglePlay('center')" aria-label="Abspielen"><i class="fa-solid fa-play"></i></button>
             </div>
 
             <div class="rvp-controls-bar rvp-controls-center">
                 <div class="rvp-seek-row">
-                    <span class="rvp-time" id="rvpCenterTimeCur">0:00</span>
-                    <input type="range" id="rvpCenterSeek" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" oninput="window.rvpSeek('center', this.value)">
-                    <span class="rvp-time" id="rvpCenterTimeDur">0:00</span>
+                    <span class="rvp-time" id="rvpTimeCur-center">0:00</span>
+                    <input type="range" id="rvpSeek-center" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" onpointerdown="window.rvpSeekStart('center')" onpointerup="window.rvpSeekEnd('center')" oninput="window.rvpSeekMove('center', this.value)" onchange="window.rvpSeekEnd('center', this.value)">
+                    <span class="rvp-time" id="rvpTimeDur-center">0:00</span>
                 </div>
                 <div class="rvp-btn-row">
                     <div class="rvp-btn-group">
-                        <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('center', -5)" title="5 Sekunden zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
-                        <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpCenterPlayBtn" onclick="window.rvpTogglePlay('center')" title="Abspielen / Pause"><i class="fa-solid fa-pause"></i></button>
-                        <button type="button" class="rvp-ctrl-btn" onclick="window.rvpStop('center')" title="Stopp (auf Anfang)"><i class="fa-solid fa-stop"></i></button>
-                        <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('center', 5)" title="5 Sekunden vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
+                        <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpSkip('center', -5)" title="5 Sekunden zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
+                        <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpPlayBtn-center" onclick="event.stopPropagation(); window.rvpTogglePlay('center')" title="Abspielen / Pause"><i class="fa-solid fa-pause"></i></button>
+                        <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpStop('center')" title="Stopp (auf Anfang)"><i class="fa-solid fa-stop"></i></button>
+                        <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpSkip('center', 5)" title="5 Sekunden vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
                     </div>
                     <div class="rvp-vol-group">
-                        <button type="button" class="rvp-ctrl-btn" id="rvpCenterMuteBtn" onclick="window.rvpToggleMute('center')" title="Ton Ein/Aus"><i class="fa-solid fa-volume-high"></i></button>
-                        <input type="range" id="rvpCenterVol" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0.9" oninput="window.rvpSetVolume('center', this.value)" aria-label="Lautstärke">
+                        <button type="button" class="rvp-ctrl-btn" id="rvpMuteBtn-center" onclick="event.stopPropagation(); window.rvpToggleMute('center')" title="Ton Ein/Aus"><i class="fa-solid fa-volume-high"></i></button>
+                        <input type="range" id="rvpVol-center" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0.9" oninput="window.rvpSetVolume('center', this.value)" aria-label="Lautstärke">
                     </div>
                 </div>
             </div>
@@ -1335,10 +1340,24 @@
                 </button>
             </div>
 
-            <!-- TAB 1: VIDEOS & PLATZIERUNG -->
+            <!-- TAB 1: VIDEOS, LAYOUT, INTRO/OUTRO-LOGO & STUDIO-MUSIK -->
             <div class="exec-studio-body" id="vmPaneVideos">
                 <div class="service-config-section">
-                    <h4>1. Platzierung &amp; Verhalten auf der Website</h4>
+                    <h4>1. Bereichs-Überschrift, Multi-Video-Ansicht &amp; Platzierung</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Bereichs-Kategorie (klein oben)</label>
+                            <input type="text" id="vmSectionEyebrow" class="form-control" value="RED Berlin in Aktion" placeholder="z.B. RED Berlin in Aktion" onblur="window.saveVideoSettingsOnly()">
+                        </div>
+                        <div class="form-group">
+                            <label>Ansicht (1, 2 oder 3 Videos)</label>
+                            <select id="vmLayoutSelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
+                                <option value="showcase">🎬 1 Haupt-Video + Playlist-Auswahl</option>
+                                <option value="grid-2">🎞️ 2 Videos nebeneinander (Showroom)</option>
+                                <option value="grid-3">🎥 3 Videos nebeneinander (3er-Kino)</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group" style="flex:1.4; margin-bottom:0;">
                             <label>Wo soll der Video-Bereich erscheinen?</label>
@@ -1352,7 +1371,7 @@
                         <div class="form-group" style="margin-bottom:0;">
                             <label>Start-Verhalten</label>
                             <select id="vmAutoplaySelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
-                                <option value="muted-auto">🔇 Autoplay im Stumm-Modus (Empfohlen)</option>
+                                <option value="muted-auto">🔇 Autoplay im Stumm-Modus</option>
                                 <option value="manual">▶️ Nur bei Klick starten</option>
                             </select>
                         </div>
@@ -1360,8 +1379,13 @@
                 </div>
 
                 <div class="service-config-section">
+                    <div class="inv-edit-banner" id="vmEditBanner" style="margin-bottom:10px;">
+                        <span><i class="fa-solid fa-pen"></i> Bearbeite Video: <strong id="vmEditBannerName"></strong></span>
+                        <button type="button" class="inv-arch-btn" onclick="window.resetVideoManagerForm()"><i class="fa-solid fa-plus"></i> Neues Video</button>
+                    </div>
                     <h4 id="vmFormHeading">2. Video hinzufügen oder bearbeiten</h4>
                     <input type="hidden" id="vmEditId">
+
                     <div class="form-row">
                         <div class="form-group" style="flex:1.4;">
                             <label>Video-Überschrift *</label>
@@ -1369,17 +1393,21 @@
                         </div>
                         <div class="form-group">
                             <label>Etikett (Badge)</label>
-                            <input type="text" id="vmBadge" class="form-control" placeholder="z.B. 30s Einblick">
+                            <input type="text" id="vmBadge" class="form-control" placeholder="z.B. 30s Live-Einblick">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Kurzer Begleittext</label>
-                        <input type="text" id="vmDesc" class="form-control" placeholder="z.B. Anmelden, Abmelden &amp; Kennzeichenprägung direkt vor Ort.">
+                        <label>Beschreibungstext</label>
+                        <textarea id="vmDesc" class="form-control" rows="2" style="resize:vertical;" placeholder="Kurze Beschreibung für Ihre Kunden..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>3 Highlight-Punkte neben dem Video (1 Punkt pro Zeile)</label>
+                        <textarea id="vmHighlights" class="form-control" rows="3" style="resize:vertical;" placeholder="Keine Wartenummer beim Amt – Abgabe in 5 Minuten&#10;Sofort-Kennzeichenprägung in der Kienitzer Str. 6&#10;An-, Um-, Abmeldung, Kurzzeit- &amp; Zollkennzeichen"></textarea>
                     </div>
                     <div class="form-row">
                         <div class="form-group" style="flex:1.5;">
                             <label>Video-Dateipfad oder MP4-Link *</label>
-                            <input type="text" id="vmUrl" class="form-control" placeholder="./werbevideo-1.mp4 oder https://...">
+                            <input type="text" id="vmUrl" class="form-control" placeholder="./werbevideo-1.mp4 (oder ./werbevideo-2.mp4)">
                         </div>
                         <div class="form-group">
                             <label>Video-Format</label>
@@ -1390,21 +1418,115 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom:10px;">
+                    <div class="form-group">
                         <label>Oder kurzes Video (bis 650 KB) direkt hochladen</label>
                         <label class="noble-file-upload" style="margin-top:0;">
                             <input type="file" id="vmFileInput" accept="video/mp4,video/webm" onchange="window.handlePromoVideoFileSelect(this)">
-                            <span class="noble-file-trigger" id="vmFileLabel"><i class="fa-solid fa-cloud-arrow-up"></i> Video auswählen (für größere Videos Datei per GitHub als ./werbevideo-1.mp4 hochladen)</span>
+                            <span class="noble-file-trigger" id="vmFileLabel"><i class="fa-solid fa-cloud-arrow-up"></i> Video wählen (für größere MP4s einfach auf GitHub hochladen, z.B. ./werbevideo-2.mp4)</span>
                         </label>
                     </div>
-                    <div style="display:flex; gap:8px;">
+
+                    <!-- INTRO & OUTRO STUDIO: LOGO, SEKUNDEN & MUSIK -->
+                    <div class="vm-bumper-box">
+                        <div class="vm-bumper-box-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Intro- &amp; Outro-Logo, Sekunden &amp; Musik</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Logo-Einblendung</label>
+                                <select id="vmLogoMode" class="form-control">
+                                    <option value="both">🔴 Vor &amp; nach dem Video (Intro + Outro)</option>
+                                    <option value="intro">▶️ Nur vor dem Video (Intro)</option>
+                                    <option value="outro">⏹️ Nur nach dem Video (Outro)</option>
+                                    <option value="none">— Ohne Logo-Einblendung —</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Logo-Darstellung</label>
+                                <select id="vmLogoStyle" class="form-control">
+                                    <option value="round_title">🔴 RED Rund-Logo + Schriftzug</option>
+                                    <option value="round">🔴 Nur RED Rund-Logo (Groß)</option>
+                                    <option value="wordmark">RED Zulassungsdienst Text-Logo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Intro-Dauer (Sekunden)</label>
+                                <select id="vmIntroSec" class="form-control">
+                                    <option value="1.5">1,5 Sekunden (Schnell)</option>
+                                    <option value="2">2 Sekunden</option>
+                                    <option value="2.5" selected>2,5 Sekunden (Optimal)</option>
+                                    <option value="3">3 Sekunden</option>
+                                    <option value="4">4 Sekunden</option>
+                                    <option value="5">5 Sekunden</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Outro-Dauer (Sekunden)</label>
+                                <select id="vmOutroSec" class="form-control">
+                                    <option value="1.5">1,5 Sekunden</option>
+                                    <option value="2">2 Sekunden</option>
+                                    <option value="2.5">2,5 Sekunden</option>
+                                    <option value="3" selected>3 Sekunden (Optimal)</option>
+                                    <option value="4">4 Sekunden</option>
+                                    <option value="5">5 Sekunden</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <label>Intro-Musik</label>
+                                    <button type="button" class="pw-mini-link" onclick="window.previewSelectedVideoMusic('intro')"><i class="fa-solid fa-volume-high"></i> Vorhören</button>
+                                </div>
+                                <select id="vmIntroMusic" class="form-control" onchange="window.toggleCustomVideoAudioFields()">
+                                    <option value="cinema-whoosh">🎬 Cinema Deep Impact</option>
+                                    <option value="sport-rev">🏎️ Sport-Turbo Sweep</option>
+                                    <option value="luxury-chime">✨ Showroom Edel-Klang</option>
+                                    <option value="pulse-beat">⚡ Modern Tech Pulse</option>
+                                    <option value="victory-chord">🏆 Finale Akkord</option>
+                                    <option value="none">🔇 Keine Intro-Musik</option>
+                                    <option value="custom">🎵 Eigene MP3-URL...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <label>Outro-Musik</label>
+                                    <button type="button" class="pw-mini-link" onclick="window.previewSelectedVideoMusic('outro')"><i class="fa-solid fa-volume-high"></i> Vorhören</button>
+                                </div>
+                                <select id="vmOutroMusic" class="form-control" onchange="window.toggleCustomVideoAudioFields()">
+                                    <option value="victory-chord">🏆 Finale Akkord (Empfohlen)</option>
+                                    <option value="luxury-chime">✨ Showroom Edel-Klang</option>
+                                    <option value="cinema-whoosh">🎬 Cinema Deep Impact</option>
+                                    <option value="sport-rev">🏎️ Sport-Turbo Sweep</option>
+                                    <option value="pulse-beat">⚡ Modern Tech Pulse</option>
+                                    <option value="none">🔇 Keine Outro-Musik</option>
+                                    <option value="custom">🎵 Eigene MP3-URL...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row" id="vmCustomAudioRow" style="display:none; margin-bottom:0;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Eigene Intro MP3 (z.B. ./intro.mp3)</label>
+                                <input type="text" id="vmIntroCustomAudio" class="form-control" placeholder="./intro-sound.mp3">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Eigene Outro MP3 (z.B. ./outro.mp3)</label>
+                                <input type="text" id="vmOutroCustomAudio" class="form-control" placeholder="./outro-sound.mp3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-top:12px;">
                         <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none; border-radius:10px;" onclick="window.resetVideoManagerForm()"><i class="fa-solid fa-rotate-left"></i> Neu</button>
-                        <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:2; justify-content:center; border-radius:10px;" onclick="window.savePromoVideoItem()"><i class="fa-solid fa-floppy-disk"></i> Video speichern</button>
+                        <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:2; justify-content:center; border-radius:10px;" onclick="window.savePromoVideoItem()"><i class="fa-solid fa-floppy-disk"></i> Video &amp; Effekte speichern</button>
                     </div>
                 </div>
 
                 <div class="service-config-section" style="margin-bottom:0;">
-                    <h4>3. Hinterlegte Werbevideos</h4>
+                    <h4>3. Hinterlegte Werbevideos (Video 1, 2, 3...)</h4>
                     <div id="vmVideosList" class="pm-pages-cards"></div>
                 </div>
             </div>
@@ -3937,8 +4059,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-<script src="./app.js?v=16" defer></script>
-    <script type="module" src="./firebase-app.js?v=16"></script>
+<script src="./app.js?v=21" defer></script>
+    <script type="module" src="./firebase-app.js?v=21"></script>
 
 </body>
 </html>

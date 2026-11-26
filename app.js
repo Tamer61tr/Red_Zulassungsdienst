@@ -6406,25 +6406,47 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if (prevLogo) prevLogo.src = src;
         };
 
+const DEFAULT_VIDEO_HIGHLIGHTS = [
+            'Keine Wartenummer beim Amt – Abgabe in 5\u00A0Minuten',
+            'Sofort-Kennzeichenprägung direkt vor Ort in der Kienitzer\u00A0Str.\u00A06',
+            'Anmeldung, Ummeldung, Abmeldung, Kurzzeit- & Zollkennzeichen'
+        ];
+
         const DEFAULT_PROMO_VIDEOS_CFG = {
             placement: 'after-hero',
             autoplayMode: 'muted-auto',
+            layoutMode: 'showcase',
+            sectionEyebrow: 'RED Berlin in Aktion',
             list: [
                 {
                     id: 'vid-default-1',
                     title: 'Keine Wartenummer beim Amt – RED Berlin in 30 Sekunden',
                     badge: '30s Live-Einblick',
                     desc: 'Wozu stundenlang auf der Zulassungsstelle warten? Bei uns geben Sie Ihre Unterlagen ohne Wartezeit ab – wir prägen Ihre Schilder direkt vor Ort in der Kienitzer Str. 6, 12053 Berlin.',
+                    highlights: DEFAULT_VIDEO_HIGHLIGHTS.slice(),
                     url: './werbevideo-1.mp4',
-                    aspect: '9/16'
+                    aspect: '9/16',
+                    logoMode: 'both',
+                    logoStyle: 'round_title',
+                    introSec: 2.5,
+                    outroSec: 3,
+                    introMusic: 'cinema-whoosh',
+                    outroMusic: 'victory-chord',
+                    introCustomAudio: '',
+                    outroCustomAudio: ''
                 }
             ]
         };
 
         window.promoVideosConfig = JSON.parse(localStorage.getItem('red_promo_videos_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT_PROMO_VIDEOS_CFG));
+        if (!window.promoVideosConfig.layoutMode) window.promoVideosConfig.layoutMode = 'showcase';
+        if (!window.promoVideosConfig.sectionEyebrow) window.promoVideosConfig.sectionEyebrow = 'RED Berlin in Aktion';
+
         window.activePromoVideoIdx = 0;
-        window._rvpUserStopped = false;
-        window._rvpObserver = null;
+        window.activeCenterVideoIdx = 0;
+        window._rvpStates = {};
+        window._rvpObservers = [];
+        window._rvpCustomAudioEl = null;
 
         window.canManagePromoVideos = function() {
             return document.body.classList.contains('is-supervisor') ||
@@ -6438,155 +6460,478 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             return `${m}:${String(s).padStart(2, '0')}`;
         };
 
-        window.getRvpEl = function(scope) {
-            return document.getElementById(scope === 'center' ? 'rvpCenterVideo' : 'rvpInlineVideo');
+        // --- STUDIO JINGLE & AUDIO ENGINE (100% LOKAL / DSGVO-KONFORM + EIGENE MP3) ---
+        window.stopRedStudioAudio = function() {
+            if (window._rvpCustomAudioEl) {
+                try { window._rvpCustomAudioEl.pause(); window._rvpCustomAudioEl.currentTime = 0; } catch (e) {}
+            }
         };
 
-        window.rvpSyncUi = function(scope) {
-            const v = window.getRvpEl(scope);
-            if (!v) return;
-            const pfx = scope === 'center' ? 'rvpCenter' : 'rvpInline';
+        window.playRedStudioAudio = function(presetKey, customUrl = '', vol = 0.65) {
+            if (!presetKey || presetKey === 'none') return;
+            const gainVal = Math.max(0.05, Math.min(1, Number(vol) || 0.65));
 
-            const playBtn = document.getElementById(pfx + 'PlayBtn');
-            if (playBtn) {
-                playBtn.innerHTML = v.paused ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-pause"></i>';
+            if (presetKey === 'custom' && customUrl) {
+                try {
+                    window.stopRedStudioAudio();
+                    const a = new Audio(customUrl);
+                    a.volume = gainVal;
+                    window._rvpCustomAudioEl = a;
+                    a.play().catch(() => {});
+                } catch (e) {}
+                return;
             }
-            const muteBtn = document.getElementById(pfx + 'MuteBtn');
+
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                if (!window._rvpAudioCtx) window._rvpAudioCtx = new AudioCtx();
+                const ctx = window._rvpAudioCtx;
+                if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+
+                const now = ctx.currentTime;
+                const master = ctx.createGain();
+                master.gain.setValueAtTime(gainVal * 0.28, now);
+                master.connect(ctx.destination);
+
+                const playTone = (freq, start, dur, type = 'sine', endFreq = null, peak = 1) => {
+                    const osc = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, now + start);
+                    if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, now + start + dur);
+                    g.gain.setValueAtTime(0.001, now + start);
+                    g.gain.linearRampToValueAtTime(peak, now + start + Math.min(0.06, dur * 0.25));
+                    g.gain.exponentialRampToValueAtTime(0.001, now + start + dur);
+                    osc.connect(g);
+                    g.connect(master);
+                    osc.start(now + start);
+                    osc.stop(now + start + dur + 0.04);
+                };
+
+                if (presetKey === 'cinema-whoosh') {
+                    playTone(130, 0, 0.9, 'sine', 42, 1.2);
+                    playTone(220, 0.05, 0.85, 'triangle', 110, 0.55);
+                    playTone(440, 0.14, 0.75, 'sine', 660, 0.35);
+                } else if (presetKey === 'sport-rev') {
+                    playTone(95, 0, 0.45, 'sawtooth', 310, 0.45);
+                    playTone(190, 0.12, 0.55, 'triangle', 520, 0.55);
+                    playTone(523.25, 0.46, 0.45, 'sine', 659.25, 0.7);
+                } else if (presetKey === 'luxury-chime') {
+                    playTone(523.25, 0, 0.75, 'sine', null, 0.7);
+                    playTone(659.25, 0.14, 0.8, 'sine', null, 0.65);
+                    playTone(783.99, 0.28, 0.9, 'sine', null, 0.65);
+                    playTone(1174.66, 0.42, 1.0, 'triangle', null, 0.4);
+                } else if (presetKey === 'pulse-beat') {
+                    playTone(261.63, 0, 0.2, 'triangle', null, 0.8);
+                    playTone(329.63, 0.22, 0.2, 'triangle', null, 0.85);
+                    playTone(523.25, 0.44, 0.55, 'sine', null, 0.9);
+                } else if (presetKey === 'victory-chord') {
+                    playTone(392.0, 0, 0.45, 'triangle', null, 0.65);
+                    playTone(523.25, 0.18, 0.95, 'sine', null, 0.8);
+                    playTone(659.25, 0.18, 0.95, 'sine', null, 0.6);
+                    playTone(783.99, 0.26, 1.05, 'triangle', null, 0.55);
+                }
+            } catch (e) {}
+        };
+
+        window.previewSelectedVideoMusic = function(kind) {
+            const preset = document.getElementById(kind === 'outro' ? 'vmOutroMusic' : 'vmIntroMusic')?.value || 'none';
+            const custom = document.getElementById(kind === 'outro' ? 'vmOutroCustomAudio' : 'vmIntroCustomAudio')?.value.trim() || '';
+            if (preset === 'none') {
+                window.showToast('Aktuell ist „Keine Musik“ gewählt.', 'error');
+                return;
+            }
+            window.playRedStudioAudio(preset, custom, 0.85);
+        };
+
+        window.toggleCustomVideoAudioFields = function() {
+            const m1 = document.getElementById('vmIntroMusic')?.value;
+            const m2 = document.getElementById('vmOutroMusic')?.value;
+            const row = document.getElementById('vmCustomAudioRow');
+            if (row) row.style.display = (m1 === 'custom' || m2 === 'custom') ? 'flex' : 'none';
+        };
+
+        // --- PLAYER KERNFUNKTIONEN (MULTI-PLAYER & KINO-MODAL) ---
+        window.getRvpEl = function(key) {
+            return document.getElementById(key === 'center' ? 'rvpCenterVideo' : `rvpVid-${key}`);
+        };
+
+        window.getRvpState = function(key) {
+            if (!window._rvpStates[key]) {
+                window._rvpStates[key] = { videoIdx: 0, userPaused: false, isSeeking: false, phase: 'video', timerId: null, introShown: false };
+            }
+            return window._rvpStates[key];
+        };
+
+        window.getRvpItem = function(key) {
+            const list = window.promoVideosConfig?.list || [];
+            const st = window.getRvpState(key);
+            return list[st.videoIdx] || list[0] || null;
+        };
+
+        window.rvpShowHud = function(key, iconCls, text) {
+            const el = document.getElementById(`rvpHud-${key}`);
+            if (!el) return;
+            el.innerHTML = `<i class="${iconCls}"></i><span>${text}</span>`;
+            el.classList.add('show');
+            clearTimeout(el._hudTimer);
+            el._hudTimer = setTimeout(() => el.classList.remove('show'), 680);
+        };
+
+        window.rvpHideBumper = function(key) {
+            const st = window.getRvpState(key);
+            if (st.timerId) { clearTimeout(st.timerId); st.timerId = null; }
+            const ov = document.getElementById(`rvpBumper-${key}`);
+            if (ov) ov.classList.remove('active');
+            if (st.phase === 'intro' || st.phase === 'outro') st.phase = 'video';
+        };
+
+        window.rvpShowBumper = function(key, kind, onComplete) {
+            const item = window.getRvpItem(key);
+            const ov = document.getElementById(`rvpBumper-${key}`);
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
+            if (!item || !ov) { if (onComplete) onComplete(); return; }
+
+            const durSec = Math.max(0.8, Math.min(10, parseFloat(kind === 'outro' ? item.outroSec : item.introSec) || (kind === 'outro' ? 3 : 2.5)));
+            const logoStyle = item.logoStyle || 'round_title';
+            const brandSrc = window.getAbsoluteBrandLogoUrl();
+
+            let visualHtml = '';
+            if (logoStyle === 'round') {
+                visualHtml = `<div class="rvp-bumper-ring is-large"><img src="${window.escHtml(brandSrc)}" alt="RED"></div>`;
+            } else if (logoStyle === 'wordmark') {
+                visualHtml = `<div class="rvp-bumper-title" style="font-size:24px;"><span>RED</span> BERLIN</div><div class="rvp-bumper-sub">ZULASSUNGSDIENST &amp; SCHILDER</div>`;
+            } else {
+                visualHtml = `
+                    <div class="rvp-bumper-ring"><img src="${window.escHtml(brandSrc)}" alt="RED"></div>
+                    <div class="rvp-bumper-title"><span>RED</span> ZULASSUNGSDIENST</div>
+                    <div class="rvp-bumper-sub">${kind === 'outro' ? 'KIENITZER STR. 6 • 12053 BERLIN' : 'SCHNELL • ZUVERLÄSSIG • KOMPETENT'}</div>
+                `;
+            }
+
+            ov.innerHTML = `${visualHtml}<div class="rvp-bumper-bar"><div class="rvp-bumper-bar-fill" style="--bumper-dur:${durSec}s;"></div></div>`;
+            ov.classList.add('active');
+            st.phase = kind;
+
+            // Musik nur abspielen, wenn der Player nicht stummgeschaltet ist
+            if (v && !v.muted && v.volume > 0) {
+                const musicKey = kind === 'outro' ? (item.outroMusic || 'victory-chord') : (item.introMusic || 'cinema-whoosh');
+                const customUrl = kind === 'outro' ? (item.outroCustomAudio || '') : (item.introCustomAudio || '');
+                window.playRedStudioAudio(musicKey, customUrl, v.volume);
+            }
+
+            if (st.timerId) clearTimeout(st.timerId);
+            st.timerId = setTimeout(() => {
+                ov.classList.remove('active');
+                st.timerId = null;
+                st.phase = 'video';
+                if (onComplete) onComplete();
+            }, Math.round(durSec * 1000));
+        };
+
+        window.rvpPauseOtherPlayers = function(activeKey) {
+            Object.keys(window._rvpStates).forEach(k => {
+                if (k === activeKey) return;
+                const otherV = window.getRvpEl(k);
+                if (otherV && !otherV.paused) {
+                    otherV.pause();
+                    window.rvpHideBumper(k);
+                    window.rvpSyncUi(k);
+                }
+            });
+        };
+
+        window.rvpSyncUi = function(key) {
+            const v = window.getRvpEl(key);
+            if (!v) return;
+            const st = window.getRvpState(key);
+            const isActivePlaying = !v.paused || st.phase === 'intro' || st.phase === 'outro';
+
+            const playBtn = document.getElementById(`rvpPlayBtn-${key}`);
+            if (playBtn) {
+                playBtn.innerHTML = isActivePlaying ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
+            }
+            const muteBtn = document.getElementById(`rvpMuteBtn-${key}`);
             if (muteBtn) {
                 const isMuted = v.muted || v.volume === 0;
                 muteBtn.innerHTML = isMuted
                     ? '<i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i>'
                     : (v.volume < 0.5 ? '<i class="fa-solid fa-volume-low"></i>' : '<i class="fa-solid fa-volume-high"></i>');
             }
-            const volSlider = document.getElementById(pfx + 'Vol');
+            const volSlider = document.getElementById(`rvpVol-${key}`);
             if (volSlider) volSlider.value = v.muted ? 0 : v.volume;
 
-            const curEl = document.getElementById(pfx + 'TimeCur');
-            const durEl = document.getElementById(pfx + 'TimeDur');
-            const seekEl = document.getElementById(pfx + 'Seek');
-            if (curEl) curEl.innerText = window.formatVideoTime(v.currentTime);
-            if (durEl) durEl.innerText = window.formatVideoTime(v.duration || 0);
-            if (seekEl && v.duration) seekEl.value = ((v.currentTime / v.duration) * 100).toFixed(2);
+            const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+            const cur = isFinite(v.currentTime) ? v.currentTime : 0;
+            const curEl = document.getElementById(`rvpTimeCur-${key}`);
+            const durEl = document.getElementById(`rvpTimeDur-${key}`);
+            const seekEl = document.getElementById(`rvpSeek-${key}`);
 
-            if (scope === 'inline') {
-                const unmutePill = document.getElementById('rvpInlineUnmutePill');
-                if (unmutePill) unmutePill.classList.toggle('is-hidden', !(v.muted || v.volume === 0) || v.paused);
-            } else {
+            if (curEl) curEl.innerText = window.formatVideoTime(cur);
+            if (durEl) durEl.innerText = window.formatVideoTime(dur);
+            if (seekEl && !st.isSeeking && dur > 0) {
+                seekEl.value = Math.min(100, Math.max(0, (cur / dur) * 100)).toFixed(2);
+            }
+
+            const unmutePill = document.getElementById(`rvpUnmute-${key}`);
+            if (unmutePill) {
+                unmutePill.classList.toggle('is-hidden', !(v.muted || v.volume === 0) || !isActivePlaying);
+            }
+            if (key === 'center') {
                 const bigPlay = document.getElementById('rvpCenterBigPlay');
-                if (bigPlay) bigPlay.classList.toggle('is-hidden', !v.paused);
+                if (bigPlay) bigPlay.classList.toggle('is-hidden', isActivePlaying);
             }
         };
 
-        window.rvpTogglePlay = function(scope) {
-            const v = window.getRvpEl(scope);
-            if (!v) return;
-            if (v.paused) {
-                window._rvpUserStopped = false;
-                v.play().catch(() => {});
-            } else {
-                window._rvpUserStopped = true;
+        window.rvpStartWithIntroIfNeeded = function(key, forceIntro = false) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
+            const item = window.getRvpItem(key);
+            if (!v || !item) return;
+
+            const mode = item.logoMode || 'both';
+            const wantsIntro = (mode === 'intro' || mode === 'both') && (forceIntro || (!st.introShown && v.currentTime < 0.25));
+
+            if (wantsIntro) {
+                st.introShown = true;
                 v.pause();
+                v.currentTime = 0;
+                window.rvpShowBumper(key, 'intro', () => {
+                    if (!st.userPaused) {
+                        v.play().catch(() => {});
+                    }
+                    window.rvpSyncUi(key);
+                });
+                window.rvpSyncUi(key);
+            } else {
+                window.rvpHideBumper(key);
+                v.play().catch(() => {});
+                window.rvpSyncUi(key);
             }
-            window.rvpSyncUi(scope);
         };
 
-        window.rvpStop = function(scope) {
-            const v = window.getRvpEl(scope);
+        window.rvpTogglePlay = function(key) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
             if (!v) return;
-            window._rvpUserStopped = true;
+
+            if (st.phase === 'intro' || st.phase === 'outro') {
+                window.rvpHideBumper(key);
+                window.stopRedStudioAudio();
+                st.userPaused = true;
+                v.pause();
+                window.rvpShowHud(key, 'fa-solid fa-pause', 'Pause');
+                window.rvpSyncUi(key);
+                return;
+            }
+
+            if (v.paused) {
+                st.userPaused = false;
+                window.rvpPauseOtherPlayers(key);
+                window.rvpShowHud(key, 'fa-solid fa-play', 'Abspielen');
+                window.rvpStartWithIntroIfNeeded(key, false);
+            } else {
+                st.userPaused = true;
+                v.pause();
+                window.rvpShowHud(key, 'fa-solid fa-pause', 'Pause');
+                window.rvpSyncUi(key);
+            }
+        };
+
+        window.rvpStop = function(key) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
+            if (!v) return;
+            window.rvpHideBumper(key);
+            window.stopRedStudioAudio();
+            st.userPaused = true;
+            st.introShown = false;
             v.pause();
-            v.currentTime = 0;
-            window.rvpSyncUi(scope);
+            try { v.currentTime = 0; } catch (e) {}
+            const seekEl = document.getElementById(`rvpSeek-${key}`);
+            if (seekEl) seekEl.value = 0;
+            window.rvpShowHud(key, 'fa-solid fa-stop', 'Gestoppt');
+            window.rvpSyncUi(key);
         };
 
-        window.rvpSkip = function(scope, deltaSec) {
-            const v = window.getRvpEl(scope);
+        window.rvpSkip = function(key, deltaSec) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
             if (!v) return;
-            const dur = isFinite(v.duration) ? v.duration : 9999;
-            v.currentTime = Math.max(0, Math.min(dur, (v.currentTime || 0) + deltaSec));
-            window.rvpSyncUi(scope);
+
+            if (st.phase === 'intro' || st.phase === 'outro') {
+                window.rvpHideBumper(key);
+                window.stopRedStudioAudio();
+            }
+
+            const dur = isFinite(v.duration) && v.duration > 0
+                ? v.duration
+                : (v.seekable && v.seekable.length ? v.seekable.end(v.seekable.length - 1) : 0);
+
+            const baseTime = isFinite(v.currentTime) ? v.currentTime : 0;
+            const maxT = dur > 0.25 ? dur - 0.15 : Math.max(0, baseTime + Math.max(0, deltaSec));
+            const target = Math.max(0, Math.min(maxT, baseTime + deltaSec));
+
+            try { v.currentTime = target; } catch (e) {}
+            if (dur > 0) {
+                const seekEl = document.getElementById(`rvpSeek-${key}`);
+                if (seekEl) seekEl.value = ((target / dur) * 100).toFixed(2);
+                const curEl = document.getElementById(`rvpTimeCur-${key}`);
+                if (curEl) curEl.innerText = window.formatVideoTime(target);
+            }
+            window.rvpShowHud(key, deltaSec < 0 ? 'fa-solid fa-rotate-left' : 'fa-solid fa-rotate-right', deltaSec < 0 ? '−5 Sek.' : '+5 Sek.');
+            window.rvpSyncUi(key);
         };
 
-        window.rvpSeek = function(scope, pct) {
-            const v = window.getRvpEl(scope);
-            if (!v || !isFinite(v.duration)) return;
-            v.currentTime = (parseFloat(pct) / 100) * v.duration;
-            window.rvpSyncUi(scope);
+        window.rvpSeekStart = function(key) {
+            const st = window.getRvpState(key);
+            st.isSeeking = true;
+            if (st.phase === 'intro' || st.phase === 'outro') {
+                window.rvpHideBumper(key);
+                window.stopRedStudioAudio();
+            }
         };
 
-        window.rvpToggleMute = function(scope) {
-            const v = window.getRvpEl(scope);
+        window.rvpSeekMove = function(key, pct) {
+            const v = window.getRvpEl(key);
+            if (!v) return;
+            const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+            if (dur <= 0) return;
+            const target = (parseFloat(pct) / 100) * dur;
+            const curEl = document.getElementById(`rvpTimeCur-${key}`);
+            if (curEl) curEl.innerText = window.formatVideoTime(target);
+            try { v.currentTime = target; } catch (e) {}
+        };
+
+        window.rvpSeekEnd = function(key, pct) {
+            const st = window.getRvpState(key);
+            if (typeof pct !== 'undefined') window.rvpSeekMove(key, pct);
+            st.isSeeking = false;
+            window.rvpSyncUi(key);
+        };
+
+        window.rvpToggleMute = function(key) {
+            const v = window.getRvpEl(key);
             if (!v) return;
             if (v.muted || v.volume === 0) {
                 v.muted = false;
                 if (v.volume === 0) v.volume = 0.85;
+                window.rvpPauseOtherPlayers(key);
+                window.rvpShowHud(key, 'fa-solid fa-volume-high', 'Ton an');
             } else {
                 v.muted = true;
+                window.stopRedStudioAudio();
+                window.rvpShowHud(key, 'fa-solid fa-volume-xmark', 'Stumm');
             }
-            window.rvpSyncUi(scope);
+            window.rvpSyncUi(key);
         };
 
-        window.rvpUnmuteAndPlay = function() {
-            const v = window.getRvpEl('inline');
+        window.rvpUnmuteAndPlay = function(key) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
             if (!v) return;
             v.muted = false;
             if (v.volume === 0) v.volume = 0.85;
-            window._rvpUserStopped = false;
+            st.userPaused = false;
+            window.rvpPauseOtherPlayers(key);
             v.play().catch(() => {});
-            window.rvpSyncUi('inline');
+            window.rvpShowHud(key, 'fa-solid fa-volume-high', 'Ton aktiv');
+            window.rvpSyncUi(key);
         };
 
-        window.rvpSetVolume = function(scope, val) {
-            const v = window.getRvpEl(scope);
+        window.rvpSetVolume = function(key, val) {
+            const v = window.getRvpEl(key);
             if (!v) return;
             const num = Math.max(0, Math.min(1, parseFloat(val) || 0));
             v.volume = num;
             v.muted = num === 0;
-            window.rvpSyncUi(scope);
+            window.rvpSyncUi(key);
         };
 
-        window.openVideoCenterModal = function() {
+        window.rvpHandleEnded = function(key) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
+            const item = window.getRvpItem(key);
+            if (!v || !item) return;
+
+            const mode = item.logoMode || 'both';
+            const restartCycle = () => {
+                if (st.userPaused) { window.rvpSyncUi(key); return; }
+                st.introShown = false;
+                try { v.currentTime = 0; } catch (e) {}
+                window.rvpStartWithIntroIfNeeded(key, true);
+            };
+
+            if (mode === 'outro' || mode === 'both') {
+                window.rvpShowBumper(key, 'outro', restartCycle);
+                window.rvpSyncUi(key);
+            } else {
+                restartCycle();
+            }
+        };
+
+        window.bindRvpVideoEvents = function(key, videoIdx) {
+            const v = window.getRvpEl(key);
+            if (!v) return;
+            const st = window.getRvpState(key);
+            st.videoIdx = videoIdx;
+            st.isSeeking = false;
+            if (v.dataset.rvpBound === '1') return;
+            v.dataset.rvpBound = '1';
+
+            ['timeupdate', 'loadedmetadata', 'durationchange', 'play', 'pause', 'volumechange', 'seeked'].forEach(ev => {
+                v.addEventListener(ev, () => window.rvpSyncUi(key));
+            });
+            v.addEventListener('ended', () => window.rvpHandleEnded(key));
+        };
+
+        window.openVideoCenterModal = function(videoIdx = null, sourceKey = 'inline-0') {
             const list = window.promoVideosConfig?.list || [];
-            const item = list[window.activePromoVideoIdx] || list[0];
+            const idx = (videoIdx !== null && list[videoIdx]) ? videoIdx : (window.activePromoVideoIdx || 0);
+            const item = list[idx] || list[0];
             if (!item) return;
 
-            const inlineV = window.getRvpEl('inline');
+            window.activeCenterVideoIdx = idx;
+            const sourceV = window.getRvpEl(sourceKey);
             const centerV = window.getRvpEl('center');
             const ov = document.getElementById('redVideoCenterOverlay');
             if (!centerV || !ov) return;
 
-            const resumeTime = inlineV ? inlineV.currentTime : 0;
-            if (inlineV && !inlineV.paused) inlineV.pause();
+            const resumeTime = sourceV ? sourceV.currentTime : 0;
+            const resumeVol = sourceV && sourceV.volume > 0 ? sourceV.volume : 0.9;
+            window.rvpPauseOtherPlayers('center');
 
             document.getElementById('rvpCenterTitle').innerText = item.title || 'RED Berlin Video';
             document.getElementById('rvpCenterSub').innerText = item.badge || 'RED Zulassungsdienst Berlin';
             window.applyBrandAssetsUI();
+
+            const st = window.getRvpState('center');
+            st.videoIdx = idx;
+            st.userPaused = false;
+            st.introShown = resumeTime > 0.4;
+            window.rvpHideBumper('center');
 
             if (centerV.getAttribute('data-src') !== item.url) {
                 centerV.setAttribute('data-src', item.url);
                 centerV.src = item.url;
             }
             centerV.muted = false;
-            centerV.volume = inlineV && inlineV.volume > 0 ? inlineV.volume : 0.9;
-            centerV.loop = true;
+            centerV.volume = resumeVol;
+            window.bindRvpVideoEvents('center', idx);
 
-            const setPosAndPlay = () => {
-                try { if (resumeTime > 0 && isFinite(centerV.duration)) centerV.currentTime = Math.min(resumeTime, centerV.duration - 0.1); } catch (e) {}
-                centerV.play().catch(() => {
-                    centerV.muted = true;
-                    centerV.play().catch(() => {});
-                });
-                window.rvpSyncUi('center');
+            const beginCenter = () => {
+                if (resumeTime > 0.4 && isFinite(centerV.duration)) {
+                    try { centerV.currentTime = Math.min(resumeTime, centerV.duration - 0.15); } catch (e) {}
+                    centerV.play().catch(() => { centerV.muted = true; centerV.play().catch(() => {}); });
+                    window.rvpSyncUi('center');
+                } else {
+                    window.rvpStartWithIntroIfNeeded('center', true);
+                }
             };
-            if (centerV.readyState >= 1) setPosAndPlay();
-            else centerV.addEventListener('loadedmetadata', setPosAndPlay, { once: true });
-
-            if (!centerV.dataset.bound) {
-                centerV.dataset.bound = '1';
-                ['timeupdate', 'loadedmetadata', 'play', 'pause', 'volumechange', 'ended'].forEach(ev => {
-                    centerV.addEventListener(ev, () => window.rvpSyncUi('center'));
-                });
-            }
+            if (centerV.readyState >= 1) beginCenter();
+            else centerV.addEventListener('loadedmetadata', beginCenter, { once: true });
 
             ov.classList.add('open');
         };
@@ -6594,23 +6939,31 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.closeVideoCenterModal = function() {
             const ov = document.getElementById('redVideoCenterOverlay');
             const centerV = window.getRvpEl('center');
-            const inlineV = window.getRvpEl('inline');
-            const curTime = centerV ? centerV.currentTime : 0;
+            window.rvpHideBumper('center');
+            window.stopRedStudioAudio();
             if (centerV) centerV.pause();
             if (ov) ov.classList.remove('open');
-            if (inlineV) {
-                try { if (curTime > 0 && isFinite(inlineV.duration)) inlineV.currentTime = Math.min(curTime, inlineV.duration - 0.1); } catch (e) {}
-                if (!window._rvpUserStopped && window.promoVideosConfig?.autoplayMode !== 'manual') {
-                    inlineV.muted = true;
-                    inlineV.play().catch(() => {});
-                }
-                window.rvpSyncUi('inline');
-            }
+        };
+
+        window.editCurrentPromoVideo = function(videoId = '') {
+            if (!window.canManagePromoVideos()) return;
+            const list = window.promoVideosConfig?.list || [];
+            const target = videoId
+                ? list.find(v => v.id === videoId)
+                : (list[window.activePromoVideoIdx] || list[0]);
+            window.openVideoManagerModal('videos');
+            if (target) setTimeout(() => window.editPromoVideoItem(target.id), 50);
+        };
+
+        window.editCurrentCenterVideo = function() {
+            const list = window.promoVideosConfig?.list || [];
+            const item = list[window.activeCenterVideoIdx] || list[0];
+            window.closeVideoCenterModal();
+            if (item) window.editCurrentPromoVideo(item.id);
         };
 
         window.selectPromoVideo = function(idx) {
             window.activePromoVideoIdx = idx;
-            window._rvpUserStopped = false;
             window.renderPromoVideoShowcase();
         };
 
@@ -6631,6 +6984,45 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
         };
 
+        window.buildInlinePlayerShellHtml = function(key, item, videoIdx, autoStart) {
+            return `
+                <div class="rvp-player-shell">
+                    <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml(item.aspect || '9/16')};">
+                        <div class="rvp-overlay-top">
+                            <span class="rvp-badge-pill"><i class="fa-solid fa-circle-play"></i> ${window.escHtml(item.badge || 'RED Video')}</span>
+                            <button type="button" class="rvp-expand-fab" onclick="event.stopPropagation(); window.openVideoCenterModal(${videoIdx}, '${key}')" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
+                        </div>
+                        <video id="rvpVid-${key}" src="${window.escHtml(item.url)}" muted playsinline preload="auto" onclick="event.stopPropagation(); window.rvpTogglePlay('${key}')"></video>
+                        <div class="rvp-bumper-overlay" id="rvpBumper-${key}"></div>
+                        <div class="rvp-hud-toast" id="rvpHud-${key}"></div>
+                        <button type="button" class="rvp-unmute-callout" id="rvpUnmute-${key}" onclick="event.stopPropagation(); window.rvpUnmuteAndPlay('${key}')">
+                            <i class="fa-solid fa-volume-high"></i> Ton einschalten
+                        </button>
+                    </div>
+                    <div class="rvp-controls-bar">
+                        <div class="rvp-seek-row">
+                            <span class="rvp-time" id="rvpTimeCur-${key}">0:00</span>
+                            <input type="range" id="rvpSeek-${key}" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" onpointerdown="window.rvpSeekStart('${key}')" onpointerup="window.rvpSeekEnd('${key}')" oninput="window.rvpSeekMove('${key}', this.value)" onchange="window.rvpSeekEnd('${key}', this.value)">
+                            <span class="rvp-time" id="rvpTimeDur-${key}">0:00</span>
+                        </div>
+                        <div class="rvp-btn-row">
+                            <div class="rvp-btn-group">
+                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpSkip('${key}', -5)" title="5s zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
+                                <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpPlayBtn-${key}" onclick="event.stopPropagation(); window.rvpTogglePlay('${key}')" title="Play / Pause"><i class="fa-solid ${autoStart ? 'fa-pause' : 'fa-play'}"></i></button>
+                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpStop('${key}')" title="Stopp"><i class="fa-solid fa-stop"></i></button>
+                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpSkip('${key}', 5)" title="5s vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
+                            </div>
+                            <div class="rvp-vol-group">
+                                <button type="button" class="rvp-ctrl-btn" id="rvpMuteBtn-${key}" onclick="event.stopPropagation(); window.rvpToggleMute('${key}')" title="Ton Ein/Aus"><i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i></button>
+                                <input type="range" id="rvpVol-${key}" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0" oninput="window.rvpSetVolume('${key}', this.value)" aria-label="Lautstärke">
+                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.openVideoCenterModal(${videoIdx}, '${key}')" title="Vergrößern"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
         window.renderPromoVideoShowcase = function() {
             const host = document.getElementById('redVideoShowcaseHost');
             if (!host) return;
@@ -6638,7 +7030,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const list = Array.isArray(cfg.list) ? cfg.list : [];
             const isMgr = window.canManagePromoVideos();
 
-            if (window._rvpObserver) { window._rvpObserver.disconnect(); window._rvpObserver = null; }
+            // Alte Timer & Observer sauber aufräumen
+            Object.keys(window._rvpStates).forEach(k => { if (k !== 'center') window.rvpHideBumper(k); });
+            window._rvpObservers.forEach(o => o.disconnect());
+            window._rvpObservers = [];
 
             if (cfg.placement === 'hidden' || list.length === 0) {
                 host.innerHTML = isMgr
@@ -6648,99 +7043,120 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
 
             window.positionVideoShowcaseHost(cfg.placement || 'after-hero');
-            if (window.activePromoVideoIdx >= list.length) window.activePromoVideoIdx = 0;
-            const item = list[window.activePromoVideoIdx];
-            const isLandscape = item.aspect === '16/9';
             const autoStart = cfg.autoplayMode !== 'manual';
+            const eyebrow = cfg.sectionEyebrow || 'RED Berlin in Aktion';
+            const layout = (cfg.layoutMode === 'grid-2' || cfg.layoutMode === 'grid-3') && list.length >= 2 ? cfg.layoutMode : 'showcase';
 
-            const playlistHtml = list.length > 1
-                ? `<div class="rvp-playlist-bar">${list.map((v, i) => `<button type="button" class="rvp-playlist-chip ${i === window.activePromoVideoIdx ? 'active' : ''}" onclick="window.selectPromoVideo(${i})"><i class="fa-solid fa-play"></i> ${window.escHtml(v.badge || ('Video ' + (i + 1)))}</button>`).join('')}</div>`
-                : '';
+            const activePlayersToInit = [];
 
-            host.innerHTML = `
-                <div class="rvp-showcase-card ${isLandscape ? 'is-landscape' : ''}">
-                    <div class="rvp-player-shell">
-                        <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml(item.aspect || '9/16')};">
-                            <div class="rvp-overlay-top">
-                                <span class="rvp-badge-pill"><i class="fa-solid fa-circle-play"></i> ${window.escHtml(item.badge || 'RED Video')}</span>
-                                <button type="button" class="rvp-expand-fab" onclick="event.stopPropagation(); window.openVideoCenterModal()" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
-                            </div>
-                            <video id="rvpInlineVideo" src="${window.escHtml(item.url)}" ${autoStart ? 'autoplay' : ''} muted loop playsinline preload="metadata" onclick="window.rvpTogglePlay('inline')"></video>
-                            <button type="button" class="rvp-unmute-callout" id="rvpInlineUnmutePill" onclick="event.stopPropagation(); window.rvpUnmuteAndPlay()">
-                                <i class="fa-solid fa-volume-high"></i> Ton einschalten
-                            </button>
-                        </div>
-                        <div class="rvp-controls-bar">
-                            <div class="rvp-seek-row">
-                                <span class="rvp-time" id="rvpInlineTimeCur">0:00</span>
-                                <input type="range" id="rvpInlineSeek" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" oninput="window.rvpSeek('inline', this.value)">
-                                <span class="rvp-time" id="rvpInlineTimeDur">0:00</span>
-                            </div>
-                            <div class="rvp-btn-row">
-                                <div class="rvp-btn-group">
-                                    <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('inline', -5)" title="5s zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
-                                    <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpInlinePlayBtn" onclick="window.rvpTogglePlay('inline')" title="Play / Pause"><i class="fa-solid fa-pause"></i></button>
-                                    <button type="button" class="rvp-ctrl-btn" onclick="window.rvpStop('inline')" title="Stopp"><i class="fa-solid fa-stop"></i></button>
-                                    <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('inline', 5)" title="5s vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
+            if (layout === 'showcase') {
+                if (window.activePromoVideoIdx >= list.length) window.activePromoVideoIdx = 0;
+                const item = list[window.activePromoVideoIdx];
+                const isLandscape = item.aspect === '16/9';
+                const pKey = 'inline-0';
+                const highlights = (Array.isArray(item.highlights) && item.highlights.length > 0) ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS;
+
+                const playlistHtml = list.length > 1
+                    ? `<div class="rvp-playlist-bar">${list.map((v, i) => `<button type="button" class="rvp-playlist-chip ${i === window.activePromoVideoIdx ? 'active' : ''}" onclick="window.selectPromoVideo(${i})"><i class="fa-solid fa-play"></i> ${window.escHtml(v.badge || ('Video ' + (i + 1)))}</button>`).join('')}</div>`
+                    : '';
+
+                host.innerHTML = `
+                    <div class="rvp-showcase-card ${isLandscape ? 'is-landscape' : ''}">
+                        ${window.buildInlinePlayerShellHtml(pKey, item, window.activePromoVideoIdx, autoStart)}
+                        <div class="rvp-info-col">
+                            <div class="rvp-info-head">
+                                <div>
+                                    <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> ${window.escHtml(eyebrow)}</span>
+                                    <h2>${window.escHtml(item.title || 'RED Zulassungsdienst Berlin')}</h2>
                                 </div>
-                                <div class="rvp-vol-group">
-                                    <button type="button" class="rvp-ctrl-btn" id="rvpInlineMuteBtn" onclick="window.rvpToggleMute('inline')" title="Ton Ein/Aus"><i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i></button>
-                                    <input type="range" id="rvpInlineVol" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0" oninput="window.rvpSetVolume('inline', this.value)" aria-label="Lautstärke">
-                                    <button type="button" class="rvp-ctrl-btn" onclick="window.openVideoCenterModal()" title="Vergrößern"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+                                <div class="rvp-admin-inline-btns action-videos">
+                                    <button type="button" class="mini-admin-btn edit" onclick="window.editCurrentPromoVideo('${item.id}')" title="Dieses Video direkt mit Stift bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                                    <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos')" title="Weiteres Video hinzufügen / Studio"><i class="fa-solid fa-plus"></i> Video</button>
                                 </div>
                             </div>
+                            <p>${window.escHtml(item.desc || '')}</p>
+                            <ul class="rvp-highlights-list">
+                                ${highlights.map(h => `<li><i class="fa-solid fa-circle-check"></i><span>${window.escHtml(h)}</span></li>`).join('')}
+                            </ul>
+                            <div class="rvp-cta-row">
+                                <button type="button" class="btn-primary" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Jetzt Wunschtermin sichern</button>
+                                <button type="button" class="btn-primary" style="background:#25D366; color:#000; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp(false)"><i class="fa-brands fa-whatsapp"></i> Direkt per WhatsApp</button>
+                            </div>
+                            ${playlistHtml}
                         </div>
                     </div>
+                `;
+                activePlayersToInit.push({ key: pKey, idx: window.activePromoVideoIdx, auto: autoStart });
+            } else {
+                const maxShow = layout === 'grid-3' ? 3 : 2;
+                const shown = list.slice(0, maxShow);
+                const colClass = shown.length >= 3 ? 'cols-3' : 'cols-2';
 
-                    <div class="rvp-info-col">
-                        <div class="rvp-info-head">
+                host.innerHTML = `
+                    <div class="rvp-multi-section">
+                        <div class="rvp-multi-header">
                             <div>
-                                <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> RED Berlin in Aktion</span>
-                                <h2>${window.escHtml(item.title || 'RED Zulassungsdienst Berlin')}</h2>
+                                <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> ${window.escHtml(eyebrow)}</span>
+                                <h2>Unsere Videos – RED Berlin live erleben</h2>
                             </div>
-                            <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm action-videos" onclick="window.openVideoManagerModal('videos')" title="Videos bearbeiten, ersetzen oder verschieben">
-                                <i class="fa-solid fa-sliders"></i> Verwalten
-                            </button>
+                            <div class="rvp-admin-inline-btns action-videos">
+                                <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos'); window.resetVideoManagerForm();"><i class="fa-solid fa-plus"></i> Video hinzufügen</button>
+                                <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos')"><i class="fa-solid fa-sliders"></i> Studio</button>
+                            </div>
                         </div>
-                        <p>${window.escHtml(item.desc || '')}</p>
-                        <ul class="rvp-highlights-list">
-                            <li><i class="fa-solid fa-circle-check"></i><span>Keine Wartenummer beim Amt – Abgabe in 5&nbsp;Minuten</span></li>
-                            <li><i class="fa-solid fa-circle-check"></i><span>Sofort-Kennzeichenprägung direkt vor Ort in der Kienitzer&nbsp;Str.&nbsp;6</span></li>
-                            <li><i class="fa-solid fa-circle-check"></i><span>Anmeldung, Ummeldung, Abmeldung, Kurzzeit- &amp; Zollkennzeichen</span></li>
-                        </ul>
-                        <div class="rvp-cta-row">
-                            <button type="button" class="btn-primary" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Jetzt Wunschtermin sichern</button>
-                            <button type="button" class="btn-primary" style="background:#25D366; color:#000; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp(false)"><i class="fa-brands fa-whatsapp"></i> Direkt per WhatsApp</button>
+                        <div class="rvp-multi-grid ${colClass}">
+                            ${shown.map((item, idx) => {
+                                const pKey = `inline-${idx}`;
+                                activePlayersToInit.push({ key: pKey, idx, auto: autoStart && idx === 0 });
+                                return `
+                                    <article class="rvp-grid-card">
+                                        ${window.buildInlinePlayerShellHtml(pKey, item, idx, autoStart && idx === 0)}
+                                        <div class="rvp-grid-meta">
+                                            <div class="rvp-grid-meta-head">
+                                                <strong>${window.escHtml(item.title || 'RED Video')}</strong>
+                                                <div class="rvp-admin-inline-btns action-videos">
+                                                    <button type="button" class="mini-admin-btn edit" onclick="window.editCurrentPromoVideo('${item.id}')" title="Video bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                                                    <button type="button" class="mini-admin-btn del" onclick="window.deletePromoVideoItem('${item.id}')" title="Video löschen"><i class="fa-solid fa-trash"></i></button>
+                                                </div>
+                                            </div>
+                                            ${item.desc ? `<p>${window.escHtml(item.desc)}</p>` : ''}
+                                        </div>
+                                    </article>
+                                `;
+                            }).join('')}
                         </div>
-                        ${playlistHtml}
                     </div>
-                </div>
-            `;
+                `;
+            }
 
-            const v = document.getElementById('rvpInlineVideo');
-            if (v) {
+            activePlayersToInit.forEach(({ key, idx, auto }) => {
+                const v = window.getRvpEl(key);
+                if (!v) return;
                 v.muted = true;
-                ['timeupdate', 'loadedmetadata', 'play', 'pause', 'volumechange', 'ended'].forEach(ev => {
-                    v.addEventListener(ev, () => window.rvpSyncUi('inline'));
-                });
-                if (autoStart) {
-                    v.play().catch(() => {});
+                window._rvpStates[key] = { videoIdx: idx, userPaused: !auto, isSeeking: false, phase: 'video', timerId: null, introShown: false };
+                window.bindRvpVideoEvents(key, idx);
+                if (auto) {
+                    window.rvpStartWithIntroIfNeeded(key, true);
+                } else {
+                    window.rvpSyncUi(key);
                 }
-                window.rvpSyncUi('inline');
 
                 if (typeof IntersectionObserver !== 'undefined') {
-                    window._rvpObserver = new IntersectionObserver((entries) => {
+                    const obs = new IntersectionObserver((entries) => {
                         entries.forEach(en => {
-                            if (!en.isIntersecting && !v.paused) {
-                                v.pause();
-                            } else if (en.isIntersecting && autoStart && !window._rvpUserStopped && !document.getElementById('redVideoCenterOverlay')?.classList.contains('open')) {
+                            const st = window.getRvpState(key);
+                            if (!en.isIntersecting) {
+                                if (!v.paused) v.pause();
+                                if (st.phase === 'intro' || st.phase === 'outro') window.rvpHideBumper(key);
+                            } else if (auto && !st.userPaused && !document.getElementById('redVideoCenterOverlay')?.classList.contains('open')) {
                                 v.play().catch(() => {});
                             }
                         });
                     }, { threshold: 0.25 });
-                    window._rvpObserver.observe(v);
+                    obs.observe(v);
+                    window._rvpObservers.push(obs);
                 }
-            }
+            });
         };
 
         // --- SUPERVISOR / ADMIN VIDEO- & LOGO-MANAGER ---
@@ -6768,7 +7184,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if (isBrand) {
                 window.applyBrandAssetsUI();
                 const uInp = document.getElementById('vmBrandUrlInput');
-                const cur = window.brandAssetsData?.roundLogoUrl || './red-logo-round.jpg';
+                const cur = window.brandAssetsData?.roundLogoUrl || './red-logo-round.jpeg';
                 if (uInp) uInp.value = cur.startsWith('data:') ? '' : cur;
                 const chk = document.getElementById('vmShowFooterLogo');
                 if (chk) chk.checked = window.brandAssetsData?.showFooterLogo !== false;
@@ -6781,6 +7197,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 return;
             }
             const cfg = window.promoVideosConfig || DEFAULT_PROMO_VIDEOS_CFG;
+            if (document.getElementById('vmSectionEyebrow')) document.getElementById('vmSectionEyebrow').value = cfg.sectionEyebrow || 'RED Berlin in Aktion';
+            if (document.getElementById('vmLayoutSelect')) document.getElementById('vmLayoutSelect').value = cfg.layoutMode || 'showcase';
             if (document.getElementById('vmPlacementSelect')) document.getElementById('vmPlacementSelect').value = cfg.placement || 'after-hero';
             if (document.getElementById('vmAutoplaySelect')) document.getElementById('vmAutoplaySelect').value = cfg.autoplayMode || 'muted-auto';
             window.renderVideoManagerList();
@@ -6790,14 +7208,17 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         };
 
         window.closeVideoManagerModal = function() {
+            window.stopRedStudioAudio();
             document.getElementById('videoManagerOverlay').classList.remove('open');
         };
 
         window.saveVideoSettingsOnly = async function() {
+            window.promoVideosConfig.sectionEyebrow = (document.getElementById('vmSectionEyebrow')?.value || '').trim() || 'RED Berlin in Aktion';
+            window.promoVideosConfig.layoutMode = document.getElementById('vmLayoutSelect')?.value || 'showcase';
             window.promoVideosConfig.placement = document.getElementById('vmPlacementSelect')?.value || 'after-hero';
             window.promoVideosConfig.autoplayMode = document.getElementById('vmAutoplaySelect')?.value || 'muted-auto';
             await window.persistPromoVideosConfig();
-            window.showToast('Video-Platzierung & Verhalten gespeichert!', 'success');
+            window.showToast('Video-Ansicht & Einstellungen gespeichert!', 'success');
         };
 
         window.resetVideoManagerForm = function() {
@@ -6805,10 +7226,21 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('vmTitle').value = '';
             document.getElementById('vmBadge').value = '';
             document.getElementById('vmDesc').value = '';
+            if (document.getElementById('vmHighlights')) document.getElementById('vmHighlights').value = DEFAULT_VIDEO_HIGHLIGHTS.join('\n');
             document.getElementById('vmUrl').value = '';
             if (document.getElementById('vmAspect')) document.getElementById('vmAspect').value = '9/16';
+            if (document.getElementById('vmLogoMode')) document.getElementById('vmLogoMode').value = 'both';
+            if (document.getElementById('vmLogoStyle')) document.getElementById('vmLogoStyle').value = 'round_title';
+            if (document.getElementById('vmIntroSec')) document.getElementById('vmIntroSec').value = '2.5';
+            if (document.getElementById('vmOutroSec')) document.getElementById('vmOutroSec').value = '3';
+            if (document.getElementById('vmIntroMusic')) document.getElementById('vmIntroMusic').value = 'cinema-whoosh';
+            if (document.getElementById('vmOutroMusic')) document.getElementById('vmOutroMusic').value = 'victory-chord';
+            if (document.getElementById('vmIntroCustomAudio')) document.getElementById('vmIntroCustomAudio').value = '';
+            if (document.getElementById('vmOutroCustomAudio')) document.getElementById('vmOutroCustomAudio').value = '';
             if (document.getElementById('vmFileInput')) document.getElementById('vmFileInput').value = '';
-            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Video hinzufügen oder bearbeiten';
+            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Neues Video hinzufügen';
+            document.getElementById('vmEditBanner')?.classList.remove('active');
+            window.toggleCustomVideoAudioFields();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
         };
 
@@ -6816,7 +7248,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const file = input.files && input.files[0];
             if (!file) return;
             if (file.size > 680 * 1024) {
-                window.showToast('Video ist größer als 680 KB – bitte direkt als MP4 in deinen Website-Ordner hochladen und oben z.B. ./werbevideo-1.mp4 eintragen!', 'error');
+                window.showToast('Video > 680 KB – bitte direkt als MP4 auf GitHub hochladen und oben z.B. ./werbevideo-2.mp4 eintragen!', 'error');
                 input.value = '';
                 return;
             }
@@ -6833,19 +7265,44 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const title = document.getElementById('vmTitle').value.trim();
             const badge = document.getElementById('vmBadge').value.trim() || 'RED Video';
             const desc = document.getElementById('vmDesc').value.trim();
+            const highlightsRaw = (document.getElementById('vmHighlights')?.value || '').split('\n').map(s => s.trim()).filter(Boolean);
             const url = document.getElementById('vmUrl').value.trim();
             const aspect = document.getElementById('vmAspect')?.value || '9/16';
+
+            const logoMode = document.getElementById('vmLogoMode')?.value || 'both';
+            const logoStyle = document.getElementById('vmLogoStyle')?.value || 'round_title';
+            const introSec = parseFloat(document.getElementById('vmIntroSec')?.value || '2.5') || 2.5;
+            const outroSec = parseFloat(document.getElementById('vmOutroSec')?.value || '3') || 3;
+            const introMusic = document.getElementById('vmIntroMusic')?.value || 'cinema-whoosh';
+            const outroMusic = document.getElementById('vmOutroMusic')?.value || 'victory-chord';
+            const introCustomAudio = (document.getElementById('vmIntroCustomAudio')?.value || '').trim();
+            const outroCustomAudio = (document.getElementById('vmOutroCustomAudio')?.value || '').trim();
 
             if (!title || !url) {
                 window.showToast('Bitte Überschrift und Video-Pfad / Link eingeben.', 'error');
                 return;
             }
+
+            window.promoVideosConfig.sectionEyebrow = (document.getElementById('vmSectionEyebrow')?.value || '').trim() || 'RED Berlin in Aktion';
+            window.promoVideosConfig.layoutMode = document.getElementById('vmLayoutSelect')?.value || 'showcase';
+            window.promoVideosConfig.placement = document.getElementById('vmPlacementSelect')?.value || 'after-hero';
+            window.promoVideosConfig.autoplayMode = document.getElementById('vmAutoplaySelect')?.value || 'muted-auto';
+
             if (!Array.isArray(window.promoVideosConfig.list)) window.promoVideosConfig.list = [];
-            const rec = { id: editId || ('vid-' + Date.now()), title, badge, desc, url, aspect };
+            const rec = {
+                id: editId || ('vid-' + Date.now()),
+                title, badge, desc,
+                highlights: highlightsRaw.length > 0 ? highlightsRaw : DEFAULT_VIDEO_HIGHLIGHTS.slice(),
+                url, aspect,
+                logoMode, logoStyle, introSec, outroSec, introMusic, outroMusic, introCustomAudio, outroCustomAudio
+            };
 
             if (editId) {
                 const idx = window.promoVideosConfig.list.findIndex(v => v.id === editId);
-                if (idx > -1) window.promoVideosConfig.list[idx] = rec;
+                if (idx > -1) {
+                    window.promoVideosConfig.list[idx] = rec;
+                    window.activePromoVideoIdx = idx;
+                }
             } else {
                 window.promoVideosConfig.list.push(rec);
                 window.activePromoVideoIdx = window.promoVideosConfig.list.length - 1;
@@ -6853,7 +7310,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             await window.persistPromoVideosConfig();
             window.resetVideoManagerForm();
-            window.showToast(editId ? 'Werbevideo aktualisiert!' : 'Neues Werbevideo veröffentlicht!', 'success');
+            window.showToast(editId ? 'Video, Überschrift & Intro/Outro gespeichert!' : 'Neues Werbevideo veröffentlicht!', 'success');
         };
 
         window.editPromoVideoItem = function(id) {
@@ -6863,11 +7320,37 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('vmTitle').value = item.title || '';
             document.getElementById('vmBadge').value = item.badge || '';
             document.getElementById('vmDesc').value = item.desc || '';
+            if (document.getElementById('vmHighlights')) {
+                document.getElementById('vmHighlights').value = (Array.isArray(item.highlights) && item.highlights.length ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS).join('\n');
+            }
             document.getElementById('vmUrl').value = item.url || '';
             if (document.getElementById('vmAspect')) document.getElementById('vmAspect').value = item.aspect || '9/16';
-            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = `2. Video bearbeiten: ${item.badge || item.title}`;
+            if (document.getElementById('vmLogoMode')) document.getElementById('vmLogoMode').value = item.logoMode || 'both';
+            if (document.getElementById('vmLogoStyle')) document.getElementById('vmLogoStyle').value = item.logoStyle || 'round_title';
+            if (document.getElementById('vmIntroSec')) document.getElementById('vmIntroSec').value = String(item.introSec || '2.5');
+            if (document.getElementById('vmOutroSec')) document.getElementById('vmOutroSec').value = String(item.outroSec || '3');
+            if (document.getElementById('vmIntroMusic')) document.getElementById('vmIntroMusic').value = item.introMusic || 'cinema-whoosh';
+            if (document.getElementById('vmOutroMusic')) document.getElementById('vmOutroMusic').value = item.outroMusic || 'victory-chord';
+            if (document.getElementById('vmIntroCustomAudio')) document.getElementById('vmIntroCustomAudio').value = item.introCustomAudio || '';
+            if (document.getElementById('vmOutroCustomAudio')) document.getElementById('vmOutroCustomAudio').value = item.outroCustomAudio || '';
+            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Ausgewähltes Video bearbeiten';
+            const bName = document.getElementById('vmEditBannerName');
+            if (bName) bName.innerText = item.title || item.badge || 'Video';
+            document.getElementById('vmEditBanner')?.classList.add('active');
+            window.toggleCustomVideoAudioFields();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
-            document.getElementById('vmPaneVideos')?.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('vmPaneVideos')?.scrollTo({ top: 120, behavior: 'smooth' });
+        };
+
+        window.movePromoVideoOrder = async function(id, delta) {
+            const list = window.promoVideosConfig?.list || [];
+            const idx = list.findIndex(v => v.id === id);
+            const target = idx + delta;
+            if (idx === -1 || target < 0 || target >= list.length) return;
+            const [moved] = list.splice(idx, 1);
+            list.splice(target, 0, moved);
+            window.activePromoVideoIdx = target;
+            await window.persistPromoVideosConfig();
         };
 
         window.deletePromoVideoItem = function(id) {
@@ -6879,6 +7362,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 async () => {
                     window.promoVideosConfig.list = (window.promoVideosConfig.list || []).filter(v => v.id !== id);
                     window.activePromoVideoIdx = 0;
+                    if (document.getElementById('vmEditId')?.value === id) window.resetVideoManagerForm();
                     await window.persistPromoVideosConfig();
                     window.showToast('Werbevideo entfernt.', 'success');
                 }
@@ -6895,14 +7379,17 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 listEl.innerHTML = '<div style="text-align:center; padding:14px; font-size:12px; color:var(--text-muted);">Noch keine Werbevideos eingetragen.</div>';
                 return;
             }
-            listEl.innerHTML = list.map(v => `
+            const modeLbl = { both: 'Intro+Outro', intro: 'Nur Intro', outro: 'Nur Outro', none: 'Ohne Logo' };
+            listEl.innerHTML = list.map((v, idx) => `
                 <div class="pm-page-card">
                     <div class="pm-page-info">
-                        <strong><i class="fa-solid fa-film" style="color:var(--primary-red); margin-right:6px;"></i>${window.escHtml(v.title)}</strong>
-                        <span>${window.escHtml(v.badge || 'Video')} • Format ${window.escHtml(v.aspect || '9/16')}</span>
+                        <strong><i class="fa-solid fa-film" style="color:var(--primary-red); margin-right:6px;"></i>${idx + 1}. ${window.escHtml(v.title)}</strong>
+                        <span>${window.escHtml(v.badge || 'Video')} • ${modeLbl[v.logoMode || 'both'] || 'Intro+Outro'} (${v.introSec || 2.5}s / ${v.outroSec || 3}s)</span>
                     </div>
                     <div class="pm-page-actions">
-                        <button type="button" class="apt-btn edit" onclick="window.editPromoVideoItem('${v.id}')" title="Bearbeiten / Ersetzen"><i class="fa-solid fa-pen"></i></button>
+                        ${idx > 0 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', -1)" title="Nach oben"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
+                        ${idx < list.length - 1 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', 1)" title="Nach unten"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
+                        <button type="button" class="apt-btn edit" onclick="window.editPromoVideoItem('${v.id}')" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
                         <button type="button" class="apt-btn delete" onclick="window.deletePromoVideoItem('${v.id}')" title="Löschen"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>

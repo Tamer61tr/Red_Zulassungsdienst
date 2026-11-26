@@ -673,6 +673,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                     window.promoVideosConfig = {
                         placement: d.placement || 'after-hero',
                         autoplayMode: d.autoplayMode || 'muted-auto',
+                        layoutMode: d.layoutMode || 'showcase',
+                        sectionEyebrow: d.sectionEyebrow || 'RED Berlin in Aktion',
                         list: Array.isArray(d.list) ? d.list : []
                     };
                     localStorage.setItem('red_promo_videos_v1', JSON.stringify(window.promoVideosConfig));
