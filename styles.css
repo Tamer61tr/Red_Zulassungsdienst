@@ -6783,6 +6783,36 @@
             }
         }
 
+        /* =========================================================================
+           PLAYER V25: INLINE-PLAYER MOBILE TOUCH-FIX (IDENTISCH ZUM KINO-MODAL)
+           ========================================================================= */
+        .rvp-player-shell {
+            overflow: visible !important;
+        }
+        .rvp-media-stage {
+            border-radius: 16px 16px 0 0;
+            overflow: hidden;
+        }
+        .rvp-controls-bar {
+            position: relative;
+            z-index: 35;
+            border-radius: 0 0 16px 16px;
+            touch-action: manipulation;
+        }
+        .rvp-ctrl-btn > * {
+            pointer-events: none;
+        }
+        .rvp-qual-menu {
+            z-index: 95 !important;
+        }
+        .rvp-seek-row,
+        .rvp-vol-group {
+            touch-action: pan-y;
+        }
+        .rvp-range {
+            touch-action: none !important;
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }

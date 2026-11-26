@@ -6841,7 +6841,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const v = window.getRvpEl(key);
             if (!v) return;
             const st = window.getRvpState(key);
-            const isPlayingVisual = st.phase === 'intro' || st.phase === 'outro' || !v.paused || st.desiredPlaying;
+            const isPlayingVisual = st.phase === 'intro' || st.phase === 'outro' || !v.paused;
 
             const playBtn = document.getElementById(`rvpPlayBtn-${key}`);
             if (playBtn) {
@@ -6882,6 +6882,10 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (!v) return;
             const safeVol = Math.max(0.05, Math.min(1, Number(st.volume) || 0.85));
             v.muted = !!st.muted;
+            if (!st.muted) {
+                v.defaultMuted = false;
+                v.removeAttribute('muted');
+            }
             try { v.volume = safeVol; } catch (e) {}
         };
 
@@ -7138,6 +7142,38 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             }
         };
 
+window.rvpBindDirectTap = function(el, onTap) {
+            if (!el || el.dataset.rvpTapBound === '1') return;
+            el.dataset.rvpTapBound = '1';
+            let sx = 0, sy = 0, lastTouchFire = 0;
+
+            el.addEventListener('touchstart', (e) => {
+                if (!e.touches || !e.touches[0]) return;
+                sx = e.touches[0].clientX;
+                sy = e.touches[0].clientY;
+            }, { passive: true });
+
+            el.addEventListener('touchend', (e) => {
+                if (!e.changedTouches || !e.changedTouches[0]) return;
+                const dx = e.changedTouches[0].clientX - sx;
+                const dy = e.changedTouches[0].clientY - sy;
+                // Auch bei leichtem Daumen-Wackeln (bis 16px) sofort als Klick ausführen
+                if (Math.hypot(dx, dy) <= 16) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    lastTouchFire = Date.now();
+                    onTap(e);
+                }
+            }, { passive: false });
+
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (Date.now() - lastTouchFire < 450) return;
+                onTap(e);
+            });
+        };
+
         window.bindRvpPlayerControls = function(key, videoIdx) {
             const host = document.getElementById(`rvpHost-${key}`);
             const v = window.getRvpEl(key);
@@ -7151,23 +7187,8 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (host.dataset.rvpControlsBound === '1') return;
             host.dataset.rvpControlsBound = '1';
 
-            // 1. Einziger zentraler Klick-Handler (liest immer live window.getRvpState(key)!)
-            host.addEventListener('click', (e) => {
-                const qOpt = e.target.closest('button[data-rvp-qual]');
-                if (qOpt) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.rvpApplyQualityProfile(key, qOpt.getAttribute('data-rvp-qual'), true);
-                    return;
-                }
-
-                const actEl = e.target.closest('[data-rvp-act]');
-                if (!actEl) return;
-                e.preventDefault();
-                e.stopPropagation();
-
+            const runAction = (act) => {
                 const curSt = window.getRvpState(key);
-                const act = actEl.getAttribute('data-rvp-act');
                 if (act === 'play') window.rvpTogglePlay(key);
                 else if (act === 'stop') window.rvpStop(key);
                 else if (act === 'back5') window.rvpSkip(key, -5);
@@ -7183,12 +7204,31 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     document.querySelectorAll('.rvp-qual-menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
                     if (menu) menu.classList.toggle('open');
                 }
+            };
+
+            // 1. Jedes Bedien-Symbol direkt & scroll-sicher für Touch + Maus binden
+            host.querySelectorAll('button[data-rvp-act]').forEach(btn => {
+                const act = btn.getAttribute('data-rvp-act');
+                window.rvpBindDirectTap(btn, () => runAction(act));
             });
 
-            // 2. Zeitleiste (mit Live-Scrub + globalem Loslass-Schutz, klemmt niemals!)
+            // Qualitäts-Optionen (4K / HDR / Full HD / HD / SD / Auto) direkt binden
+            host.querySelectorAll('button[data-rvp-qual]').forEach(qBtn => {
+                const qVal = qBtn.getAttribute('data-rvp-qual');
+                window.rvpBindDirectTap(qBtn, () => window.rvpApplyQualityProfile(key, qVal, true));
+            });
+
+            // Tipp direkt auf die Videofläche (Scrollen bleibt frei, nur echter Tap schaltet Play/Pause)
+            v.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.rvpTogglePlay(key);
+            });
+
+            // 2. Zeitleiste (Touch + Pointer komplett gegen Seiten-Scroll isoliert)
             const seekEl = document.getElementById(`rvpSeek-${key}`);
             if (seekEl) {
-                const startSeek = () => {
+                const startSeek = (e) => {
+                    if (e) e.stopPropagation();
                     const s = window.getRvpState(key);
                     s.isSeeking = true;
                     if (s.phase === 'intro' || s.phase === 'outro') {
@@ -7197,6 +7237,8 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     }
                     window.addEventListener('pointerup', finishSeek, { once: true });
                     window.addEventListener('pointercancel', finishSeek, { once: true });
+                    window.addEventListener('touchend', finishSeek, { once: true });
+                    window.addEventListener('touchcancel', finishSeek, { once: true });
                 };
 
                 const scrubSeek = () => {
@@ -7210,18 +7252,16 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                         s.seekLockUntil = Date.now() + 900;
                         const curEl = document.getElementById(`rvpTimeCur-${key}`);
                         if (curEl) curEl.innerText = window.formatVideoTime(target);
-                        // Sanft gedrosseltes Live-Vorschau-Spulen beim Ziehen
                         const now = Date.now();
                         if (now - s.lastScrubTs > 85) {
                             s.lastScrubTs = now;
-                            try { v.currentTime = target; } catch (e) {}
+                            try { v.currentTime = target; } catch (err) {}
                         }
                     }
                 };
 
                 const finishSeek = () => {
                     const s = window.getRvpState(key);
-                    if (!s.isSeeking) return;
                     const pct = Math.max(0, Math.min(100, parseFloat(seekEl.value) || 0));
                     seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
                     const dur = window.rvpGetDuration(v);
@@ -7229,7 +7269,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                         const target = Math.max(0, Math.min(dur - 0.1, (pct / 100) * dur));
                         s.pendingTime = target;
                         s.seekLockUntil = Date.now() + 1000;
-                        try { v.currentTime = target; } catch (e) {}
+                        try { v.currentTime = target; } catch (err) {}
                     }
                     s.isSeeking = false;
                     window.rvpEnsureRafLoop();
@@ -7237,18 +7277,22 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 };
 
                 seekEl.addEventListener('pointerdown', startSeek);
+                seekEl.addEventListener('touchstart', startSeek, { passive: true });
+                seekEl.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
                 seekEl.addEventListener('input', scrubSeek);
                 seekEl.addEventListener('change', finishSeek);
             }
 
-            // 3. Lautstärke-Slider (direkte visuelle & akustische Reaktion)
+            // 3. Lautstärke-Slider (Touch + Pointer isoliert)
             const volEl = document.getElementById(`rvpVol-${key}`);
             if (volEl) {
+                volEl.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+                volEl.addEventListener('touchmove', (e) => e.stopPropagation(), { passive: true });
                 volEl.addEventListener('input', () => window.rvpSetVolume(key, volEl.value, false));
                 volEl.addEventListener('change', () => window.rvpSetVolume(key, volEl.value, true));
             }
 
-            // 4. Video-Events inkl. sauberer Seek-Freigabe bei 'seeked'
+            // 4. Video-Events
             v.addEventListener('seeked', () => {
                 const s = window.getRvpState(key);
                 if (!s.isSeeking) {
@@ -7632,11 +7676,12 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                             if (!en.isIntersecting) {
                                 if (!v.paused) v.pause();
                                 if (st.phase === 'intro' || st.phase === 'outro') window.rvpHideBumper(key);
+                                window.rvpSyncUi(key);
                             } else if (auto && st.desiredPlaying && !st.userPaused && !document.getElementById('redVideoCenterOverlay')?.classList.contains('open')) {
                                 window.rvpSafePlay(key);
                             }
                         });
-                    }, { threshold: 0.25 });
+                    }, { threshold: 0.05 });
                     obs.observe(v);
                     window._rvpObservers.push(obs);
                 }
