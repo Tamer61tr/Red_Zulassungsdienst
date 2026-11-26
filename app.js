@@ -6413,6 +6413,15 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             'Anmeldung, Ummeldung, Abmeldung, Kurzzeit- & Zollkennzeichen'
         ];
 
+        const RVP_QUALITY_META = {
+            '4k': { short: '4K', label: '4K UHD (2160p)', cls: 'rvp-q-4k', urlField: 'url4k' },
+            'hdr': { short: 'HDR', label: 'HDR10 Kino', cls: 'rvp-q-hdr', urlField: 'url4k' },
+            '1080': { short: 'FHD', label: 'Full HD (1080p)', cls: 'rvp-q-1080', urlField: 'url1080' },
+            '720': { short: 'HD', label: 'HD (720p)', cls: 'rvp-q-720', urlField: 'url720' },
+            '480': { short: 'SD', label: 'SD (480p)', cls: 'rvp-q-480', urlField: 'url480' },
+            'auto': { short: 'AUTO', label: 'Auto (Original)', cls: '', urlField: '' }
+        };
+
         const DEFAULT_PROMO_VIDEOS_CFG = {
             placement: 'after-hero',
             autoplayMode: 'muted-auto',
@@ -6427,7 +6436,25 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     desc: 'Wozu stundenlang auf der Zulassungsstelle warten? Bei uns geben Sie Ihre Unterlagen ohne Wartezeit ab – wir prägen Ihre Schilder direkt vor Ort in der Kienitzer Str. 6, 12053 Berlin.',
                     highlights: DEFAULT_VIDEO_HIGHLIGHTS.slice(),
                     url: './werbevideo-1.mp4',
+                    url4k: '', url1080: '', url720: '', url480: '',
+                    defaultQuality: '1080',
                     aspect: '9/16',
+                    showcaseSide: 'left',
+                    playerSize: 'normal',
+                    videoFit: 'cover',
+                    videoPos: 'center center',
+                    frameStyle: 'classic',
+                    titleFont: "'Montserrat', sans-serif",
+                    bodyFont: "'Montserrat', sans-serif",
+                    titleSizeD: '26px',
+                    titleSizeM: '17px',
+                    bodySize: '13px',
+                    textAlign: 'left',
+                    titleCase: 'uppercase',
+                    titleColor: '',
+                    descColor: '',
+                    highColor: '',
+                    badgeBgColor: '',
                     logoMode: 'both',
                     logoStyle: 'round_title',
                     introSec: 2.5,
@@ -6462,7 +6489,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             return `${m}:${String(s).padStart(2, '0')}`;
         };
 
-        // --- STUDIO JINGLE & AUDIO ENGINE (100% LOKAL / DSGVO-KONFORM + EIGENE MP3) ---
+        // --- STUDIO JINGLE & AUDIO ENGINE (12 SOUNDS + EIGENE MP3) ---
         window.stopRedStudioAudio = function() {
             if (window._rvpCustomAudioEl) {
                 try { window._rvpCustomAudioEl.pause(); window._rvpCustomAudioEl.currentTime = 0; } catch (e) {}
@@ -6584,16 +6611,35 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (row) row.style.display = (m1 === 'custom' || m2 === 'custom') ? 'flex' : 'none';
         };
 
-        // --- PLAYER KERNFUNKTIONEN (MULTI-PLAYER & KINO-MODAL) ---
+        // --- PLAYER KERN-ENGINE V23 (EINHEITLICHE STEUERUNG OHNE KONFLIKTE) ---
         window.getRvpEl = function(key) {
             return document.getElementById(key === 'center' ? 'rvpCenterVideo' : `rvpVid-${key}`);
         };
 
         window.getRvpState = function(key) {
             if (!window._rvpStates[key]) {
-                window._rvpStates[key] = { videoIdx: 0, userPaused: false, isSeeking: false, seekTarget: null, seekLockTimer: null, phase: 'video', timerId: null, introShown: false };
+                window._rvpStates[key] = {
+                    videoIdx: 0,
+                    desiredPlaying: false,
+                    userPaused: false,
+                    isSeeking: false,
+                    pendingTime: null,
+                    seekLockUntil: 0,
+                    volume: 0.85,
+                    muted: true,
+                    quality: '1080',
+                    phase: 'video',
+                    timerId: null,
+                    introShown: false
+                };
             }
             return window._rvpStates[key];
+        };
+
+        window.getRvpItem = function(key) {
+            const list = window.promoVideosConfig?.list || [];
+            const st = window.getRvpState(key);
+            return list[st.videoIdx] || list[0] || null;
         };
 
         window.buildVideoBadgeIconHtml = function(iconKey) {
@@ -6613,19 +6659,13 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             return `<i class="${map[k] || 'fa-solid fa-circle-play'}"></i>`;
         };
 
-        window.getRvpItem = function(key) {
-            const list = window.promoVideosConfig?.list || [];
-            const st = window.getRvpState(key);
-            return list[st.videoIdx] || list[0] || null;
-        };
-
         window.rvpShowHud = function(key, iconCls, text) {
             const el = document.getElementById(`rvpHud-${key}`);
             if (!el) return;
             el.innerHTML = `<i class="${iconCls}"></i><span>${text}</span>`;
             el.classList.add('show');
             clearTimeout(el._hudTimer);
-            el._hudTimer = setTimeout(() => el.classList.remove('show'), 680);
+            el._hudTimer = setTimeout(() => el.classList.remove('show'), 720);
         };
 
         window.rvpHideBumper = function(key) {
@@ -6639,7 +6679,6 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
         window.rvpShowBumper = function(key, kind, onComplete) {
             const item = window.getRvpItem(key);
             const ov = document.getElementById(`rvpBumper-${key}`);
-            const v = window.getRvpEl(key);
             const st = window.getRvpState(key);
             if (!item || !ov) { if (onComplete) onComplete(); return; }
 
@@ -6664,11 +6703,10 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             ov.classList.add('active');
             st.phase = kind;
 
-            // Musik nur abspielen, wenn der Player nicht stummgeschaltet ist
-            if (v && !v.muted && v.volume > 0) {
+            if (!st.muted && st.volume > 0) {
                 const musicKey = kind === 'outro' ? (item.outroMusic || 'victory-chord') : (item.introMusic || 'cinema-whoosh');
                 const customUrl = kind === 'outro' ? (item.outroCustomAudio || '') : (item.introCustomAudio || '');
-                window.playRedStudioAudio(musicKey, customUrl, v.volume);
+                window.playRedStudioAudio(musicKey, customUrl, st.volume);
             }
 
             if (st.timerId) clearTimeout(st.timerId);
@@ -6683,54 +6721,136 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
         window.rvpPauseOtherPlayers = function(activeKey) {
             Object.keys(window._rvpStates).forEach(k => {
                 if (k === activeKey) return;
+                const otherSt = window._rvpStates[k];
                 const otherV = window.getRvpEl(k);
-                if (otherV && !otherV.paused) {
-                    otherV.pause();
-                    window.rvpHideBumper(k);
-                    window.rvpSyncUi(k);
+                if (otherSt) {
+                    otherSt.desiredPlaying = false;
+                    otherSt.userPaused = true;
                 }
+                window.rvpHideBumper(k);
+                if (otherV && !otherV.paused) otherV.pause();
+                window.rvpSyncUi(k);
             });
+        };
+
+        window.rvpApplyQualityProfile = function(key, qKey, notify = false) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
+            const item = window.getRvpItem(key);
+            const q = RVP_QUALITY_META[qKey] ? qKey : '1080';
+            const meta = RVP_QUALITY_META[q];
+            st.quality = q;
+
+            if (v) {
+                v.classList.remove('rvp-q-4k', 'rvp-q-hdr', 'rvp-q-1080', 'rvp-q-720', 'rvp-q-480');
+                if (meta.cls) v.classList.add(meta.cls);
+
+                // Falls für diese Qualitätsstufe eine separate MP4 hinterlegt wurde, nahtlos umschalten
+                if (item) {
+                    const targetSrc = (meta.urlField && item[meta.urlField]) ? item[meta.urlField] : item.url;
+                    const curSrcAttr = v.getAttribute('data-rvp-src') || v.getAttribute('src') || '';
+                    if (targetSrc && targetSrc !== curSrcAttr) {
+                        const resumeAt = isFinite(v.currentTime) ? v.currentTime : 0;
+                        const wasPlaying = st.desiredPlaying && !v.paused;
+                        v.setAttribute('data-rvp-src', targetSrc);
+                        v.src = targetSrc;
+                        const restorePos = () => {
+                            if (resumeAt > 0.2 && isFinite(v.duration)) {
+                                try { v.currentTime = Math.min(resumeAt, v.duration - 0.15); } catch (e) {}
+                            }
+                            if (wasPlaying) v.play().catch(() => {});
+                            window.rvpSyncUi(key);
+                        };
+                        v.addEventListener('loadedmetadata', restorePos, { once: true });
+                    }
+                }
+            }
+
+            const btn = document.getElementById(`rvpQualBtn-${key}`);
+            if (btn) btn.innerHTML = `<span>${meta.short}</span>`;
+            const menu = document.getElementById(`rvpQualMenu-${key}`);
+            if (menu) {
+                menu.querySelectorAll('button[data-rvp-qual]').forEach(b => {
+                    b.classList.toggle('active', b.getAttribute('data-rvp-qual') === q);
+                });
+                menu.classList.remove('open');
+            }
+            if (notify) {
+                window.rvpShowHud(key, 'fa-solid fa-sliders', meta.label);
+            }
         };
 
         window.rvpSyncUi = function(key) {
             const v = window.getRvpEl(key);
             if (!v) return;
             const st = window.getRvpState(key);
-            const isActivePlaying = !v.paused || st.phase === 'intro' || st.phase === 'outro';
+            const isPlayingVisual = st.phase === 'intro' || st.phase === 'outro' || !v.paused;
 
             const playBtn = document.getElementById(`rvpPlayBtn-${key}`);
             if (playBtn) {
-                playBtn.innerHTML = isActivePlaying ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
+                playBtn.innerHTML = isPlayingVisual ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
             }
+
+            const isMuted = st.muted || v.muted || st.volume <= 0.001;
             const muteBtn = document.getElementById(`rvpMuteBtn-${key}`);
             if (muteBtn) {
-                const isMuted = v.muted || v.volume === 0;
                 muteBtn.innerHTML = isMuted
                     ? '<i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i>'
-                    : (v.volume < 0.5 ? '<i class="fa-solid fa-volume-low"></i>' : '<i class="fa-solid fa-volume-high"></i>');
+                    : (st.volume < 0.5 ? '<i class="fa-solid fa-volume-low"></i>' : '<i class="fa-solid fa-volume-high"></i>');
             }
+
             const volSlider = document.getElementById(`rvpVol-${key}`);
-            if (volSlider) volSlider.value = v.muted ? 0 : v.volume;
+            if (volSlider) {
+                const effVol = isMuted ? 0 : st.volume;
+                volSlider.value = effVol.toFixed(2);
+                volSlider.style.setProperty('--pct', Math.round(effVol * 100) + '%');
+            }
 
             const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
-            const cur = isFinite(v.currentTime) ? v.currentTime : 0;
+            const lockActive = st.isSeeking || Date.now() < st.seekLockUntil;
+            const cur = (lockActive && st.pendingTime !== null)
+                ? st.pendingTime
+                : (isFinite(v.currentTime) ? v.currentTime : 0);
+
             const curEl = document.getElementById(`rvpTimeCur-${key}`);
             const durEl = document.getElementById(`rvpTimeDur-${key}`);
             const seekEl = document.getElementById(`rvpSeek-${key}`);
 
             if (curEl) curEl.innerText = window.formatVideoTime(cur);
             if (durEl) durEl.innerText = window.formatVideoTime(dur);
-            if (seekEl && !st.isSeeking && dur > 0) {
-                seekEl.value = Math.min(100, Math.max(0, (cur / dur) * 100)).toFixed(2);
+            if (seekEl && !st.isSeeking) {
+                const pct = dur > 0 ? Math.min(100, Math.max(0, (cur / dur) * 100)) : 0;
+                seekEl.value = pct.toFixed(2);
+                seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
             }
 
             const unmutePill = document.getElementById(`rvpUnmute-${key}`);
             if (unmutePill) {
-                unmutePill.classList.toggle('is-hidden', !(v.muted || v.volume === 0) || !isActivePlaying);
+                unmutePill.classList.toggle('is-hidden', !isMuted || !isPlayingVisual);
             }
             if (key === 'center') {
                 const bigPlay = document.getElementById('rvpCenterBigPlay');
-                if (bigPlay) bigPlay.classList.toggle('is-hidden', isActivePlaying);
+                if (bigPlay) bigPlay.classList.toggle('is-hidden', isPlayingVisual);
+            }
+        };
+
+        window.rvpSafePlay = function(key) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
+            if (!v) return;
+            v.muted = st.muted;
+            try { v.volume = st.muted ? 0 : Math.max(0.05, st.volume); } catch (e) {}
+            const p = v.play();
+            if (p && typeof p.catch === 'function') {
+                p.catch(() => {
+                    st.muted = true;
+                    v.muted = true;
+                    v.play().catch(() => {
+                        st.desiredPlaying = false;
+                        window.rvpSyncUi(key);
+                    });
+                    window.rvpSyncUi(key);
+                });
             }
         };
 
@@ -6741,22 +6861,22 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (!v || !item) return;
 
             const mode = item.logoMode || 'both';
-            const wantsIntro = (mode === 'intro' || mode === 'both') && (forceIntro || (!st.introShown && v.currentTime < 0.25));
+            const wantsIntro = (mode === 'intro' || mode === 'both') && (forceIntro || (!st.introShown && (v.currentTime || 0) < 0.25));
 
             if (wantsIntro) {
                 st.introShown = true;
                 v.pause();
-                v.currentTime = 0;
+                try { v.currentTime = 0; } catch (e) {}
                 window.rvpShowBumper(key, 'intro', () => {
-                    if (!st.userPaused) {
-                        v.play().catch(() => {});
+                    if (st.desiredPlaying && !st.userPaused) {
+                        window.rvpSafePlay(key);
                     }
                     window.rvpSyncUi(key);
                 });
                 window.rvpSyncUi(key);
             } else {
                 window.rvpHideBumper(key);
-                v.play().catch(() => {});
+                window.rvpSafePlay(key);
                 window.rvpSyncUi(key);
             }
         };
@@ -6766,9 +6886,10 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const st = window.getRvpState(key);
             if (!v) return;
 
-            if (st.phase === 'intro' || st.phase === 'outro') {
+            if (st.phase === 'intro' || st.phase === 'outro' || !v.paused) {
                 window.rvpHideBumper(key);
                 window.stopRedStudioAudio();
+                st.desiredPlaying = false;
                 st.userPaused = true;
                 v.pause();
                 window.rvpShowHud(key, 'fa-solid fa-pause', 'Pause');
@@ -6776,33 +6897,18 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 return;
             }
 
-            if (v.paused) {
-                st.userPaused = false;
-                window.rvpPauseOtherPlayers(key);
-                window.rvpShowHud(key, 'fa-solid fa-play', 'Abspielen');
+            st.desiredPlaying = true;
+            st.userPaused = false;
+            window.rvpPauseOtherPlayers(key);
+            window.rvpShowHud(key, 'fa-solid fa-play', 'Abspielen');
 
-                const item = window.getRvpItem(key);
-                const mode = item?.logoMode || 'both';
-                const wantsIntro = (mode === 'intro' || mode === 'both') && !st.introShown && (v.currentTime < 0.25);
-
-                if (wantsIntro) {
-                    // Entsperrt die Wiedergabe synchron im Fingertipp für iOS Safari & Android
-                    const unlockP = v.play();
-                    if (unlockP && typeof unlockP.then === 'function') {
-                        unlockP.then(() => { if (st.phase === 'intro') v.pause(); }).catch(() => {});
-                    }
-                    window.rvpStartWithIntroIfNeeded(key, true);
-                } else {
-                    const playP = v.play();
-                    if (playP && typeof playP.catch === 'function') {
-                        playP.catch(() => { v.muted = true; v.play().catch(() => {}); });
-                    }
-                    window.rvpSyncUi(key);
-                }
+            const item = window.getRvpItem(key);
+            const mode = item?.logoMode || 'both';
+            const wantsIntro = (mode === 'intro' || mode === 'both') && !st.introShown && (v.currentTime || 0) < 0.25;
+            if (wantsIntro) {
+                window.rvpStartWithIntroIfNeeded(key, true);
             } else {
-                st.userPaused = true;
-                v.pause();
-                window.rvpShowHud(key, 'fa-solid fa-pause', 'Pause');
+                window.rvpSafePlay(key);
                 window.rvpSyncUi(key);
             }
         };
@@ -6813,12 +6919,16 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (!v) return;
             window.rvpHideBumper(key);
             window.stopRedStudioAudio();
+            st.desiredPlaying = false;
             st.userPaused = true;
             st.introShown = false;
+            st.isSeeking = false;
+            st.pendingTime = 0;
+            st.seekLockUntil = Date.now() + 350;
             v.pause();
             try { v.currentTime = 0; } catch (e) {}
             const seekEl = document.getElementById(`rvpSeek-${key}`);
-            if (seekEl) seekEl.value = 0;
+            if (seekEl) { seekEl.value = 0; seekEl.style.setProperty('--pct', '0%'); }
             window.rvpShowHud(key, 'fa-solid fa-stop', 'Gestoppt');
             window.rvpSyncUi(key);
         };
@@ -6834,97 +6944,60 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 window.stopRedStudioAudio();
             }
 
-            const shouldKeepPlaying = !st.userPaused && (wasInBumper || !v.paused);
-
-            const applyJump = () => {
+            const executeJump = () => {
                 const dur = isFinite(v.duration) && v.duration > 0
                     ? v.duration
                     : (v.seekable && v.seekable.length ? v.seekable.end(v.seekable.length - 1) : 0);
 
-                const baseTime = (st.seekTarget !== null && isFinite(st.seekTarget))
-                    ? st.seekTarget
+                const base = (Date.now() < st.seekLockUntil && st.pendingTime !== null)
+                    ? st.pendingTime
                     : (isFinite(v.currentTime) ? v.currentTime : 0);
 
-                const maxT = dur > 0.25 ? dur - 0.15 : Math.max(0, baseTime + Math.max(0, deltaSec));
-                const target = Math.max(0, Math.min(maxT, baseTime + deltaSec));
+                const maxT = dur > 0.2 ? dur - 0.12 : Math.max(0, base + Math.max(0, deltaSec));
+                const target = Math.max(0, Math.min(maxT, base + deltaSec));
 
-                st.isSeeking = true;
-                st.seekTarget = target;
-                clearTimeout(st.seekLockTimer);
-                st.seekLockTimer = setTimeout(() => {
-                    st.isSeeking = false;
-                    st.seekTarget = null;
-                    window.rvpSyncUi(key);
-                }, 480);
+                st.pendingTime = target;
+                st.seekLockUntil = Date.now() + 550;
 
                 try { v.currentTime = target; } catch (e) {}
 
+                const seekEl = document.getElementById(`rvpSeek-${key}`);
+                if (seekEl && dur > 0) {
+                    const pct = Math.min(100, Math.max(0, (target / dur) * 100));
+                    seekEl.value = pct.toFixed(2);
+                    seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
+                }
                 const curEl = document.getElementById(`rvpTimeCur-${key}`);
                 if (curEl) curEl.innerText = window.formatVideoTime(target);
-                if (dur > 0) {
-                    const seekEl = document.getElementById(`rvpSeek-${key}`);
-                    if (seekEl) seekEl.value = Math.min(100, Math.max(0, (target / dur) * 100)).toFixed(2);
-                }
 
-                if (shouldKeepPlaying) {
-                    const p = v.play();
-                    if (p && typeof p.catch === 'function') p.catch(() => {});
+                if (st.desiredPlaying && !st.userPaused) {
+                    window.rvpSafePlay(key);
                 }
                 window.rvpShowHud(key, deltaSec < 0 ? 'fa-solid fa-rotate-left' : 'fa-solid fa-rotate-right', deltaSec < 0 ? '−5 Sek.' : '+5 Sek.');
                 window.rvpSyncUi(key);
             };
 
             if (v.readyState < 1) {
-                v.addEventListener('loadedmetadata', applyJump, { once: true });
+                v.addEventListener('loadedmetadata', executeJump, { once: true });
                 try { v.load(); } catch (e) {}
             } else {
-                applyJump();
+                executeJump();
             }
-        };
-
-        window.rvpSeekStart = function(key) {
-            const st = window.getRvpState(key);
-            st.isSeeking = true;
-            clearTimeout(st.seekLockTimer);
-            if (st.phase === 'intro' || st.phase === 'outro') {
-                window.rvpHideBumper(key);
-                window.stopRedStudioAudio();
-            }
-        };
-
-        window.rvpSeekMove = function(key, pct) {
-            const v = window.getRvpEl(key);
-            const st = window.getRvpState(key);
-            if (!v) return;
-            const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
-            if (dur <= 0) return;
-            const target = Math.max(0, Math.min(dur - 0.1, (parseFloat(pct) / 100) * dur));
-            st.seekTarget = target;
-            const curEl = document.getElementById(`rvpTimeCur-${key}`);
-            if (curEl) curEl.innerText = window.formatVideoTime(target);
-            try { v.currentTime = target; } catch (e) {}
-        };
-
-        window.rvpSeekEnd = function(key, pct) {
-            const st = window.getRvpState(key);
-            if (typeof pct !== 'undefined') window.rvpSeekMove(key, pct);
-            clearTimeout(st.seekLockTimer);
-            st.seekLockTimer = setTimeout(() => {
-                st.isSeeking = false;
-                st.seekTarget = null;
-                window.rvpSyncUi(key);
-            }, 180);
         };
 
         window.rvpToggleMute = function(key) {
             const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
             if (!v) return;
-            if (v.muted || v.volume === 0) {
+            if (st.muted || v.muted || st.volume <= 0.001) {
+                st.muted = false;
+                if (st.volume <= 0.05) st.volume = 0.85;
                 v.muted = false;
-                if (v.volume === 0) v.volume = 0.85;
+                try { v.volume = st.volume; } catch (e) {}
                 window.rvpPauseOtherPlayers(key);
-                window.rvpShowHud(key, 'fa-solid fa-volume-high', 'Ton an');
+                window.rvpShowHud(key, 'fa-solid fa-volume-high', `Ton ${Math.round(st.volume * 100)}%`);
             } else {
+                st.muted = true;
                 v.muted = true;
                 window.stopRedStudioAudio();
                 window.rvpShowHud(key, 'fa-solid fa-volume-xmark', 'Stumm');
@@ -6936,21 +7009,28 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const v = window.getRvpEl(key);
             const st = window.getRvpState(key);
             if (!v) return;
-            v.muted = false;
-            if (v.volume === 0) v.volume = 0.85;
+            st.muted = false;
+            if (st.volume <= 0.05) st.volume = 0.85;
+            st.desiredPlaying = true;
             st.userPaused = false;
+            v.muted = false;
+            try { v.volume = st.volume; } catch (e) {}
             window.rvpPauseOtherPlayers(key);
-            v.play().catch(() => {});
+            window.rvpSafePlay(key);
             window.rvpShowHud(key, 'fa-solid fa-volume-high', 'Ton aktiv');
             window.rvpSyncUi(key);
         };
 
         window.rvpSetVolume = function(key, val) {
             const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
             if (!v) return;
             const num = Math.max(0, Math.min(1, parseFloat(val) || 0));
-            v.volume = num;
-            v.muted = num === 0;
+            st.volume = num;
+            st.muted = num <= 0.001;
+            v.muted = st.muted;
+            try { v.volume = num; } catch (e) {}
+            if (!st.muted) window.rvpPauseOtherPlayers(key);
             window.rvpSyncUi(key);
         };
 
@@ -6962,7 +7042,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
             const mode = item.logoMode || 'both';
             const restartCycle = () => {
-                if (st.userPaused) { window.rvpSyncUi(key); return; }
+                if (!st.desiredPlaying || st.userPaused) { window.rvpSyncUi(key); return; }
                 st.introShown = false;
                 try { v.currentTime = 0; } catch (e) {}
                 window.rvpStartWithIntroIfNeeded(key, true);
@@ -6976,20 +7056,114 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             }
         };
 
-        window.bindRvpVideoEvents = function(key, videoIdx) {
+        window.bindRvpPlayerControls = function(key, videoIdx) {
+            const host = document.getElementById(`rvpHost-${key}`);
             const v = window.getRvpEl(key);
-            if (!v) return;
+            if (!host || !v) return;
+
             const st = window.getRvpState(key);
             st.videoIdx = videoIdx;
-            st.isSeeking = false;
-            if (v.dataset.rvpBound === '1') return;
-            v.dataset.rvpBound = '1';
+            const item = window.getRvpItem(key);
+            window.rvpApplyQualityProfile(key, item?.defaultQuality || st.quality || '1080', false);
 
-            ['timeupdate', 'loadedmetadata', 'durationchange', 'play', 'pause', 'volumechange', 'seeked'].forEach(ev => {
+            if (host.dataset.rvpControlsBound === '1') return;
+            host.dataset.rvpControlsBound = '1';
+
+            // 1. Einheitlicher Click-Delegator für ALLE Buttons & Qualitäts-Optionen (kein Touch/Click-Doppelkonflikt)
+            host.addEventListener('click', (e) => {
+                const qOpt = e.target.closest('button[data-rvp-qual]');
+                if (qOpt) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.rvpApplyQualityProfile(key, qOpt.getAttribute('data-rvp-qual'), true);
+                    return;
+                }
+
+                const actEl = e.target.closest('[data-rvp-act]');
+                if (!actEl) return;
+                e.preventDefault();
+                e.stopPropagation();
+
+                const act = actEl.getAttribute('data-rvp-act');
+                if (act === 'play') window.rvpTogglePlay(key);
+                else if (act === 'stop') window.rvpStop(key);
+                else if (act === 'back5') window.rvpSkip(key, -5);
+                else if (act === 'fwd5') window.rvpSkip(key, 5);
+                else if (act === 'mute') window.rvpToggleMute(key);
+                else if (act === 'unmute') window.rvpUnmuteAndPlay(key);
+                else if (act === 'expand') window.openVideoCenterModal(st.videoIdx, key);
+                else if (act === 'qual-toggle') {
+                    const menu = document.getElementById(`rvpQualMenu-${key}`);
+                    document.querySelectorAll('.rvp-qual-menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
+                    if (menu) menu.classList.toggle('open');
+                }
+            });
+
+            // 2. Saubere Seekbar-Steuerung (erst beim Ziehen visuell aktualisieren, beim Loslassen präzise springen)
+            const seekEl = document.getElementById(`rvpSeek-${key}`);
+            if (seekEl) {
+                const startSeek = () => {
+                    st.isSeeking = true;
+                    if (st.phase === 'intro' || st.phase === 'outro') {
+                        window.rvpHideBumper(key);
+                        window.stopRedStudioAudio();
+                    }
+                };
+                const previewSeek = () => {
+                    const pct = Math.max(0, Math.min(100, parseFloat(seekEl.value) || 0));
+                    seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
+                    const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+                    if (dur > 0) {
+                        const t = (pct / 100) * dur;
+                        st.pendingTime = t;
+                        const curEl = document.getElementById(`rvpTimeCur-${key}`);
+                        if (curEl) curEl.innerText = window.formatVideoTime(t);
+                    }
+                };
+                const commitSeek = () => {
+                    const pct = Math.max(0, Math.min(100, parseFloat(seekEl.value) || 0));
+                    seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
+                    const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+                    if (dur > 0) {
+                        const target = Math.max(0, Math.min(dur - 0.1, (pct / 100) * dur));
+                        st.pendingTime = target;
+                        st.seekLockUntil = Date.now() + 500;
+                        try { v.currentTime = target; } catch (e) {}
+                    }
+                    st.isSeeking = false;
+                    window.rvpSyncUi(key);
+                };
+
+                seekEl.addEventListener('pointerdown', startSeek);
+                seekEl.addEventListener('input', previewSeek);
+                seekEl.addEventListener('change', commitSeek);
+                seekEl.addEventListener('pointerup', commitSeek);
+                seekEl.addEventListener('pointercancel', commitSeek);
+            }
+
+            // 3. Saubere Lautstärke-Steuerung
+            const volEl = document.getElementById(`rvpVol-${key}`);
+            if (volEl) {
+                const onVol = () => window.rvpSetVolume(key, volEl.value);
+                volEl.addEventListener('input', onVol);
+                volEl.addEventListener('change', onVol);
+            }
+
+            // 4. Video-Events
+            ['timeupdate', 'loadedmetadata', 'durationchange', 'play', 'pause', 'seeked'].forEach(ev => {
                 v.addEventListener(ev, () => window.rvpSyncUi(key));
             });
             v.addEventListener('ended', () => window.rvpHandleEnded(key));
         };
+
+        if (!window._rvpOutsideMenuBound) {
+            window._rvpOutsideMenuBound = true;
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.rvp-qual-wrap')) {
+                    document.querySelectorAll('.rvp-qual-menu.open').forEach(m => m.classList.remove('open'));
+                }
+            });
+        }
 
         window.openVideoCenterModal = function(videoIdx = null, sourceKey = 'inline-0') {
             const list = window.promoVideosConfig?.list || [];
@@ -6999,12 +7173,14 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
             window.activeCenterVideoIdx = idx;
             const sourceV = window.getRvpEl(sourceKey);
+            const sourceSt = window._rvpStates[sourceKey];
             const centerV = window.getRvpEl('center');
             const ov = document.getElementById('redVideoCenterOverlay');
             if (!centerV || !ov) return;
 
-            const resumeTime = sourceV ? sourceV.currentTime : 0;
-            const resumeVol = sourceV && sourceV.volume > 0 ? sourceV.volume : 0.9;
+            const resumeTime = sourceV && isFinite(sourceV.currentTime) ? sourceV.currentTime : 0;
+            const resumeVol = (sourceSt && sourceSt.volume > 0.05) ? sourceSt.volume : 0.9;
+            const resumeQual = sourceSt?.quality || item.defaultQuality || '1080';
             window.rvpPauseOtherPlayers('center');
 
             document.getElementById('rvpCenterTitle').innerText = item.title || 'RED Berlin Video';
@@ -7013,22 +7189,24 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
             const st = window.getRvpState('center');
             st.videoIdx = idx;
+            st.desiredPlaying = true;
             st.userPaused = false;
+            st.muted = false;
+            st.volume = resumeVol;
             st.introShown = resumeTime > 0.4;
             window.rvpHideBumper('center');
 
-            if (centerV.getAttribute('data-src') !== item.url) {
-                centerV.setAttribute('data-src', item.url);
+            if (centerV.getAttribute('data-rvp-src') !== item.url) {
+                centerV.setAttribute('data-rvp-src', item.url);
                 centerV.src = item.url;
             }
-            centerV.muted = false;
-            centerV.volume = resumeVol;
-            window.bindRvpVideoEvents('center', idx);
+            window.bindRvpPlayerControls('center', idx);
+            window.rvpApplyQualityProfile('center', resumeQual, false);
 
             const beginCenter = () => {
                 if (resumeTime > 0.4 && isFinite(centerV.duration)) {
                     try { centerV.currentTime = Math.min(resumeTime, centerV.duration - 0.15); } catch (e) {}
-                    centerV.play().catch(() => { centerV.muted = true; centerV.play().catch(() => {}); });
+                    window.rvpSafePlay('center');
                     window.rvpSyncUi('center');
                 } else {
                     window.rvpStartWithIntroIfNeeded('center', true);
@@ -7043,6 +7221,9 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
         window.closeVideoCenterModal = function() {
             const ov = document.getElementById('redVideoCenterOverlay');
             const centerV = window.getRvpEl('center');
+            const st = window.getRvpState('center');
+            st.desiredPlaying = false;
+            st.userPaused = true;
             window.rvpHideBumper('center');
             window.stopRedStudioAudio();
             if (centerV) centerV.pause();
@@ -7089,42 +7270,77 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
         };
 
         window.buildInlinePlayerShellHtml = function(key, item, videoIdx, autoStart) {
+            const frameCls = item.frameStyle && item.frameStyle !== 'classic' ? ` frame-${item.frameStyle}` : '';
+            const fitStyle = `object-fit:${window.escHtml(item.videoFit || 'cover')}; object-position:${window.escHtml(item.videoPos || 'center center')};`;
+            const badgeStyle = item.badgeBgColor ? `style="background:${window.escHtml(item.badgeBgColor)}; border-color:rgba(255,255,255,0.4);"` : '';
+            const defQ = item.defaultQuality || '1080';
+            const qShort = (RVP_QUALITY_META[defQ] || RVP_QUALITY_META['1080']).short;
+
             return `
-                <div class="rvp-player-shell">
+                <div class="rvp-player-shell${frameCls}" id="rvpHost-${key}">
                     <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml(item.aspect || '9/16')};">
                         <div class="rvp-overlay-top">
-                            <span class="rvp-badge-pill">${window.buildVideoBadgeIconHtml(item.badgeIcon || 'live-dot')}<span>${window.escHtml(item.badge || 'RED Video')}</span></span>
-                            <button type="button" class="rvp-expand-fab" onclick="event.stopPropagation(); window.openVideoCenterModal(${videoIdx}, '${key}')" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
+                            <span class="rvp-badge-pill" ${badgeStyle}>${window.buildVideoBadgeIconHtml(item.badgeIcon || 'live-dot')}<span>${window.escHtml(item.badge || 'RED Video')}</span></span>
+                            <button type="button" class="rvp-expand-fab" data-rvp-act="expand" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
                         </div>
-                        <video id="rvpVid-${key}" src="${window.escHtml(item.url)}" muted playsinline preload="auto" onclick="event.stopPropagation(); window.rvpTogglePlay('${key}')"></video>
+                        <video id="rvpVid-${key}" src="${window.escHtml(item.url)}" data-rvp-src="${window.escHtml(item.url)}" style="${fitStyle}" muted playsinline webkit-playsinline preload="auto" data-rvp-act="play"></video>
                         <div class="rvp-bumper-overlay" id="rvpBumper-${key}"></div>
                         <div class="rvp-hud-toast" id="rvpHud-${key}"></div>
-                        <button type="button" class="rvp-unmute-callout" id="rvpUnmute-${key}" onclick="event.stopPropagation(); window.rvpUnmuteAndPlay('${key}')">
+                        <button type="button" class="rvp-unmute-callout" id="rvpUnmute-${key}" data-rvp-act="unmute">
                             <i class="fa-solid fa-volume-high"></i> Ton einschalten
                         </button>
                     </div>
                     <div class="rvp-controls-bar">
                         <div class="rvp-seek-row">
                             <span class="rvp-time" id="rvpTimeCur-${key}">0:00</span>
-                            <input type="range" id="rvpSeek-${key}" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" onpointerdown="window.rvpSeekStart('${key}')" onpointerup="window.rvpSeekEnd('${key}', this.value)" onpointercancel="window.rvpSeekEnd('${key}', this.value)" ontouchstart="window.rvpSeekStart('${key}')" ontouchend="window.rvpSeekEnd('${key}', this.value)" ontouchcancel="window.rvpSeekEnd('${key}', this.value)" oninput="window.rvpSeekMove('${key}', this.value)" onchange="window.rvpSeekEnd('${key}', this.value)">
+                            <input type="range" id="rvpSeek-${key}" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" style="--pct:0%;" aria-label="Wiedergabeposition">
                             <span class="rvp-time" id="rvpTimeDur-${key}">0:00</span>
                         </div>
                         <div class="rvp-btn-row">
                             <div class="rvp-btn-group">
-                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpSkip('${key}', -5)" title="5s zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
-                                <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpPlayBtn-${key}" onclick="event.stopPropagation(); window.rvpTogglePlay('${key}')" title="Play / Pause"><i class="fa-solid ${autoStart ? 'fa-pause' : 'fa-play'}"></i></button>
-                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpStop('${key}')" title="Stopp"><i class="fa-solid fa-stop"></i></button>
-                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.rvpSkip('${key}', 5)" title="5s vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
+                                <button type="button" class="rvp-ctrl-btn" data-rvp-act="back5" title="5s zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
+                                <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpPlayBtn-${key}" data-rvp-act="play" title="Play / Pause"><i class="fa-solid ${autoStart ? 'fa-pause' : 'fa-play'}"></i></button>
+                                <button type="button" class="rvp-ctrl-btn" data-rvp-act="stop" title="Stopp"><i class="fa-solid fa-stop"></i></button>
+                                <button type="button" class="rvp-ctrl-btn" data-rvp-act="fwd5" title="5s vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
                             </div>
                             <div class="rvp-vol-group">
-                                <button type="button" class="rvp-ctrl-btn" id="rvpMuteBtn-${key}" onclick="event.stopPropagation(); window.rvpToggleMute('${key}')" title="Ton Ein/Aus"><i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i></button>
-                                <input type="range" id="rvpVol-${key}" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0" oninput="window.rvpSetVolume('${key}', this.value)" aria-label="Lautstärke">
-                                <button type="button" class="rvp-ctrl-btn" onclick="event.stopPropagation(); window.openVideoCenterModal(${videoIdx}, '${key}')" title="Vergrößern"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+                                <button type="button" class="rvp-ctrl-btn" id="rvpMuteBtn-${key}" data-rvp-act="mute" title="Ton Ein/Aus"><i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i></button>
+                                <input type="range" id="rvpVol-${key}" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0" style="--pct:0%;" aria-label="Lautstärke">
+                                <div class="rvp-qual-wrap">
+                                    <button type="button" class="rvp-ctrl-btn rvp-qual-btn" id="rvpQualBtn-${key}" data-rvp-act="qual-toggle" title="Bildqualität (4K / HDR / Full HD / HD / SD)"><span>${qShort}</span></button>
+                                    <div class="rvp-qual-menu" id="rvpQualMenu-${key}">
+                                        <button type="button" data-rvp-qual="4k"><strong>4K UHD</strong><span>2160p Ultra</span></button>
+                                        <button type="button" data-rvp-qual="hdr"><strong>HDR10</strong><span>Kino-Kontrast</span></button>
+                                        <button type="button" data-rvp-qual="1080"><strong>Full HD</strong><span>1080p Scharf</span></button>
+                                        <button type="button" data-rvp-qual="720"><strong>HD</strong><span>720p Standard</span></button>
+                                        <button type="button" data-rvp-qual="480"><strong>SD</strong><span>480p Datenspar</span></button>
+                                        <button type="button" data-rvp-qual="auto"><strong>Auto</strong><span>Original</span></button>
+                                    </div>
+                                </div>
+                                <button type="button" class="rvp-ctrl-btn" data-rvp-act="expand" title="Vergrößern"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+        };
+
+        window.buildVideoTypographyStyle = function(item) {
+            const align = item.textAlign || 'left';
+            const justify = align === 'center' ? 'center' : (align === 'right' ? 'flex-end' : 'space-between');
+            return [
+                `--rvp-title-font:${item.titleFont || "'Montserrat', sans-serif"}`,
+                `--rvp-body-font:${item.bodyFont || "'Montserrat', sans-serif"}`,
+                `--rvp-title-d:${item.titleSizeD || '26px'}`,
+                `--rvp-title-m:${item.titleSizeM || '17px'}`,
+                `--rvp-body-size:${item.bodySize || '13px'}`,
+                `--rvp-align:${align}`,
+                `--rvp-head-justify:${justify}`,
+                `--rvp-title-case:${item.titleCase || 'uppercase'}`,
+                item.titleColor ? `--rvp-title-col:${item.titleColor}` : '',
+                item.descColor ? `--rvp-desc-col:${item.descColor}` : '',
+                item.highColor ? `--rvp-high-col:${item.highColor}; --rvp-high-icon-col:${item.highColor}` : ''
+            ].filter(Boolean).join(';');
         };
 
         window.renderPromoVideoShowcase = function() {
@@ -7134,7 +7350,6 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const list = Array.isArray(cfg.list) ? cfg.list : [];
             const isMgr = window.canManagePromoVideos();
 
-            // Alte Timer & Observer sauber aufräumen
             Object.keys(window._rvpStates).forEach(k => { if (k !== 'center') window.rvpHideBumper(k); });
             window._rvpObservers.forEach(o => o.disconnect());
             window._rvpObservers = [];
@@ -7159,15 +7374,18 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 const isLandscape = item.aspect === '16/9';
                 const pKey = 'inline-0';
                 const highlights = (Array.isArray(item.highlights) && item.highlights.length > 0) ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS;
+                const sideCls = item.showcaseSide === 'right' ? ' pos-right' : (item.showcaseSide === 'center' ? ' pos-center' : '');
+                const sizeCls = item.playerSize === 'compact' ? ' size-compact' : (item.playerSize === 'large' ? ' size-large' : '');
+                const typoStyle = window.buildVideoTypographyStyle(item);
 
                 const playlistHtml = list.length > 1
                     ? `<div class="rvp-playlist-bar">${list.map((v, i) => `<button type="button" class="rvp-playlist-chip ${i === window.activePromoVideoIdx ? 'active' : ''}" onclick="window.selectPromoVideo(${i})"><i class="fa-solid fa-play"></i> ${window.escHtml(v.badge || ('Video ' + (i + 1)))}</button>`).join('')}</div>`
                     : '';
 
                 host.innerHTML = `
-                    <div class="rvp-showcase-card ${isLandscape ? 'is-landscape' : ''}">
+                    <div class="rvp-showcase-card${isLandscape ? ' is-landscape' : ''}${sideCls}${sizeCls}">
                         ${window.buildInlinePlayerShellHtml(pKey, item, window.activePromoVideoIdx, autoStart)}
-                        <div class="rvp-info-col">
+                        <div class="rvp-info-col" style="${typoStyle}">
                             <div class="rvp-info-head">
                                 <div>
                                     <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> ${window.escHtml(eyebrow)}</span>
@@ -7190,7 +7408,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                         </div>
                     </div>
                 `;
-                activePlayersToInit.push({ key: pKey, idx: window.activePromoVideoIdx, auto: autoStart });
+                activePlayersToInit.push({ key: pKey, idx: window.activePromoVideoIdx, auto: autoStart, item });
             } else {
                 const maxShow = layout === 'grid-3' ? 3 : 2;
                 const shown = list.slice(0, maxShow);
@@ -7211,19 +7429,27 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                         <div class="rvp-multi-grid ${colClass}">
                             ${shown.map((item, idx) => {
                                 const pKey = `inline-${idx}`;
-                                activePlayersToInit.push({ key: pKey, idx, auto: autoStart && idx === 0 });
+                                activePlayersToInit.push({ key: pKey, idx, auto: autoStart && idx === 0, item });
+                                const tStyle = [
+                                    `font-family:${item.titleFont || "'Montserrat', sans-serif"}`,
+                                    item.titleColor ? `color:${item.titleColor}` : ''
+                                ].filter(Boolean).join(';');
+                                const dStyle = [
+                                    `font-family:${item.bodyFont || "'Montserrat', sans-serif"}`,
+                                    item.descColor ? `color:${item.descColor}` : ''
+                                ].filter(Boolean).join(';');
                                 return `
                                     <article class="rvp-grid-card">
                                         ${window.buildInlinePlayerShellHtml(pKey, item, idx, autoStart && idx === 0)}
-                                        <div class="rvp-grid-meta">
+                                        <div class="rvp-grid-meta" style="text-align:${window.escHtml(item.textAlign || 'left')};">
                                             <div class="rvp-grid-meta-head">
-                                                <strong>${window.escHtml(item.title || 'RED Video')}</strong>
+                                                <strong style="${tStyle}">${window.escHtml(item.title || 'RED Video')}</strong>
                                                 <div class="rvp-admin-inline-btns action-videos">
                                                     <button type="button" class="mini-admin-btn edit" onclick="window.editCurrentPromoVideo('${item.id}')" title="Video bearbeiten"><i class="fa-solid fa-pencil"></i></button>
                                                     <button type="button" class="mini-admin-btn del" onclick="window.deletePromoVideoItem('${item.id}')" title="Video löschen"><i class="fa-solid fa-trash"></i></button>
                                                 </div>
                                             </div>
-                                            ${item.desc ? `<p>${window.escHtml(item.desc)}</p>` : ''}
+                                            ${item.desc ? `<p style="${dStyle}">${window.escHtml(item.desc)}</p>` : ''}
                                         </div>
                                     </article>
                                 `;
@@ -7233,12 +7459,25 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 `;
             }
 
-            activePlayersToInit.forEach(({ key, idx, auto }) => {
+            activePlayersToInit.forEach(({ key, idx, auto, item }) => {
                 const v = window.getRvpEl(key);
                 if (!v) return;
                 v.muted = true;
-                window._rvpStates[key] = { videoIdx: idx, userPaused: !auto, isSeeking: false, phase: 'video', timerId: null, introShown: false };
-                window.bindRvpVideoEvents(key, idx);
+                window._rvpStates[key] = {
+                    videoIdx: idx,
+                    desiredPlaying: auto,
+                    userPaused: !auto,
+                    isSeeking: false,
+                    pendingTime: null,
+                    seekLockUntil: 0,
+                    volume: 0.85,
+                    muted: true,
+                    quality: item?.defaultQuality || '1080',
+                    phase: 'video',
+                    timerId: null,
+                    introShown: false
+                };
+                window.bindRvpPlayerControls(key, idx);
                 if (auto) {
                     window.rvpStartWithIntroIfNeeded(key, true);
                 } else {
@@ -7252,8 +7491,8 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                             if (!en.isIntersecting) {
                                 if (!v.paused) v.pause();
                                 if (st.phase === 'intro' || st.phase === 'outro') window.rvpHideBumper(key);
-                            } else if (auto && !st.userPaused && !document.getElementById('redVideoCenterOverlay')?.classList.contains('open')) {
-                                v.play().catch(() => {});
+                            } else if (auto && st.desiredPlaying && !st.userPaused && !document.getElementById('redVideoCenterOverlay')?.classList.contains('open')) {
+                                window.rvpSafePlay(key);
                             }
                         });
                     }, { threshold: 0.25 });
@@ -7261,6 +7500,56 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     window._rvpObservers.push(obs);
                 }
             });
+        };
+
+        // --- LIVE-VORSCHAU IM VIDEO-STUDIO ---
+        window.updateVideoStudioLivePreview = function() {
+            const stage = document.getElementById('vmLivePreviewStage');
+            if (!stage) return;
+
+            const eyebrow = (document.getElementById('vmSectionEyebrow')?.value || 'RED Berlin in Aktion').trim();
+            const title = (document.getElementById('vmTitle')?.value || 'Keine Wartenummer beim Amt!').trim();
+            const desc = (document.getElementById('vmDesc')?.value || 'Schnelle Abgabe & Kennzeichen-Sofortprägung in Berlin-Neukölln.').trim();
+            const badge = (document.getElementById('vmBadge')?.value || '30s Live-Einblick').trim();
+            const badgeIcon = document.getElementById('vmBadgeIcon')?.value || 'live-dot';
+            const defQual = document.getElementById('vmDefaultQuality')?.value || '1080';
+            const qMeta = RVP_QUALITY_META[defQual] || RVP_QUALITY_META['1080'];
+            const aspect = document.getElementById('vmAspect')?.value || '9/16';
+            const side = document.getElementById('vmShowcaseSide')?.value || 'left';
+            const fit = document.getElementById('vmVideoFit')?.value || 'cover';
+            const pos = document.getElementById('vmVideoPos')?.value || 'center center';
+            const frame = document.getElementById('vmFrameStyle')?.value || 'classic';
+            const url = (document.getElementById('vmUrl')?.value || './werbevideo-1.mp4').trim();
+
+            const titleFont = document.getElementById('vmTitleFont')?.value || "'Montserrat', sans-serif";
+            const bodyFont = document.getElementById('vmBodyFont')?.value || "'Montserrat', sans-serif";
+            const align = document.getElementById('vmTextAlign')?.value || 'left';
+            const titleCase = document.getElementById('vmTitleCase')?.value || 'uppercase';
+            const titleCol = document.getElementById('vmTitleColorMode')?.value === 'custom' ? document.getElementById('vmTitleColor')?.value : '';
+            const descCol = document.getElementById('vmDescColorMode')?.value === 'custom' ? document.getElementById('vmDescColor')?.value : '';
+            const highCol = document.getElementById('vmHighColorMode')?.value === 'custom' ? document.getElementById('vmHighColor')?.value : '';
+            const badgeBg = document.getElementById('vmBadgeColorMode')?.value === 'custom' ? document.getElementById('vmBadgeBgColor')?.value : '';
+
+            const pill = document.getElementById('vmPreviewModePill');
+            if (pill) pill.innerText = `${qMeta.label} • ${side === 'right' ? 'Video Rechts' : (side === 'center' ? 'Kino Mitte' : 'Video Links')}`;
+
+            stage.className = 'vm-live-preview-stage' + (side === 'right' ? ' pos-right' : (side === 'center' ? ' pos-center' : ''));
+            const frameExtra = frame === 'cinema' ? 'border-color:var(--primary-red); box-shadow:0 0 14px rgba(217,0,0,0.45);'
+                : (frame === 'gold' ? 'border-color:#d4af37; box-shadow:0 0 12px rgba(212,175,55,0.4);' : '');
+
+            stage.innerHTML = `
+                <div class="vm-prev-frame${aspect === '16/9' ? ' is-wide' : ''}" style="--prev-aspect:${window.escHtml(aspect)}; ${frameExtra}">
+                    <video src="${window.escHtml(url)}" class="${qMeta.cls}" style="object-fit:${window.escHtml(fit)}; object-position:${window.escHtml(pos)};" muted playsinline preload="metadata"></video>
+                    <span class="vm-prev-badge" ${badgeBg ? `style="background:${window.escHtml(badgeBg)};"` : ''}>${window.buildVideoBadgeIconHtml(badgeIcon)}<span>${window.escHtml(badge)}</span></span>
+                    <span class="vm-prev-qtag">${qMeta.short}</span>
+                </div>
+                <div class="vm-prev-text" style="text-align:${window.escHtml(align)}; font-family:${bodyFont};">
+                    <span style="display:inline-block; font-size:8.5px; font-weight:900; color:var(--primary-red); text-transform:uppercase; letter-spacing:0.6px;">${window.escHtml(eyebrow)}</span>
+                    <strong style="display:block; font-family:${titleFont}; font-size:13.5px; line-height:1.25; margin:2px 0 4px; text-transform:${window.escHtml(titleCase)}; color:${titleCol || 'var(--text-light)'};">${window.escHtml(title)}</strong>
+                    <p style="margin:0 0 5px; font-size:10.5px; line-height:1.35; color:${descCol || 'var(--text-muted)'}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${window.escHtml(desc)}</p>
+                    <span style="display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:800; color:${highCol || 'var(--green-accent)'};"><i class="fa-solid fa-circle-check"></i> Highlight-Vorschau aktiv</span>
+                </div>
+            `;
         };
 
         // --- SUPERVISOR / ADMIN VIDEO- & LOGO-MANAGER ---
@@ -7292,6 +7581,8 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 if (uInp) uInp.value = cur.startsWith('data:') ? '' : cur;
                 const chk = document.getElementById('vmShowFooterLogo');
                 if (chk) chk.checked = window.brandAssetsData?.showFooterLogo !== false;
+            } else {
+                window.updateVideoStudioLivePreview();
             }
         };
 
@@ -7308,7 +7599,10 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             window.renderVideoManagerList();
             window.switchVideoManagerTab(startTab === 'brand' ? 'brand' : 'videos');
             document.getElementById('videoManagerOverlay').classList.add('open');
-            setTimeout(() => { if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays(); }, 40);
+            setTimeout(() => {
+                window.updateVideoStudioLivePreview();
+                if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+            }, 40);
         };
 
         window.closeVideoManagerModal = function() {
@@ -7326,26 +7620,46 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
         };
 
         window.resetVideoManagerForm = function() {
-            document.getElementById('vmEditId').value = '';
-            document.getElementById('vmTitle').value = '';
-            document.getElementById('vmBadge').value = '';
-            if (document.getElementById('vmBadgeIcon')) document.getElementById('vmBadgeIcon').value = 'live-dot';
-            document.getElementById('vmDesc').value = '';
-            if (document.getElementById('vmHighlights')) document.getElementById('vmHighlights').value = DEFAULT_VIDEO_HIGHLIGHTS.join('\n');
-            document.getElementById('vmUrl').value = '';
-            if (document.getElementById('vmAspect')) document.getElementById('vmAspect').value = '9/16';
-            if (document.getElementById('vmLogoMode')) document.getElementById('vmLogoMode').value = 'both';
-            if (document.getElementById('vmLogoStyle')) document.getElementById('vmLogoStyle').value = 'round_title';
-            if (document.getElementById('vmIntroSec')) document.getElementById('vmIntroSec').value = '2.5';
-            if (document.getElementById('vmOutroSec')) document.getElementById('vmOutroSec').value = '3';
-            if (document.getElementById('vmIntroMusic')) document.getElementById('vmIntroMusic').value = 'cinema-whoosh';
-            if (document.getElementById('vmOutroMusic')) document.getElementById('vmOutroMusic').value = 'victory-chord';
-            if (document.getElementById('vmIntroCustomAudio')) document.getElementById('vmIntroCustomAudio').value = '';
-            if (document.getElementById('vmOutroCustomAudio')) document.getElementById('vmOutroCustomAudio').value = '';
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            setVal('vmEditId', '');
+            setVal('vmTitle', '');
+            setVal('vmBadge', '');
+            setVal('vmBadgeIcon', 'live-dot');
+            setVal('vmDefaultQuality', '1080');
+            setVal('vmDesc', '');
+            setVal('vmHighlights', DEFAULT_VIDEO_HIGHLIGHTS.join('\n'));
+            setVal('vmUrl', '');
+            setVal('vmUrl4k', ''); setVal('vmUrl1080', ''); setVal('vmUrl720', ''); setVal('vmUrl480', '');
+            setVal('vmAspect', '9/16');
+            setVal('vmShowcaseSide', 'left');
+            setVal('vmPlayerSize', 'normal');
+            setVal('vmVideoFit', 'cover');
+            setVal('vmVideoPos', 'center center');
+            setVal('vmFrameStyle', 'classic');
+            setVal('vmTitleFont', "'Montserrat', sans-serif");
+            setVal('vmBodyFont', "'Montserrat', sans-serif");
+            setVal('vmTitleSizeD', '26px');
+            setVal('vmTitleSizeM', '17px');
+            setVal('vmBodySize', '13px');
+            setVal('vmTextAlign', 'left');
+            setVal('vmTitleCase', 'uppercase');
+            setVal('vmTitleColorMode', 'auto'); setVal('vmTitleColor', '#d90000');
+            setVal('vmDescColorMode', 'auto'); setVal('vmDescColor', '#55555c');
+            setVal('vmHighColorMode', 'auto'); setVal('vmHighColor', '#0b6e31');
+            setVal('vmBadgeColorMode', 'auto'); setVal('vmBadgeBgColor', '#d90000');
+            setVal('vmLogoMode', 'both');
+            setVal('vmLogoStyle', 'round_title');
+            setVal('vmIntroSec', '2.5');
+            setVal('vmOutroSec', '3');
+            setVal('vmIntroMusic', 'cinema-whoosh');
+            setVal('vmOutroMusic', 'victory-chord');
+            setVal('vmIntroCustomAudio', '');
+            setVal('vmOutroCustomAudio', '');
             if (document.getElementById('vmFileInput')) document.getElementById('vmFileInput').value = '';
             if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Neues Video hinzufügen';
             document.getElementById('vmEditBanner')?.classList.remove('active');
             window.toggleCustomVideoAudioFields();
+            window.updateVideoStudioLivePreview();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
         };
 
@@ -7360,47 +7674,68 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const reader = new FileReader();
             reader.onload = (ev) => {
                 document.getElementById('vmUrl').value = ev.target.result;
+                window.updateVideoStudioLivePreview();
                 window.showToast(`Video „${file.name}“ geladen – jetzt speichern!`, 'success');
             };
             reader.readAsDataURL(file);
         };
 
         window.savePromoVideoItem = async function() {
-            const editId = document.getElementById('vmEditId').value;
-            const title = document.getElementById('vmTitle').value.trim();
-            const badge = document.getElementById('vmBadge').value.trim() || 'RED Video';
-            const badgeIcon = document.getElementById('vmBadgeIcon')?.value || 'live-dot';
-            const desc = document.getElementById('vmDesc').value.trim();
-            const highlightsRaw = (document.getElementById('vmHighlights')?.value || '').split('\n').map(s => s.trim()).filter(Boolean);
-            const url = document.getElementById('vmUrl').value.trim();
-            const aspect = document.getElementById('vmAspect')?.value || '9/16';
-
-            const logoMode = document.getElementById('vmLogoMode')?.value || 'both';
-            const logoStyle = document.getElementById('vmLogoStyle')?.value || 'round_title';
-            const introSec = parseFloat(document.getElementById('vmIntroSec')?.value || '2.5') || 2.5;
-            const outroSec = parseFloat(document.getElementById('vmOutroSec')?.value || '3') || 3;
-            const introMusic = document.getElementById('vmIntroMusic')?.value || 'cinema-whoosh';
-            const outroMusic = document.getElementById('vmOutroMusic')?.value || 'victory-chord';
-            const introCustomAudio = (document.getElementById('vmIntroCustomAudio')?.value || '').trim();
-            const outroCustomAudio = (document.getElementById('vmOutroCustomAudio')?.value || '').trim();
+            const val = (id, fb = '') => (document.getElementById(id)?.value ?? fb);
+            const editId = val('vmEditId');
+            const title = val('vmTitle').trim();
+            const badge = val('vmBadge').trim() || 'RED Video';
+            const badgeIcon = val('vmBadgeIcon', 'live-dot');
+            const defaultQuality = val('vmDefaultQuality', '1080');
+            const desc = val('vmDesc').trim();
+            const highlightsRaw = val('vmHighlights').split('\n').map(s => s.trim()).filter(Boolean);
+            const url = val('vmUrl').trim();
 
             if (!title || !url) {
                 window.showToast('Bitte Überschrift und Video-Pfad / Link eingeben.', 'error');
                 return;
             }
 
-            window.promoVideosConfig.sectionEyebrow = (document.getElementById('vmSectionEyebrow')?.value || '').trim() || 'RED Berlin in Aktion';
-            window.promoVideosConfig.layoutMode = document.getElementById('vmLayoutSelect')?.value || 'showcase';
-            window.promoVideosConfig.placement = document.getElementById('vmPlacementSelect')?.value || 'after-hero';
-            window.promoVideosConfig.autoplayMode = document.getElementById('vmAutoplaySelect')?.value || 'muted-auto';
+            window.promoVideosConfig.sectionEyebrow = val('vmSectionEyebrow').trim() || 'RED Berlin in Aktion';
+            window.promoVideosConfig.layoutMode = val('vmLayoutSelect', 'showcase');
+            window.promoVideosConfig.placement = val('vmPlacementSelect', 'after-hero');
+            window.promoVideosConfig.autoplayMode = val('vmAutoplaySelect', 'muted-auto');
 
             if (!Array.isArray(window.promoVideosConfig.list)) window.promoVideosConfig.list = [];
             const rec = {
                 id: editId || ('vid-' + Date.now()),
-                title, badge, badgeIcon, desc,
+                title, badge, badgeIcon, defaultQuality, desc,
                 highlights: highlightsRaw.length > 0 ? highlightsRaw : DEFAULT_VIDEO_HIGHLIGHTS.slice(),
-                url, aspect,
-                logoMode, logoStyle, introSec, outroSec, introMusic, outroMusic, introCustomAudio, outroCustomAudio
+                url,
+                url4k: val('vmUrl4k').trim(),
+                url1080: val('vmUrl1080').trim(),
+                url720: val('vmUrl720').trim(),
+                url480: val('vmUrl480').trim(),
+                aspect: val('vmAspect', '9/16'),
+                showcaseSide: val('vmShowcaseSide', 'left'),
+                playerSize: val('vmPlayerSize', 'normal'),
+                videoFit: val('vmVideoFit', 'cover'),
+                videoPos: val('vmVideoPos', 'center center'),
+                frameStyle: val('vmFrameStyle', 'classic'),
+                titleFont: val('vmTitleFont', "'Montserrat', sans-serif"),
+                bodyFont: val('vmBodyFont', "'Montserrat', sans-serif"),
+                titleSizeD: val('vmTitleSizeD', '26px'),
+                titleSizeM: val('vmTitleSizeM', '17px'),
+                bodySize: val('vmBodySize', '13px'),
+                textAlign: val('vmTextAlign', 'left'),
+                titleCase: val('vmTitleCase', 'uppercase'),
+                titleColor: val('vmTitleColorMode') === 'custom' ? val('vmTitleColor') : '',
+                descColor: val('vmDescColorMode') === 'custom' ? val('vmDescColor') : '',
+                highColor: val('vmHighColorMode') === 'custom' ? val('vmHighColor') : '',
+                badgeBgColor: val('vmBadgeColorMode') === 'custom' ? val('vmBadgeBgColor') : '',
+                logoMode: val('vmLogoMode', 'both'),
+                logoStyle: val('vmLogoStyle', 'round_title'),
+                introSec: parseFloat(val('vmIntroSec', '2.5')) || 2.5,
+                outroSec: parseFloat(val('vmOutroSec', '3')) || 3,
+                introMusic: val('vmIntroMusic', 'cinema-whoosh'),
+                outroMusic: val('vmOutroMusic', 'victory-chord'),
+                introCustomAudio: val('vmIntroCustomAudio').trim(),
+                outroCustomAudio: val('vmOutroCustomAudio').trim()
             };
 
             if (editId) {
@@ -7416,37 +7751,63 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
             await window.persistPromoVideosConfig();
             window.resetVideoManagerForm();
-            window.showToast(editId ? 'Video, Überschrift & Intro/Outro gespeichert!' : 'Neues Werbevideo veröffentlicht!', 'success');
+            window.showToast(editId ? 'Video, Qualität, Design & Schriften gespeichert!' : 'Neues Werbevideo veröffentlicht!', 'success');
         };
 
         window.editPromoVideoItem = function(id) {
             const item = (window.promoVideosConfig?.list || []).find(v => v.id === id);
             if (!item) return;
-            document.getElementById('vmEditId').value = item.id;
-            document.getElementById('vmTitle').value = item.title || '';
-            document.getElementById('vmBadge').value = item.badge || '';
-            if (document.getElementById('vmBadgeIcon')) document.getElementById('vmBadgeIcon').value = item.badgeIcon || 'live-dot';
-            document.getElementById('vmDesc').value = item.desc || '';
-            if (document.getElementById('vmHighlights')) {
-                document.getElementById('vmHighlights').value = (Array.isArray(item.highlights) && item.highlights.length ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS).join('\n');
-            }
-            document.getElementById('vmUrl').value = item.url || '';
-            if (document.getElementById('vmAspect')) document.getElementById('vmAspect').value = item.aspect || '9/16';
-            if (document.getElementById('vmLogoMode')) document.getElementById('vmLogoMode').value = item.logoMode || 'both';
-            if (document.getElementById('vmLogoStyle')) document.getElementById('vmLogoStyle').value = item.logoStyle || 'round_title';
-            if (document.getElementById('vmIntroSec')) document.getElementById('vmIntroSec').value = String(item.introSec || '2.5');
-            if (document.getElementById('vmOutroSec')) document.getElementById('vmOutroSec').value = String(item.outroSec || '3');
-            if (document.getElementById('vmIntroMusic')) document.getElementById('vmIntroMusic').value = item.introMusic || 'cinema-whoosh';
-            if (document.getElementById('vmOutroMusic')) document.getElementById('vmOutroMusic').value = item.outroMusic || 'victory-chord';
-            if (document.getElementById('vmIntroCustomAudio')) document.getElementById('vmIntroCustomAudio').value = item.introCustomAudio || '';
-            if (document.getElementById('vmOutroCustomAudio')) document.getElementById('vmOutroCustomAudio').value = item.outroCustomAudio || '';
+            const setVal = (elId, v) => { const el = document.getElementById(elId); if (el) el.value = v; };
+
+            setVal('vmEditId', item.id);
+            setVal('vmTitle', item.title || '');
+            setVal('vmBadge', item.badge || '');
+            setVal('vmBadgeIcon', item.badgeIcon || 'live-dot');
+            setVal('vmDefaultQuality', item.defaultQuality || '1080');
+            setVal('vmDesc', item.desc || '');
+            setVal('vmHighlights', (Array.isArray(item.highlights) && item.highlights.length ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS).join('\n'));
+            setVal('vmUrl', item.url || '');
+            setVal('vmUrl4k', item.url4k || ''); setVal('vmUrl1080', item.url1080 || ''); setVal('vmUrl720', item.url720 || ''); setVal('vmUrl480', item.url480 || '');
+            setVal('vmAspect', item.aspect || '9/16');
+            setVal('vmShowcaseSide', item.showcaseSide || 'left');
+            setVal('vmPlayerSize', item.playerSize || 'normal');
+            setVal('vmVideoFit', item.videoFit || 'cover');
+            setVal('vmVideoPos', item.videoPos || 'center center');
+            setVal('vmFrameStyle', item.frameStyle || 'classic');
+            setVal('vmTitleFont', item.titleFont || "'Montserrat', sans-serif");
+            setVal('vmBodyFont', item.bodyFont || "'Montserrat', sans-serif");
+            setVal('vmTitleSizeD', item.titleSizeD || '26px');
+            setVal('vmTitleSizeM', item.titleSizeM || '17px');
+            setVal('vmBodySize', item.bodySize || '13px');
+            setVal('vmTextAlign', item.textAlign || 'left');
+            setVal('vmTitleCase', item.titleCase || 'uppercase');
+
+            setVal('vmTitleColorMode', item.titleColor ? 'custom' : 'auto');
+            if (item.titleColor) setVal('vmTitleColor', item.titleColor);
+            setVal('vmDescColorMode', item.descColor ? 'custom' : 'auto');
+            if (item.descColor) setVal('vmDescColor', item.descColor);
+            setVal('vmHighColorMode', item.highColor ? 'custom' : 'auto');
+            if (item.highColor) setVal('vmHighColor', item.highColor);
+            setVal('vmBadgeColorMode', item.badgeBgColor ? 'custom' : 'auto');
+            if (item.badgeBgColor) setVal('vmBadgeBgColor', item.badgeBgColor);
+
+            setVal('vmLogoMode', item.logoMode || 'both');
+            setVal('vmLogoStyle', item.logoStyle || 'round_title');
+            setVal('vmIntroSec', String(item.introSec || '2.5'));
+            setVal('vmOutroSec', String(item.outroSec || '3'));
+            setVal('vmIntroMusic', item.introMusic || 'cinema-whoosh');
+            setVal('vmOutroMusic', item.outroMusic || 'victory-chord');
+            setVal('vmIntroCustomAudio', item.introCustomAudio || '');
+            setVal('vmOutroCustomAudio', item.outroCustomAudio || '');
+
             if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Ausgewähltes Video bearbeiten';
             const bName = document.getElementById('vmEditBannerName');
             if (bName) bName.innerText = item.title || item.badge || 'Video';
             document.getElementById('vmEditBanner')?.classList.add('active');
             window.toggleCustomVideoAudioFields();
+            window.updateVideoStudioLivePreview();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
-            document.getElementById('vmPaneVideos')?.scrollTo({ top: 120, behavior: 'smooth' });
+            document.getElementById('vmPaneVideos')?.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.movePromoVideoOrder = async function(id, delta) {
@@ -7487,20 +7848,23 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 return;
             }
             const modeLbl = { both: 'Intro+Outro', intro: 'Nur Intro', outro: 'Nur Outro', none: 'Ohne Logo' };
-            listEl.innerHTML = list.map((v, idx) => `
-                <div class="pm-page-card">
-                    <div class="pm-page-info">
-                        <strong><i class="fa-solid fa-film" style="color:var(--primary-red); margin-right:6px;"></i>${idx + 1}. ${window.escHtml(v.title)}</strong>
-                        <span>${window.escHtml(v.badge || 'Video')} • ${modeLbl[v.logoMode || 'both'] || 'Intro+Outro'} (${v.introSec || 2.5}s / ${v.outroSec || 3}s)</span>
+            listEl.innerHTML = list.map((v, idx) => {
+                const qShort = (RVP_QUALITY_META[v.defaultQuality || '1080'] || RVP_QUALITY_META['1080']).short;
+                return `
+                    <div class="pm-page-card">
+                        <div class="pm-page-info">
+                            <strong><i class="fa-solid fa-film" style="color:var(--primary-red); margin-right:6px;"></i>${idx + 1}. ${window.escHtml(v.title)}</strong>
+                            <span>${window.escHtml(v.badge || 'Video')} • ${qShort} • ${modeLbl[v.logoMode || 'both'] || 'Intro+Outro'} (${v.introSec || 2.5}s / ${v.outroSec || 3}s)</span>
+                        </div>
+                        <div class="pm-page-actions">
+                            ${idx > 0 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', -1)" title="Nach oben"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
+                            ${idx < list.length - 1 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', 1)" title="Nach unten"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
+                            <button type="button" class="apt-btn edit" onclick="window.editPromoVideoItem('${v.id}')" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="apt-btn delete" onclick="window.deletePromoVideoItem('${v.id}')" title="Löschen"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
-                    <div class="pm-page-actions">
-                        ${idx > 0 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', -1)" title="Nach oben"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
-                        ${idx < list.length - 1 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', 1)" title="Nach unten"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
-                        <button type="button" class="apt-btn edit" onclick="window.editPromoVideoItem('${v.id}')" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
-                        <button type="button" class="apt-btn delete" onclick="window.deletePromoVideoItem('${v.id}')" title="Löschen"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         };
 
         window.handleBrandLogoUpload = async function(input) {
