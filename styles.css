@@ -749,7 +749,6 @@
             transform: none !important;
             transition: none !important;
             backface-visibility: visible !important;
-            isolation: isolate;
         }
         .inv-client-filter-bar {
             display: flex;
@@ -3258,16 +3257,22 @@
         #districtResultBox strong .paren-sub { margin-bottom: 0; }
         #districtResultBox br { display: none; }
 
-        /* THEME-ADAPTIVES MOBILE AUSWAHL-SHEET (ANDROID/iOS OHNE GPU-KACHEL-FEHLER) */
+        /* WÄHREND SELECT-SHEET OFFEN IST: DARUNTERLIEGENDE MODALS NICHT ZEICHNEN (EINGABEN & SCROLL BLEIBEN ERHALTEN) */
+        body.mobile-select-active .custom-dialog-overlay.open .custom-dialog-window {
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        /* THEME-ADAPTIVES MOBILE AUSWAHL-SHEET (SAUBER ZENTRIERT & OHNE DURCHSCHEINEN) */
         .mobile-select-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.78);
-            z-index: 99990;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 99995;
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 16px 12px;
+            padding: 20px 14px;
         }
         .mobile-select-overlay.open {
             display: flex;
@@ -3275,13 +3280,14 @@
         .mobile-select-sheet {
             width: 100%;
             max-width: 460px;
-            max-height: 78dvh;
+            max-height: 70dvh;
+            margin: auto;
             background: var(--bg-card);
             color: var(--text-light);
             border: 1.5px solid var(--glass-border);
             border-top: 3px solid var(--primary-red);
             border-radius: 20px;
-            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
             display: flex;
             flex-direction: column;
         }
@@ -3338,7 +3344,7 @@
             overscroll-behavior: contain;
             background: var(--bg-card);
             border-radius: 0 0 18px 18px;
-            padding: 8px;
+            padding: 10px 10px 16px;
             display: flex;
             flex-direction: column;
             gap: 6px;

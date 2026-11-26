@@ -4137,6 +4137,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
+            if (overlay.parentElement !== document.body || document.body.lastElementChild !== overlay) {
+                document.body.appendChild(overlay);
+            }
+            document.body.classList.add('mobile-select-active');
             overlay.classList.add('open');
             listEl.scrollTop = 0;
         };
@@ -4144,6 +4148,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.closeMobileSelectSheet = function() {
             const overlay = document.getElementById('mobileSelectOverlay');
             if (overlay) overlay.classList.remove('open');
+            document.body.classList.remove('mobile-select-active');
             if (window.activeMobileSelectBtn) window.activeMobileSelectBtn.classList.remove('active-open');
             window.activeMobileSelectEl = null;
             window.activeMobileSelectBtn = null;
