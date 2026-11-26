@@ -1122,28 +1122,103 @@
                 <span>Noch kein Bild ausgewählt</span>
             </div>
 
-            <div class="form-row">
-                <div class="form-group" style="flex:1.4;">
+<div class="form-row">
+                <div class="form-group" style="flex:1.35;">
                     <label>Überschrift / Titel *</label>
                     <input type="text" id="shopPhotoTitle" class="form-control" placeholder="z.B. Annahmestelle Kienitzer Str. 6">
                 </div>
                 <div class="form-group">
                     <label>Kategorie-Etikett</label>
-                    <select id="shopPhotoBadge" class="form-control">
-                        <option value="Standort">Standort</option>
-                        <option value="Prägung">Prägung</option>
-                        <option value="Sofort-Service">Sofort-Service</option>
-                        <option value="Büro &amp; Empfang">Büro &amp; Empfang</option>
-                        <option value="3D-Carbon">3D-Carbon</option>
-                        <option value="Team">Team</option>
-                        <option value="Neu">Neu</option>
+                    <select id="shopPhotoBadge" class="form-control" onchange="window.toggleShopCustomBadgeInput()">
+                        <option value="Standort">📍 Standort</option>
+                        <option value="Prägung">🪪 Prägung</option>
+                        <option value="Sofort-Service">⚡ Sofort-Service</option>
+                        <option value="Büro & Empfang">🏢 Büro &amp; Empfang</option>
+                        <option value="3D-Carbon">🏁 3D-Carbon</option>
+                        <option value="Kurzzeit & Zoll">🌍 Kurzzeit &amp; Zoll</option>
+                        <option value="Express-Service">🚀 Express-Service</option>
+                        <option value="Annahmestelle">🔑 Annahmestelle</option>
+                        <option value="Wunschkennzeichen">✨ Wunschkennzeichen</option>
+                        <option value="Kundenservice">🤝 Kundenservice</option>
+                        <option value="Team">👤 Team</option>
+                        <option value="Neu">🆕 Neu</option>
+                        <option value="">— Kein Etikett —</option>
+                        <option value="__custom__">✏️ Eigenes Etikett eingeben...</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="form-group" id="shopPhotoBadgeCustomGroup" style="display:none;">
+                <label>Eigenes Kategorie-Etikett eingeben</label>
+                <input type="text" id="shopPhotoBadgeCustom" class="form-control" maxlength="24" placeholder="z.B. Neukölln Live / Original">
             </div>
 
             <div class="form-group">
                 <label>Kurze Beschreibung (Unterzeile)</label>
                 <input type="text" id="shopPhotoSub" class="form-control" placeholder="z.B. Direkt an der U8 Boddinstraße – ohne Wartezeit">
+            </div>
+
+            <div class="service-config-section" style="padding:11px 12px 4px; margin-bottom:12px;">
+                <h4>Schriftart, Desktop-/Mobil-Größen &amp; Farben</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Schriftart</label>
+                        <select id="shopPhotoFont" class="form-control">
+                            <option value="'Montserrat', sans-serif">Montserrat (Standard)</option>
+                            <option value="'Oswald', sans-serif">Oswald (Modern &amp; Markant)</option>
+                            <option value="'Playfair Display', serif">Playfair Display (Edel)</option>
+                            <option value="Arial, Helvetica, sans-serif">Clean Sans (Arial)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Schriftgröße Desktop</label>
+                        <select id="shopPhotoSizeDesktop" class="form-control">
+                            <option value="11px">Klein (11px)</option>
+                            <option value="12.5px" selected>Standard (12.5px)</option>
+                            <option value="14px">Mittel (14px)</option>
+                            <option value="15.5px">Groß (15.5px)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Titel-Größe Mobil (Separat)</label>
+                        <select id="shopPhotoSizeMobile" class="form-control">
+                            <option value="9.5px">Sehr kompakt (9.5px)</option>
+                            <option value="10.5px" selected>Optimal Mobil (10.5px)</option>
+                            <option value="11.5px">Mittel (11.5px)</option>
+                            <option value="12.5px">Groß (12.5px)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unterzeile Mobil (Separat)</label>
+                        <select id="shopPhotoSubSizeMobile" class="form-control">
+                            <option value="8.5px">Kompakt (8.5px)</option>
+                            <option value="9.4px" selected>Standard (9.4px)</option>
+                            <option value="10.5px">Größer (10.5px)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-bottom:0;">
+                    <div class="form-group">
+                        <label>Titel-Farbe in der Karte</label>
+                        <select id="shopPhotoCardColor" class="form-control">
+                            <option value="">Automatisch (Hell/Dunkel)</option>
+                            <option value="#d90000">RED Marken-Rot</option>
+                            <option value="#141417">Tiefschwarz</option>
+                            <option value="#ffffff">Reinweiß</option>
+                            <option value="#9a6500">Premium Gold</option>
+                            <option value="#0b6e31">Express Grün</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Schriftfarbe beim Vergrößern (Lightbox)</label>
+                        <div class="admin-color-wrap">
+                            <input type="color" id="shopPhotoLightboxColor" value="#d90000">
+                            <span>Untertitel-Farbe</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -1965,9 +2040,15 @@
 
     <div class="custom-dialog-overlay" id="lightboxOverlay">
         <div class="custom-dialog-window">
-            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeLightbox()"></i>
-            <div style="width:100%; height:min(66dvh, 480px); background:#0c0c12; border-radius:14px; overflow:hidden; margin-bottom:14px; margin-top:14px; display:flex; align-items:center; justify-content:center;" id="lightboxImageContainer"></div>
-            <h3 id="lightboxTitle" style="color:var(--gold-accent); text-transform:uppercase; font-size:16px;"></h3>
+            <div class="lightbox-top-bar">
+                <span class="lightbox-top-label" id="lightboxBadgeLabel"><i class="fa-solid fa-camera" style="color:var(--primary-red);"></i> RED Berlin Galerie</span>
+                <button type="button" class="lightbox-top-close" onclick="window.closeLightbox()" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="lightbox-media-stage" id="lightboxImageContainer"></div>
+            <div class="lightbox-caption-bar">
+                <h3 id="lightboxTitle"></h3>
+                <p id="lightboxSubtitle" style="display:none;"></p>
+            </div>
         </div>
     </div>
 

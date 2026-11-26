@@ -713,7 +713,110 @@
         #deleteConfirmOverlay .custom-dialog-window { max-width: 410px; border-top: 3.5px solid var(--primary-red); border-radius: 20px; padding: 26px 20px 22px; }
         #logoutConfirmOverlay .custom-dialog-window { max-width: 400px; }
         #tickerConfigOverlay .custom-dialog-window { max-width: 620px; border-top-color: #007aff; text-align: left; }
-        #lightboxOverlay .custom-dialog-window { max-width: 640px; border-top-color: var(--gold-border); padding: 25px; }
+        #lightboxOverlay { z-index: 9500 !important; padding: 12px !important; }
+        #lightboxOverlay .custom-dialog-window {
+            max-width: 720px;
+            width: 100%;
+            max-height: 94dvh;
+            border-top: 3.5px solid var(--primary-red);
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            text-align: center;
+        }
+        .lightbox-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        .lightbox-top-label {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .lightbox-top-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1.5px solid var(--glass-border);
+            color: var(--text-light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .lightbox-top-close:hover {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: #ffffff;
+            transform: rotate(90deg);
+        }
+        .lightbox-media-stage {
+            flex: 1 1 auto;
+            min-height: 180px;
+            max-height: 70dvh;
+            background: #0b0b10;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .lightbox-media-stage img,
+        .lightbox-media-stage video {
+            max-width: 100%;
+            max-height: 66dvh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+        .lightbox-caption-bar {
+            flex-shrink: 0;
+            padding: 13px 16px 15px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+        .lightbox-caption-bar h3 {
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 1.3;
+            text-wrap: balance;
+        }
+        .lightbox-caption-bar p {
+            margin: 4px 0 0;
+            font-size: 12px;
+            line-height: 1.4;
+            color: var(--text-muted);
+            text-wrap: pretty;
+        }
+        @media (max-width: 768px) {
+            #lightboxOverlay { padding: 8px !important; }
+            #lightboxOverlay .custom-dialog-window { max-width: 100% !important; width: 100% !important; border-radius: 16px !important; }
+            .lightbox-media-stage { padding: 8px; max-height: 66dvh; }
+            .lightbox-media-stage img, .lightbox-media-stage video { max-height: 62dvh; }
+            .lightbox-caption-bar { padding: 11px 12px 13px; }
+        }
         #infoPopupOverlay .custom-dialog-window { max-width: 450px; border-top-color: var(--primary-red); } 
         #editAptOverlay .custom-dialog-window { max-width: 400px; border-top-color: #007aff; }
         #pageManagerOverlay .custom-dialog-window { max-width: 700px; border-top-color: #ff9500; }
@@ -1103,21 +1206,69 @@
         .inv-arch-btn.edit { color: #007aff; border-color: rgba(0,122,255,0.4); }
         .inv-arch-btn.pdf { color: var(--green-accent); border-color: var(--green-border); }
         .inv-arch-btn.del { color: #ff3b30; border-color: rgba(255,59,48,0.4); width: 34px; padding: 0; }
+        /* GPU-ENTLASTUNG AM HANDY: HINTERGRUND-MODALS & SEITE RUHEN WÄHREND BAR-RECHNUNG OFFEN IST */
         @media (max-width: 768px) {
-            #cashInvoiceOverlay { padding: 6px !important; }
+            body.invoice-modal-open .custom-dialog-overlay:not(#cashInvoiceOverlay):not(#deleteConfirmOverlay),
+            body.invoice-modal-open #header-wrapper,
+            body.invoice-modal-open .view-section,
+            body.invoice-modal-open .contact-layout,
+            body.invoice-modal-open footer,
+            body.invoice-modal-open .floating-quick-bar {
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+            /* EIN EINZIGER NATIVER SCROLL-CONTAINER OHNE VERSCHACHTELTES OVERFLOW -> KEIN ZITTERN/VERSCHWINDEN */
+            #cashInvoiceOverlay {
+                padding: 0 !important;
+                background: var(--bg-card) !important;
+                display: none !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                align-items: flex-start !important;
+                justify-content: flex-start !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transition: none !important;
+            }
+            #cashInvoiceOverlay.open {
+                display: block !important;
+            }
             #cashInvoiceOverlay .custom-dialog-window {
                 width: 100% !important;
                 max-width: 100% !important;
-                height: 95dvh !important;
-                max-height: 95dvh !important;
-                border-radius: 16px !important;
+                height: auto !important;
+                max-height: none !important;
+                min-height: 100dvh !important;
+                border-radius: 0 !important;
+                border-left: none !important;
+                border-right: none !important;
+                border-bottom: none !important;
+                box-shadow: none !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: visible !important;
+                transform: none !important;
             }
-            .inv-modal-header { padding: 12px 42px 9px 13px; }
+            .inv-modal-header {
+                position: sticky;
+                top: 0;
+                z-index: 30;
+                padding: calc(11px + var(--safe-top)) 44px 9px 13px;
+                background: var(--bg-card);
+            }
+            .inv-modal-header .close-dialog-btn {
+                top: calc(10px + var(--safe-top)) !important;
+            }
             .inv-modal-header h3 { font-size: 14px !important; }
             .inv-modal-header p { display: none; }
-            .inv-tab-bar { padding: 6px 10px; }
+            .inv-tab-bar { padding: 7px 10px; }
             .inv-tab-btn { padding: 8px 6px; font-size: 10.8px !important; }
-            .inv-modal-body { padding: 10px 10px 16px; }
+            .inv-modal-body {
+                flex: 1 0 auto !important;
+                overflow: visible !important;
+                min-height: auto !important;
+                padding: 10px 10px 22px;
+            }
             .inv-item-header-row { display: none !important; }
             .inv-item-card {
                 grid-template-columns: 1fr 1fr 36px;
@@ -1128,7 +1279,14 @@
             .inv-item-sublabel { display: block; }
             .inv-item-card input { font-size: 14px !important; padding: 8px 9px !important; }
             .inv-del-row-btn { width: 36px; height: 38px; align-self: end; }
-            .inv-modal-footer { padding: 9px 10px calc(9px + var(--safe-bottom)); gap: 7px; }
+            .inv-modal-footer {
+                position: sticky;
+                bottom: 0;
+                z-index: 30;
+                padding: 9px 10px calc(10px + var(--safe-bottom));
+                gap: 7px;
+                box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.14);
+            }
             .inv-footer-actions { width: 100%; }
             .inv-footer-actions .btn-primary { flex: 1; padding: 10px 8px !important; font-size: 10.5px !important; white-space: nowrap; }
         }
@@ -4582,18 +4740,21 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
+            font-family: var(--sp-font, inherit);
         }
         .shop-photo-caption strong {
-            font-size: 12px;
+            font-size: var(--sp-size-d, 12.5px);
             font-weight: 800;
-            color: var(--text-light);
+            color: var(--sp-title-col, var(--text-light));
             line-height: 1.28;
+            text-wrap: balance;
         }
         .shop-photo-caption span {
-            font-size: 10.5px;
+            font-size: var(--sp-sub-d, 10.5px);
             color: var(--text-muted);
             line-height: 1.35;
+            text-wrap: pretty;
         }
         .shop-photo-missing-box {
             width: 100%;
@@ -4677,10 +4838,12 @@
                 padding: 8px 8px 9px;
             }
             .shop-photo-caption strong {
-                font-size: 11px;
+                font-size: var(--sp-size-m, 10.5px) !important;
+                line-height: 1.25;
             }
             .shop-photo-caption span {
-                font-size: 9.8px;
+                font-size: var(--sp-sub-m, 9.4px) !important;
+                line-height: 1.32;
             }
         }
 

@@ -184,6 +184,7 @@ window.escHtml = function(str) {
         document.addEventListener('touchmove', (e) => {
             if (!window._isBodyScrollLocked) return;
             if (e.target && e.target.closest && e.target.closest('.signature-pad-wrapper')) return;
+            if (e.target && e.target.closest && e.target.closest('#cashInvoiceOverlay')) return;
             const scrollInfo = window.findActiveScrollableInsideOverlay(e.target);
             if (!scrollInfo) {
                 e.preventDefault();
@@ -3748,6 +3749,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 }
                 if (!targetOv) targetOv = openOverlays[openOverlays.length - 1];
                 targetOv.classList.remove('open');
+                if (targetOv.id === 'cashInvoiceOverlay') document.body.classList.remove('invoice-modal-open');
                 if (targetOv.id === 'widgetModalOverlay') window.closeWidgetModal();
                 if (targetOv.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
                 return true;
@@ -3905,13 +3907,31 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
         window.closeInfo = function() { document.getElementById('infoPopupOverlay').classList.remove('open'); };
 
-        window.openLightbox = function(title, mediaUrl) {
-            document.getElementById('lightboxTitle').innerText = title;
+        window.openLightbox = function(title, mediaUrl, opts = {}) {
+            const titleEl = document.getElementById('lightboxTitle');
+            const subEl = document.getElementById('lightboxSubtitle');
+            const badgeEl = document.getElementById('lightboxBadgeLabel');
             const container = document.getElementById('lightboxImageContainer');
-            if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
-                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:contain; border-radius: 12px;"></video>`;
+
+            if (titleEl) {
+                titleEl.innerText = title || '';
+                titleEl.style.color = opts.lightboxColor || 'var(--primary-red)';
+                titleEl.style.fontFamily = opts.font || "'Montserrat', sans-serif";
+            }
+            if (subEl) {
+                const subTxt = (opts.subtitle || '').trim();
+                subEl.innerText = subTxt;
+                subEl.style.display = subTxt ? 'block' : 'none';
+            }
+            if (badgeEl) {
+                const bTxt = (opts.badge || 'RED Berlin Galerie').trim();
+                badgeEl.innerHTML = `<i class="fa-solid fa-camera" style="color:var(--primary-red);"></i> ${window.escHtml(bTxt)}`;
+            }
+
+            if (mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
+                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop playsinline></video>`;
             } else {
-                container.innerHTML = `<img src="${mediaUrl}" alt="${window.escHtml(title)}" style="width:100%; height:100%; object-fit:contain; border-radius: 12px;">`;
+                container.innerHTML = `<img src="${mediaUrl}" alt="${window.escHtml(title || 'RED Berlin')}">`;
             }
             document.getElementById('lightboxOverlay').classList.add('open');
         };
@@ -4708,6 +4728,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             const scrollBody = document.getElementById('invModalScrollBody');
             if (scrollBody) scrollBody.scrollTop = 0;
+            const invOv = document.getElementById('cashInvoiceOverlay');
+            if (invOv) invOv.scrollTop = 0;
 
             if (isArchive) {
                 window.renderSavedInvoicesArchive();
@@ -4925,7 +4947,12 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
             window.updateInvoiceEditBanner();
             window.updateInvoiceFormBridges();
-            document.getElementById('cashInvoiceOverlay').classList.add('open');
+            document.body.classList.add('invoice-modal-open');
+            const invOv = document.getElementById('cashInvoiceOverlay');
+            if (invOv) {
+                invOv.classList.add('open');
+                invOv.scrollTop = 0;
+            }
             window.switchInvoiceTab(startTab === 'archive' ? 'archive' : 'create');
             requestAnimationFrame(() => {
                 window.recalcCashInvoice();
@@ -4935,6 +4962,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         window.closeCashInvoiceModal = function() {
             document.getElementById('cashInvoiceOverlay').classList.remove('open');
+            document.body.classList.remove('invoice-modal-open');
         };
 
         window.collectCashInvoiceRecord = function() {
@@ -5555,38 +5583,71 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         };
 
         // =========================================================================
-        // GESCHÄFTS-SHOWROOM GALERIE (KIENITZER STR. 6 – MIT ADMIN UPLOAD/EDIT/DELETE)
+        // GESCHÄFTS-SHOWROOM GALERIE (KIENITZER STR. 6 – MIT ADMIN STYLING & UPLOAD)
         // =========================================================================
         const DEFAULT_SHOP_PHOTOS = [
             {
                 id: 'shop-1',
-                title: 'Annahmestelle Kienitzer Str. 6',
-                subtitle: 'Direkt an der U8 Boddinstraße • Berlin-Neukölln',
+                title: 'Annahmestelle Kienitzer\u00A0Str.\u00A06',
+                subtitle: 'Direkt an der U8\u00A0Boddinstraße • Berlin-Neukölln',
                 badge: 'Standort',
-                url: './laden-aussen.jpg'
+                url: './laden-aussen.jpg',
+                font: "'Montserrat', sans-serif",
+                sizeDesktop: '12.5px',
+                sizeMobile: '10.5px',
+                subSizeMobile: '9.4px',
+                cardColor: '',
+                lightboxColor: '#d90000'
             },
             {
                 id: 'shop-2',
-                title: 'Eigene Schilderpresse vor Ort',
+                title: 'Eigene Schilderpresse vor\u00A0Ort',
                 subtitle: 'Standard-Alu & 3D-Carbon sofort zum Mitnehmen',
                 badge: 'Prägung',
-                url: './schilderpresse.jpg'
+                url: './schilderpresse.jpg',
+                font: "'Montserrat', sans-serif",
+                sizeDesktop: '12.5px',
+                sizeMobile: '10.5px',
+                subSizeMobile: '9.4px',
+                cardColor: '',
+                lightboxColor: '#d90000'
             },
             {
                 id: 'shop-3',
                 title: 'Präzisions-Heißprägung',
-                subtitle: 'Fertige Kennzeichen in nur 3–5 Minuten',
+                subtitle: 'Fertige Kennzeichen in nur 3–5\u00A0Minuten',
                 badge: 'Sofort-Service',
-                url: './heisspraege.jpg'
+                url: './heisspraege.jpg',
+                font: "'Montserrat', sans-serif",
+                sizeDesktop: '12.5px',
+                sizeMobile: '10.5px',
+                subSizeMobile: '9.4px',
+                cardColor: '',
+                lightboxColor: '#d90000'
             },
             {
                 id: 'shop-4',
                 title: 'Modernes Büro & Empfang',
                 subtitle: 'Schnelle 5-Minuten-Abgabe ohne Wartezeit',
                 badge: 'Büro & Empfang',
-                url: './laden-innen.jpg'
+                url: './laden-innen.jpg',
+                font: "'Montserrat', sans-serif",
+                sizeDesktop: '12.5px',
+                sizeMobile: '10.5px',
+                subSizeMobile: '9.4px',
+                cardColor: '',
+                lightboxColor: '#d90000'
             }
         ];
+
+        window.formatShopCaptionText = function(txt) {
+            return String(txt || '')
+                .replace(/Kienitzer\s+Str\.\s*6/gi, 'Kienitzer\u00A0Str.\u00A06')
+                .replace(/Str\.\s*(\d+)/gi, 'Str.\u00A0$1')
+                .replace(/vor\s+Ort/gi, 'vor\u00A0Ort')
+                .replace(/U8\s+Boddinstraße/gi, 'U8\u00A0Boddinstraße')
+                .replace(/(\d[\d–-]*)\s+(Minuten?|Min\.)/gi, '$1\u00A0$2');
+        };
 
         window.shopPhotosData = JSON.parse(localStorage.getItem('red_shop_gallery_v1') || 'null') || DEFAULT_SHOP_PHOTOS.map(p => ({ ...p }));
 
@@ -5649,27 +5710,49 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
 
             list.forEach(photo => {
+                const cleanTitle = window.formatShopCaptionText(photo.title || 'RED Berlin');
+                const cleanSub = window.formatShopCaptionText(photo.subtitle || '');
                 const card = document.createElement('figure');
                 card.className = 'shop-photo-card';
-                card.onclick = () => window.openLightbox(photo.title || 'RED Zulassungsdienst Berlin', photo.url || '');
+                card.onclick = () => window.openLightbox(cleanTitle, photo.url || '', {
+                    subtitle: cleanSub,
+                    badge: photo.badge || 'RED Berlin Galerie',
+                    font: photo.font || "'Montserrat', sans-serif",
+                    lightboxColor: photo.lightboxColor || '#d90000'
+                });
+
+                const styleVars = [
+                    `--sp-font:${photo.font || "'Montserrat', sans-serif"}`,
+                    `--sp-size-d:${photo.sizeDesktop || '12.5px'}`,
+                    `--sp-size-m:${photo.sizeMobile || '10.5px'}`,
+                    `--sp-sub-m:${photo.subSizeMobile || '9.4px'}`,
+                    photo.cardColor ? `--sp-title-col:${photo.cardColor}` : ''
+                ].filter(Boolean).join(';');
 
                 card.innerHTML = `
                     <div class="shop-photo-media">
                         ${photo.badge ? `<span class="shop-photo-badge">${window.escHtml(photo.badge)}</span>` : ''}
                         <div class="shop-photo-admin-btns action-content">
-                            <button type="button" class="mini-admin-btn edit" onclick="event.stopPropagation(); window.openShopPhotoModal('${photo.id}')" title="Foto bearbeiten oder ersetzen"><i class="fa-solid fa-pencil"></i></button>
+                            <button type="button" class="mini-admin-btn edit" onclick="event.stopPropagation(); window.openShopPhotoModal('${photo.id}')" title="Foto, Etikett & Schrift bearbeiten"><i class="fa-solid fa-pencil"></i></button>
                             <button type="button" class="mini-admin-btn del" onclick="event.stopPropagation(); window.deleteShopPhoto('${photo.id}')" title="Foto entfernen"><i class="fa-solid fa-trash"></i></button>
                         </div>
-                        <img src="${window.escHtml(photo.url)}" alt="${window.escHtml(photo.title)}" loading="lazy" decoding="async" onerror="window.handleShopImgError(this, '${photo.id}')">
+                        <img src="${window.escHtml(photo.url)}" alt="${window.escHtml(cleanTitle)}" loading="lazy" decoding="async" onerror="window.handleShopImgError(this, '${photo.id}')">
                         <span class="shop-photo-zoom" aria-hidden="true"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
                     </div>
-                    <figcaption class="shop-photo-caption">
-                        <strong>${window.escHtml(photo.title || 'RED Berlin')}</strong>
-                        ${photo.subtitle ? `<span>${window.escHtml(photo.subtitle)}</span>` : ''}
+                    <figcaption class="shop-photo-caption" style="${styleVars}">
+                        <strong>${window.escHtml(cleanTitle)}</strong>
+                        ${cleanSub ? `<span>${window.escHtml(cleanSub)}</span>` : ''}
                     </figcaption>
                 `;
                 grid.appendChild(card);
             });
+        };
+
+        window.toggleShopCustomBadgeInput = function() {
+            const sel = document.getElementById('shopPhotoBadge');
+            const grp = document.getElementById('shopPhotoBadgeCustomGroup');
+            if (!sel || !grp) return;
+            grp.style.display = (sel.value === '__custom__') ? 'block' : 'none';
         };
 
         window.setShopModalPreview = function(src) {
@@ -5739,16 +5822,34 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const item = isEdit ? (window.shopPhotosData || []).find(p => p.id === photoId) : null;
 
             document.getElementById('shopPhotoModalHeading').innerHTML = isEdit
-                ? '<i class="fa-solid fa-pen"></i> Geschäftsfoto bearbeiten / ersetzen'
+                ? '<i class="fa-solid fa-pen"></i> Geschäftsfoto &amp; Schrift bearbeiten'
                 : '<i class="fa-solid fa-plus"></i> Neues Geschäftsfoto hinzufügen';
             document.getElementById('shopPhotoEditId').value = item ? item.id : '';
-            document.getElementById('shopPhotoTitle').value = item ? (item.title || '') : '';
-            document.getElementById('shopPhotoSub').value = item ? (item.subtitle || '') : '';
+            document.getElementById('shopPhotoTitle').value = item ? (item.title || '').replace(/\u00A0/g, ' ') : '';
+            document.getElementById('shopPhotoSub').value = item ? (item.subtitle || '').replace(/\u00A0/g, ' ') : '';
+
             const badgeSel = document.getElementById('shopPhotoBadge');
+            const badgeCustomInp = document.getElementById('shopPhotoBadgeCustom');
+            const badgeVal = item ? (item.badge || '') : 'Standort';
             if (badgeSel) {
-                badgeSel.value = item ? (item.badge || 'Standort') : 'Standort';
-                if (typeof window.syncMobileSelectDisplay === 'function') window.syncMobileSelectDisplay(badgeSel);
+                const hasOpt = Array.from(badgeSel.options).some(o => o.value === badgeVal && o.value !== '__custom__');
+                if (hasOpt) {
+                    badgeSel.value = badgeVal;
+                    if (badgeCustomInp) badgeCustomInp.value = '';
+                } else {
+                    badgeSel.value = '__custom__';
+                    if (badgeCustomInp) badgeCustomInp.value = badgeVal;
+                }
+                window.toggleShopCustomBadgeInput();
             }
+
+            if (document.getElementById('shopPhotoFont')) document.getElementById('shopPhotoFont').value = item?.font || "'Montserrat', sans-serif";
+            if (document.getElementById('shopPhotoSizeDesktop')) document.getElementById('shopPhotoSizeDesktop').value = item?.sizeDesktop || '12.5px';
+            if (document.getElementById('shopPhotoSizeMobile')) document.getElementById('shopPhotoSizeMobile').value = item?.sizeMobile || '10.5px';
+            if (document.getElementById('shopPhotoSubSizeMobile')) document.getElementById('shopPhotoSubSizeMobile').value = item?.subSizeMobile || '9.4px';
+            if (document.getElementById('shopPhotoCardColor')) document.getElementById('shopPhotoCardColor').value = item?.cardColor || '';
+            if (document.getElementById('shopPhotoLightboxColor')) document.getElementById('shopPhotoLightboxColor').value = item?.lightboxColor || '#d90000';
+
             const existingUrl = item ? (item.url || '') : '';
             document.getElementById('shopPhotoDataUrl').value = existingUrl.startsWith('data:') ? existingUrl : '';
             document.getElementById('shopPhotoUrlInput').value = existingUrl.startsWith('data:') ? '' : existingUrl;
@@ -5757,6 +5858,9 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             window.setShopModalPreview(existingUrl);
 
             document.getElementById('shopPhotoEditOverlay').classList.add('open');
+            setTimeout(() => {
+                if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+            }, 40);
         };
 
         window.closeShopPhotoModal = function() {
@@ -5765,9 +5869,19 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         window.saveShopPhotoItem = async function() {
             const editId = document.getElementById('shopPhotoEditId').value;
-            const title = document.getElementById('shopPhotoTitle').value.trim();
-            const subtitle = document.getElementById('shopPhotoSub').value.trim();
-            const badge = document.getElementById('shopPhotoBadge').value || 'Standort';
+            const title = window.formatShopCaptionText(document.getElementById('shopPhotoTitle').value.trim());
+            const subtitle = window.formatShopCaptionText(document.getElementById('shopPhotoSub').value.trim());
+            const selBadge = document.getElementById('shopPhotoBadge').value;
+            const badge = selBadge === '__custom__'
+                ? (document.getElementById('shopPhotoBadgeCustom')?.value.trim() || '')
+                : selBadge;
+            const font = document.getElementById('shopPhotoFont')?.value || "'Montserrat', sans-serif";
+            const sizeDesktop = document.getElementById('shopPhotoSizeDesktop')?.value || '12.5px';
+            const sizeMobile = document.getElementById('shopPhotoSizeMobile')?.value || '10.5px';
+            const subSizeMobile = document.getElementById('shopPhotoSubSizeMobile')?.value || '9.4px';
+            const cardColor = document.getElementById('shopPhotoCardColor')?.value || '';
+            const lightboxColor = document.getElementById('shopPhotoLightboxColor')?.value || '#d90000';
+
             const dataUrl = document.getElementById('shopPhotoDataUrl').value.trim();
             const rawUrl = document.getElementById('shopPhotoUrlInput').value.trim();
             const finalUrl = dataUrl || rawUrl;
@@ -5775,18 +5889,17 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if (!title) { window.showToast('Bitte eine Überschrift für das Foto eingeben.', 'error'); return; }
             if (!finalUrl) { window.showToast('Bitte ein Foto auswählen oder einen Bildpfad eintragen.', 'error'); return; }
 
+            const record = { id: editId || ('shop-' + Date.now()), title, subtitle, badge, url: finalUrl, font, sizeDesktop, sizeMobile, subSizeMobile, cardColor, lightboxColor };
             if (editId) {
                 const idx = window.shopPhotosData.findIndex(p => p.id === editId);
-                if (idx > -1) {
-                    window.shopPhotosData[idx] = { id: editId, title, subtitle, badge, url: finalUrl };
-                }
+                if (idx > -1) window.shopPhotosData[idx] = record;
             } else {
-                window.shopPhotosData.push({ id: 'shop-' + Date.now(), title, subtitle, badge, url: finalUrl });
+                window.shopPhotosData.push(record);
             }
 
             await window.persistShopPhotos();
             window.closeShopPhotoModal();
-            window.showToast(editId ? 'Geschäftsfoto aktualisiert!' : 'Neues Geschäftsfoto veröffentlicht!', 'success');
+            window.showToast(editId ? 'Geschäftsfoto & Styling aktualisiert!' : 'Neues Geschäftsfoto veröffentlicht!', 'success');
         };
 
         window.deleteShopPhoto = function(photoId) {
