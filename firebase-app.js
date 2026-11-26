@@ -94,17 +94,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
         };
 
         onSnapshot(collection(db, "custom_pages"), (snapshot) => {
-            if (!snapshot.empty) {
-                const pages = [];
-                snapshot.forEach(docSnap => pages.push({id: docSnap.id, ...docSnap.data()}));
-                window.customPagesData = pages;
-                localStorage.setItem('red_custom_pages', JSON.stringify(pages));
-                window.renderCustomPagesToDOM();
-            } else {
-                const localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
-                window.customPagesData = localPages;
-                window.renderCustomPagesToDOM();
+            const pages = [];
+            snapshot.forEach(docSnap => pages.push({ id: docSnap.id, ...docSnap.data() }));
+            pages.sort((a, b) => (a.order ?? a.timestamp ?? 0) - (b.order ?? b.timestamp ?? 0));
+            window.customPagesData = pages;
+            localStorage.setItem('red_custom_pages', JSON.stringify(pages));
+            if (typeof window.renderCustomPagesToDOM === 'function') window.renderCustomPagesToDOM();
+            if (document.getElementById('pageManagerOverlay')?.classList.contains('open') && typeof window.renderPageManagerList === 'function') {
+                window.renderPageManagerList();
             }
+        }, () => {
+            const localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
+            window.customPagesData = localPages;
+            if (typeof window.renderCustomPagesToDOM === 'function') window.renderCustomPagesToDOM();
         });
 
         window.saveCRMDetail = async function() {

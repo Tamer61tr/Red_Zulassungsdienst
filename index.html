@@ -365,6 +365,7 @@
                 <a href="javascript:void(0)" class="dhn-link" data-nav-key="galerie" onclick="window.desktopNavGo('realShopGalleryWrap')"><i class="fa-solid fa-camera" style="font-size:10px; margin-right:5px; color:var(--primary-red);"></i>Bilder</a>
                 <a href="javascript:void(0)" class="dhn-link" data-nav-key="view-formulare" onclick="window.switchView('view-formulare')">Formulare</a>
                 <a href="javascript:void(0)" class="dhn-link" data-nav-key="view-ankauf" onclick="window.switchView('view-ankauf')">Auto Ankauf</a>
+                <span id="dynamicDesktopNavContainer" style="display:contents;"></span>
                 <a href="javascript:void(0)" class="dhn-cta" data-nav-key="termin" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Termin</a>
             </div>
             
@@ -1626,6 +1627,11 @@
             <div class="exec-studio-body">
                 <input type="hidden" id="pmEditingPageId">
 
+                <div class="inv-edit-banner" id="pmEditingBanner">
+                    <span><i class="fa-solid fa-pen"></i> Bearbeitungsmodus: <strong id="pmEditingTitleLabel"></strong></span>
+                    <button type="button" class="inv-arch-btn" onclick="window.resetPageManagerForm()"><i class="fa-solid fa-plus"></i> Neue Seite</button>
+                </div>
+
                 <div class="service-config-section">
                     <h4>1. Schnell-Vorlagen (1-Klick Start)</h4>
                     <div class="inv-quick-bar" style="margin-bottom:4px;">
@@ -1660,9 +1666,11 @@
                         <label>Kurzer Untertitel (Optional)</label>
                         <input type="text" id="pmPageSubtitle" class="form-control" placeholder="z.B. Ihr Partner für Kfz-Zulassung in Berlin-Neukölln">
                     </div>
-                    <div style="display:flex; gap:14px; flex-wrap:wrap;">
-                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowMenu" checked><span class="noble-checkbox-box"></span> Im Hauptmenü anzeigen</label>
-                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowFooter" checked><span class="noble-checkbox-box"></span> Im Footer verlinken</label>
+                    <div class="pm-placement-grid">
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowHeader" checked><span class="noble-checkbox-box"></span> Desktop-Header (oben)</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowMenu" checked><span class="noble-checkbox-box"></span> Hauptmenü (Mobil &amp; PC)</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowFooter" checked><span class="noble-checkbox-box"></span> Footer (unten)</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowCta" checked><span class="noble-checkbox-box"></span> Termin- &amp; WhatsApp-Leiste</label>
                     </div>
                 </div>
 

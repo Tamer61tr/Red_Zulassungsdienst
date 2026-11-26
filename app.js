@@ -50,9 +50,9 @@ window.escHtml = function(str) {
             const activeView = forcedViewId || (document.querySelector('.view-section.active')?.id || 'view-home');
             let activeKey = '';
 
-            if (activeView === 'view-formulare' || activeView === 'view-ankauf') {
+            if (activeView !== 'view-home') {
                 activeKey = activeView;
-            } else if (activeView === 'view-home') {
+            } else {
                 const y = window.scrollY + 180;
                 const terminEl = document.getElementById('termin');
                 const galEl = document.getElementById('realShopGalleryWrap');
@@ -3287,14 +3287,29 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('pageManagerOverlay').classList.add('open');
             window.renderPageManagerList();
         };
+       window.updatePageManagerEditBanner = function() {
+            const editId = document.getElementById('pmEditingPageId')?.value || '';
+            const banner = document.getElementById('pmEditingBanner');
+            const lbl = document.getElementById('pmEditingTitleLabel');
+            if (editId) {
+                if (banner) banner.classList.add('active');
+                if (lbl) lbl.innerText = document.getElementById('pmPageTitle')?.value || 'Seite';
+            } else {
+                if (banner) banner.classList.remove('active');
+            }
+        };
+
         window.resetPageManagerForm = function() {
             document.getElementById('pmEditingPageId').value = '';
             document.getElementById('pmPageTitle').value = '';
             if (document.getElementById('pmPageSubtitle')) document.getElementById('pmPageSubtitle').value = '';
             if (document.getElementById('pmPageIcon')) document.getElementById('pmPageIcon').value = 'fa-file-lines';
+            if (document.getElementById('pmShowHeader')) document.getElementById('pmShowHeader').checked = true;
             if (document.getElementById('pmShowMenu')) document.getElementById('pmShowMenu').checked = true;
             if (document.getElementById('pmShowFooter')) document.getElementById('pmShowFooter').checked = true;
+            if (document.getElementById('pmShowCta')) document.getElementById('pmShowCta').checked = true;
             document.getElementById('pmPageContent').value = '';
+            window.updatePageManagerEditBanner();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
         };
 
@@ -3303,31 +3318,36 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             window.resetPageManagerForm();
         };
 
+        window.openPageEditorDirect = function(pageId) {
+            window.openPageManager();
+            setTimeout(() => window.editCustomPage(pageId), 50);
+        };
+
         window.applyPageTemplate = function(tplKey) {
             const templates = {
                 about: {
                     title: 'Über RED Berlin',
                     sub: 'Persönlicher Kfz-Zulassungsdienst in der Kienitzer Str. 6, 12053 Berlin',
                     icon: 'fa-building',
-                    content: '<h3>Ihr zuverlässiger Partner in Berlin-Neukölln</h3>\nWillkommen beim RED Zulassungsdienst Berlin (Inhaber: Tamer Yazici). Wir übernehmen für Privat- und Gewerbekunden sämtliche Behördengänge beim LABO Berlin – schnell, transparent und ohne Wartezeit.\n\n<ul><li>Direkt an der U7 Karl-Marx-Straße &amp; U8 Boddinstraße</li><li>Eigene Profi-Schilderpresse vor Ort (Standard &amp; 3D-Carbon)</li><li>Persönliche Beratung Mo–Fr von 09:00 bis 20:00 Uhr</li></ul>'
+                    content: '<h3>Ihr zuverlässiger Partner in Berlin-Neukölln</h3>\n<p>Willkommen beim RED Zulassungsdienst Berlin (Inhaber: Tamer Yazici). Wir übernehmen für Privat- und Gewerbekunden sämtliche Behördengänge beim LABO Berlin – schnell, transparent und ohne Wartezeit.</p>\n<ul>\n<li>Direkt an der U7 Karl-Marx-Straße &amp; U8 Boddinstraße</li>\n<li>Eigene Profi-Schilderpresse vor Ort (Standard &amp; 3D-Carbon)</li>\n<li>Persönliche Beratung Mo–Fr von 09:00 bis 20:00 Uhr</li>\n</ul>'
                 },
                 b2b: {
                     title: 'Händler & Gewerbe',
                     sub: 'Feste Konditionen & Express-Abwicklung für Autohäuser und Flotten',
                     icon: 'fa-handshake',
-                    content: '<h3>Maßgeschneiderter B2B-Zulassungsservice</h3>\nFür Gebrauchtwagenhändler, Werkstätten und Firmenflotten bieten wir feste Abgabezeiten, Sammel-Anmeldungen sowie Kurzzeit- und Zollkennzeichen auf Abruf.\n\n<ul><li>Direkter Draht ohne Callcenter</li><li>Zuverlässige 24h-Abwicklung nach Absprache</li><li>Vorab-Prüfung der Unterlagen per WhatsApp</li></ul>'
+                    content: '<h3>Maßgeschneiderter B2B-Zulassungsservice</h3>\n<p>Für Gebrauchtwagenhändler, Werkstätten und Firmenflotten bieten wir feste Abgabezeiten, Sammel-Anmeldungen sowie Kurzzeit- und Zollkennzeichen auf Abruf.</p>\n<ul>\n<li>Direkter Draht ohne Callcenter</li>\n<li>Zuverlässige 24h-Abwicklung nach Absprache</li>\n<li>Vorab-Prüfung der Unterlagen per WhatsApp</li>\n</ul>'
                 },
                 prices: {
                     title: 'Preisübersicht',
                     sub: 'Transparente Komplettpreise ohne versteckte Kosten',
                     icon: 'fa-euro-sign',
-                    content: '<h3>Unsere aktuellen Festpreise</h3>\n<ul><li><strong>Anmeldung mit Wunschkennzeichen:</strong> 100 € (inkl. Gebühren, Schilder &amp; Plakette)</li><li><strong>Anmeldung mit Zufallskennzeichen:</strong> 90 € (inkl. Gebühren, Schilder &amp; Plakette)</li><li><strong>Ummeldung:</strong> 70 €</li><li><strong>Abmeldung:</strong> 30 € vor Ort / 20 € online</li><li><strong>Kurzzeitkennzeichen (6 Tage):</strong> 120 €</li><li><strong>Zollkennzeichen (30 Tage):</strong> 350 €</li></ul>'
+                    content: '<h3>Unsere aktuellen Festpreise</h3>\n<ul>\n<li><strong>Anmeldung mit Wunschkennzeichen:</strong> 100 € (inkl. Gebühren, Schilder &amp; Plakette)</li>\n<li><strong>Anmeldung mit Zufallskennzeichen:</strong> 90 € (inkl. Gebühren, Schilder &amp; Plakette)</li>\n<li><strong>Ummeldung:</strong> 70 €</li>\n<li><strong>Abmeldung:</strong> 30 € vor Ort / 20 € online</li>\n<li><strong>Kurzzeitkennzeichen (6 Tage):</strong> 120 €</li>\n<li><strong>Zollkennzeichen (30 Tage):</strong> 350 €</li>\n</ul>'
                 },
                 notice: {
                     title: 'Aktuelle Hinweise',
                     sub: 'Öffnungszeiten & wichtige Mitteilungen für unsere Kunden',
                     icon: 'fa-bullhorn',
-                    content: '<h3>Aktuelle Kundeninformation</h3>\nHier finden Sie aktuelle Hinweise zu unseren Öffnungszeiten, Feiertagen und LABO-Bearbeitungszeiten in Berlin.'
+                    content: '<h3>Aktuelle Kundeninformation</h3>\n<p>Hier finden Sie aktuelle Hinweise zu unseren Öffnungszeiten, Feiertagen und LABO-Bearbeitungszeiten in Berlin.</p>'
                 }
             };
             const t = templates[tplKey];
@@ -3356,76 +3376,132 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             ta.focus();
         };
 
+        window.formatCustomPageBodyHtml = function(raw) {
+            const txt = String(raw || '').trim();
+            if (!txt) return '';
+            // Wenn bereits HTML-Blöcke enthalten sind, sauber ohne übermäßige Leerzeilen rendern
+            if (/<(h[1-6]|p|ul|ol|div|section|table)\b/i.test(txt)) {
+                return txt;
+            }
+            return txt.split(/\n{2,}/).map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`).join('');
+        };
+
         window.saveCustomPage = async function() {
             const title = document.getElementById('pmPageTitle').value.trim();
             const subtitle = (document.getElementById('pmPageSubtitle')?.value || '').trim();
             const icon = document.getElementById('pmPageIcon')?.value || 'fa-file-lines';
+            const showHeader = document.getElementById('pmShowHeader')?.checked !== false;
             const showMenu = document.getElementById('pmShowMenu')?.checked !== false;
             const showFooter = document.getElementById('pmShowFooter')?.checked !== false;
+            const showCta = document.getElementById('pmShowCta')?.checked !== false;
             const content = document.getElementById('pmPageContent').value;
             const editId = document.getElementById('pmEditingPageId').value;
 
-            if(!title) { window.showToast('Bitte einen Seitentitel eingeben.', 'error'); return; }
+            if (!title) { window.showToast('Bitte einen Seitentitel eingeben.', 'error'); return; }
 
-            const pageData = { title, subtitle, icon, showMenu, showFooter, content, timestamp: Date.now() };
+            const existing = editId ? window.customPagesData.find(p => p.id === editId) : null;
+            const maxOrder = window.customPagesData.reduce((m, p, idx) => Math.max(m, Number.isFinite(p.order) ? p.order : idx), -1);
+            const pageData = {
+                title, subtitle, icon, showHeader, showMenu, showFooter, showCta, content,
+                order: existing && Number.isFinite(existing.order) ? existing.order : (maxOrder + 1),
+                timestamp: existing?.timestamp || Date.now(),
+                updatedAt: Date.now()
+            };
 
             try {
-                if(editId) {
-                    await window.firebaseUpdateDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", editId), pageData);
-                    window.showToast('Seite aktualisiert!', 'success');
+                if (editId) {
+                    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", editId), pageData, { merge: true });
+                    const idx = window.customPagesData.findIndex(p => p.id === editId);
+                    if (idx > -1) window.customPagesData[idx] = { id: editId, ...pageData };
+                    window.showToast(`Seite „${title}“ aktualisiert!`, 'success');
                 } else {
-                    await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "custom_pages"), pageData);
-                    window.showToast('Seite erstellt!', 'success');
+                    const docRef = await window.firebaseAddDoc(window.firebaseCollection(window.firebaseDb, "custom_pages"), pageData);
+                    if (!window.customPagesData.some(p => p.id === docRef.id)) {
+                        window.customPagesData.push({ id: docRef.id, ...pageData });
+                    }
+                    window.showToast(`Seite „${title}“ veröffentlicht!`, 'success');
                 }
-            } catch(e) {
-                let localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
-                if(editId) {
-                    let idx = localPages.findIndex(p => p.id === editId);
-                    if(idx > -1) localPages[idx] = {id: editId, ...pageData};
+            } catch (e) {
+                if (editId) {
+                    const idx = window.customPagesData.findIndex(p => p.id === editId);
+                    if (idx > -1) window.customPagesData[idx] = { id: editId, ...pageData };
                 } else {
-                    localPages.push({id: 'page-' + Date.now(), ...pageData});
+                    window.customPagesData.push({ id: 'page-' + Date.now(), ...pageData });
                 }
-                localStorage.setItem('red_custom_pages', JSON.stringify(localPages));
-                window.customPagesData = localPages;
-                window.renderCustomPagesToDOM();
                 window.showToast('Seite lokal gespeichert.', 'success');
             }
 
+            localStorage.setItem('red_custom_pages', JSON.stringify(window.customPagesData));
+            window.renderCustomPagesToDOM();
             window.resetPageManagerForm();
             window.renderPageManagerList();
         };
 
         window.editCustomPage = function(id) {
             const page = window.customPagesData.find(p => p.id === id);
-            if(!page) return;
+            if (!page) return;
             document.getElementById('pmEditingPageId').value = page.id;
             document.getElementById('pmPageTitle').value = page.title || '';
             if (document.getElementById('pmPageSubtitle')) document.getElementById('pmPageSubtitle').value = page.subtitle || '';
             if (document.getElementById('pmPageIcon')) document.getElementById('pmPageIcon').value = page.icon || 'fa-file-lines';
+            if (document.getElementById('pmShowHeader')) document.getElementById('pmShowHeader').checked = page.showHeader !== false;
             if (document.getElementById('pmShowMenu')) document.getElementById('pmShowMenu').checked = page.showMenu !== false;
             if (document.getElementById('pmShowFooter')) document.getElementById('pmShowFooter').checked = page.showFooter !== false;
+            if (document.getElementById('pmShowCta')) document.getElementById('pmShowCta').checked = page.showCta !== false;
             document.getElementById('pmPageContent').value = page.content || '';
+            window.updatePageManagerEditBanner();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
             document.querySelector('#pageManagerOverlay .exec-studio-body')?.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
+        window.moveCustomPageOrder = async function(id, delta) {
+            const list = window.customPagesData || [];
+            const idx = list.findIndex(p => p.id === id);
+            const targetIdx = idx + delta;
+            if (idx === -1 || targetIdx < 0 || targetIdx >= list.length) return;
+
+            const [moved] = list.splice(idx, 1);
+            list.splice(targetIdx, 0, moved);
+            list.forEach((p, i) => { p.order = i; });
+
+            localStorage.setItem('red_custom_pages', JSON.stringify(list));
+            window.renderCustomPagesToDOM();
+            window.renderPageManagerList();
+
+            if (window.firebaseDb && window.firebaseSetDoc) {
+                for (const p of list) {
+                    window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", p.id), { order: p.order }, { merge: true }).catch(() => {});
+                }
+            }
+            window.showToast('Seiten-Reihenfolge aktualisiert!', 'success');
+        };
+
         window.deleteCustomPage = function(id) {
+            const target = (window.customPagesData || []).find(p => p.id === id);
             window.openRedDeleteConfirm(
-                'Seite komplett löschen?',
-                'Möchten Sie diese benutzerdefinierte Seite wirklich unwiderruflich entfernen?',
+                `Seite „${target?.title || 'Seite'}“ löschen?`,
+                'Möchten Sie diese benutzerdefinierte Seite wirklich dauerhaft aus Menü, Header und Footer entfernen?',
                 async () => {
+                    const wasViewing = window.getCurrentViewId() === ('view-' + id);
+                    window.customPagesData = (window.customPagesData || []).filter(p => p.id !== id);
+                    localStorage.setItem('red_custom_pages', JSON.stringify(window.customPagesData));
+
+                    if (document.getElementById('pmEditingPageId')?.value === id) {
+                        window.resetPageManagerForm();
+                    }
+                    if (wasViewing) {
+                        window.switchView('view-home');
+                    }
+
+                    window.renderCustomPagesToDOM();
+                    window.renderPageManagerList();
+
                     try {
                         await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", id));
-                        window.showToast('Seite gelöscht!', 'success');
-                    } catch(e) {
-                        let localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
-                        localPages = localPages.filter(p => p.id !== id);
-                        localStorage.setItem('red_custom_pages', JSON.stringify(localPages));
-                        window.customPagesData = localPages;
-                        window.renderCustomPagesToDOM();
-                        window.showToast('Seite lokal gelöscht.', 'success');
+                        window.showToast('Seite dauerhaft gelöscht!', 'success');
+                    } catch (e) {
+                        window.showToast('Seite entfernt.', 'success');
                     }
-                    window.renderPageManagerList();
                 }
             );
         };
@@ -3433,25 +3509,33 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.renderPageManagerList = function() {
             const list = document.getElementById('pmPagesList');
             const badge = document.getElementById('pmPageCountBadge');
-            if (badge) badge.innerText = `${window.customPagesData.length} Seiten`;
+            const pages = window.customPagesData || [];
+            if (badge) badge.innerText = `${pages.length} ${pages.length === 1 ? 'Seite' : 'Seiten'}`;
             if (!list) return;
             list.innerHTML = '';
-            if(window.customPagesData.length === 0) {
+            if (pages.length === 0) {
                 list.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:12px; background:var(--bg-card); border-radius:10px;">Noch keine eigenen Unterseiten erstellt – oben eine Vorlage wählen oder frei schreiben.</div>';
                 return;
             }
-            window.customPagesData.forEach(p => {
-                const loc = [p.showMenu !== false ? 'Menü' : '', p.showFooter !== false ? 'Footer' : ''].filter(Boolean).join(' • ') || 'Versteckt';
+            pages.forEach((p, idx) => {
+                const loc = [
+                    p.showHeader !== false ? 'Desktop-Header' : '',
+                    p.showMenu !== false ? 'Menü' : '',
+                    p.showFooter !== false ? 'Footer' : ''
+                ].filter(Boolean).join(' • ') || 'Nur Direktlink';
+
                 list.innerHTML += `
                     <div class="pm-page-card">
                         <div class="pm-page-info">
                             <strong><i class="fa-solid ${window.escHtml(p.icon || 'fa-file-lines')}" style="color:var(--primary-red); margin-right:6px;"></i>${window.escHtml(p.title)}</strong>
-                            <span>Sichtbar: ${loc}</span>
+                            <span>${loc}</span>
                         </div>
                         <div class="pm-page-actions">
-                            <button type="button" class="apt-btn" onclick="window.closePageManager(); window.switchView('view-${p.id}');" title="Seite ansehen"><i class="fa-solid fa-eye"></i></button>
+                            ${idx > 0 ? `<button type="button" class="apt-btn" onclick="window.moveCustomPageOrder('${p.id}', -1)" title="Nach oben"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
+                            ${idx < pages.length - 1 ? `<button type="button" class="apt-btn" onclick="window.moveCustomPageOrder('${p.id}', 1)" title="Nach unten"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
+                            <button type="button" class="apt-btn" onclick="window.closePageManager(); window.switchView('view-${p.id}');" title="Seite öffnen"><i class="fa-solid fa-eye"></i></button>
                             <button type="button" class="apt-btn edit" onclick="window.editCustomPage('${p.id}')" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
-                            <button type="button" class="apt-btn delete" onclick="window.deleteCustomPage('${p.id}')" title="Löschen"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" class="apt-btn delete" onclick="window.deleteCustomPage('${p.id}')" title="Dauerhaft löschen"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -3459,49 +3543,97 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         };
 
         window.renderCustomPagesToDOM = function() {
+            const activeBefore = window.getCurrentViewId();
+
             document.querySelectorAll('.dynamic-custom-page').forEach(e => e.remove());
             document.querySelectorAll('.dynamic-menu-item').forEach(e => e.remove());
+            document.querySelectorAll('.dynamic-footer-item').forEach(e => e.remove());
+            document.querySelectorAll('.dynamic-desktop-nav-item').forEach(e => e.remove());
 
+            const pagesHost = document.getElementById('customPagesContainer') || document.body;
+            const desktopNavHost = document.getElementById('dynamicDesktopNavContainer');
             const menuContainer = document.getElementById('dynamicMenuItemsContainer');
             const footerLinks = document.getElementById('dynamicFooterLinks');
-            
-            menuContainer.innerHTML = '';
-            document.querySelectorAll('.dynamic-footer-item').forEach(e => e.remove());
 
-            window.customPagesData.forEach(page => {
+            if (menuContainer) menuContainer.innerHTML = '';
+            if (desktopNavHost) desktopNavHost.innerHTML = '';
+
+            const sortedPages = [...(window.customPagesData || [])].sort((a, b) => (a.order ?? a.timestamp ?? 0) - (b.order ?? b.timestamp ?? 0));
+
+            sortedPages.forEach(page => {
+                const viewId = 'view-' + page.id;
                 const view = document.createElement('div');
-                view.id = 'view-' + page.id;
-                view.className = 'view-section dynamic-custom-page';
+                view.id = viewId;
+                view.className = 'view-section dynamic-custom-page' + (activeBefore === viewId ? ' active' : '');
+                const bodyHtml = window.formatCustomPageBodyHtml(page.content);
+                const ctaHtml = page.showCta !== false ? `
+                    <div class="custom-page-cta-bar">
+                        <div>
+                            <strong style="display:block; font-size:13px; color:var(--text-light);">Fragen oder direkt loslegen?</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">Kienitzer&nbsp;Str.&nbsp;6, 12053&nbsp;Berlin • Mo–Fr 09:00–20:00&nbsp;Uhr</span>
+                        </div>
+                        <div class="custom-page-cta-actions">
+                            <button type="button" class="btn-primary" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Termin buchen</button>
+                            <button type="button" class="btn-primary" style="background:#25D366; color:#000; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp(false)"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                        </div>
+                    </div>
+                ` : '';
+
                 view.innerHTML = `
                     <div class="subpage-nav-bar">
                         <button type="button" class="subpage-back-btn" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
+                        <div class="subpage-actions-group subpage-admin-group mod-pages">
+                            <button type="button" class="subpage-action-btn is-edit" onclick="window.openPageEditorDirect('${page.id}')"><i class="fa-solid fa-pen"></i> Seite bearbeiten</button>
+                            <button type="button" class="subpage-action-btn is-del" onclick="window.deleteCustomPage('${page.id}')"><i class="fa-solid fa-trash"></i> Seite löschen</button>
+                        </div>
                     </div>
-                    <div class="booking-wrapper" style="margin-top:15px; text-align:left;">
-                        <h2 style="color:var(--primary-red); margin-bottom:6px; font-weight:900; text-transform:uppercase;"><i class="fa-solid ${window.escHtml(page.icon || 'fa-file-lines')}" style="margin-right:8px;"></i>${window.escHtml(page.title)}</h2>
-                        ${page.subtitle ? `<p style="color:var(--text-muted); font-size:12.5px; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--glass-border);">${window.escHtml(page.subtitle)}</p>` : ''}
-                        <div style="white-space:pre-wrap; color:var(--text-light); line-height:1.75; font-size:13.5px;">${page.content}</div>
-                    </div>
+                    <article class="custom-page-shell">
+                        <header class="custom-page-hero">
+                            <span class="custom-page-eyebrow"><i class="fa-solid fa-shield-halved"></i> RED Zulassungsdienst Berlin</span>
+                            <h1><i class="fa-solid ${window.escHtml(page.icon || 'fa-file-lines')}"></i><span>${window.escHtml(page.title)}</span></h1>
+                            ${page.subtitle ? `<p>${window.escHtml(page.subtitle)}</p>` : ''}
+                        </header>
+                        <div class="custom-page-body">${bodyHtml}</div>
+                        ${ctaHtml}
+                    </article>
                 `;
-                document.body.appendChild(view);
+                pagesHost.appendChild(view);
 
-                if (page.showMenu !== false) {
+                if (desktopNavHost && page.showHeader !== false) {
+                    const aDesk = document.createElement('a');
+                    aDesk.className = 'dhn-link dynamic-desktop-nav-item';
+                    aDesk.href = 'javascript:void(0)';
+                    aDesk.setAttribute('data-nav-key', viewId);
+                    aDesk.onclick = () => window.switchView(viewId);
+                    aDesk.innerText = page.title;
+                    desktopNavHost.appendChild(aDesk);
+                }
+
+                if (menuContainer && page.showMenu !== false) {
                     const aMenu = document.createElement('a');
                     aMenu.className = 'dynamic-menu-item';
-                    aMenu.href = "javascript:void(0)";
-                    aMenu.onclick = () => { window.toggleMenu(); window.switchView('view-' + page.id); };
+                    aMenu.href = 'javascript:void(0)';
+                    aMenu.onclick = () => { window.toggleMenu(); window.switchView(viewId); };
                     aMenu.innerHTML = `<i class="fa-solid ${window.escHtml(page.icon || 'fa-file-lines')}" style="color:var(--primary-red);"></i> ${window.escHtml(page.title)}`;
                     menuContainer.appendChild(aMenu);
                 }
 
-                if (page.showFooter !== false) {
+                if (footerLinks && page.showFooter !== false) {
                     const aFooter = document.createElement('a');
                     aFooter.className = 'dynamic-footer-item';
-                    aFooter.href = "javascript:void(0)";
-                    aFooter.onclick = () => { window.switchView('view-' + page.id); };
+                    aFooter.href = 'javascript:void(0)';
+                    aFooter.onclick = () => window.switchView(viewId);
                     aFooter.innerText = page.title;
                     footerLinks.insertBefore(aFooter, footerLinks.children[3]);
                 }
             });
+
+            // Falls die vorher offene Seite gelöscht wurde, sauber zur Startseite wechseln
+            if (activeBefore && activeBefore.startsWith('view-') && !document.getElementById(activeBefore)) {
+                window.switchView('view-home', false);
+            } else if (typeof window.updateHeaderNavActiveState === 'function') {
+                window.updateHeaderNavActiveState(window.getCurrentViewId());
+            }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
