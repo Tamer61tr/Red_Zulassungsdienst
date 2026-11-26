@@ -6871,6 +6871,202 @@
             pointer-events: none !important;
         }
 
+        /* =========================================================================
+           V27: CLOUD-UPLOADER, AUTO-KONVERTER, FORMAT-PILLS & 12 RAHMENDESIGNS
+           ========================================================================= */
+        .vm-upload-pro-box {
+            background: var(--bg-card);
+            border: 1.5px solid var(--glass-border);
+            border-left: 3.5px solid #16a34a;
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 10px;
+        }
+        .vm-detected-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .vm-meta-chip {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .vm-meta-chip.is-hi {
+            background: rgba(22, 163, 74, 0.14);
+            border-color: rgba(22, 163, 74, 0.45);
+            color: var(--green-accent);
+        }
+        .vm-upload-progress {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+        }
+        .vm-upload-progress-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        .vm-upload-bar-track {
+            width: 100%;
+            height: 7px;
+            border-radius: 10px;
+            background: rgba(130, 130, 145, 0.25);
+            overflow: hidden;
+        }
+        .vm-upload-bar-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--primary-red), #16a34a);
+            transition: width 0.2s ease;
+        }
+        .vm-autoconv-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--primary-red);
+            border-radius: 10px;
+            padding: 9px 11px;
+            margin-bottom: 10px;
+        }
+        .vm-qslot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 10px;
+        }
+        .vm-qslot-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .vm-qslot-row .form-control {
+            flex: 1;
+            min-width: 0;
+        }
+        .vm-qslot-up-btn {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 9px;
+            background: var(--bg-input);
+            border: 1.5px solid var(--glass-border);
+            color: var(--primary-red);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.18s;
+        }
+        .vm-qslot-up-btn:hover {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: #ffffff;
+        }
+        .vm-qslot-up-btn input { display: none; }
+
+        /* FORMAT-SCHNELLWAHL PILLS */
+        .vm-aspect-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 7px;
+        }
+        .vm-aspect-pill {
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 10.5px !important;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.18s;
+        }
+        .vm-aspect-pill:hover { border-color: var(--primary-red); }
+        .vm-aspect-pill.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: #ffffff;
+        }
+
+        /* 12 PROFESSIONELLE RAHMENDESIGNS FÜR DEN VIDEO-PLAYER */
+        .rvp-player-shell.frame-neon-red {
+            border: 2px solid #ff1e1e;
+            box-shadow: 0 0 18px rgba(255, 30, 30, 0.55), 0 0 40px rgba(255, 30, 30, 0.25);
+        }
+        .rvp-player-shell.frame-carbon {
+            padding: 5px;
+            background: repeating-linear-gradient(45deg, #16161d 0, #16161d 4px, #252530 4px, #252530 8px);
+            border: 2px solid #3c3c4c;
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.48);
+        }
+        .rvp-player-shell.frame-chrome {
+            padding: 4px;
+            background: linear-gradient(135deg, #f4f6fa 0%, #9ca3af 38%, #ffffff 55%, #6b7280 100%);
+            border: 1px solid #d1d5db;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
+        }
+        .rvp-player-shell.frame-glass {
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 255, 255, 0.36);
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28);
+        }
+        .rvp-player-shell.frame-phone {
+            padding: 8px;
+            border-radius: 30px !important;
+            background: linear-gradient(160deg, #272730, #09090d);
+            border: 2.5px solid #484856;
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.52);
+        }
+        .rvp-player-shell.frame-phone .rvp-media-stage { border-radius: 22px 22px 0 0; }
+        .rvp-player-shell.frame-phone .rvp-controls-bar { border-radius: 0 0 22px 22px; }
+        .rvp-player-shell.frame-cinema-bar {
+            padding: 5px;
+            background: #08080c;
+            border: 2px solid #1f1f28;
+            outline: 2px solid rgba(217, 0, 0, 0.65);
+            outline-offset: 2px;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5);
+        }
+        .rvp-player-shell.frame-berlin-flag {
+            padding: 4px;
+            background: linear-gradient(135deg, #111111 0%, #d90000 52%, #f5c542 100%);
+            border: none;
+            box-shadow: 0 14px 36px rgba(217, 0, 0, 0.3);
+        }
+        .rvp-player-shell.frame-white-studio {
+            padding: 5px;
+            background: #ffffff;
+            border: 1.5px solid #e2e4ea;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+        }
+
+        @media (max-width: 768px) {
+            .vm-qslot-grid { grid-template-columns: 1fr; }
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }

@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-   <link rel="stylesheet" href="./styles.css?v=26">
+   <link rel="stylesheet" href="./styles.css?v=28">
 </head>
 
 <body data-theme="light">
@@ -1455,47 +1455,155 @@
                         <label>3 Highlight-Punkte neben dem Video (1 Punkt pro Zeile)</label>
                         <textarea id="vmHighlights" class="form-control" rows="3" style="resize:vertical;" placeholder="Keine Wartenummer beim Amt – Abgabe in 5 Minuten&#10;Sofort-Kennzeichenprägung in der Kienitzer Str. 6&#10;An-, Um-, Abmeldung, Kurzzeit- &amp; Zollkennzeichen" oninput="window.updateVideoStudioLivePreview()"></textarea>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group" style="flex:1.5;">
-                            <label>Haupt-Video (MP4-Dateipfad oder Link) *</label>
-                            <input type="text" id="vmUrl" class="form-control" placeholder="./werbevideo-1.mp4 (oder ./werbevideo-2.mp4)" oninput="window.updateVideoStudioLivePreview()">
+                    <!-- KOSTENLOSER VIDEO-UPLOAD (0 €: CLOUDINARY FREE BIS 100 MB ODER GITHUB BIS 25 MB) -->
+                    <div class="vm-upload-pro-box">
+                        <details class="admin-details" id="vmFreeUploadCfgDetails" style="margin-bottom:10px;">
+                            <summary style="font-size:11px; padding:8px 11px;">
+                                <span><i class="fa-solid fa-gear" style="color:var(--green-accent); margin-right:5px;"></i> Kostenlosen MB-Upload einrichten (0 € – <strong id="vmUploadProviderBadge">Cloudinary Free</strong>)</span>
+                            </summary>
+                            <div class="admin-details-content" style="padding:10px 11px;">
+                                <div class="form-group" style="margin-bottom:8px;">
+                                    <label>Kostenloser Speicher-Modus (0 € / keine Kreditkarte)</label>
+                                    <select id="vmUploadProvider" class="form-control" onchange="window.toggleFreeUploadProviderFields()">
+                                        <option value="cloudinary" selected>☁️ Cloudinary Free (Empfohlen – bis 100 MB + Auto 4K/FHD/HD/SD)</option>
+                                        <option value="github">🐙 Direkt in dein GitHub-Repo (bis 25 MB, kein neuer Account)</option>
+                                    </select>
+                                </div>
+
+                                <div id="vmCfgCloudinaryWrap">
+                                    <div class="form-row" style="margin-bottom:6px;">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Cloudinary Cloud-Name *</label>
+                                            <input type="text" id="vmCloudName" class="form-control" placeholder="z.B. dxyz12345">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Unsigned Upload-Preset *</label>
+                                            <input type="text" id="vmCloudPreset" class="form-control" placeholder="z.B. red_videos">
+                                        </div>
+                                    </div>
+                                    <p style="font-size:10px; color:var(--text-muted); margin:0 0 8px; line-height:1.4;">Kostenlos auf <strong>cloudinary.com</strong> (ohne Kreditkarte): Cloud-Name vom Dashboard kopieren &amp; unter <em>Settings → Upload → Add upload preset</em> ein Preset auf <strong>Unsigned</strong> stellen.</p>
+                                </div>
+
+                                <div id="vmCfgGithubWrap" style="display:none;">
+                                    <div class="form-row" style="margin-bottom:6px;">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>GitHub Benutzer / Repo *</label>
+                                            <input type="text" id="vmGhRepo" class="form-control" placeholder="Tamer61tr/dein-repo-name">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Branch</label>
+                                            <input type="text" id="vmGhBranch" class="form-control" value="main" placeholder="main">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:6px;">
+                                        <label>GitHub Personal Access Token (bleibt nur lokal auf diesem Gerät) *</label>
+                                        <input type="password" id="vmGhToken" class="form-control" placeholder="github_pat_... oder ghp_...">
+                                    </div>
+                                    <p style="font-size:10px; color:var(--text-muted); margin:0 0 8px; line-height:1.4;">Token wird ausschließlich lokal in diesem Browser gespeichert und nie öffentlich hochgeladen.</p>
+                                </div>
+
+                                <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" style="width:100%; justify-content:center;" onclick="window.saveFreeUploadSettings()">
+                                    <i class="fa-solid fa-check"></i> Kostenlosen Upload-Speicher speichern
+                                </button>
+                            </div>
+                        </details>
+
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <label><i class="fa-solid fa-cloud-arrow-up" style="color:var(--green-accent);"></i> Video direkt hochladen (0 € – MB-Dateien + Auto 4K/Full HD/HD/SD)</label>
+                            <label class="noble-file-upload" style="margin-top:0;">
+                                <input type="file" id="vmFileInput" accept="video/*,.mp4,.mov,.webm,.m4v" onchange="window.handlePromoVideoFileSelect(this)">
+                                <span class="noble-file-trigger" id="vmFileLabel"><i class="fa-solid fa-film"></i> Video vom Gerät wählen &amp; kostenlos hochladen (bis 100 MB)</span>
+                            </label>
                         </div>
-                        <div class="form-group">
-                            <label>Video-Format</label>
-                            <select id="vmAspect" class="form-control" onchange="window.updateVideoStudioLivePreview()">
-                                <option value="9/16">📱 Hochformat (9:16 Reel)</option>
-                                <option value="16/9">🖥️ Querformat (16:9 Kino)</option>
-                                <option value="1/1">⬜ Quadratisch (1:1)</option>
-                            </select>
+
+                        <div id="vmDetectedMetaBox" class="vm-detected-meta" style="display:none;"></div>
+
+                        <div id="vmUploadProgressWrap" class="vm-upload-progress" style="display:none;">
+                            <div class="vm-upload-progress-head">
+                                <span id="vmUploadStatusTxt">Wird hochgeladen...</span>
+                                <strong id="vmUploadPctTxt">0%</strong>
+                            </div>
+                            <div class="vm-upload-bar-track"><div id="vmUploadBarFill" class="vm-upload-bar-fill"></div></div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Haupt-Video URL / Pfad (wird beim Upload automatisch eingetragen) *</label>
+                            <input type="text" id="vmUrl" class="form-control" placeholder="./werbevideo-1.mp4 oder Cloud-Link" oninput="window.updateVideoStudioLivePreview()">
                         </div>
                     </div>
 
-                    <details class="admin-details" style="margin-bottom:10px;">
-                        <summary style="font-size:11.5px; padding:10px 12px;"><i class="fa-solid fa-sliders" style="color:var(--primary-red); margin-right:6px;"></i> Optionale Einzel-Dateien für 4K / Full HD / HD / SD hinterlegen</summary>
+                    <!-- 4K / FULL HD / HD / SD EINZEL-UPLOADS & AUTO-KONVERTER -->
+                    <details class="admin-details" id="vmQualitySlotsDetails" style="margin-bottom:10px;">
+                        <summary style="font-size:11.5px; padding:10px 12px;"><i class="fa-solid fa-sliders" style="color:var(--primary-red); margin-right:6px;"></i> 4K / Full HD / HD / SD hochladen oder automatisch konvertieren</summary>
                         <div class="admin-details-content" style="padding:10px 12px;">
-                            <p style="font-size:10.5px; color:var(--text-muted); margin:0 0 8px;">Leer lassen = automatische Live-Bildoptimierung der Hauptdatei. Wenn du echte separate MP4-Auflösungen hochlädst, hier eintragen:</p>
-                            <div class="form-row">
-                                <div class="form-group"><label>4K UHD (2160p) MP4</label><input type="text" id="vmUrl4k" class="form-control" placeholder="./werbevideo-1-4k.mp4"></div>
-                                <div class="form-group"><label>Full HD (1080p) MP4</label><input type="text" id="vmUrl1080" class="form-control" placeholder="./werbevideo-1-1080p.mp4"></div>
+                            <div class="vm-autoconv-banner">
+                                <div style="flex:1; min-width:190px;">
+                                    <strong style="display:block; font-size:11.5px; color:var(--text-light);"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary-red);"></i> Auto-Konverter (Qualitätsstufen erzeugen)</strong>
+                                    <span style="font-size:10.5px; color:var(--text-muted);">Erzeugt aus deinem Haupt-Video automatisch kleinere Stufen (Full HD / HD / SD) inkl. Ton &amp; lädt sie in die Cloud hoch.</span>
+                                </div>
+                                <button type="button" id="vmAutoConvertBtn" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.autoConvertVideoQualities()">
+                                    <i class="fa-solid fa-gears"></i> Stufen konvertieren
+                                </button>
                             </div>
-                            <div class="form-row" style="margin-bottom:0;">
-                                <div class="form-group" style="margin-bottom:0;"><label>HD (720p) MP4</label><input type="text" id="vmUrl720" class="form-control" placeholder="./werbevideo-1-720p.mp4"></div>
-                                <div class="form-group" style="margin-bottom:0;"><label>SD (480p) MP4</label><input type="text" id="vmUrl480" class="form-control" placeholder="./werbevideo-1-480p.mp4"></div>
+
+                            <div class="vm-qslot-grid">
+                                <div class="form-group">
+                                    <label>4K UHD (2160p)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl4k" class="form-control" placeholder="4K Link / Datei">
+                                        <label class="vm-qslot-up-btn" title="4K Video hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('4k', this)"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Full HD (1080p)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl1080" class="form-control" placeholder="1080p Link / Datei">
+                                        <label class="vm-qslot-up-btn" title="Full HD Video hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('1080', this)"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>HD (720p)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl720" class="form-control" placeholder="720p Link / Datei">
+                                        <label class="vm-qslot-up-btn" title="HD Video hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('720', this)"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>SD (480p Datenspar)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl480" class="form-control" placeholder="480p Link / Datei">
+                                        <label class="vm-qslot-up-btn" title="SD Video hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('480', this)"></label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </details>
 
-                    <div class="form-group">
-                        <label>Oder kurzes Video (bis 650 KB) direkt hochladen</label>
-                        <label class="noble-file-upload" style="margin-top:0;">
-                            <input type="file" id="vmFileInput" accept="video/mp4,video/webm" onchange="window.handlePromoVideoFileSelect(this)">
-                            <span class="noble-file-trigger" id="vmFileLabel"><i class="fa-solid fa-cloud-arrow-up"></i> Video wählen (für größere MP4s einfach auf GitHub hochladen)</span>
-                        </label>
-                    </div>
-
-                    <!-- POSITIONIERUNG & DARSTELLUNG -->
+                    <!-- POSITIONIERUNG, FORMAT (HOCH/QUER/QUADRAT) & 12 RAHMENDESIGNS -->
                     <div class="vm-bumper-box" style="margin-bottom:10px;">
-                        <div class="vm-bumper-box-title"><i class="fa-solid fa-up-down-left-right"></i> Positionierung &amp; Darstellung (Live-Vorschau)</div>
+                        <div class="vm-bumper-box-title"><i class="fa-solid fa-up-down-left-right"></i> Positionierung, Format &amp; Rahmendesign (Live-Vorschau)</div>
+
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <label>Video-Format (Schnellwahl &amp; Feinauswahl)</label>
+                            <div class="vm-aspect-pills" id="vmAspectQuickPills">
+                                <button type="button" class="vm-aspect-pill active" data-aspect="9/16" onclick="window.setQuickVideoAspect('9/16')">📱 Hochformat</button>
+                                <button type="button" class="vm-aspect-pill" data-aspect="16/9" onclick="window.setQuickVideoAspect('16/9')">🖥️ Querformat</button>
+                                <button type="button" class="vm-aspect-pill" data-aspect="1/1" onclick="window.setQuickVideoAspect('1/1')">⬜ Quadratisch</button>
+                                <button type="button" class="vm-aspect-pill" data-aspect="4/5" onclick="window.setQuickVideoAspect('4/5')">📸 4:5 Feed</button>
+                                <button type="button" class="vm-aspect-pill" data-aspect="auto" onclick="window.setQuickVideoAspect('auto')">✨ Auto</button>
+                            </div>
+                            <select id="vmAspect" class="form-control" onchange="window.syncQuickVideoAspectPills(); window.updateVideoStudioLivePreview();">
+                                <option value="9/16" selected>📱 Hochformat (9:16 Reel / TikTok / Shorts)</option>
+                                <option value="16/9">🖥️ Querformat (16:9 Kino / YouTube)</option>
+                                <option value="1/1">⬜ Quadratisch (1:1 Instagram / Feed)</option>
+                                <option value="4/5">📸 Hochformat (4:5 Social Feed)</option>
+                                <option value="3/4">🖼️ Hochformat (3:4 Portrait)</option>
+                                <option value="4/3">📺 Querformat (4:3 Klassisch)</option>
+                                <option value="21/9">🎬 Kino Breitbild (21:9 Ultrawide)</option>
+                                <option value="auto">✨ Automatisch (Original-Seitenverhältnis)</option>
+                            </select>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Player-Position (Desktop)</label>
@@ -1533,12 +1641,20 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Rahmen-Design</label>
+                                <label>Rahmen-Design (12 Stile)</label>
                                 <select id="vmFrameStyle" class="form-control" onchange="window.updateVideoStudioLivePreview()">
-                                    <option value="classic" selected>RED Standard</option>
-                                    <option value="cinema">Kino Rot-Glow</option>
-                                    <option value="gold">Royal Gold Rahmen</option>
-                                    <option value="minimal">Clean / Minimal</option>
+                                    <option value="classic" selected>🔴 RED Standard</option>
+                                    <option value="cinema">🔥 Kino Rot-Glow</option>
+                                    <option value="neon-red">⚡ Berlin Neon-Rot (Leuchtend)</option>
+                                    <option value="gold">👑 Royal Gold Luxus</option>
+                                    <option value="carbon">🏁 3D-Carbon Sport-Optik</option>
+                                    <option value="chrome">⚙️ Chrom-Silber Metallic</option>
+                                    <option value="glass">💎 Frosted Glass (Edel-Glas)</option>
+                                    <option value="phone">📱 Smartphone Bezel (iPhone-Look)</option>
+                                    <option value="cinema-bar">🎬 Kino-Leinwand (Doppelrand)</option>
+                                    <option value="berlin-flag">🇩🇪 Schwarz-Rot-Gold Akzent</option>
+                                    <option value="white-studio">⬜ Clean White Studio</option>
+                                    <option value="minimal">✨ Ultra-Minimal (Schlank)</option>
                                 </select>
                             </div>
                         </div>
@@ -4327,8 +4443,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-<script src="./app.js?v=26" defer></script>
-    <script type="module" src="./firebase-app.js?v=26"></script>
+<script src="./app.js?v=28" defer></script>
+    <script type="module" src="./firebase-app.js?v=28"></script>
 
 </body>
 </html>

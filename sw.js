@@ -1,10 +1,10 @@
-const CACHE_NAME = 'red-berlin-pwa-v26';
+const CACHE_NAME = 'red-berlin-pwa-v28';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './styles.css?v=26',
-  './app.js?v=26',
-  './firebase-app.js?v=26',
+  './styles.css?v=28',
+  './app.js?v=28',
+  './firebase-app.js?v=28',
   './manifest.json',
   './icon-180.png',
   './icon-192.png',

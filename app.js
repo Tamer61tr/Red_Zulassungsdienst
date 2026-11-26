@@ -7459,7 +7459,7 @@ window.rvpBindDirectTap = function(el, onTap) {
 
             return `
                 <div class="rvp-player-shell${frameCls}" id="rvpHost-${key}">
-                    <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml(item.aspect || '9/16')};">
+                    <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml((!item.aspect || item.aspect === 'auto') ? (item.detectedAspect || '9/16') : item.aspect)};">
                         <div class="rvp-overlay-top">
                             <span class="rvp-badge-pill" ${badgeStyle}>${window.buildVideoBadgeIconHtml(item.badgeIcon || 'live-dot')}<span>${window.escHtml(item.badge || 'RED Video')}</span></span>
                             <button type="button" class="rvp-expand-fab" data-rvp-act="expand" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
@@ -7554,7 +7554,8 @@ window.rvpBindDirectTap = function(el, onTap) {
             if (layout === 'showcase') {
                 if (window.activePromoVideoIdx >= list.length) window.activePromoVideoIdx = 0;
                 const item = list[window.activePromoVideoIdx];
-                const isLandscape = item.aspect === '16/9';
+                const effAspect = (!item.aspect || item.aspect === 'auto') ? (item.detectedAspect || '9/16') : item.aspect;
+                const isLandscape = ['16/9', '4/3', '21/9'].includes(effAspect);
                 const pKey = 'inline-0';
                 const highlights = (Array.isArray(item.highlights) && item.highlights.length > 0) ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS;
                 const sideCls = item.showcaseSide === 'right' ? ' pos-right' : (item.showcaseSide === 'center' ? ' pos-center' : '');
@@ -7719,12 +7720,27 @@ window.rvpBindDirectTap = function(el, onTap) {
             const pill = document.getElementById('vmPreviewModePill');
             if (pill) pill.innerText = `${qMeta.label} • ${side === 'right' ? 'Video Rechts' : (side === 'center' ? 'Kino Mitte' : 'Video Links')}`;
 
+            const previewAspect = aspect === 'auto' ? (window._vmLastDetectedAspect || '9/16') : aspect;
+            const isWidePrev = ['16/9', '4/3', '21/9'].includes(previewAspect);
             stage.className = 'vm-live-preview-stage' + (side === 'right' ? ' pos-right' : (side === 'center' ? ' pos-center' : ''));
-            const frameExtra = frame === 'cinema' ? 'border-color:var(--primary-red); box-shadow:0 0 14px rgba(217,0,0,0.45);'
-                : (frame === 'gold' ? 'border-color:#d4af37; box-shadow:0 0 12px rgba(212,175,55,0.4);' : '');
+
+            const frameStylesMap = {
+                cinema: 'border:2px solid var(--primary-red); box-shadow:0 0 14px rgba(217,0,0,0.5);',
+                'neon-red': 'border:2px solid #ff1e1e; box-shadow:0 0 16px rgba(255,30,30,0.75);',
+                gold: 'border:2px solid #d4af37; box-shadow:0 0 14px rgba(212,175,55,0.5);',
+                carbon: 'border:3px solid #353545; box-shadow:0 6px 16px rgba(0,0,0,0.5);',
+                chrome: 'border:3px solid #cbd5e1; box-shadow:0 6px 16px rgba(148,163,184,0.45);',
+                glass: 'border:2px solid rgba(255,255,255,0.55); box-shadow:0 6px 18px rgba(0,0,0,0.3);',
+                phone: 'border:3px solid #484856; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.5);',
+                'cinema-bar': 'border:2px solid #111; outline:2px solid #d90000; outline-offset:1px;',
+                'berlin-flag': 'border:3px solid #d90000; box-shadow:0 0 0 2px #f5c542;',
+                'white-studio': 'border:3px solid #ffffff; box-shadow:0 4px 14px rgba(0,0,0,0.22);',
+                minimal: 'border:1px solid var(--glass-border); box-shadow:none;'
+            };
+            const frameExtra = frameStylesMap[frame] || '';
 
             stage.innerHTML = `
-                <div class="vm-prev-frame${aspect === '16/9' ? ' is-wide' : ''}" style="--prev-aspect:${window.escHtml(aspect)}; ${frameExtra}">
+                <div class="vm-prev-frame${isWidePrev ? ' is-wide' : ''}" style="--prev-aspect:${window.escHtml(previewAspect)}; ${frameExtra}">
                     <video src="${window.escHtml(url)}" class="${qMeta.cls}" style="object-fit:${window.escHtml(fit)}; object-position:${window.escHtml(pos)};" muted playsinline preload="metadata"></video>
                     <span class="vm-prev-badge" ${badgeBg ? `style="background:${window.escHtml(badgeBg)};"` : ''}>${window.buildVideoBadgeIconHtml(badgeIcon)}<span>${window.escHtml(badge)}</span></span>
                     <span class="vm-prev-qtag">${qMeta.short}</span>
@@ -7782,6 +7798,7 @@ window.rvpBindDirectTap = function(el, onTap) {
             if (document.getElementById('vmLayoutSelect')) document.getElementById('vmLayoutSelect').value = cfg.layoutMode || 'showcase';
             if (document.getElementById('vmPlacementSelect')) document.getElementById('vmPlacementSelect').value = cfg.placement || 'after-hero';
             if (document.getElementById('vmAutoplaySelect')) document.getElementById('vmAutoplaySelect').value = cfg.autoplayMode || 'muted-auto';
+            if (typeof window.loadFreeUploadSettingsIntoForm === 'function') window.loadFreeUploadSettingsIntoForm();
             window.renderVideoManagerList();
             window.switchVideoManagerTab(startTab === 'brand' ? 'brand' : 'videos');
             document.getElementById('videoManagerOverlay').classList.add('open');
@@ -7849,21 +7866,482 @@ window.rvpBindDirectTap = function(el, onTap) {
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
         };
 
-        window.handlePromoVideoFileSelect = function(input) {
+        window._vmLastSelectedFile = null;
+        window._vmLastDetectedMeta = null;
+        window._vmLastDetectedAspect = '9/16';
+
+        window.setQuickVideoAspect = function(ratio) {
+            const sel = document.getElementById('vmAspect');
+            if (sel) sel.value = ratio;
+            window.syncQuickVideoAspectPills();
+            window.updateVideoStudioLivePreview();
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+        };
+
+        window.syncQuickVideoAspectPills = function() {
+            const cur = document.getElementById('vmAspect')?.value || '9/16';
+            document.querySelectorAll('#vmAspectQuickPills .vm-aspect-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-aspect') === cur);
+            });
+        };
+
+        window.setVmUploadProgress = function(show, pct = 0, text = '') {
+            const wrap = document.getElementById('vmUploadProgressWrap');
+            const fill = document.getElementById('vmUploadBarFill');
+            const pctEl = document.getElementById('vmUploadPctTxt');
+            const txtEl = document.getElementById('vmUploadStatusTxt');
+            if (!wrap) return;
+            wrap.style.display = show ? 'block' : 'none';
+            if (fill) fill.style.width = Math.max(0, Math.min(100, pct)) + '%';
+            if (pctEl) pctEl.innerText = Math.round(pct) + '%';
+            if (txtEl && text) txtEl.innerText = text;
+        };
+
+        window.formatFileSizeMB = function(bytes) {
+            if (!bytes) return '0 MB';
+            if (bytes >= 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        };
+
+        window.inspectVideoFileMetadata = function(fileOrUrl) {
+            return new Promise((resolve) => {
+                const tempV = document.createElement('video');
+                tempV.preload = 'metadata';
+                tempV.muted = true;
+                tempV.playsInline = true;
+                const isObjUrl = (fileOrUrl instanceof Blob);
+                const srcUrl = isObjUrl ? URL.createObjectURL(fileOrUrl) : fileOrUrl;
+
+                const finish = (meta) => {
+                    if (isObjUrl) { try { URL.revokeObjectURL(srcUrl); } catch (e) {} }
+                    resolve(meta);
+                };
+
+                tempV.onloadedmetadata = () => {
+                    const w = tempV.videoWidth || 0;
+                    const h = tempV.videoHeight || 0;
+                    const dur = isFinite(tempV.duration) ? tempV.duration : 0;
+                    const minSide = Math.min(w, h);
+                    const maxSide = Math.max(w, h);
+
+                    let quality = '720';
+                    let qualityLabel = 'HD 720p';
+                    if (minSide >= 2100 || maxSide >= 3800) { quality = '4k'; qualityLabel = '4K UHD (2160p)'; }
+                    else if (minSide >= 1020 || maxSide >= 1880) { quality = '1080'; qualityLabel = 'Full HD (1080p)'; }
+                    else if (minSide >= 680 || maxSide >= 1220) { quality = '720'; qualityLabel = 'HD (720p)'; }
+                    else { quality = '480'; qualityLabel = 'SD (480p)'; }
+
+                    const ratio = h > 0 ? (w / h) : 0.5625;
+                    let aspect = '9/16';
+                    if (ratio >= 2.0) aspect = '21/9';
+                    else if (ratio >= 1.55) aspect = '16/9';
+                    else if (ratio >= 1.18) aspect = '4/3';
+                    else if (ratio >= 0.88) aspect = '1/1';
+                    else if (ratio >= 0.77) aspect = '4/5';
+                    else if (ratio >= 0.66) aspect = '3/4';
+                    else aspect = '9/16';
+
+                    finish({ width: w, height: h, duration: dur, quality, qualityLabel, aspect });
+                };
+                tempV.onerror = () => finish({ width: 0, height: 0, duration: 0, quality: '1080', qualityLabel: 'Auto', aspect: '9/16' });
+                tempV.src = srcUrl;
+            });
+        };
+
+// --- KOSTENLOSER MB-UPLOAD (0 €: CLOUDINARY FREE BIS 100 MB ODER GITHUB BIS 25 MB) ---
+        window.getFreeUploadSettings = function() {
+            const saved = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v1') || 'null') || {};
+            return {
+                provider: saved.provider || 'cloudinary',
+                cloudName: (saved.cloudName || '').trim(),
+                cloudPreset: (saved.cloudPreset || '').trim(),
+                ghRepo: (saved.ghRepo || '').trim(),
+                ghBranch: (saved.ghBranch || 'main').trim() || 'main',
+                ghToken: (saved.ghToken || '').trim()
+            };
+        };
+
+        window.toggleFreeUploadProviderFields = function() {
+            const p = document.getElementById('vmUploadProvider')?.value || 'cloudinary';
+            const cWrap = document.getElementById('vmCfgCloudinaryWrap');
+            const gWrap = document.getElementById('vmCfgGithubWrap');
+            const badge = document.getElementById('vmUploadProviderBadge');
+            if (cWrap) cWrap.style.display = p === 'cloudinary' ? 'block' : 'none';
+            if (gWrap) gWrap.style.display = p === 'github' ? 'block' : 'none';
+            if (badge) badge.innerText = p === 'github' ? 'GitHub Repo' : 'Cloudinary Free';
+        };
+
+        window.loadFreeUploadSettingsIntoForm = function() {
+            const cfg = window.getFreeUploadSettings();
+            const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            setV('vmUploadProvider', cfg.provider);
+            setV('vmCloudName', cfg.cloudName);
+            setV('vmCloudPreset', cfg.cloudPreset);
+            setV('vmGhRepo', cfg.ghRepo);
+            setV('vmGhBranch', cfg.ghBranch);
+            setV('vmGhToken', cfg.ghToken);
+            window.toggleFreeUploadProviderFields();
+        };
+
+        window.saveFreeUploadSettings = function() {
+            const cfg = {
+                provider: document.getElementById('vmUploadProvider')?.value || 'cloudinary',
+                cloudName: (document.getElementById('vmCloudName')?.value || '').trim(),
+                cloudPreset: (document.getElementById('vmCloudPreset')?.value || '').trim(),
+                ghRepo: (document.getElementById('vmGhRepo')?.value || '').trim(),
+                ghBranch: (document.getElementById('vmGhBranch')?.value || 'main').trim() || 'main',
+                ghToken: (document.getElementById('vmGhToken')?.value || '').trim()
+            };
+            localStorage.setItem('red_free_video_upload_cfg_v1', JSON.stringify(cfg));
+            window.toggleFreeUploadProviderFields();
+            const det = document.getElementById('vmFreeUploadCfgDetails');
+            if (det) det.open = false;
+            window.showToast('Kostenloser Upload-Speicher gespeichert!', 'success');
+        };
+
+        window.buildCloudinaryAutoTiers = function(secureUrl, meta) {
+            if (!secureUrl || !secureUrl.includes('/video/upload/')) return null;
+            const makeVariant = (transform) => secureUrl.replace('/video/upload/', `/video/upload/${transform}/`);
+            const minSide = Math.min(meta?.width || 1080, meta?.height || 1920);
+            const maxSide = Math.max(meta?.width || 1080, meta?.height || 1920);
+            return {
+                '4k': (minSide >= 2100 || maxSide >= 3800) ? secureUrl : '',
+                '1080': (minSide >= 1020 || maxSide >= 1880) ? makeVariant('c_limit,w_1920,h_1920,q_auto:good,f_mp4') : '',
+                '720': (minSide >= 680 || maxSide >= 1220) ? makeVariant('c_limit,w_1280,h_1280,q_auto:good,f_mp4') : secureUrl,
+                '480': makeVariant('c_limit,w_854,h_854,q_auto:eco,f_mp4')
+            };
+        };
+
+        window.uploadVideoFree = function(fileOrBlob, fileName, onProgress) {
+            const cfg = window.getFreeUploadSettings();
+
+            // 1. CLOUDINARY FREE (0 €, keine Kreditkarte, bis 100 MB/Video + Auto-Auflösungen)
+            if (cfg.provider === 'cloudinary') {
+                if (!cfg.cloudName || !cfg.cloudPreset) {
+                    const det = document.getElementById('vmFreeUploadCfgDetails');
+                    if (det) det.open = true;
+                    return Promise.reject(new Error('Bitte oben kurz deinen kostenlosen Cloudinary Cloud-Name & Upload-Preset eintragen (oder auf GitHub umschalten).'));
+                }
+                if (fileOrBlob.size > 100 * 1024 * 1024) {
+                    return Promise.reject(new Error('Cloudinary Free erlaubt bis 100 MB pro Video. Bitte Video kurz komprimieren.'));
+                }
+                return new Promise((resolve, reject) => {
+                    const fd = new FormData();
+                    fd.append('file', fileOrBlob, fileName || 'video.mp4');
+                    fd.append('upload_preset', cfg.cloudPreset);
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', `https://api.cloudinary.com/v1_1/${encodeURIComponent(cfg.cloudName)}/video/upload`, true);
+                    xhr.upload.onprogress = (ev) => {
+                        if (ev.lengthComputable && typeof onProgress === 'function') {
+                            onProgress(Math.round((ev.loaded / ev.total) * 100), ev.loaded, ev.total);
+                        }
+                    };
+                    xhr.onload = () => {
+                        try {
+                            const res = JSON.parse(xhr.responseText || '{}');
+                            if (xhr.status >= 200 && xhr.status < 300 && res.secure_url) {
+                                resolve({ url: res.secure_url, provider: 'cloudinary' });
+                            } else {
+                                reject(new Error(res.error?.message || `Cloudinary Fehler (${xhr.status})`));
+                            }
+                        } catch (e) {
+                            reject(new Error('Antwort von Cloudinary ungültig.'));
+                        }
+                    };
+                    xhr.onerror = () => reject(new Error('Netzwerkfehler beim Cloudinary-Upload.'));
+                    xhr.send(fd);
+                });
+            }
+
+            // 2. DIREKT IN DEIN GITHUB-REPO (0 €, bis 25 MB pro Video)
+            if (!cfg.ghRepo || !cfg.ghRepo.includes('/') || !cfg.ghToken) {
+                const det = document.getElementById('vmFreeUploadCfgDetails');
+                if (det) det.open = true;
+                return Promise.reject(new Error('Bitte oben dein GitHub-Repo (z.B. Tamer61tr/...) und Token eintragen.'));
+            }
+            if (fileOrBlob.size > 25 * 1024 * 1024) {
+                return Promise.reject(new Error('GitHub-Direktupload unterstützt bis 25 MB. Für Videos bis 100 MB einfach auf Cloudinary Free (0 €) umschalten!'));
+            }
+
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('Video konnte nicht gelesen werden.'));
+                reader.onload = () => {
+                    const base64 = String(reader.result || '').split(',')[1] || '';
+                    const cleanName = String(fileName || 'video.mp4').replace(/[^a-zA-Z0-9._-]/g, '_');
+                    const repoPath = `videos/${Date.now()}_${cleanName}`;
+                    const apiUrl = `https://api.github.com/repos/${cfg.ghRepo}/contents/${repoPath}`;
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('PUT', apiUrl, true);
+                    xhr.setRequestHeader('Authorization', `Bearer ${cfg.ghToken}`);
+                    xhr.setRequestHeader('Accept', 'application/vnd.github+json');
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.upload.onprogress = (ev) => {
+                        if (ev.lengthComputable && typeof onProgress === 'function') {
+                            onProgress(Math.round((ev.loaded / ev.total) * 100), ev.loaded, ev.total);
+                        }
+                    };
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            resolve({ url: `./${repoPath}`, provider: 'github' });
+                        } else {
+                            let msg = `GitHub Fehler (${xhr.status})`;
+                            try { msg = JSON.parse(xhr.responseText)?.message || msg; } catch (e) {}
+                            reject(new Error(msg));
+                        }
+                    };
+                    xhr.onerror = () => reject(new Error('Netzwerkfehler beim GitHub-Upload.'));
+                    xhr.send(JSON.stringify({
+                        message: `Upload Video ${cleanName}`,
+                        content: base64,
+                        branch: cfg.ghBranch
+                    }));
+                };
+                reader.readAsDataURL(fileOrBlob);
+            });
+        };
+
+        window.handlePromoVideoFileSelect = async function(input) {
             const file = input.files && input.files[0];
             if (!file) return;
-            if (file.size > 680 * 1024) {
-                window.showToast('Video > 680 KB – bitte direkt als MP4 auf GitHub hochladen und oben z.B. ./werbevideo-2.mp4 eintragen!', 'error');
+
+            window._vmLastSelectedFile = file;
+            const sizeTxt = window.formatFileSizeMB(file.size);
+            const meta = await window.inspectVideoFileMetadata(file);
+            window._vmLastDetectedMeta = meta;
+            window._vmLastDetectedAspect = meta.aspect;
+
+            if (document.getElementById('vmAspect')) {
+                document.getElementById('vmAspect').value = meta.aspect;
+                window.syncQuickVideoAspectPills();
+            }
+            if (document.getElementById('vmDefaultQuality')) {
+                document.getElementById('vmDefaultQuality').value = meta.quality;
+            }
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+
+            const metaBox = document.getElementById('vmDetectedMetaBox');
+            if (metaBox) {
+                metaBox.style.display = 'flex';
+                metaBox.innerHTML = `
+                    <span class="vm-meta-chip is-hi"><i class="fa-solid fa-wand-magic-sparkles"></i> Erkannt: ${meta.qualityLabel}</span>
+                    ${meta.width ? `<span class="vm-meta-chip">${meta.width} × ${meta.height} px</span>` : ''}
+                    <span class="vm-meta-chip">Format ${meta.aspect}</span>
+                    <span class="vm-meta-chip">${sizeTxt}</span>
+                    ${meta.duration ? `<span class="vm-meta-chip">${window.formatVideoTime(meta.duration)}</span>` : ''}
+                `;
+            }
+
+            try {
+                window.setVmUploadProgress(true, 2, `Lade „${file.name}“ (${sizeTxt}) kostenlos hoch...`);
+                const result = await window.uploadVideoFree(file, file.name, (pct, sent, total) => {
+                    window.setVmUploadProgress(true, pct, `Upload: ${window.formatFileSizeMB(sent)} / ${window.formatFileSizeMB(total)}`);
+                });
+
+                document.getElementById('vmUrl').value = result.url;
+
+                // Bei Cloudinary werden alle passenden Qualitätsstufen sofort automatisch befüllt!
+                if (result.provider === 'cloudinary') {
+                    const tiers = window.buildCloudinaryAutoTiers(result.url, meta);
+                    if (tiers) {
+                        if (tiers['4k'] && document.getElementById('vmUrl4k')) document.getElementById('vmUrl4k').value = tiers['4k'];
+                        if (tiers['1080'] && document.getElementById('vmUrl1080')) document.getElementById('vmUrl1080').value = tiers['1080'];
+                        if (tiers['720'] && document.getElementById('vmUrl720')) document.getElementById('vmUrl720').value = tiers['720'];
+                        if (tiers['480'] && document.getElementById('vmUrl480')) document.getElementById('vmUrl480').value = tiers['480'];
+                    }
+                    window.setVmUploadProgress(true, 100, `✅ Hochgeladen & 4K/FHD/HD/SD automatisch bereit!`);
+                    window.showToast(`Video (${meta.qualityLabel}, ${sizeTxt}) hochgeladen + alle Auflösungen automatisch erstellt!`, 'success');
+                } else {
+                    const slotMap = { '4k': 'vmUrl4k', '1080': 'vmUrl1080', '720': 'vmUrl720', '480': 'vmUrl480' };
+                    const targetSlot = slotMap[meta.quality];
+                    if (targetSlot && document.getElementById(targetSlot)) document.getElementById(targetSlot).value = result.url;
+                    window.setVmUploadProgress(true, 100, `✅ Direkt ins GitHub-Repo hochgeladen (in ca. 1 Min. live)!`);
+                    window.showToast(`Video (${meta.qualityLabel}, ${sizeTxt}) direkt zu GitHub hochgeladen – jetzt speichern!`, 'success');
+                }
+
+                setTimeout(() => window.setVmUploadProgress(false), 3200);
+                window.updateVideoStudioLivePreview();
+            } catch (err) {
+                console.error('Video Upload Fehler:', err);
+                window.setVmUploadProgress(false);
+                window.showToast(err.message || 'Upload fehlgeschlagen.', 'error');
+            } finally {
                 input.value = '';
+            }
+        };
+
+        window.uploadQualitySlotFile = async function(slotKey, input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const slotInputMap = { '4k': 'vmUrl4k', '1080': 'vmUrl1080', '720': 'vmUrl720', '480': 'vmUrl480' };
+            const labelMap = { '4k': '4K UHD', '1080': 'Full HD 1080p', '720': 'HD 720p', '480': 'SD 480p' };
+            const targetId = slotInputMap[slotKey];
+            if (!targetId) return;
+
+            try {
+                const sizeTxt = window.formatFileSizeMB(file.size);
+                window.setVmUploadProgress(true, 2, `Lade ${labelMap[slotKey]} (${sizeTxt}) hoch...`);
+                const res = await window.uploadVideoFree(file, `${slotKey}_${file.name}`, (pct, sent, total) => {
+                    window.setVmUploadProgress(true, pct, `${labelMap[slotKey]}: ${window.formatFileSizeMB(sent)} / ${window.formatFileSizeMB(total)}`);
+                });
+                document.getElementById(targetId).value = res.url;
+                if (!document.getElementById('vmUrl')?.value.trim()) {
+                    document.getElementById('vmUrl').value = res.url;
+                }
+                window.setVmUploadProgress(true, 100, `✅ ${labelMap[slotKey]} hochgeladen!`);
+                setTimeout(() => window.setVmUploadProgress(false), 2400);
+                window.showToast(`${labelMap[slotKey]} erfolgreich hochgeladen!`, 'success');
+            } catch (err) {
+                window.setVmUploadProgress(false);
+                window.showToast(err.message || `Upload (${labelMap[slotKey]}) fehlgeschlagen.`, 'error');
+            } finally {
+                input.value = '';
+            }
+        };
+
+        // BROWSER AUTO-KONVERTER: Erzeugt niedrigere Auflösungen (Full HD / HD / SD) inkl. Ton & lädt sie hoch
+        window.transcodeVideoTierInBrowser = function(sourceFileOrUrl, targetShortSide, bitrateMbps, onPct) {
+            return new Promise((resolve, reject) => {
+                if (typeof MediaRecorder === 'undefined') {
+                    reject(new Error('Dieser Browser unterstützt keine Video-Konvertierung (bitte Chrome/Edge am PC nutzen).'));
+                    return;
+                }
+                const v = document.createElement('video');
+                v.crossOrigin = 'anonymous';
+                v.playsInline = true;
+                v.muted = false;
+                const isBlob = (sourceFileOrUrl instanceof Blob);
+                const srcUrl = isBlob ? URL.createObjectURL(sourceFileOrUrl) : sourceFileOrUrl;
+
+                const cleanup = () => {
+                    try { v.pause(); } catch (e) {}
+                    if (isBlob) { try { URL.revokeObjectURL(srcUrl); } catch (e) {} }
+                };
+
+                v.onerror = () => { cleanup(); reject(new Error('Quellvideo konnte zum Konvertieren nicht geladen werden.')); };
+                v.onloadedmetadata = async () => {
+                    const sw = v.videoWidth || 720;
+                    const sh = v.videoHeight || 1280;
+                    const isPortrait = sh > sw;
+                    const scale = Math.min(1, targetShortSide / Math.min(sw, sh));
+                    const tw = Math.max(2, Math.round((sw * scale) / 2) * 2);
+                    const th = Math.max(2, Math.round((sh * scale) / 2) * 2);
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = tw;
+                    canvas.height = th;
+                    const ctx = canvas.getContext('2d');
+
+                    const canvasStream = canvas.captureStream(30);
+                    // Tonspur sauber mitnehmen
+                    try {
+                        const aCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const srcNode = aCtx.createMediaElementSource(v);
+                        const destNode = aCtx.createMediaStreamDestination();
+                        srcNode.connect(destNode);
+                        destNode.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
+                    } catch (e) {}
+
+                    const mimePrefs = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+                    const mimeType = mimePrefs.find(m => MediaRecorder.isTypeSupported(m)) || '';
+                    const rec = new MediaRecorder(canvasStream, {
+                        ...(mimeType ? { mimeType } : {}),
+                        videoBitsPerSecond: Math.round(bitrateMbps * 1000000)
+                    });
+                    const chunks = [];
+                    rec.ondataavailable = (ev) => { if (ev.data && ev.data.size > 0) chunks.push(ev.data); };
+                    rec.onstop = () => {
+                        const outBlob = new Blob(chunks, { type: mimeType || 'video/webm' });
+                        const ext = (mimeType || '').includes('mp4') ? 'mp4' : 'webm';
+                        cleanup();
+                        resolve({ blob: outBlob, ext, width: tw, height: th, isPortrait });
+                    };
+
+                    let rafId = null;
+                    const drawLoop = () => {
+                        if (v.ended || v.paused) return;
+                        ctx.drawImage(v, 0, 0, tw, th);
+                        if (typeof onPct === 'function' && v.duration > 0) {
+                            onPct(Math.min(99, Math.round((v.currentTime / v.duration) * 100)));
+                        }
+                        rafId = requestAnimationFrame(drawLoop);
+                    };
+
+                    v.onended = () => {
+                        cancelAnimationFrame(rafId);
+                        if (rec.state !== 'inactive') rec.stop();
+                    };
+
+                    try {
+                        rec.start(250);
+                        v.currentTime = 0;
+                        await v.play();
+                        drawLoop();
+                    } catch (err) {
+                        cleanup();
+                        reject(err);
+                    }
+                };
+                v.src = srcUrl;
+            });
+        };
+
+        window.autoConvertVideoQualities = async function() {
+            const source = window._vmLastSelectedFile || (document.getElementById('vmUrl')?.value || '').trim();
+            if (!source) {
+                window.showToast('Bitte zuerst ein Haupt-Video auswählen oder hochladen.', 'error');
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                document.getElementById('vmUrl').value = ev.target.result;
-                window.updateVideoStudioLivePreview();
-                window.showToast(`Video „${file.name}“ geladen – jetzt speichern!`, 'success');
-            };
-            reader.readAsDataURL(file);
+            const btn = document.getElementById('vmAutoConvertBtn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Konvertiere...'; }
+
+            try {
+                const meta = window._vmLastDetectedMeta || await window.inspectVideoFileMetadata(source);
+                const minSide = Math.min(meta.width || 1080, meta.height || 1920);
+
+                // Nur sinnvolle kleinere Stufen erzeugen (kein künstliches Hochskalieren)
+                const tiers = [];
+                if (minSide >= 1600 && !document.getElementById('vmUrl1080')?.value.trim()) {
+                    tiers.push({ key: '1080', label: 'Full HD 1080p', shortSide: 1080, mbps: 5.5, inputId: 'vmUrl1080' });
+                }
+                if (minSide >= 900 && !document.getElementById('vmUrl720')?.value.trim()) {
+                    tiers.push({ key: '720', label: 'HD 720p', shortSide: 720, mbps: 2.8, inputId: 'vmUrl720' });
+                }
+                if (minSide >= 600 && !document.getElementById('vmUrl480')?.value.trim()) {
+                    tiers.push({ key: '480', label: 'SD 480p', shortSide: 480, mbps: 1.2, inputId: 'vmUrl480' });
+                }
+
+                if (tiers.length === 0) {
+                    window.showToast('Alle passenden Qualitätsstufen sind bereits vorhanden!', 'success');
+                    return;
+                }
+
+                for (let i = 0; i < tiers.length; i++) {
+                    const t = tiers[i];
+                    window.setVmUploadProgress(true, 1, `Konvertiere Stufe ${i + 1}/${tiers.length}: ${t.label}...`);
+                    const converted = await window.transcodeVideoTierInBrowser(source, t.shortSide, t.mbps, (p) => {
+                        window.setVmUploadProgress(true, Math.round(p * 0.7), `Konvertiere ${t.label} (${i + 1}/${tiers.length})...`);
+                    });
+
+                    window.setVmUploadProgress(true, 72, `Lade ${t.label} (${window.formatFileSizeMB(converted.blob.size)}) hoch...`);
+                    const upRes = await window.uploadVideoFree(converted.blob, `auto_${t.key}.${converted.ext}`, (upPct) => {
+                        window.setVmUploadProgress(true, 70 + Math.round(upPct * 0.3), `Upload ${t.label}...`);
+                    });
+                    if (document.getElementById(t.inputId)) document.getElementById(t.inputId).value = upRes.url;
+                }
+
+                window.setVmUploadProgress(true, 100, `✅ Alle ${tiers.length} Qualitätsstufen automatisch erstellt & gespeichert!`);
+                setTimeout(() => window.setVmUploadProgress(false), 3000);
+                window.showToast(`Fertig! ${tiers.length} Qualitätsstufen wurden erzeugt – jetzt unten auf „Speichern“ klicken!`, 'success');
+            } catch (err) {
+                console.error('Auto-Konverter Fehler:', err);
+                window.setVmUploadProgress(false);
+                window.showToast('Konvertierung abgebrochen: ' + (err.message || 'Bitte am PC in Chrome/Edge versuchen.'), 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-gears"></i> Stufen konvertieren'; }
+            }
         };
 
         window.savePromoVideoItem = async function() {
@@ -7898,6 +8376,7 @@ window.rvpBindDirectTap = function(el, onTap) {
                 url720: val('vmUrl720').trim(),
                 url480: val('vmUrl480').trim(),
                 aspect: val('vmAspect', '9/16'),
+                detectedAspect: window._vmLastDetectedAspect || '9/16',
                 showcaseSide: val('vmShowcaseSide', 'left'),
                 playerSize: val('vmPlayerSize', 'normal'),
                 videoFit: val('vmVideoFit', 'cover'),
@@ -7990,6 +8469,13 @@ window.rvpBindDirectTap = function(el, onTap) {
             const bName = document.getElementById('vmEditBannerName');
             if (bName) bName.innerText = item.title || item.badge || 'Video';
             document.getElementById('vmEditBanner')?.classList.add('active');
+            window._vmLastSelectedFile = null;
+            window._vmLastDetectedMeta = null;
+            if (document.getElementById('vmDetectedMetaBox')) document.getElementById('vmDetectedMetaBox').style.display = 'none';
+            window.syncQuickVideoAspectPills();
+            window.toggleCustomVideoAudioFields();
+            window.updateVideoStudioLivePreview();window._vmLastDetectedAspect = item.detectedAspect || (item.aspect !== 'auto' ? item.aspect : '9/16') || '9/16';
+            window.syncQuickVideoAspectPills();
             window.toggleCustomVideoAudioFields();
             window.updateVideoStudioLivePreview();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
