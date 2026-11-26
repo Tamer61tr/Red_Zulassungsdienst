@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-   <link rel="stylesheet" href="./styles.css?v=21">
+   <link rel="stylesheet" href="./styles.css?v=22">
 </head>
 
 <body data-theme="light">
@@ -1301,7 +1301,7 @@
             <div class="rvp-controls-bar rvp-controls-center">
                 <div class="rvp-seek-row">
                     <span class="rvp-time" id="rvpTimeCur-center">0:00</span>
-                    <input type="range" id="rvpSeek-center" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" onpointerdown="window.rvpSeekStart('center')" onpointerup="window.rvpSeekEnd('center')" oninput="window.rvpSeekMove('center', this.value)" onchange="window.rvpSeekEnd('center', this.value)">
+                    <input type="range" id="rvpSeek-center" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" onpointerdown="window.rvpSeekStart('center')" onpointerup="window.rvpSeekEnd('center', this.value)" onpointercancel="window.rvpSeekEnd('center', this.value)" ontouchstart="window.rvpSeekStart('center')" ontouchend="window.rvpSeekEnd('center', this.value)" ontouchcancel="window.rvpSeekEnd('center', this.value)" oninput="window.rvpSeekMove('center', this.value)" onchange="window.rvpSeekEnd('center', this.value)">
                     <span class="rvp-time" id="rvpTimeDur-center">0:00</span>
                 </div>
                 <div class="rvp-btn-row">
@@ -1392,9 +1392,24 @@
                             <input type="text" id="vmTitle" class="form-control" placeholder="z.B. Keine Wartenummer beim Amt!">
                         </div>
                         <div class="form-group">
-                            <label>Etikett (Badge)</label>
+                            <label>Etikett-Text (Badge)</label>
                             <input type="text" id="vmBadge" class="form-control" placeholder="z.B. 30s Live-Einblick">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Badge-Logo / Symbol (vor „Live-Einblick“)</label>
+                        <select id="vmBadgeIcon" class="form-control">
+                            <option value="live-dot">🔴 LIVE-Logo (Pulsierender roter LIVE-Punkt)</option>
+                            <option value="live-wave">📡 LIVE-Signal (Funkwelle + LIVE)</option>
+                            <option value="round-logo">⭕ RED Rund-Logo (Mini-Emblem)</option>
+                            <option value="play">▶️ Play-Symbol (Standard)</option>
+                            <option value="bolt">⚡ Express-Blitz</option>
+                            <option value="fire">🔥 Highlight / Aktion</option>
+                            <option value="star">⭐ Premium / Top-Tipp</option>
+                            <option value="camera">🎥 Kamera / Studio</option>
+                            <option value="shield">🛡️ Original / Geprüft</option>
+                            <option value="none">— Kein Symbol —</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Beschreibungstext</label>
@@ -1453,23 +1468,37 @@
                             <div class="form-group">
                                 <label>Intro-Dauer (Sekunden)</label>
                                 <select id="vmIntroSec" class="form-control">
+                                    <option value="0.5">0,5 Sekunden (Blitz)</option>
+                                    <option value="1">1 Sekunde (Kurz)</option>
                                     <option value="1.5">1,5 Sekunden (Schnell)</option>
                                     <option value="2">2 Sekunden</option>
                                     <option value="2.5" selected>2,5 Sekunden (Optimal)</option>
                                     <option value="3">3 Sekunden</option>
+                                    <option value="3.5">3,5 Sekunden</option>
                                     <option value="4">4 Sekunden</option>
                                     <option value="5">5 Sekunden</option>
+                                    <option value="6">6 Sekunden</option>
+                                    <option value="7">7 Sekunden</option>
+                                    <option value="8">8 Sekunden</option>
+                                    <option value="10">10 Sekunden (Kino-Lang)</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Outro-Dauer (Sekunden)</label>
                                 <select id="vmOutroSec" class="form-control">
+                                    <option value="0.5">0,5 Sekunden (Blitz)</option>
+                                    <option value="1">1 Sekunde (Kurz)</option>
                                     <option value="1.5">1,5 Sekunden</option>
                                     <option value="2">2 Sekunden</option>
                                     <option value="2.5">2,5 Sekunden</option>
                                     <option value="3" selected>3 Sekunden (Optimal)</option>
+                                    <option value="3.5">3,5 Sekunden</option>
                                     <option value="4">4 Sekunden</option>
                                     <option value="5">5 Sekunden</option>
+                                    <option value="6">6 Sekunden</option>
+                                    <option value="7">7 Sekunden</option>
+                                    <option value="8">8 Sekunden</option>
+                                    <option value="10">10 Sekunden (Kino-Lang)</option>
                                 </select>
                             </div>
                         </div>
@@ -1483,9 +1512,16 @@
                                 <select id="vmIntroMusic" class="form-control" onchange="window.toggleCustomVideoAudioFields()">
                                     <option value="cinema-whoosh">🎬 Cinema Deep Impact</option>
                                     <option value="sport-rev">🏎️ Sport-Turbo Sweep</option>
+                                    <option value="engine-start">🔥 Motor-Start &amp; Boost</option>
+                                    <option value="berlin-bass">🔊 Berlin Deep Bass Drop</option>
+                                    <option value="news-flash">📡 Live-News Broadcast</option>
                                     <option value="luxury-chime">✨ Showroom Edel-Klang</option>
+                                    <option value="vip-harp">👑 VIP Gold-Harfe</option>
+                                    <option value="piano-rise">🎹 Modern Piano Aufstieg</option>
                                     <option value="pulse-beat">⚡ Modern Tech Pulse</option>
+                                    <option value="cyber-synth">🚀 Futuristischer Synth-Swell</option>
                                     <option value="victory-chord">🏆 Finale Akkord</option>
+                                    <option value="soft-bell">🔔 Sanfter Studio-Gong</option>
                                     <option value="none">🔇 Keine Intro-Musik</option>
                                     <option value="custom">🎵 Eigene MP3-URL...</option>
                                 </select>
@@ -1497,10 +1533,17 @@
                                 </div>
                                 <select id="vmOutroMusic" class="form-control" onchange="window.toggleCustomVideoAudioFields()">
                                     <option value="victory-chord">🏆 Finale Akkord (Empfohlen)</option>
+                                    <option value="soft-bell">🔔 Sanfter Abschluss-Gong</option>
                                     <option value="luxury-chime">✨ Showroom Edel-Klang</option>
+                                    <option value="vip-harp">👑 VIP Gold-Harfe</option>
+                                    <option value="piano-rise">🎹 Modern Piano Ausklang</option>
                                     <option value="cinema-whoosh">🎬 Cinema Deep Impact</option>
+                                    <option value="berlin-bass">🔊 Berlin Deep Bass Drop</option>
                                     <option value="sport-rev">🏎️ Sport-Turbo Sweep</option>
+                                    <option value="engine-start">🔥 Motor-Start &amp; Boost</option>
+                                    <option value="news-flash">📡 Live-News Broadcast</option>
                                     <option value="pulse-beat">⚡ Modern Tech Pulse</option>
+                                    <option value="cyber-synth">🚀 Futuristischer Synth-Swell</option>
                                     <option value="none">🔇 Keine Outro-Musik</option>
                                     <option value="custom">🎵 Eigene MP3-URL...</option>
                                 </select>
@@ -4059,8 +4102,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-<script src="./app.js?v=21" defer></script>
-    <script type="module" src="./firebase-app.js?v=21"></script>
+<script src="./app.js?v=22" defer></script>
+    <script type="module" src="./firebase-app.js?v=22"></script>
 
 </body>
 </html>

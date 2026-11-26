@@ -203,6 +203,7 @@ window.escHtml = function(str) {
         document.addEventListener('touchmove', (e) => {
             if (!window._isBodyScrollLocked) return;
             if (e.target && e.target.closest && e.target.closest('.signature-pad-wrapper')) return;
+            if (e.target && e.target.closest && e.target.closest('.rvp-controls-bar')) return;
             if (e.target && e.target.closest && e.target.closest('#cashInvoiceOverlay')) return;
             const scrollInfo = window.findActiveScrollableInsideOverlay(e.target);
             if (!scrollInfo) {
@@ -6422,6 +6423,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     id: 'vid-default-1',
                     title: 'Keine Wartenummer beim Amt – RED Berlin in 30 Sekunden',
                     badge: '30s Live-Einblick',
+                    badgeIcon: 'live-dot',
                     desc: 'Wozu stundenlang auf der Zulassungsstelle warten? Bei uns geben Sie Ihre Unterlagen ohne Wartezeit ab – wir prägen Ihre Schilder direkt vor Ort in der Kienitzer Str. 6, 12053 Berlin.',
                     highlights: DEFAULT_VIDEO_HIGHLIGHTS.slice(),
                     url: './werbevideo-1.mp4',
@@ -6531,6 +6533,36 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     playTone(523.25, 0.18, 0.95, 'sine', null, 0.8);
                     playTone(659.25, 0.18, 0.95, 'sine', null, 0.6);
                     playTone(783.99, 0.26, 1.05, 'triangle', null, 0.55);
+                } else if (presetKey === 'berlin-bass') {
+                    playTone(110, 0, 0.95, 'sine', 38, 1.35);
+                    playTone(165, 0.08, 0.65, 'sawtooth', 55, 0.35);
+                    playTone(330, 0.28, 0.5, 'triangle', 440, 0.45);
+                } else if (presetKey === 'news-flash') {
+                    playTone(587.33, 0, 0.14, 'square', null, 0.3);
+                    playTone(587.33, 0.17, 0.14, 'square', null, 0.3);
+                    playTone(880.0, 0.34, 0.45, 'triangle', null, 0.65);
+                    playTone(1174.66, 0.48, 0.55, 'sine', null, 0.5);
+                } else if (presetKey === 'vip-harp') {
+                    [523.25, 659.25, 783.99, 987.77, 1046.5, 1318.5].forEach((f, i) => {
+                        playTone(f, i * 0.09, 0.85, 'sine', null, 0.55);
+                    });
+                } else if (presetKey === 'engine-start') {
+                    playTone(72, 0, 0.38, 'sawtooth', 165, 0.5);
+                    playTone(145, 0.28, 0.48, 'sawtooth', 390, 0.42);
+                    playTone(390, 0.62, 0.55, 'triangle', 120, 0.6);
+                } else if (presetKey === 'piano-rise') {
+                    playTone(261.63, 0, 0.65, 'triangle', null, 0.7);
+                    playTone(329.63, 0.16, 0.65, 'triangle', null, 0.65);
+                    playTone(392.0, 0.32, 0.75, 'triangle', null, 0.7);
+                    playTone(523.25, 0.48, 1.0, 'sine', null, 0.85);
+                } else if (presetKey === 'cyber-synth') {
+                    playTone(220, 0, 0.85, 'sawtooth', 880, 0.28);
+                    playTone(440, 0.12, 0.85, 'sine', 1320, 0.42);
+                    playTone(660, 0.5, 0.6, 'triangle', 990, 0.5);
+                } else if (presetKey === 'soft-bell') {
+                    playTone(659.25, 0, 1.25, 'sine', null, 0.75);
+                    playTone(1318.5, 0.02, 0.95, 'sine', null, 0.32);
+                    playTone(987.77, 0.22, 1.15, 'triangle', null, 0.4);
                 }
             } catch (e) {}
         };
@@ -6559,9 +6591,26 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
         window.getRvpState = function(key) {
             if (!window._rvpStates[key]) {
-                window._rvpStates[key] = { videoIdx: 0, userPaused: false, isSeeking: false, phase: 'video', timerId: null, introShown: false };
+                window._rvpStates[key] = { videoIdx: 0, userPaused: false, isSeeking: false, seekTarget: null, seekLockTimer: null, phase: 'video', timerId: null, introShown: false };
             }
             return window._rvpStates[key];
+        };
+
+        window.buildVideoBadgeIconHtml = function(iconKey) {
+            const k = iconKey || 'live-dot';
+            if (k === 'none') return '';
+            if (k === 'live-dot') return `<span class="rvp-live-dot"></span><span class="rvp-live-tag">LIVE</span>`;
+            if (k === 'live-wave') return `<i class="fa-solid fa-tower-broadcast" style="color:#ff1e1e;"></i><span class="rvp-live-tag">LIVE</span>`;
+            if (k === 'round-logo') return `<img src="${window.escHtml(window.getAbsoluteBrandLogoUrl())}" alt="RED" class="rvp-badge-mini-logo">`;
+            const map = {
+                play: 'fa-solid fa-circle-play',
+                bolt: 'fa-solid fa-bolt',
+                fire: 'fa-solid fa-fire',
+                star: 'fa-solid fa-star',
+                camera: 'fa-solid fa-video',
+                shield: 'fa-solid fa-shield-halved'
+            };
+            return `<i class="${map[k] || 'fa-solid fa-circle-play'}"></i>`;
         };
 
         window.getRvpItem = function(key) {
@@ -6594,7 +6643,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const st = window.getRvpState(key);
             if (!item || !ov) { if (onComplete) onComplete(); return; }
 
-            const durSec = Math.max(0.8, Math.min(10, parseFloat(kind === 'outro' ? item.outroSec : item.introSec) || (kind === 'outro' ? 3 : 2.5)));
+            const durSec = Math.max(0.5, Math.min(10, parseFloat(kind === 'outro' ? item.outroSec : item.introSec) || (kind === 'outro' ? 3 : 2.5)));
             const logoStyle = item.logoStyle || 'round_title';
             const brandSrc = window.getAbsoluteBrandLogoUrl();
 
@@ -6731,7 +6780,25 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 st.userPaused = false;
                 window.rvpPauseOtherPlayers(key);
                 window.rvpShowHud(key, 'fa-solid fa-play', 'Abspielen');
-                window.rvpStartWithIntroIfNeeded(key, false);
+
+                const item = window.getRvpItem(key);
+                const mode = item?.logoMode || 'both';
+                const wantsIntro = (mode === 'intro' || mode === 'both') && !st.introShown && (v.currentTime < 0.25);
+
+                if (wantsIntro) {
+                    // Entsperrt die Wiedergabe synchron im Fingertipp für iOS Safari & Android
+                    const unlockP = v.play();
+                    if (unlockP && typeof unlockP.then === 'function') {
+                        unlockP.then(() => { if (st.phase === 'intro') v.pause(); }).catch(() => {});
+                    }
+                    window.rvpStartWithIntroIfNeeded(key, true);
+                } else {
+                    const playP = v.play();
+                    if (playP && typeof playP.catch === 'function') {
+                        playP.catch(() => { v.muted = true; v.play().catch(() => {}); });
+                    }
+                    window.rvpSyncUi(key);
+                }
             } else {
                 st.userPaused = true;
                 v.pause();
@@ -6761,33 +6828,64 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const st = window.getRvpState(key);
             if (!v) return;
 
-            if (st.phase === 'intro' || st.phase === 'outro') {
+            const wasInBumper = (st.phase === 'intro' || st.phase === 'outro');
+            if (wasInBumper) {
                 window.rvpHideBumper(key);
                 window.stopRedStudioAudio();
             }
 
-            const dur = isFinite(v.duration) && v.duration > 0
-                ? v.duration
-                : (v.seekable && v.seekable.length ? v.seekable.end(v.seekable.length - 1) : 0);
+            const shouldKeepPlaying = !st.userPaused && (wasInBumper || !v.paused);
 
-            const baseTime = isFinite(v.currentTime) ? v.currentTime : 0;
-            const maxT = dur > 0.25 ? dur - 0.15 : Math.max(0, baseTime + Math.max(0, deltaSec));
-            const target = Math.max(0, Math.min(maxT, baseTime + deltaSec));
+            const applyJump = () => {
+                const dur = isFinite(v.duration) && v.duration > 0
+                    ? v.duration
+                    : (v.seekable && v.seekable.length ? v.seekable.end(v.seekable.length - 1) : 0);
 
-            try { v.currentTime = target; } catch (e) {}
-            if (dur > 0) {
-                const seekEl = document.getElementById(`rvpSeek-${key}`);
-                if (seekEl) seekEl.value = ((target / dur) * 100).toFixed(2);
+                const baseTime = (st.seekTarget !== null && isFinite(st.seekTarget))
+                    ? st.seekTarget
+                    : (isFinite(v.currentTime) ? v.currentTime : 0);
+
+                const maxT = dur > 0.25 ? dur - 0.15 : Math.max(0, baseTime + Math.max(0, deltaSec));
+                const target = Math.max(0, Math.min(maxT, baseTime + deltaSec));
+
+                st.isSeeking = true;
+                st.seekTarget = target;
+                clearTimeout(st.seekLockTimer);
+                st.seekLockTimer = setTimeout(() => {
+                    st.isSeeking = false;
+                    st.seekTarget = null;
+                    window.rvpSyncUi(key);
+                }, 480);
+
+                try { v.currentTime = target; } catch (e) {}
+
                 const curEl = document.getElementById(`rvpTimeCur-${key}`);
                 if (curEl) curEl.innerText = window.formatVideoTime(target);
+                if (dur > 0) {
+                    const seekEl = document.getElementById(`rvpSeek-${key}`);
+                    if (seekEl) seekEl.value = Math.min(100, Math.max(0, (target / dur) * 100)).toFixed(2);
+                }
+
+                if (shouldKeepPlaying) {
+                    const p = v.play();
+                    if (p && typeof p.catch === 'function') p.catch(() => {});
+                }
+                window.rvpShowHud(key, deltaSec < 0 ? 'fa-solid fa-rotate-left' : 'fa-solid fa-rotate-right', deltaSec < 0 ? '−5 Sek.' : '+5 Sek.');
+                window.rvpSyncUi(key);
+            };
+
+            if (v.readyState < 1) {
+                v.addEventListener('loadedmetadata', applyJump, { once: true });
+                try { v.load(); } catch (e) {}
+            } else {
+                applyJump();
             }
-            window.rvpShowHud(key, deltaSec < 0 ? 'fa-solid fa-rotate-left' : 'fa-solid fa-rotate-right', deltaSec < 0 ? '−5 Sek.' : '+5 Sek.');
-            window.rvpSyncUi(key);
         };
 
         window.rvpSeekStart = function(key) {
             const st = window.getRvpState(key);
             st.isSeeking = true;
+            clearTimeout(st.seekLockTimer);
             if (st.phase === 'intro' || st.phase === 'outro') {
                 window.rvpHideBumper(key);
                 window.stopRedStudioAudio();
@@ -6796,10 +6894,12 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
         window.rvpSeekMove = function(key, pct) {
             const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
             if (!v) return;
             const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
             if (dur <= 0) return;
-            const target = (parseFloat(pct) / 100) * dur;
+            const target = Math.max(0, Math.min(dur - 0.1, (parseFloat(pct) / 100) * dur));
+            st.seekTarget = target;
             const curEl = document.getElementById(`rvpTimeCur-${key}`);
             if (curEl) curEl.innerText = window.formatVideoTime(target);
             try { v.currentTime = target; } catch (e) {}
@@ -6808,8 +6908,12 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
         window.rvpSeekEnd = function(key, pct) {
             const st = window.getRvpState(key);
             if (typeof pct !== 'undefined') window.rvpSeekMove(key, pct);
-            st.isSeeking = false;
-            window.rvpSyncUi(key);
+            clearTimeout(st.seekLockTimer);
+            st.seekLockTimer = setTimeout(() => {
+                st.isSeeking = false;
+                st.seekTarget = null;
+                window.rvpSyncUi(key);
+            }, 180);
         };
 
         window.rvpToggleMute = function(key) {
@@ -6904,7 +7008,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             window.rvpPauseOtherPlayers('center');
 
             document.getElementById('rvpCenterTitle').innerText = item.title || 'RED Berlin Video';
-            document.getElementById('rvpCenterSub').innerText = item.badge || 'RED Zulassungsdienst Berlin';
+            document.getElementById('rvpCenterSub').innerHTML = `<span style="display:inline-flex; align-items:center; gap:5px;">${window.buildVideoBadgeIconHtml(item.badgeIcon || 'live-dot')}<span>${window.escHtml(item.badge || 'RED Zulassungsdienst Berlin')}</span></span>`;
             window.applyBrandAssetsUI();
 
             const st = window.getRvpState('center');
@@ -6989,7 +7093,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 <div class="rvp-player-shell">
                     <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml(item.aspect || '9/16')};">
                         <div class="rvp-overlay-top">
-                            <span class="rvp-badge-pill"><i class="fa-solid fa-circle-play"></i> ${window.escHtml(item.badge || 'RED Video')}</span>
+                            <span class="rvp-badge-pill">${window.buildVideoBadgeIconHtml(item.badgeIcon || 'live-dot')}<span>${window.escHtml(item.badge || 'RED Video')}</span></span>
                             <button type="button" class="rvp-expand-fab" onclick="event.stopPropagation(); window.openVideoCenterModal(${videoIdx}, '${key}')" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
                         </div>
                         <video id="rvpVid-${key}" src="${window.escHtml(item.url)}" muted playsinline preload="auto" onclick="event.stopPropagation(); window.rvpTogglePlay('${key}')"></video>
@@ -7002,7 +7106,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     <div class="rvp-controls-bar">
                         <div class="rvp-seek-row">
                             <span class="rvp-time" id="rvpTimeCur-${key}">0:00</span>
-                            <input type="range" id="rvpSeek-${key}" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" onpointerdown="window.rvpSeekStart('${key}')" onpointerup="window.rvpSeekEnd('${key}')" oninput="window.rvpSeekMove('${key}', this.value)" onchange="window.rvpSeekEnd('${key}', this.value)">
+                            <input type="range" id="rvpSeek-${key}" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" onpointerdown="window.rvpSeekStart('${key}')" onpointerup="window.rvpSeekEnd('${key}', this.value)" onpointercancel="window.rvpSeekEnd('${key}', this.value)" ontouchstart="window.rvpSeekStart('${key}')" ontouchend="window.rvpSeekEnd('${key}', this.value)" ontouchcancel="window.rvpSeekEnd('${key}', this.value)" oninput="window.rvpSeekMove('${key}', this.value)" onchange="window.rvpSeekEnd('${key}', this.value)">
                             <span class="rvp-time" id="rvpTimeDur-${key}">0:00</span>
                         </div>
                         <div class="rvp-btn-row">
@@ -7225,6 +7329,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             document.getElementById('vmEditId').value = '';
             document.getElementById('vmTitle').value = '';
             document.getElementById('vmBadge').value = '';
+            if (document.getElementById('vmBadgeIcon')) document.getElementById('vmBadgeIcon').value = 'live-dot';
             document.getElementById('vmDesc').value = '';
             if (document.getElementById('vmHighlights')) document.getElementById('vmHighlights').value = DEFAULT_VIDEO_HIGHLIGHTS.join('\n');
             document.getElementById('vmUrl').value = '';
@@ -7264,6 +7369,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const editId = document.getElementById('vmEditId').value;
             const title = document.getElementById('vmTitle').value.trim();
             const badge = document.getElementById('vmBadge').value.trim() || 'RED Video';
+            const badgeIcon = document.getElementById('vmBadgeIcon')?.value || 'live-dot';
             const desc = document.getElementById('vmDesc').value.trim();
             const highlightsRaw = (document.getElementById('vmHighlights')?.value || '').split('\n').map(s => s.trim()).filter(Boolean);
             const url = document.getElementById('vmUrl').value.trim();
@@ -7291,7 +7397,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (!Array.isArray(window.promoVideosConfig.list)) window.promoVideosConfig.list = [];
             const rec = {
                 id: editId || ('vid-' + Date.now()),
-                title, badge, desc,
+                title, badge, badgeIcon, desc,
                 highlights: highlightsRaw.length > 0 ? highlightsRaw : DEFAULT_VIDEO_HIGHLIGHTS.slice(),
                 url, aspect,
                 logoMode, logoStyle, introSec, outroSec, introMusic, outroMusic, introCustomAudio, outroCustomAudio
@@ -7319,6 +7425,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             document.getElementById('vmEditId').value = item.id;
             document.getElementById('vmTitle').value = item.title || '';
             document.getElementById('vmBadge').value = item.badge || '';
+            if (document.getElementById('vmBadgeIcon')) document.getElementById('vmBadgeIcon').value = item.badgeIcon || 'live-dot';
             document.getElementById('vmDesc').value = item.desc || '';
             if (document.getElementById('vmHighlights')) {
                 document.getElementById('vmHighlights').value = (Array.isArray(item.highlights) && item.highlights.length ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS).join('\n');
