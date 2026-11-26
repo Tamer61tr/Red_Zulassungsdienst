@@ -6813,6 +6813,64 @@
             touch-action: none !important;
         }
 
+        /* =========================================================================
+           V26 MOBILE TOUCH-BLOCKER FIX: UNSICHTBARE OVERLAYS LASSEN TOUCHES DURCH
+           ========================================================================= */
+        .floating-quick-bar {
+            pointer-events: none !important;
+        }
+        .floating-quick-bar .fab-main-toggle {
+            pointer-events: auto !important;
+        }
+        @media (max-width: 768px) {
+            /* Eingeklappte Schnell-Service-Liste blockiert keine Video-Buttons mehr */
+            .floating-quick-bar .fab-items-list,
+            .floating-quick-bar .fab-items-list .fab-btn {
+                pointer-events: none !important;
+            }
+            /* Erst beim Aufklappen über den roten Headset-Button wieder antippbar */
+            .floating-quick-bar.open .fab-items-list,
+            .floating-quick-bar.open .fab-items-list .fab-btn,
+            .floating-quick-bar.is-open .fab-items-list,
+            .floating-quick-bar.is-open .fab-items-list .fab-btn,
+            .floating-quick-bar.active .fab-items-list,
+            .floating-quick-bar.active .fab-items-list .fab-btn,
+            .floating-quick-bar.show .fab-items-list,
+            .floating-quick-bar.show .fab-items-list .fab-btn,
+            .floating-quick-bar.expanded .fab-items-list,
+            .floating-quick-bar.expanded .fab-items-list .fab-btn,
+            .floating-quick-bar:has(#fabMainToggle[aria-expanded="true"]) .fab-items-list,
+            .floating-quick-bar:has(#fabMainToggle[aria-expanded="true"]) .fab-items-list .fab-btn {
+                pointer-events: auto !important;
+            }
+            .fab-backdrop:not(.open):not(.show):not(.active):not(.is-open) {
+                pointer-events: none !important;
+            }
+        }
+        @media (min-width: 769px) {
+            .floating-quick-bar .fab-items-list,
+            .floating-quick-bar .fab-items-list .fab-btn {
+                pointer-events: auto !important;
+            }
+        }
+
+        /* Alle weiteren festen Layer blockieren im Ruhezustand keine Touches */
+        #toast-container,
+        #pinned-container,
+        #plate-container {
+            pointer-events: none !important;
+        }
+        #toast-container > *,
+        #pinned-container .pinned-plate {
+            pointer-events: auto !important;
+        }
+        #cookieConsentOverlay:not(.show),
+        .custom-dialog-overlay:not(.open),
+        .mobile-select-overlay:not(.open),
+        .fullscreen-menu:not(.open):not(.active) {
+            pointer-events: none !important;
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
