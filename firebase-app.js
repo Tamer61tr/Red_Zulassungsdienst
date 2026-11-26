@@ -197,7 +197,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             } else {
                 window.isAuthorized = false;
                 window.loggedInUser = null;
-                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme', 'perm-invoice');
+                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme', 'perm-invoice', 'perm-shopgallery');
 
                 if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
                 if (invoicesUnsubscribe) { invoicesUnsubscribe(); invoicesUnsubscribe = null; }
@@ -302,6 +302,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 pages: document.getElementById('permPages').checked,
                 theme: document.getElementById('permTheme').checked,
                 invoice: document.getElementById('permInvoice')?.checked === true,
+                shopgallery: document.getElementById('permShopgallery')?.checked === true,
                 timestamp: Date.now()
             };
 

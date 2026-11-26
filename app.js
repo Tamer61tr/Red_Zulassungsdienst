@@ -345,6 +345,15 @@ window.escHtml = function(str) {
                 box.title = 'Geöffnet (Mo–Fr 09:00–20:00 Uhr, Berlin)';
                 lbl.innerText = 'Offen • 09–20';
                 timer.innerText = `Noch ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+                const termPill = document.getElementById('adminTerminalHoursPill');
+                if (termPill) {
+                    termPill.classList.add('is-open');
+                    termPill.classList.remove('is-closed');
+                    const tl = document.getElementById('alhStatusLabel');
+                    const tv = document.getElementById('alhCountdownVal');
+                    if (tl) tl.innerText = 'Offen (09–20)';
+                    if (tv) tv.innerText = `${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+                }
             } else {
                 let remSec = 0;
                 if (isWorkday && nowSec < openSec) {
@@ -377,6 +386,15 @@ window.escHtml = function(str) {
                 timer.innerText = days > 0
                     ? `In ${days}T ${pad(rh)}:${pad(rm)}:${pad(rs)}`
                     : `Öffnet ${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+                const termPill = document.getElementById('adminTerminalHoursPill');
+                if (termPill) {
+                    termPill.classList.remove('is-open');
+                    termPill.classList.add('is-closed');
+                    const tl = document.getElementById('alhStatusLabel');
+                    const tv = document.getElementById('alhCountdownVal');
+                    if (tl) tl.innerText = todayHoliday ? 'Feiertag' : 'Mo–Fr 09–20';
+                    if (tv) tv.innerText = days > 0 ? `In ${days}T ${pad(rh)}:${pad(rm)}` : `${pad(rh)}:${pad(rm)}:${pad(rs)}`;
+                }
             }
         };
 
@@ -471,7 +489,7 @@ window.escHtml = function(str) {
                 ? docItems.join('\n')
                 : '⬜ Fahrzeugschein (ZB I) & Fahrzeugbrief (ZB II)\n⬜ Gültiger Ausweis / Reisepass + Meldebescheinigung\n⬜ 7-stellige eVB-Nummer\n⬜ Gültiger TÜV / HU-Bericht & IBAN';
 
-            const msg = encodeURIComponent(`📋 *MEINE UNTERLAGEN-CHECKLISTE (RED BERLIN)*\n*Vorgang:* ${caseTitle}\n\n${listText}\n\n📍 *Abgabe-Adresse:*\nRED Zulassungsdienst Berlin\nKienitzer Str. 6, 12053 Berlin (U8 Boddinstraße)\n🕒 Mo–Fr 09:00–20:00 Uhr\n📞 Tel: 0178 378 38 75`);
+            const msg = encodeURIComponent(`📋 *MEINE UNTERLAGEN-CHECKLISTE (RED BERLIN)*\n*Vorgang:* ${caseTitle}\n\n${listText}\n\n📍 *Abgabe-Adresse:*\nRED Zulassungsdienst Berlin\nKienitzer Str. 6, 12053 Berlin (U7 Karl-Marx-Str. & U8 Boddinstraße)\n🕒 Mo–Fr 09:00–20:00 Uhr\n📞 Tel: 0178 378 38 75`);
             window.open(`https://wa.me/?text=${msg}`, '_blank');
         };
 
@@ -1308,7 +1326,7 @@ window.escHtml = function(str) {
         };
 
         const districtDetails = {
-            "neukoelln": "Direkt vor Ort in Neukölln / Britz (Kienitzer Str. 6, 12053 Berlin): Nur 2–8 Minuten Fahrzeit (U8 Boddinstr. / Hermannplatz / Stadtautobahn A100 Ausfahrt Britzer Damm). Sofort-Annahme ohne Wartezeit!",
+            "neukoelln": "Direkt vor Ort in Neukölln / Britz (Kienitzer Str. 6, 12053 Berlin): Nur 2–8 Minuten Fahrzeit (U7 Karl-Marx-Straße / U8 Boddinstraße / Hermannplatz / Stadtautobahn A100 Ausfahrt Britzer Damm). Sofort-Annahme ohne Wartezeit!",
             "kreuzberg": "Ab Kreuzberg / Mitte: Nur ca. 8–12 Minuten über Hermannplatz, Kottbusser Damm oder Urbanstraße direkt zu unserer Annahmestelle in der Kienitzer Str. 6.",
             "tempelhof": "Ab Tempelhof-Schöneberg: Über den Tempelhofer Damm / Columbiadamm oder die A100 (Ausfahrt Tempelhofer Damm / Britzer Damm) in nur ca. 8–10 Minuten direkt vor Ort.",
             "charlottenburg": "Ab Charlottenburg-Wilmersdorf: Direkt über die Stadtautobahn A100 bis Ausfahrt Britzer Damm / Hermannstraße – Ihre Dokumente sind in 5 Minuten abgegeben!",
@@ -2573,14 +2591,24 @@ window.escHtml = function(str) {
         };
 
         window.adminPermissions = {
-            leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true, invoice: false
+            leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true, invoice: false, shopgallery: false
+        };
+
+        window.ALL_SUPERVISOR_PERM_IDS = ['permLeads','permCrm','permInvoice','permShopgallery','permPrices','permForms','permCars','permCustomblocks','permContent','permPages','permTheme','permTicker','permCompanydata'];
+
+        window.updateSupervisorPermCounter = function() {
+            const ids = window.ALL_SUPERVISOR_PERM_IDS;
+            const active = ids.filter(id => document.getElementById(id)?.checked).length;
+            const badge = document.getElementById('supPermActiveCount');
+            if (badge) badge.innerText = `${active} / ${ids.length} Aktiv`;
         };
 
         window.toggleAllSupervisorPerms = function(state) {
-            ['permLeads','permCrm','permInvoice','permPages','permTheme','permPrices','permCustomblocks','permContent','permCompanydata','permForms','permCars','permTicker'].forEach(id => {
+            window.ALL_SUPERVISOR_PERM_IDS.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.checked = state;
             });
+            window.updateSupervisorPermCounter();
         };
 
         // --- ALLE SEITENTEXTE MIT STIFT BEARBEITBAR ---
@@ -2922,9 +2950,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         };
 
         window.applyAdminModulePermissions = function(perms) {
-            if(!perms) perms = { leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true, invoice: false };
+            if(!perms) perms = { leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true, invoice: false, shopgallery: false };
             const allowInvoice = perms.invoice === true;
-            window.adminPermissions = { ...perms, invoice: allowInvoice };
+            const allowShopGallery = perms.shopgallery === true;
+            window.adminPermissions = { ...perms, invoice: allowInvoice, shopgallery: allowShopGallery };
             if(!window.loggedInUser) return;
             
             if(document.getElementById('permLeads')) {
@@ -2940,6 +2969,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 document.getElementById('permPages').checked = perms.pages;
                 document.getElementById('permTheme').checked = perms.theme;
                 if(document.getElementById('permInvoice')) document.getElementById('permInvoice').checked = allowInvoice;
+                if(document.getElementById('permShopgallery')) document.getElementById('permShopgallery').checked = allowShopGallery;
+                window.updateSupervisorPermCounter();
             }
 
             document.body.classList.toggle('perm-leads', perms.leads);
@@ -2954,6 +2985,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.body.classList.toggle('perm-pages', perms.pages);
             document.body.classList.toggle('perm-theme', perms.theme);
             document.body.classList.toggle('perm-invoice', allowInvoice);
+            document.body.classList.toggle('perm-shopgallery', allowShopGallery);
+            if (typeof window.renderShopGallery === 'function') window.renderShopGallery();
             setTimeout(window.syncHeaderHeight, 80);
         };
 
@@ -3901,7 +3934,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         };
         window.closeAdmin = function() { document.getElementById('adminModal').classList.remove('open'); };
         
-        window.openSupervisorPanel = function() { document.getElementById('supervisorPermsOverlay').classList.add('open'); };
+        window.openSupervisorPanel = function() {
+            window.updateSupervisorPermCounter();
+            document.getElementById('supervisorPermsOverlay').classList.add('open');
+        };
         window.closeSupervisorPanel = function() { document.getElementById('supervisorPermsOverlay').classList.remove('open'); };
 
         window.closeCustomConfirm = function() { document.getElementById('confirmModalOverlay').classList.remove('open'); };
@@ -5589,7 +5625,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             {
                 id: 'shop-1',
                 title: 'Annahmestelle Kienitzer\u00A0Str.\u00A06',
-                subtitle: 'Direkt an der U8\u00A0Boddinstraße • Berlin-Neukölln',
+                subtitle: '12053\u00A0Berlin • U7\u00A0Karl-Marx-Str. & U8\u00A0Boddinstraße',
                 badge: 'Standort',
                 url: './laden-aussen.jpg',
                 font: "'Montserrat', sans-serif",
@@ -5643,8 +5679,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.formatShopCaptionText = function(txt) {
             return String(txt || '')
                 .replace(/Kienitzer\s+Str\.\s*6/gi, 'Kienitzer\u00A0Str.\u00A06')
+                .replace(/12053\s+Berlin/gi, '12053\u00A0Berlin')
                 .replace(/Str\.\s*(\d+)/gi, 'Str.\u00A0$1')
                 .replace(/vor\s+Ort/gi, 'vor\u00A0Ort')
+                .replace(/U7\s+(Karl-Marx-Straße|Karl-Marx-Str\.)/gi, 'U7\u00A0$1')
                 .replace(/U8\s+Boddinstraße/gi, 'U8\u00A0Boddinstraße')
                 .replace(/(\d[\d–-]*)\s+(Minuten?|Min\.)/gi, '$1\u00A0$2');
         };
@@ -5670,7 +5708,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.handleShopImgError = function(imgEl, photoId) {
             const card = imgEl.closest('.shop-photo-card');
             const isAdmin = document.body.classList.contains('is-supervisor') ||
-                (document.body.classList.contains('is-admin') && document.body.classList.contains('perm-content'));
+                (document.body.classList.contains('is-admin') && document.body.classList.contains('perm-shopgallery'));
             if (!isAdmin) {
                 if (card) card.style.display = 'none';
                 const visibleCards = document.querySelectorAll('#shopGalleryGrid .shop-photo-card:not([style*="display: none"])').length;
@@ -5695,7 +5733,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             const list = Array.isArray(window.shopPhotosData) ? window.shopPhotosData : [];
             const isAdmin = document.body.classList.contains('is-supervisor') ||
-                (document.body.classList.contains('is-admin') && document.body.classList.contains('perm-content'));
+                (document.body.classList.contains('is-admin') && document.body.classList.contains('perm-shopgallery'));
 
             if (list.length === 0 && !isAdmin) {
                 wrap.style.display = 'none';
@@ -5732,7 +5770,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 card.innerHTML = `
                     <div class="shop-photo-media">
                         ${photo.badge ? `<span class="shop-photo-badge">${window.escHtml(photo.badge)}</span>` : ''}
-                        <div class="shop-photo-admin-btns action-content">
+                        <div class="shop-photo-admin-btns action-shopgallery">
                             <button type="button" class="mini-admin-btn edit" onclick="event.stopPropagation(); window.openShopPhotoModal('${photo.id}')" title="Foto, Etikett & Schrift bearbeiten"><i class="fa-solid fa-pencil"></i></button>
                             <button type="button" class="mini-admin-btn del" onclick="event.stopPropagation(); window.deleteShopPhoto('${photo.id}')" title="Foto entfernen"><i class="fa-solid fa-trash"></i></button>
                         </div>

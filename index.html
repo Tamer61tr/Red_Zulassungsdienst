@@ -580,6 +580,11 @@
                             <i class="fa-solid fa-user-shield" style="color:var(--primary-red);"></i>
                             <strong id="loggedInUser" style="color:var(--text-light);"></strong>
                         </span>
+                        <button type="button" class="admin-hdr-chip admin-live-hours-pill is-closed" id="adminTerminalHoursPill" onclick="window.openWidgetModal('office')" title="Live Öffnungszeiten Berlin (Mo–Fr 09:00–20:00 Uhr)">
+                            <span class="alh-dot"></span>
+                            <span id="alhStatusLabel">Mo–Fr 09–20</span>
+                            <strong id="alhCountdownVal">--:--:--</strong>
+                        </button>
                     </div>
                 </div>
                 
@@ -1596,34 +1601,105 @@
         </div>
     </div>
 
-    <!-- SUPERVISOR RECHTE-ZENTRALE -->
+    <!-- SUPERVISOR RECHTE-ZENTRALE (EXECUTIVE RED DESIGN – 1-ZEILIG & MOBIL OPTIMIERT) -->
     <div class="custom-dialog-overlay" id="supervisorPermsOverlay">
-        <div class="custom-dialog-window">
-            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeSupervisorPanel()"></i>
-            <h3 style="color:#ff00ff; font-weight:900; margin-bottom:8px;"><i class="fa-solid fa-crown"></i> Supervisor Rechte- & Modul-Zentrale</h3>
-            <p style="color:var(--text-muted); font-size:11.5px; margin-bottom:14px; text-align:left;">Steuern Sie in Echtzeit, welche Module und Werkzeuge für den regulären Administrator freigeschaltet sind:</p>
-            
-            <div style="display:flex; gap:8px; margin-bottom:12px;">
-                <button type="button" class="btn-primary" style="flex:1; padding:8px; font-size:10px !important; background:#25D366; color:#000;" onclick="window.toggleAllSupervisorPerms(true)"><i class="fa-solid fa-check-double"></i> Alle Rechte aktivieren</button>
-                <button type="button" class="btn-primary" style="flex:1; padding:8px; font-size:10px !important; background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); box-shadow:none;" onclick="window.toggleAllSupervisorPerms(false)"><i class="fa-solid fa-lock"></i> Alle sperren</button>
+        <div class="custom-dialog-window sup-perms-window">
+            <div class="sup-perms-header">
+                <div class="sup-perms-title-block">
+                    <span class="sup-perms-eyebrow"><i class="fa-solid fa-crown"></i> Supervisor Steuerung</span>
+                    <h3>Rechte- &amp; Modul-Zentrale</h3>
+                </div>
+                <span class="sup-perms-counter" id="supPermActiveCount">0 / 13 Aktiv</span>
+                <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeSupervisorPanel()"></i>
             </div>
 
-            <div style="text-align:left; background:var(--bg-input); padding:15px; border-radius:12px; border:1px solid var(--glass-border); margin-bottom:18px; display:grid; grid-template-columns:1fr; gap:8px;">
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permLeads"><span class="noble-checkbox-box"></span> 📡 Live-Leads & Monitoring Terminal (Terminliste)</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0; color:var(--primary-red); font-weight:700;"><input type="checkbox" id="permCrm"><span class="noble-checkbox-box"></span> 🗂️ RED Kundendatenbank & CRM</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0; color:var(--green-accent); font-weight:700;"><input type="checkbox" id="permInvoice"><span class="noble-checkbox-box"></span> 🧾 Bar-Rechnung &amp; Quittung (PDF + Logo + Stempel)</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0; color:#ff9500;"><input type="checkbox" id="permPages"><span class="noble-checkbox-box"></span> 📄 Seiten Manager (Page Builder)</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0; color:var(--green-accent);"><input type="checkbox" id="permTheme"><span class="noble-checkbox-box"></span> 🎨 Design- & Farb-Manager (Themes)</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permPrices"><span class="noble-checkbox-box"></span> 💶 Leistungskarten, Preise & Schnellkalkulator</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permCustomblocks"><span class="noble-checkbox-box"></span> 🧱 Infoblock Manager (Eigene Bausteine)</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permContent"><span class="noble-checkbox-box"></span> ✏️ Seitentexte, Checkliste, 6er-FAQ & Rechtliches</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permCompanydata"><span class="noble-checkbox-box"></span> 🏢 Firmendaten & Webhook API</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permForms"><span class="noble-checkbox-box"></span> 📁 Formulare & PDF-Uploads verwalten</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permCars"><span class="noble-checkbox-box"></span> 🚗 Auto Ankauf Galerie Manager</label>
-                <label class="noble-checkbox-label" style="display:flex; margin:0;"><input type="checkbox" id="permTicker"><span class="noble-checkbox-box"></span> 🏎️ Header-Auto, Logo & Ticker Studio</label>
+            <div class="sup-perms-quickbar">
+                <button type="button" class="sup-qbtn sup-qbtn-all" onclick="window.toggleAllSupervisorPerms(true)">
+                    <i class="fa-solid fa-check-double"></i> Alle freigeben
+                </button>
+                <button type="button" class="sup-qbtn sup-qbtn-none" onclick="window.toggleAllSupervisorPerms(false)">
+                    <i class="fa-solid fa-lock"></i> Alle sperren
+                </button>
             </div>
-            
-            <button class="btn-primary" style="background:#ff00ff; width:100%; justify-content:center;" onclick="window.saveSupervisorPerms()"><i class="fa-solid fa-shield-halved"></i> Berechtigungen sofort anwenden</button>
+
+            <div class="sup-perms-list">
+                <div class="sup-perm-cat">Aufträge, Kunden &amp; Finanzen</div>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-satellite-dish" style="color:var(--primary-red);"></i><span class="sup-perm-text">Live-Leads &amp; Terminliste</span></span>
+                    <input type="checkbox" id="permLeads" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-database" style="color:var(--primary-red);"></i><span class="sup-perm-text">RED Kundendatenbank &amp; CRM</span></span>
+                    <input type="checkbox" id="permCrm" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--green-accent);"></i><span class="sup-perm-text">Bar-Rechnung, Angebot &amp; PDF</span></span>
+                    <input type="checkbox" id="permInvoice" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+
+                <div class="sup-perm-cat">Inhalte, Galerie &amp; Formulare</div>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-camera" style="color:var(--primary-red);"></i><span class="sup-perm-text">Geschäftsfotos (Kienitzer Str. 6)</span></span>
+                    <input type="checkbox" id="permShopgallery" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-euro-sign" style="color:var(--green-accent);"></i><span class="sup-perm-text">Leistungskarten &amp; Kalkulator</span></span>
+                    <input type="checkbox" id="permPrices" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-file-pdf" style="color:#d97706;"></i><span class="sup-perm-text">Formulare &amp; PDF-Uploads</span></span>
+                    <input type="checkbox" id="permForms" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-car" style="color:var(--gold-accent);"></i><span class="sup-perm-text">Auto Ankauf Galerie</span></span>
+                    <input type="checkbox" id="permCars" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-cubes" style="color:#007aff;"></i><span class="sup-perm-text">Infoblock Manager (Bausteine)</span></span>
+                    <input type="checkbox" id="permCustomblocks" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-pen-nib" style="color:var(--text-muted);"></i><span class="sup-perm-text">Seitentexte, Checkliste &amp; FAQ</span></span>
+                    <input type="checkbox" id="permContent" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+
+                <div class="sup-perm-cat">Design, Struktur &amp; System</div>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-file-lines" style="color:#d97706;"></i><span class="sup-perm-text">Seiten Manager (Page Builder)</span></span>
+                    <input type="checkbox" id="permPages" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-palette" style="color:#0891b2;"></i><span class="sup-perm-text">Design- &amp; Farb-Manager</span></span>
+                    <input type="checkbox" id="permTheme" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-car-side" style="color:var(--primary-red);"></i><span class="sup-perm-text">Header-Auto, Logo &amp; Ticker</span></span>
+                    <input type="checkbox" id="permTicker" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-building" style="color:var(--text-muted);"></i><span class="sup-perm-text">Firmendaten &amp; Webhook API</span></span>
+                    <input type="checkbox" id="permCompanydata" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+            </div>
+
+            <div class="sup-perms-footer">
+                <button type="button" class="btn-primary" style="width:100%; justify-content:center; border-radius:12px;" onclick="window.saveSupervisorPerms()">
+                    <i class="fa-solid fa-shield-halved"></i> Berechtigungen sofort anwenden
+                </button>
+            </div>
         </div>
     </div>
 
@@ -2861,13 +2937,13 @@
             <div class="compass-box" style="text-align:left; border-top:3px solid var(--primary-red);">
                 <div style="text-align:center; margin-bottom:20px;">
                     <span style="display:inline-block; background:rgba(217,0,0,0.09); color:var(--primary-red); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:4px 12px; border-radius:50px; margin-bottom:8px;">
-                        <i class="fa-solid fa-location-dot"></i> Berlin-Neukölln • Kienitzer Str. 6
+                        <i class="fa-solid fa-location-dot"></i> Kienitzer Str. 6 • 12053 Berlin-Neukölln
                     </span>
                     <h2 style="font-size:clamp(18px, 2.6vw, 25px); font-weight:900; text-transform:uppercase; color:var(--text-light); margin:0;">
                         Ihr Zulassungs- &amp; Schilderdienst direkt vor Ort in Neukölln
                     </h2>
-                    <p style="font-size:12px; color:var(--text-muted); max-width:820px; margin:7px auto 0; line-height:1.5;">
-                        Persönlicher Service ohne Behörden-Wartezeit – direkt an der U8&nbsp;Boddinstraße, nahe Hermannplatz &amp; A100&nbsp;(Ausfahrt Britzer&nbsp;Damm).
+                    <p style="font-size:12px; color:var(--text-muted); max-width:840px; margin:7px auto 0; line-height:1.5;">
+                        Persönlicher Service ohne Behörden-Wartezeit – direkt an der U7&nbsp;Karl-Marx-Straße &amp; U8&nbsp;Boddinstraße, nahe Hermannplatz &amp; A100&nbsp;(Ausfahrt Britzer&nbsp;Damm).
                     </p>
                 </div>
 
@@ -2924,7 +3000,7 @@
                         <i class="fa-solid fa-user-tie" style="color:var(--primary-red); font-size:16px; margin-top:2px;"></i>
                         <div>
                             <strong style="display:block; font-size:12px; color:var(--text-light);">Inhaber: Tamer Yazici</strong>
-                            <span style="font-size:11px; color:var(--text-muted);">Persönlich in der Kienitzer Str. 6</span>
+                            <span style="font-size:11px; color:var(--text-muted);">Kienitzer&nbsp;Str.&nbsp;6 • 12053&nbsp;Berlin</span>
                         </div>
                     </div>
                     <div style="display:flex; align-items:center;">
@@ -2939,10 +3015,10 @@
                     <div class="shop-gallery-header">
                         <div class="shop-gallery-title-group">
                             <span class="shop-gallery-eyebrow"><i class="fa-solid fa-camera"></i> Echt • Persönlich • Direkt vor Ort</span>
-                            <h3>Einblick in unser Geschäft – Kienitzer Str. 6</h3>
-                            <p>Modernes Büro &amp; eigene Profi-Schilderprägung (Standard &amp; 3D-Carbon) in Berlin-Neukölln – zum Vergrößern Foto antippen.</p>
+                            <h3>Einblick in unser Geschäft – Kienitzer&nbsp;Str.&nbsp;6, 12053&nbsp;Berlin</h3>
+                            <p>Modernes Büro &amp; eigene Profi-Schilderprägung direkt an der U7&nbsp;Karl-Marx-Straße &amp; U8&nbsp;Boddinstraße – zum Vergrößern Foto antippen.</p>
                         </div>
-                        <div class="shop-admin-controls action-content">
+                        <div class="shop-admin-controls action-shopgallery">
                             <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.openShopPhotoModal()">
                                 <i class="fa-solid fa-plus"></i> Foto hinzufügen
                             </button>

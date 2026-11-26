@@ -222,7 +222,7 @@
         /* Rollen-Management */
         .mod-leads, .mod-blocks, .mod-data, .mod-ticker, .mod-prices, .mod-crm, .mod-pages, .mod-theme, .mod-forms, .mod-cars, .mod-invoice { display: none !important; }
         .mod-leads-locked { display: none; }
-        .action-forms, .action-cars, .action-content, .action-prices { display: none !important; }
+        .action-forms, .action-cars, .action-content, .action-prices, .action-shopgallery { display: none !important; }
 
         body.is-admin.perm-leads .mod-leads { display: block !important; }
         body.is-admin.perm-leads .admin-kpi-grid.mod-leads,
@@ -245,12 +245,13 @@
         body.is-admin.perm-ticker .mod-ticker { display: flex !important; }
         body.is-admin.perm-content .action-content { display: flex !important; }
         body.is-admin.perm-prices .action-prices { display: inline-flex !important; }
+        body.is-admin.perm-shopgallery .action-shopgallery { display: inline-flex !important; }
 
         body.is-supervisor .mod-leads, body.is-supervisor .mod-blocks, body.is-supervisor .mod-data, body.is-supervisor .mod-prices, body.is-supervisor .mod-forms, body.is-supervisor .mod-cars { display: block !important; }
         body.is-supervisor .mod-crm, body.is-supervisor .mod-ticker, body.is-supervisor .mod-pages, body.is-supervisor .action-cars, body.is-supervisor .action-content { display: inline-flex !important; }
         body.is-supervisor .mod-theme,
         body.is-supervisor .mod-invoice { display: inline-flex !important; }
-        body.is-supervisor .action-forms, body.is-supervisor .action-prices { display: inline-flex !important; }
+        body.is-supervisor .action-forms, body.is-supervisor .action-prices, body.is-supervisor .action-shopgallery { display: inline-flex !important; }
         body.is-supervisor .mod-leads-locked { display: none !important; }
 
         .admin-only-block, .admin-only-flex, .admin-only-inline { display: none !important; }
@@ -545,29 +546,77 @@
             opacity: 0.65;
         }
 
+        /* EXECUTIVE SCHWARZ / ROT / WEISS FÜR BESUCHERZÄHLER, SCHLÜSSEL & KUNDEN-CHIP */
         body.is-admin .visitor-counter, body.is-supervisor .visitor-counter {
-            opacity: 1; font-size: 9.5px; font-weight: 800; padding: 3px 7px;
-            background: var(--bg-input); border: 1px solid var(--primary-red);
+            opacity: 1;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 9px;
+            border-radius: 9px;
+            background: #14141c;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-left: 2.5px solid #ff1a1a;
+            color: #ffffff;
+            gap: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+        body.is-admin .visitor-counter i, body.is-supervisor .visitor-counter i {
+            color: #ff1a1a;
+            font-size: 10px;
         }
         body.is-admin .visitor-counter span#vCount, body.is-supervisor .visitor-counter span#vCount {
-            color: var(--primary-red); font-weight: 900;
+            color: #ffffff;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.2px;
         }
 
         body.is-admin .key-ring, body.is-supervisor .key-ring {
-            opacity: 1; width: 25px; height: 25px; min-width: 25px;
-            background: rgba(37, 211, 102, 0.14); border: 1.5px solid #25D366;
-            box-shadow: 0 0 8px rgba(37, 211, 102, 0.3);
+            opacity: 1;
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 9px;
+            background: #14141c;
+            border: 1.5px solid rgba(255, 255, 255, 0.72);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
         }
         body.is-supervisor .key-ring {
-            background: rgba(255, 0, 255, 0.14); border-color: #ff00ff;
-            box-shadow: 0 0 8px rgba(255, 0, 255, 0.35);
+            background: linear-gradient(145deg, #1a1a24, #0d0d13);
+            border: 1.5px solid #ff1a1a;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22), 0 3px 12px rgba(255, 26, 26, 0.35);
         }
-        body.is-admin .key-icon-wrapper i { color: #25D366; font-size: 10.5px; }
-        body.is-supervisor .key-icon-wrapper i { color: #ff00ff; font-size: 10.5px; }
-        .key-ring.new-alert { animation: severePulse 1.5s infinite; background: var(--primary-red) !important; opacity: 1 !important; }
-        .key-ring.new-alert i { color: #fff !important; }
+        body.is-admin .key-ring:hover, body.is-supervisor .key-ring:hover {
+            background: #d90000;
+            border-color: #ffffff;
+            transform: translateY(-1px);
+        }
+        body.is-admin .key-icon-wrapper i, body.is-supervisor .key-icon-wrapper i {
+            color: #ffffff;
+            font-size: 11px;
+        }
+        .key-ring.new-alert { animation: severePulse 1.5s infinite; background: #d90000 !important; border-color: #ffffff !important; opacity: 1 !important; }
+        .key-ring.new-alert i { color: #ffffff !important; }
 
-        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--primary-red); color: white; font-size: 7.5px; font-weight: 900; width: 14px; height: 14px; border-radius: 50%; display: none !important; justify-content: center; align-items: center; box-shadow: 0 0 6px var(--primary-red); transition: 0.3s; }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff1a1a;
+            color: #ffffff;
+            border: 1.5px solid #0b0b10;
+            font-size: 8px;
+            font-weight: 900;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 3px;
+            border-radius: 20px;
+            display: none !important;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+            transition: 0.25s;
+        }
         body.is-admin .notification-badge, body.is-supervisor .notification-badge { display: flex !important; }
         .notification-badge.prio-pulse { animation: badgePulse 1s infinite alternate; }
         @keyframes badgePulse { 0% { transform: scale(1); background: #ff3b30; } 100% { transform: scale(1.18); background: #ff3b30; } }
@@ -608,8 +657,24 @@
         }
         .header-app-install-chip:hover { background: var(--primary-red); color: #fff; }
 
-        .btn-crm-header { border: 1.5px solid var(--primary-red); color: var(--primary-red); font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 20px; align-items: center; gap: 5px; background: rgba(230,0,0,0.08); text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
-        .btn-crm-header:hover { background: var(--primary-red); color: #fff; }
+        .btn-crm-header {
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-left: 2.5px solid #ff1a1a;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9px;
+            align-items: center;
+            gap: 5px;
+            background: #14141c;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-crm-header i { color: #ff1a1a; }
+        .btn-crm-header:hover { background: #d90000; border-color: #ffffff; color: #ffffff; }
+        .btn-crm-header:hover i { color: #ffffff; }
 
         .header-clock-date { font-size: 10.5px; font-weight: 700; color: var(--text-light); letter-spacing: 0.3px; display:inline-flex; align-items:center; gap:5px; white-space: nowrap; }
         .header-clock-date span { color: var(--primary-red); font-weight: 800; }
@@ -2820,45 +2885,53 @@
             .key-ring { width: 18px; height: 18px; min-width: 18px; }
             .quick-menu-btn { padding: 4px 8px !important; font-size: 9px !important; }
 
-            /* WICHTIGER FIX 1: WENN ADMIN ODER SUPERVISOR AUF DEM HANDY EINGELOGGT IST:
-               Logo ("RED ZULASSUNGSDIENST"), Auto-Icon und Buttons verkleinern sich leicht,
-               damit ALLES garantiert in 1 einzige oberste Zeile passt und nichts überlappt! */
+            /* MOBILER ADMIN-/SUPERVISOR-HEADER: LOGO + LIVE-COUNTDOWN + SCHWARZ/ROT/WEISS KONTROLLEN IN 1 ZEILE */
             body.is-admin nav .logo-container,
             body.is-supervisor nav .logo-container {
-                max-width: 47%;
-                gap: 4px;
+                max-width: none !important;
+                gap: 0 !important;
+                flex-shrink: 0;
+            }
+            body.is-admin nav #headerCarDisplayWrapper,
+            body.is-supervisor nav #headerCarDisplayWrapper {
+                display: none !important;
             }
             body.is-admin nav .logo-red-svg,
             body.is-supervisor nav .logo-red-svg {
-                height: clamp(9px, 2.5vw, 11px) !important;
+                height: 11px !important;
             }
             body.is-admin nav .logo-text .white-part,
             body.is-supervisor nav .logo-text .white-part {
-                font-size: clamp(5.2px, 1.45vw, 6.5px) !important;
-                letter-spacing: 0.2px !important;
-            }
-            body.is-admin nav .logo-car-svg,
-            body.is-supervisor nav .logo-car-svg {
-                height: clamp(16px, 4.4vw, 20px) !important;
+                font-size: 5.5px !important;
+                letter-spacing: 0.25px !important;
             }
             body.is-admin nav .admin-ticker-edit-icon,
             body.is-supervisor nav .admin-ticker-edit-icon {
-                width: 15px; height: 15px; font-size: 8px; top: -4px; right: -10px;
+                width: 14px; height: 14px; font-size: 7.5px; top: -5px; right: -8px;
             }
             body.is-admin nav .nav-actions,
             body.is-supervisor nav .nav-actions {
-                gap: 2.5px !important;
+                gap: 3.5px !important;
             }
             body.is-admin .btn-crm-header,
             body.is-supervisor .btn-crm-header {
-                padding: 2px 5px !important;
-                font-size: 7.5px !important;
-                gap: 3px !important;
+                width: 24px !important;
+                height: 24px !important;
+                padding: 0 !important;
+                justify-content: center;
+                border-radius: 7px !important;
+            }
+            body.is-admin .btn-crm-header span,
+            body.is-supervisor .btn-crm-header span {
+                display: none !important;
             }
             body.is-admin .visitor-counter,
             body.is-supervisor .visitor-counter {
-                font-size: 8px !important;
-                padding: 2px 4px !important;
+                font-size: 8.5px !important;
+                padding: 3px 6px !important;
+                height: 24px !important;
+                border-radius: 7px !important;
+                gap: 3px !important;
             }
             body.is-admin .visitor-counter span#txt-header-visitors,
             body.is-supervisor .visitor-counter span#txt-header-visitors {
@@ -2866,18 +2939,21 @@
             }
             body.is-admin .key-ring,
             body.is-supervisor .key-ring {
-                width: 21px !important;
-                height: 21px !important;
-                min-width: 21px !important;
+                width: 24px !important;
+                height: 24px !important;
+                min-width: 24px !important;
+                border-radius: 7px !important;
             }
             body.is-admin .key-icon-wrapper i,
             body.is-supervisor .key-icon-wrapper i {
-                font-size: 9px !important;
+                font-size: 9.5px !important;
             }
             body.is-admin .quick-menu-btn,
             body.is-supervisor .quick-menu-btn {
-                padding: 3px 6px !important;
+                padding: 4px 7px !important;
+                height: 24px !important;
                 font-size: 8.5px !important;
+                border-radius: 7px !important;
             }
 
             nav {
@@ -3875,10 +3951,12 @@
             nav .nav-actions { order: 3 !important; margin-left: 0 !important; gap: 3px !important; }
             nav .header-widgets-wrapper { order: 4 !important; }
 
-            /* Im mobilen Admin-Modus ausgeblendet, damit alle Admin-Icons in 1 Zeile bleiben */
+            /* Im mobilen Admin-Modus bleibt der Live-Countdown kompakt direkt neben dem Logo sichtbar */
             body.is-admin nav .header-hours-countdown,
             body.is-supervisor nav .header-hours-countdown {
-                display: none !important;
+                display: inline-flex !important;
+                padding: 2.5px 5.5px !important;
+                margin: 0 auto 0 6px !important;
             }
         }
 
@@ -4845,6 +4923,249 @@
                 font-size: var(--sp-sub-m, 9.4px) !important;
                 line-height: 1.32;
             }
+        }
+
+        /* =========================================================================
+           EXECUTIVE SUPERVISOR RECHTE-ZENTRALE (1-ZEILIG + TOGGLE-SWITCHES)
+           ========================================================================= */
+        #supervisorPermsOverlay .sup-perms-window {
+            max-width: 520px !important;
+            border-top: 3.5px solid var(--primary-red) !important;
+            padding: 0 !important;
+            text-align: left !important;
+            display: flex;
+            flex-direction: column;
+            max-height: 92dvh;
+            overflow: hidden;
+        }
+        .sup-perms-header {
+            flex-shrink: 0;
+            position: relative;
+            padding: 15px 50px 12px 18px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .sup-perms-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--primary-red);
+        }
+        .sup-perms-title-block h3 {
+            margin: 2px 0 0 !important;
+            padding: 0 !important;
+            font-size: 16px !important;
+            font-weight: 900;
+            color: var(--text-light);
+            line-height: 1.2;
+        }
+        .sup-perms-counter {
+            background: #14141c;
+            color: #ffffff;
+            border: 1px solid var(--primary-red);
+            padding: 4px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 900;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
+        }
+        .sup-perms-quickbar {
+            flex-shrink: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .sup-qbtn {
+            height: 36px;
+            border-radius: 10px;
+            font-size: 11px !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .sup-qbtn-all {
+            background: #16a34a;
+            color: #ffffff;
+            border: 1px solid #16a34a;
+        }
+        .sup-qbtn-all:hover { filter: brightness(1.08); }
+        .sup-qbtn-none {
+            background: var(--bg-card);
+            color: var(--text-light);
+            border: 1.5px solid var(--glass-border);
+        }
+        .sup-qbtn-none:hover { border-color: var(--primary-red); color: var(--primary-red); }
+        .sup-perms-list {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px 14px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .sup-perm-cat {
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            padding: 7px 4px 2px;
+        }
+        .sup-perm-cat:first-child { padding-top: 2px; }
+        .sup-perm-row {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 11px;
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-radius: 11px;
+            cursor: pointer;
+            user-select: none;
+            margin: 0 !important;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+        .sup-perm-row:hover {
+            border-color: rgba(217, 0, 0, 0.45);
+        }
+        .sup-perm-row input {
+            display: none !important;
+        }
+        .sup-perm-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+        .sup-perm-left i {
+            width: 16px;
+            text-align: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .sup-perm-text {
+            font-size: 12.2px;
+            font-weight: 700;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            line-height: 1.2;
+        }
+        .sup-switch {
+            width: 38px;
+            height: 22px;
+            border-radius: 50px;
+            background: rgba(128, 128, 140, 0.35);
+            position: relative;
+            flex-shrink: 0;
+            transition: background 0.2s ease;
+        }
+        .sup-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+        .sup-perm-row input:checked + .sup-switch {
+            background: var(--primary-red);
+        }
+        .sup-perm-row input:checked + .sup-switch::after {
+            transform: translateX(16px);
+        }
+        .sup-perms-footer {
+            flex-shrink: 0;
+            padding: 11px 14px calc(11px + var(--safe-bottom));
+            background: var(--bg-card);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        /* LIVE ÖFFNUNGSZEITEN-COUNTDOWN IM TERMINAL NEBEN DEM NAMEN */
+        .admin-live-hours-pill {
+            background: #14141c !important;
+            border: 1px solid rgba(255, 255, 255, 0.22) !important;
+            border-left: 3px solid #ff9f1c !important;
+            color: #ffffff !important;
+            font-variant-numeric: tabular-nums;
+            gap: 6px !important;
+        }
+        .admin-live-hours-pill.is-open {
+            border-left-color: #25D366 !important;
+        }
+        .admin-live-hours-pill .alh-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ff9f1c;
+            flex-shrink: 0;
+        }
+        .admin-live-hours-pill.is-open .alh-dot {
+            background: #25D366;
+            box-shadow: 0 0 7px rgba(37, 211, 102, 0.85);
+            animation: pulseAnim 1.2s infinite alternate;
+        }
+        .admin-live-hours-pill strong {
+            color: #ffbe4d;
+            font-weight: 900;
+        }
+        .admin-live-hours-pill.is-open strong {
+            color: #3be37c;
+        }
+
+        @media (max-width: 768px) {
+            #supervisorPermsOverlay { padding: 8px !important; }
+            #supervisorPermsOverlay .sup-perms-window {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 94dvh !important;
+                border-radius: 16px !important;
+            }
+            .sup-perms-header { padding: 12px 46px 10px 13px; }
+            .sup-perms-title-block h3 { font-size: 14px !important; }
+            .sup-perms-counter { font-size: 9px; padding: 3px 7px; }
+            .sup-perms-quickbar { padding: 8px 11px; gap: 6px; }
+            .sup-qbtn { height: 32px; font-size: 10px !important; }
+            .sup-perms-list { padding: 6px 10px 10px; gap: 4.5px; }
+            .sup-perm-row { padding: 7.5px 9px; border-radius: 9px; }
+            .sup-perm-left { gap: 7px; }
+            .sup-perm-left i { font-size: 11.5px; width: 14px; }
+            .sup-perm-text { font-size: 11.2px; }
+            .sup-switch { width: 34px; height: 20px; }
+            .sup-switch::after { width: 14px; height: 14px; }
+            .sup-perm-row input:checked + .sup-switch::after { transform: translateX(14px); }
+            .sup-perms-footer { padding: 9px 11px calc(9px + var(--safe-bottom)); }
         }
 
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
