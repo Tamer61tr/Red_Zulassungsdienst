@@ -2638,10 +2638,10 @@ window.escHtml = function(str) {
         };
 
         window.adminPermissions = {
-            leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true, invoice: false, shopgallery: false
+            leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true, invoice: false, shopgallery: false, videos: false
         };
 
-        window.ALL_SUPERVISOR_PERM_IDS = ['permLeads','permCrm','permInvoice','permShopgallery','permPrices','permForms','permCars','permCustomblocks','permContent','permPages','permTheme','permTicker','permCompanydata'];
+        window.ALL_SUPERVISOR_PERM_IDS = ['permLeads','permCrm','permInvoice','permShopgallery','permVideos','permPrices','permForms','permCars','permCustomblocks','permContent','permPages','permTheme','permTicker','permCompanydata'];
 
         window.updateSupervisorPermCounter = function() {
             const ids = window.ALL_SUPERVISOR_PERM_IDS;
@@ -3000,7 +3000,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if(!perms) perms = { leads: true, prices: true, customblocks: true, content: true, companydata: true, forms: true, cars: true, ticker: true, crm: true, pages: true, theme: true, invoice: false, shopgallery: false };
             const allowInvoice = perms.invoice === true;
             const allowShopGallery = perms.shopgallery === true;
-            window.adminPermissions = { ...perms, invoice: allowInvoice, shopgallery: allowShopGallery };
+            const allowVideos = perms.videos === true;
+            window.adminPermissions = { ...perms, invoice: allowInvoice, shopgallery: allowShopGallery, videos: allowVideos };
             if(!window.loggedInUser) return;
             
             if(document.getElementById('permLeads')) {
@@ -3017,6 +3018,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 document.getElementById('permTheme').checked = perms.theme;
                 if(document.getElementById('permInvoice')) document.getElementById('permInvoice').checked = allowInvoice;
                 if(document.getElementById('permShopgallery')) document.getElementById('permShopgallery').checked = allowShopGallery;
+                if(document.getElementById('permVideos')) document.getElementById('permVideos').checked = allowVideos;
                 window.updateSupervisorPermCounter();
             }
 
@@ -3033,6 +3035,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.body.classList.toggle('perm-theme', perms.theme);
             document.body.classList.toggle('perm-invoice', allowInvoice);
             document.body.classList.toggle('perm-shopgallery', allowShopGallery);
+            document.body.classList.toggle('perm-videos', allowVideos);
             if (typeof window.renderShopGallery === 'function') window.renderShopGallery();
             setTimeout(window.syncHeaderHeight, 80);
         };
@@ -3844,6 +3847,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         if(this.id === 'kaufvertragOverlay') window.closeKaufvertragModal();
                         if(this.id === 'cashInvoiceOverlay') window.closeCashInvoiceModal();
                         if(this.id === 'shopPhotoEditOverlay') window.closeShopPhotoModal();
+                        if(this.id === 'redVideoCenterOverlay') window.closeVideoCenterModal();
+                        if(this.id === 'videoManagerOverlay') window.closeVideoManagerModal();
                         if(this.id === 'viralShareOverlay') window.closeViralShareModal();
                         if(this.id === 'pwaInstallOverlay') window.closePwaInstallModal();
                         if(this.id === 'callbackRequestOverlay') window.closeCallbackModal();
@@ -4045,6 +4050,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 if (!targetOv) targetOv = openOverlays[openOverlays.length - 1];
                 targetOv.classList.remove('open');
                 if (targetOv.id === 'cashInvoiceOverlay') document.body.classList.remove('invoice-modal-open');
+                if (targetOv.id === 'redVideoCenterOverlay') window.closeVideoCenterModal();
                 if (targetOv.id === 'widgetModalOverlay') window.closeWidgetModal();
                 if (targetOv.id === 'deleteConfirmOverlay') { window.deleteTargetId = null; window.deleteNoteTargetId = null; }
                 return true;
@@ -5210,9 +5216,9 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('invNote').value = '';
             document.getElementById('invTaxMode').value = 'mwst19';
             document.getElementById('invPayStatus').value = 'paid';
-            document.getElementById('invOptLogo').checked = true;
-            document.getElementById('invOptStamp').checked = true;
-            document.getElementById('invOptSigLines').checked = true;
+            if (document.getElementById('invLogoStyle')) document.getElementById('invLogoStyle').value = 'round_text';
+            if (document.getElementById('invStampStyle')) document.getElementById('invStampStyle').value = 'classic';
+            if (document.getElementById('invOptSigLines')) document.getElementById('invOptSigLines').checked = true;
             const validGrp = document.getElementById('invValidUntilGroup');
             if (validGrp) validGrp.style.display = 'none';
             const pick = document.getElementById('invClientQuickPick');
@@ -5307,8 +5313,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 note: (document.getElementById('invNote')?.value || '').trim(),
                 taxMode: document.getElementById('invTaxMode')?.value || 'mwst19',
                 payStatus: document.getElementById('invPayStatus')?.value || 'paid',
-                showLogo: document.getElementById('invOptLogo')?.checked !== false,
-                showStamp: document.getElementById('invOptStamp')?.checked !== false,
+                logoStyle: document.getElementById('invLogoStyle')?.value || 'round_text',
+                stampStyle: document.getElementById('invStampStyle')?.value || 'classic',
+                showLogo: (document.getElementById('invLogoStyle')?.value || 'round_text') !== 'none',
+                showStamp: (document.getElementById('invStampStyle')?.value || 'classic') !== 'none',
                 showSigLines: document.getElementById('invOptSigLines')?.checked !== false,
                 sigDataUrl,
                 items,
@@ -5383,9 +5391,9 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('invNote').value = rec.note || '';
             document.getElementById('invTaxMode').value = rec.taxMode || 'mwst19';
             document.getElementById('invPayStatus').value = rec.payStatus || 'paid';
-            document.getElementById('invOptLogo').checked = rec.showLogo !== false;
-            document.getElementById('invOptStamp').checked = rec.showStamp !== false;
-            document.getElementById('invOptSigLines').checked = rec.showSigLines !== false;
+            if (document.getElementById('invLogoStyle')) document.getElementById('invLogoStyle').value = rec.logoStyle || (rec.showLogo === false ? 'none' : 'round_text');
+            if (document.getElementById('invStampStyle')) document.getElementById('invStampStyle').value = rec.stampStyle || (rec.showStamp === false ? 'none' : 'classic');
+            if (document.getElementById('invOptSigLines')) document.getElementById('invOptSigLines').checked = rec.showSigLines !== false;
 
             const isQuote = window.getDocTemplateMeta(rec.docTitle).isQuote;
             const validGrp = document.getElementById('invValidUntilGroup');
@@ -5608,21 +5616,50 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                     ? `<div class="pay-badge paid">✓ BETRAG VON ${window.formatEuroDE(total)} DANKEND IN BAR ERHALTEN (${esc(rec.invDate)})</div>`
                     : `<div class="pay-badge open">ZAHLUNGSART: BARZAHLUNG BEI ÜBERGABE / ABHOLUNG</div>`);
 
-            const logoHtml = rec.showLogo !== false ? `
-                <div class="brand-logo">
-                    <div class="brand-red">RED</div>
-                    <div class="brand-sub">ZULASSUNGSDIENST &amp; SCHILDER BERLIN</div>
-                </div>
-            ` : `<div class="brand-plain">RED Zulassungsdienst Berlin</div>`;
+            const brandImgSrc = typeof window.getAbsoluteBrandLogoUrl === 'function' ? window.getAbsoluteBrandLogoUrl() : './red-logo-round.jpg';
+            const logoStyle = rec.logoStyle || (rec.showLogo === false ? 'none' : 'round_text');
+            const stampStyle = rec.stampStyle || (rec.showStamp === false ? 'none' : 'classic');
+
+            let logoHtml = `<div class="brand-plain">RED Zulassungsdienst Berlin</div>`;
+            if (logoStyle === 'round_text') {
+                logoHtml = `
+                    <div class="brand-combo">
+                        <img src="${esc(brandImgSrc)}" alt="RED Logo" class="brand-round-img" onerror="this.style.display='none'">
+                        <div class="brand-logo">
+                            <div class="brand-red">RED</div>
+                            <div class="brand-sub">ZULASSUNGSDIENST &amp; SCHILDER BERLIN</div>
+                        </div>
+                    </div>
+                `;
+            } else if (logoStyle === 'round') {
+                logoHtml = `<img src="${esc(brandImgSrc)}" alt="RED Logo" class="brand-round-img large" onerror="this.style.display='none'">`;
+            } else if (logoStyle === 'text') {
+                logoHtml = `
+                    <div class="brand-logo">
+                        <div class="brand-red">RED</div>
+                        <div class="brand-sub">ZULASSUNGSDIENST &amp; SCHILDER BERLIN</div>
+                    </div>
+                `;
+            }
 
             const stampBottomText = isQuote ? '★ ANGEBOT / INFO ★' : (rec.payStatus === 'paid' ? '★ BAR BEZAHLT ★' : '★ BERLIN-NEUKÖLLN ★');
-            const stampHtml = rec.showStamp !== false ? `
+            const classicStamp = `
                 <div class="rubber-stamp">
                     <div class="stamp-top">RED ZULASSUNGSDIENST</div>
                     <div class="stamp-mid">Inh. Tamer Yazici • Kienitzer Str. 6<br>12053 Berlin • Tel. ${phone}</div>
                     <div class="stamp-bot">${stampBottomText}</div>
                 </div>
-            ` : '';
+            `;
+            const roundSealStamp = `
+                <div class="round-logo-stamp">
+                    <img src="${esc(brandImgSrc)}" alt="RED Siegel" onerror="this.style.display='none'">
+                    <span>${stampBottomText}</span>
+                </div>
+            `;
+            let stampHtml = '';
+            if (stampStyle === 'classic') stampHtml = classicStamp;
+            else if (stampStyle === 'round_logo') stampHtml = roundSealStamp;
+            else if (stampStyle === 'both') stampHtml = `<div class="dual-stamp-wrap">${roundSealStamp}${classicStamp}</div>`;
 
             const sigSectionHtml = rec.showSigLines !== false ? `
                 <div class="sig-area">
@@ -5693,6 +5730,20 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         .brand-red { font-size: 32px; font-weight: 900; color: #d90000; letter-spacing: 3px; line-height: 1; }
                         .brand-sub { font-size: 10px; font-weight: 800; letter-spacing: 1.1px; color: #141417; margin-top: 3px; }
                         .brand-plain { font-size: 20px; font-weight: 900; color: #141417; }
+                        .brand-combo { display: flex; align-items: center; gap: 12px; }
+                        .brand-round-img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; object-position: center; border: 2px solid #d90000; background: #000; flex-shrink: 0; }
+                        .brand-round-img.large { width: 74px; height: 74px; }
+                        .round-logo-stamp {
+                            position: absolute; right: 10px; bottom: 22px; transform: rotate(-6deg);
+                            display: inline-flex; flex-direction: column; align-items: center; gap: 3px;
+                            padding: 5px 8px; border: 2px solid #d90000; border-radius: 10px;
+                            background: rgba(255, 255, 255, 0.92);
+                        }
+                        .round-logo-stamp img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; object-position: center; background: #000; }
+                        .round-logo-stamp span { font-size: 8px; font-weight: 900; color: #d90000; letter-spacing: 0.4px; }
+                        .dual-stamp-wrap { position: absolute; right: 6px; bottom: 22px; display: inline-flex; align-items: center; gap: 8px; }
+                        .dual-stamp-wrap .rubber-stamp, .dual-stamp-wrap .round-logo-stamp { position: relative !important; right: auto !important; bottom: auto !important; }
+                        .stamp-standalone-wrap .round-logo-stamp, .stamp-standalone-wrap .dual-stamp-wrap { position: relative !important; right: auto !important; bottom: auto !important; }
                         .sender-info { text-align: right; font-size: 11px; color: #444; line-height: 1.45; }
 
                         .meta-grid { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
@@ -6322,3 +6373,605 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 window.renderSupervisorUsersList();
             }
         };
+
+        // =========================================================================
+        // RED CINEMA WERBEVIDEO-PLAYER, SUPERVISOR MANAGER & RUND-LOGO ENGINE
+        // =========================================================================
+        window.brandAssetsData = JSON.parse(localStorage.getItem('red_brand_assets_v1') || 'null') || {
+            roundLogoUrl: './red-logo-round.jpg',
+            showFooterLogo: true
+        };
+
+        window.getAbsoluteBrandLogoUrl = function() {
+            const raw = (window.brandAssetsData?.roundLogoUrl || './red-logo-round.jpg').trim();
+            if (!raw || raw.startsWith('data:') || raw.startsWith('http://') || raw.startsWith('https://')) {
+                return raw || './red-logo-round.jpg';
+            }
+            try { return new URL(raw, window.location.href).href; } catch (e) { return raw; }
+        };
+
+        window.applyBrandAssetsUI = function() {
+            const src = (window.brandAssetsData?.roundLogoUrl || './red-logo-round.jpg').trim();
+            const showFooter = window.brandAssetsData?.showFooterLogo !== false;
+
+            const footerWrap = document.getElementById('footerCornerBrand');
+            const footerImg = document.getElementById('footerCornerLogoImg');
+            if (footerImg) footerImg.src = src;
+            if (footerWrap) footerWrap.style.display = showFooter ? '' : 'none';
+
+            const centerLogo = document.getElementById('rvpCenterBrandBadge');
+            if (centerLogo) { centerLogo.src = src; centerLogo.style.display = 'block'; }
+
+            const prevLogo = document.getElementById('vmBrandLogoPreview');
+            if (prevLogo) prevLogo.src = src;
+        };
+
+        const DEFAULT_PROMO_VIDEOS_CFG = {
+            placement: 'after-hero',
+            autoplayMode: 'muted-auto',
+            list: [
+                {
+                    id: 'vid-default-1',
+                    title: 'Keine Wartenummer beim Amt – RED Berlin in 30 Sekunden',
+                    badge: '30s Live-Einblick',
+                    desc: 'Wozu stundenlang auf der Zulassungsstelle warten? Bei uns geben Sie Ihre Unterlagen ohne Wartezeit ab – wir prägen Ihre Schilder direkt vor Ort in der Kienitzer Str. 6, 12053 Berlin.',
+                    url: './werbevideo-1.mp4',
+                    aspect: '9/16'
+                }
+            ]
+        };
+
+        window.promoVideosConfig = JSON.parse(localStorage.getItem('red_promo_videos_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT_PROMO_VIDEOS_CFG));
+        window.activePromoVideoIdx = 0;
+        window._rvpUserStopped = false;
+        window._rvpObserver = null;
+
+        window.canManagePromoVideos = function() {
+            return document.body.classList.contains('is-supervisor') ||
+                (document.body.classList.contains('is-admin') && window.adminPermissions?.videos === true);
+        };
+
+        window.formatVideoTime = function(sec) {
+            if (!isFinite(sec) || sec < 0) return '0:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${String(s).padStart(2, '0')}`;
+        };
+
+        window.getRvpEl = function(scope) {
+            return document.getElementById(scope === 'center' ? 'rvpCenterVideo' : 'rvpInlineVideo');
+        };
+
+        window.rvpSyncUi = function(scope) {
+            const v = window.getRvpEl(scope);
+            if (!v) return;
+            const pfx = scope === 'center' ? 'rvpCenter' : 'rvpInline';
+
+            const playBtn = document.getElementById(pfx + 'PlayBtn');
+            if (playBtn) {
+                playBtn.innerHTML = v.paused ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-pause"></i>';
+            }
+            const muteBtn = document.getElementById(pfx + 'MuteBtn');
+            if (muteBtn) {
+                const isMuted = v.muted || v.volume === 0;
+                muteBtn.innerHTML = isMuted
+                    ? '<i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i>'
+                    : (v.volume < 0.5 ? '<i class="fa-solid fa-volume-low"></i>' : '<i class="fa-solid fa-volume-high"></i>');
+            }
+            const volSlider = document.getElementById(pfx + 'Vol');
+            if (volSlider) volSlider.value = v.muted ? 0 : v.volume;
+
+            const curEl = document.getElementById(pfx + 'TimeCur');
+            const durEl = document.getElementById(pfx + 'TimeDur');
+            const seekEl = document.getElementById(pfx + 'Seek');
+            if (curEl) curEl.innerText = window.formatVideoTime(v.currentTime);
+            if (durEl) durEl.innerText = window.formatVideoTime(v.duration || 0);
+            if (seekEl && v.duration) seekEl.value = ((v.currentTime / v.duration) * 100).toFixed(2);
+
+            if (scope === 'inline') {
+                const unmutePill = document.getElementById('rvpInlineUnmutePill');
+                if (unmutePill) unmutePill.classList.toggle('is-hidden', !(v.muted || v.volume === 0) || v.paused);
+            } else {
+                const bigPlay = document.getElementById('rvpCenterBigPlay');
+                if (bigPlay) bigPlay.classList.toggle('is-hidden', !v.paused);
+            }
+        };
+
+        window.rvpTogglePlay = function(scope) {
+            const v = window.getRvpEl(scope);
+            if (!v) return;
+            if (v.paused) {
+                window._rvpUserStopped = false;
+                v.play().catch(() => {});
+            } else {
+                window._rvpUserStopped = true;
+                v.pause();
+            }
+            window.rvpSyncUi(scope);
+        };
+
+        window.rvpStop = function(scope) {
+            const v = window.getRvpEl(scope);
+            if (!v) return;
+            window._rvpUserStopped = true;
+            v.pause();
+            v.currentTime = 0;
+            window.rvpSyncUi(scope);
+        };
+
+        window.rvpSkip = function(scope, deltaSec) {
+            const v = window.getRvpEl(scope);
+            if (!v) return;
+            const dur = isFinite(v.duration) ? v.duration : 9999;
+            v.currentTime = Math.max(0, Math.min(dur, (v.currentTime || 0) + deltaSec));
+            window.rvpSyncUi(scope);
+        };
+
+        window.rvpSeek = function(scope, pct) {
+            const v = window.getRvpEl(scope);
+            if (!v || !isFinite(v.duration)) return;
+            v.currentTime = (parseFloat(pct) / 100) * v.duration;
+            window.rvpSyncUi(scope);
+        };
+
+        window.rvpToggleMute = function(scope) {
+            const v = window.getRvpEl(scope);
+            if (!v) return;
+            if (v.muted || v.volume === 0) {
+                v.muted = false;
+                if (v.volume === 0) v.volume = 0.85;
+            } else {
+                v.muted = true;
+            }
+            window.rvpSyncUi(scope);
+        };
+
+        window.rvpUnmuteAndPlay = function() {
+            const v = window.getRvpEl('inline');
+            if (!v) return;
+            v.muted = false;
+            if (v.volume === 0) v.volume = 0.85;
+            window._rvpUserStopped = false;
+            v.play().catch(() => {});
+            window.rvpSyncUi('inline');
+        };
+
+        window.rvpSetVolume = function(scope, val) {
+            const v = window.getRvpEl(scope);
+            if (!v) return;
+            const num = Math.max(0, Math.min(1, parseFloat(val) || 0));
+            v.volume = num;
+            v.muted = num === 0;
+            window.rvpSyncUi(scope);
+        };
+
+        window.openVideoCenterModal = function() {
+            const list = window.promoVideosConfig?.list || [];
+            const item = list[window.activePromoVideoIdx] || list[0];
+            if (!item) return;
+
+            const inlineV = window.getRvpEl('inline');
+            const centerV = window.getRvpEl('center');
+            const ov = document.getElementById('redVideoCenterOverlay');
+            if (!centerV || !ov) return;
+
+            const resumeTime = inlineV ? inlineV.currentTime : 0;
+            if (inlineV && !inlineV.paused) inlineV.pause();
+
+            document.getElementById('rvpCenterTitle').innerText = item.title || 'RED Berlin Video';
+            document.getElementById('rvpCenterSub').innerText = item.badge || 'RED Zulassungsdienst Berlin';
+            window.applyBrandAssetsUI();
+
+            if (centerV.getAttribute('data-src') !== item.url) {
+                centerV.setAttribute('data-src', item.url);
+                centerV.src = item.url;
+            }
+            centerV.muted = false;
+            centerV.volume = inlineV && inlineV.volume > 0 ? inlineV.volume : 0.9;
+            centerV.loop = true;
+
+            const setPosAndPlay = () => {
+                try { if (resumeTime > 0 && isFinite(centerV.duration)) centerV.currentTime = Math.min(resumeTime, centerV.duration - 0.1); } catch (e) {}
+                centerV.play().catch(() => {
+                    centerV.muted = true;
+                    centerV.play().catch(() => {});
+                });
+                window.rvpSyncUi('center');
+            };
+            if (centerV.readyState >= 1) setPosAndPlay();
+            else centerV.addEventListener('loadedmetadata', setPosAndPlay, { once: true });
+
+            if (!centerV.dataset.bound) {
+                centerV.dataset.bound = '1';
+                ['timeupdate', 'loadedmetadata', 'play', 'pause', 'volumechange', 'ended'].forEach(ev => {
+                    centerV.addEventListener(ev, () => window.rvpSyncUi('center'));
+                });
+            }
+
+            ov.classList.add('open');
+        };
+
+        window.closeVideoCenterModal = function() {
+            const ov = document.getElementById('redVideoCenterOverlay');
+            const centerV = window.getRvpEl('center');
+            const inlineV = window.getRvpEl('inline');
+            const curTime = centerV ? centerV.currentTime : 0;
+            if (centerV) centerV.pause();
+            if (ov) ov.classList.remove('open');
+            if (inlineV) {
+                try { if (curTime > 0 && isFinite(inlineV.duration)) inlineV.currentTime = Math.min(curTime, inlineV.duration - 0.1); } catch (e) {}
+                if (!window._rvpUserStopped && window.promoVideosConfig?.autoplayMode !== 'manual') {
+                    inlineV.muted = true;
+                    inlineV.play().catch(() => {});
+                }
+                window.rvpSyncUi('inline');
+            }
+        };
+
+        window.selectPromoVideo = function(idx) {
+            window.activePromoVideoIdx = idx;
+            window._rvpUserStopped = false;
+            window.renderPromoVideoShowcase();
+        };
+
+        window.positionVideoShowcaseHost = function(placement) {
+            const host = document.getElementById('redVideoShowcaseHost');
+            const viewHome = document.getElementById('view-home');
+            if (!host || !viewHome) return;
+
+            if (placement === 'before-termin') {
+                const terminSec = document.getElementById('termin');
+                if (terminSec && terminSec.parentNode) terminSec.parentNode.insertBefore(host, terminSec);
+            } else if (placement === 'in-neukoelln') {
+                const nkSec = document.getElementById('neukoelln-lokal');
+                if (nkSec && nkSec.parentNode) nkSec.parentNode.insertBefore(host, nkSec.nextSibling);
+            } else {
+                const dynHome = document.getElementById('dynamic-client-section-home');
+                if (dynHome && dynHome.parentNode) dynHome.parentNode.insertBefore(host, dynHome);
+            }
+        };
+
+        window.renderPromoVideoShowcase = function() {
+            const host = document.getElementById('redVideoShowcaseHost');
+            if (!host) return;
+            const cfg = window.promoVideosConfig || DEFAULT_PROMO_VIDEOS_CFG;
+            const list = Array.isArray(cfg.list) ? cfg.list : [];
+            const isMgr = window.canManagePromoVideos();
+
+            if (window._rvpObserver) { window._rvpObserver.disconnect(); window._rvpObserver = null; }
+
+            if (cfg.placement === 'hidden' || list.length === 0) {
+                host.innerHTML = isMgr
+                    ? `<div class="admin-pro-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;"><span style="font-size:12px; font-weight:700; color:var(--text-muted);"><i class="fa-solid fa-film" style="color:var(--primary-red);"></i> Werbevideo-Player ist aktuell ausgeblendet.</span><button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos')"><i class="fa-solid fa-sliders"></i> Video-Studio öffnen</button></div>`
+                    : '';
+                return;
+            }
+
+            window.positionVideoShowcaseHost(cfg.placement || 'after-hero');
+            if (window.activePromoVideoIdx >= list.length) window.activePromoVideoIdx = 0;
+            const item = list[window.activePromoVideoIdx];
+            const isLandscape = item.aspect === '16/9';
+            const autoStart = cfg.autoplayMode !== 'manual';
+
+            const playlistHtml = list.length > 1
+                ? `<div class="rvp-playlist-bar">${list.map((v, i) => `<button type="button" class="rvp-playlist-chip ${i === window.activePromoVideoIdx ? 'active' : ''}" onclick="window.selectPromoVideo(${i})"><i class="fa-solid fa-play"></i> ${window.escHtml(v.badge || ('Video ' + (i + 1)))}</button>`).join('')}</div>`
+                : '';
+
+            host.innerHTML = `
+                <div class="rvp-showcase-card ${isLandscape ? 'is-landscape' : ''}">
+                    <div class="rvp-player-shell">
+                        <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml(item.aspect || '9/16')};">
+                            <div class="rvp-overlay-top">
+                                <span class="rvp-badge-pill"><i class="fa-solid fa-circle-play"></i> ${window.escHtml(item.badge || 'RED Video')}</span>
+                                <button type="button" class="rvp-expand-fab" onclick="event.stopPropagation(); window.openVideoCenterModal()" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
+                            </div>
+                            <video id="rvpInlineVideo" src="${window.escHtml(item.url)}" ${autoStart ? 'autoplay' : ''} muted loop playsinline preload="metadata" onclick="window.rvpTogglePlay('inline')"></video>
+                            <button type="button" class="rvp-unmute-callout" id="rvpInlineUnmutePill" onclick="event.stopPropagation(); window.rvpUnmuteAndPlay()">
+                                <i class="fa-solid fa-volume-high"></i> Ton einschalten
+                            </button>
+                        </div>
+                        <div class="rvp-controls-bar">
+                            <div class="rvp-seek-row">
+                                <span class="rvp-time" id="rvpInlineTimeCur">0:00</span>
+                                <input type="range" id="rvpInlineSeek" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" oninput="window.rvpSeek('inline', this.value)">
+                                <span class="rvp-time" id="rvpInlineTimeDur">0:00</span>
+                            </div>
+                            <div class="rvp-btn-row">
+                                <div class="rvp-btn-group">
+                                    <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('inline', -5)" title="5s zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
+                                    <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpInlinePlayBtn" onclick="window.rvpTogglePlay('inline')" title="Play / Pause"><i class="fa-solid fa-pause"></i></button>
+                                    <button type="button" class="rvp-ctrl-btn" onclick="window.rvpStop('inline')" title="Stopp"><i class="fa-solid fa-stop"></i></button>
+                                    <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('inline', 5)" title="5s vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
+                                </div>
+                                <div class="rvp-vol-group">
+                                    <button type="button" class="rvp-ctrl-btn" id="rvpInlineMuteBtn" onclick="window.rvpToggleMute('inline')" title="Ton Ein/Aus"><i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i></button>
+                                    <input type="range" id="rvpInlineVol" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0" oninput="window.rvpSetVolume('inline', this.value)" aria-label="Lautstärke">
+                                    <button type="button" class="rvp-ctrl-btn" onclick="window.openVideoCenterModal()" title="Vergrößern"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rvp-info-col">
+                        <div class="rvp-info-head">
+                            <div>
+                                <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> RED Berlin in Aktion</span>
+                                <h2>${window.escHtml(item.title || 'RED Zulassungsdienst Berlin')}</h2>
+                            </div>
+                            <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm action-videos" onclick="window.openVideoManagerModal('videos')" title="Videos bearbeiten, ersetzen oder verschieben">
+                                <i class="fa-solid fa-sliders"></i> Verwalten
+                            </button>
+                        </div>
+                        <p>${window.escHtml(item.desc || '')}</p>
+                        <ul class="rvp-highlights-list">
+                            <li><i class="fa-solid fa-circle-check"></i><span>Keine Wartenummer beim Amt – Abgabe in 5&nbsp;Minuten</span></li>
+                            <li><i class="fa-solid fa-circle-check"></i><span>Sofort-Kennzeichenprägung direkt vor Ort in der Kienitzer&nbsp;Str.&nbsp;6</span></li>
+                            <li><i class="fa-solid fa-circle-check"></i><span>Anmeldung, Ummeldung, Abmeldung, Kurzzeit- &amp; Zollkennzeichen</span></li>
+                        </ul>
+                        <div class="rvp-cta-row">
+                            <button type="button" class="btn-primary" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Jetzt Wunschtermin sichern</button>
+                            <button type="button" class="btn-primary" style="background:#25D366; color:#000; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp(false)"><i class="fa-brands fa-whatsapp"></i> Direkt per WhatsApp</button>
+                        </div>
+                        ${playlistHtml}
+                    </div>
+                </div>
+            `;
+
+            const v = document.getElementById('rvpInlineVideo');
+            if (v) {
+                v.muted = true;
+                ['timeupdate', 'loadedmetadata', 'play', 'pause', 'volumechange', 'ended'].forEach(ev => {
+                    v.addEventListener(ev, () => window.rvpSyncUi('inline'));
+                });
+                if (autoStart) {
+                    v.play().catch(() => {});
+                }
+                window.rvpSyncUi('inline');
+
+                if (typeof IntersectionObserver !== 'undefined') {
+                    window._rvpObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(en => {
+                            if (!en.isIntersecting && !v.paused) {
+                                v.pause();
+                            } else if (en.isIntersecting && autoStart && !window._rvpUserStopped && !document.getElementById('redVideoCenterOverlay')?.classList.contains('open')) {
+                                v.play().catch(() => {});
+                            }
+                        });
+                    }, { threshold: 0.25 });
+                    window._rvpObserver.observe(v);
+                }
+            }
+        };
+
+        // --- SUPERVISOR / ADMIN VIDEO- & LOGO-MANAGER ---
+        window.persistPromoVideosConfig = async function() {
+            localStorage.setItem('red_promo_videos_v1', JSON.stringify(window.promoVideosConfig));
+            window.renderPromoVideoShowcase();
+            window.renderVideoManagerList();
+            if (window.firebaseDb && window.firebaseSetDoc) {
+                try {
+                    await window.firebaseSetDoc(
+                        window.firebaseDoc(window.firebaseDb, "settings", "promo_videos"),
+                        { ...window.promoVideosConfig, updatedAt: Date.now() },
+                        { merge: true }
+                    );
+                } catch (e) { console.error('Promo-Videos Sync Fehler:', e); }
+            }
+        };
+
+        window.switchVideoManagerTab = function(tabKey) {
+            const isBrand = tabKey === 'brand';
+            document.getElementById('vmTabBtnVideos')?.classList.toggle('active', !isBrand);
+            document.getElementById('vmTabBtnBrand')?.classList.toggle('active', isBrand);
+            if (document.getElementById('vmPaneVideos')) document.getElementById('vmPaneVideos').style.display = isBrand ? 'none' : 'block';
+            if (document.getElementById('vmPaneBrand')) document.getElementById('vmPaneBrand').style.display = isBrand ? 'block' : 'none';
+            if (isBrand) {
+                window.applyBrandAssetsUI();
+                const uInp = document.getElementById('vmBrandUrlInput');
+                const cur = window.brandAssetsData?.roundLogoUrl || './red-logo-round.jpg';
+                if (uInp) uInp.value = cur.startsWith('data:') ? '' : cur;
+                const chk = document.getElementById('vmShowFooterLogo');
+                if (chk) chk.checked = window.brandAssetsData?.showFooterLogo !== false;
+            }
+        };
+
+        window.openVideoManagerModal = function(startTab = 'videos') {
+            if (!window.canManagePromoVideos()) {
+                window.showToast('Nur der Supervisor oder ein freigeschalteter Admin darf Videos & Logo verwalten.', 'error');
+                return;
+            }
+            const cfg = window.promoVideosConfig || DEFAULT_PROMO_VIDEOS_CFG;
+            if (document.getElementById('vmPlacementSelect')) document.getElementById('vmPlacementSelect').value = cfg.placement || 'after-hero';
+            if (document.getElementById('vmAutoplaySelect')) document.getElementById('vmAutoplaySelect').value = cfg.autoplayMode || 'muted-auto';
+            window.renderVideoManagerList();
+            window.switchVideoManagerTab(startTab === 'brand' ? 'brand' : 'videos');
+            document.getElementById('videoManagerOverlay').classList.add('open');
+            setTimeout(() => { if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays(); }, 40);
+        };
+
+        window.closeVideoManagerModal = function() {
+            document.getElementById('videoManagerOverlay').classList.remove('open');
+        };
+
+        window.saveVideoSettingsOnly = async function() {
+            window.promoVideosConfig.placement = document.getElementById('vmPlacementSelect')?.value || 'after-hero';
+            window.promoVideosConfig.autoplayMode = document.getElementById('vmAutoplaySelect')?.value || 'muted-auto';
+            await window.persistPromoVideosConfig();
+            window.showToast('Video-Platzierung & Verhalten gespeichert!', 'success');
+        };
+
+        window.resetVideoManagerForm = function() {
+            document.getElementById('vmEditId').value = '';
+            document.getElementById('vmTitle').value = '';
+            document.getElementById('vmBadge').value = '';
+            document.getElementById('vmDesc').value = '';
+            document.getElementById('vmUrl').value = '';
+            if (document.getElementById('vmAspect')) document.getElementById('vmAspect').value = '9/16';
+            if (document.getElementById('vmFileInput')) document.getElementById('vmFileInput').value = '';
+            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Video hinzufügen oder bearbeiten';
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+        };
+
+        window.handlePromoVideoFileSelect = function(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            if (file.size > 680 * 1024) {
+                window.showToast('Video ist größer als 680 KB – bitte direkt als MP4 in deinen Website-Ordner hochladen und oben z.B. ./werbevideo-1.mp4 eintragen!', 'error');
+                input.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('vmUrl').value = ev.target.result;
+                window.showToast(`Video „${file.name}“ geladen – jetzt speichern!`, 'success');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.savePromoVideoItem = async function() {
+            const editId = document.getElementById('vmEditId').value;
+            const title = document.getElementById('vmTitle').value.trim();
+            const badge = document.getElementById('vmBadge').value.trim() || 'RED Video';
+            const desc = document.getElementById('vmDesc').value.trim();
+            const url = document.getElementById('vmUrl').value.trim();
+            const aspect = document.getElementById('vmAspect')?.value || '9/16';
+
+            if (!title || !url) {
+                window.showToast('Bitte Überschrift und Video-Pfad / Link eingeben.', 'error');
+                return;
+            }
+            if (!Array.isArray(window.promoVideosConfig.list)) window.promoVideosConfig.list = [];
+            const rec = { id: editId || ('vid-' + Date.now()), title, badge, desc, url, aspect };
+
+            if (editId) {
+                const idx = window.promoVideosConfig.list.findIndex(v => v.id === editId);
+                if (idx > -1) window.promoVideosConfig.list[idx] = rec;
+            } else {
+                window.promoVideosConfig.list.push(rec);
+                window.activePromoVideoIdx = window.promoVideosConfig.list.length - 1;
+            }
+
+            await window.persistPromoVideosConfig();
+            window.resetVideoManagerForm();
+            window.showToast(editId ? 'Werbevideo aktualisiert!' : 'Neues Werbevideo veröffentlicht!', 'success');
+        };
+
+        window.editPromoVideoItem = function(id) {
+            const item = (window.promoVideosConfig?.list || []).find(v => v.id === id);
+            if (!item) return;
+            document.getElementById('vmEditId').value = item.id;
+            document.getElementById('vmTitle').value = item.title || '';
+            document.getElementById('vmBadge').value = item.badge || '';
+            document.getElementById('vmDesc').value = item.desc || '';
+            document.getElementById('vmUrl').value = item.url || '';
+            if (document.getElementById('vmAspect')) document.getElementById('vmAspect').value = item.aspect || '9/16';
+            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = `2. Video bearbeiten: ${item.badge || item.title}`;
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+            document.getElementById('vmPaneVideos')?.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.deletePromoVideoItem = function(id) {
+            const item = (window.promoVideosConfig?.list || []).find(v => v.id === id);
+            if (!item) return;
+            window.openRedDeleteConfirm(
+                'Werbevideo löschen?',
+                `Möchten Sie „${item.title}“ wirklich dauerhaft entfernen?`,
+                async () => {
+                    window.promoVideosConfig.list = (window.promoVideosConfig.list || []).filter(v => v.id !== id);
+                    window.activePromoVideoIdx = 0;
+                    await window.persistPromoVideosConfig();
+                    window.showToast('Werbevideo entfernt.', 'success');
+                }
+            );
+        };
+
+        window.renderVideoManagerList = function() {
+            const listEl = document.getElementById('vmVideosList');
+            const cntEl = document.getElementById('vmVideoCount');
+            const list = window.promoVideosConfig?.list || [];
+            if (cntEl) cntEl.innerText = String(list.length);
+            if (!listEl) return;
+            if (list.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:14px; font-size:12px; color:var(--text-muted);">Noch keine Werbevideos eingetragen.</div>';
+                return;
+            }
+            listEl.innerHTML = list.map(v => `
+                <div class="pm-page-card">
+                    <div class="pm-page-info">
+                        <strong><i class="fa-solid fa-film" style="color:var(--primary-red); margin-right:6px;"></i>${window.escHtml(v.title)}</strong>
+                        <span>${window.escHtml(v.badge || 'Video')} • Format ${window.escHtml(v.aspect || '9/16')}</span>
+                    </div>
+                    <div class="pm-page-actions">
+                        <button type="button" class="apt-btn edit" onclick="window.editPromoVideoItem('${v.id}')" title="Bearbeiten / Ersetzen"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="apt-btn delete" onclick="window.deletePromoVideoItem('${v.id}')" title="Löschen"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.handleBrandLogoUpload = async function(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            try {
+                // Schneidet das Bild automatisch quadratisch aus der Mitte (perfekt für das runde RED-Logo)
+                const dataUrl = await new Promise((resolve, reject) => {
+                    const r = new FileReader();
+                    r.onerror = reject;
+                    r.onload = (ev) => {
+                        const img = new Image();
+                        img.onerror = reject;
+                        img.onload = () => {
+                            const size = Math.min(img.naturalWidth, img.naturalHeight);
+                            const sx = Math.floor((img.naturalWidth - size) / 2);
+                            const sy = Math.floor((img.naturalHeight - size) / 2);
+                            const out = 512;
+                            const c = document.createElement('canvas');
+                            c.width = out; c.height = out;
+                            const ctx = c.getContext('2d');
+                            ctx.drawImage(img, sx, sy, size, size, 0, 0, out, out);
+                            resolve(c.toDataURL('image/jpeg', 0.88));
+                        };
+                        img.src = ev.target.result;
+                    };
+                    r.readAsDataURL(file);
+                });
+                window.brandAssetsData.roundLogoUrl = dataUrl;
+                if (document.getElementById('vmBrandUrlInput')) document.getElementById('vmBrandUrlInput').value = '';
+                window.applyBrandAssetsUI();
+                await window.saveBrandLogoSettings(true);
+            } catch (err) {
+                window.showToast('Logo konnte nicht verarbeitet werden.', 'error');
+            }
+        };
+
+        window.saveBrandLogoSettings = async function(keepDataUrl = false) {
+            const urlInp = (document.getElementById('vmBrandUrlInput')?.value || '').trim();
+            if (!keepDataUrl && urlInp) {
+                window.brandAssetsData.roundLogoUrl = urlInp;
+            }
+            window.brandAssetsData.showFooterLogo = document.getElementById('vmShowFooterLogo')?.checked !== false;
+            localStorage.setItem('red_brand_assets_v1', JSON.stringify(window.brandAssetsData));
+            window.applyBrandAssetsUI();
+            if (window.firebaseDb && window.firebaseSetDoc) {
+                try {
+                    await window.firebaseSetDoc(
+                        window.firebaseDoc(window.firebaseDb, "settings", "brand_assets"),
+                        { ...window.brandAssetsData, updatedAt: Date.now() },
+                        { merge: true }
+                    );
+                } catch (e) {}
+            }
+            window.showToast('RED Rund-Logo global gespeichert!', 'success');
+        };
+
+        window.resetBrandLogoDefault = async function() {
+            window.brandAssetsData = { roundLogoUrl: './red-logo-round.jpg', showFooterLogo: true };
+            if (document.getElementById('vmBrandUrlInput')) document.getElementById('vmBrandUrlInput').value = './red-logo-round.jpg';
+            if (document.getElementById('vmShowFooterLogo')) document.getElementById('vmShowFooterLogo').checked = true;
+            await window.saveBrandLogoSettings(true);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.applyBrandAssetsUI();
+            window.renderPromoVideoShowcase();
+        });

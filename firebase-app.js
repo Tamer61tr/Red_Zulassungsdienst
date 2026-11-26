@@ -187,7 +187,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 pages: raw?.pages !== false,
                 theme: raw?.theme !== false,
                 invoice: raw?.invoice === true,
-                shopgallery: raw?.shopgallery === true
+                shopgallery: raw?.shopgallery === true,
+                videos: raw?.videos === true
             };
         }
 
@@ -196,7 +197,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 permLeads: p.leads, permPrices: p.prices, permCustomblocks: p.customblocks,
                 permContent: p.content, permCompanydata: p.companydata, permForms: p.forms,
                 permCars: p.cars, permTicker: p.ticker, permCrm: p.crm,
-                permPages: p.pages, permTheme: p.theme, permInvoice: p.invoice, permShopgallery: p.shopgallery
+                permPages: p.pages, permTheme: p.theme, permInvoice: p.invoice, permShopgallery: p.shopgallery, permVideos: p.videos
             };
             Object.entries(map).forEach(([id, val]) => {
                 const el = document.getElementById(id);
@@ -450,7 +451,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 window.isAuthorized = false;
                 window.loggedInUser = null;
                 window.loggedInEmail = '';
-                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme', 'perm-invoice', 'perm-shopgallery');
+                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme', 'perm-invoice', 'perm-shopgallery', 'perm-videos');
 
                 if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
                 if (invoicesUnsubscribe) { invoicesUnsubscribe(); invoicesUnsubscribe = null; }
@@ -574,6 +575,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                 theme: document.getElementById('permTheme').checked,
                 invoice: document.getElementById('permInvoice')?.checked === true,
                 shopgallery: document.getElementById('permShopgallery')?.checked === true,
+                videos: document.getElementById('permVideos')?.checked === true,
                 timestamp: Date.now()
             };
 
@@ -662,6 +664,30 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                     window.shopPhotosData = docSnap.data().list;
                     localStorage.setItem('red_shop_gallery_v1', JSON.stringify(window.shopPhotosData));
                     if (typeof window.renderShopGallery === 'function') window.renderShopGallery();
+                }
+            });
+
+            onSnapshot(doc(db, "settings", "promo_videos"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const d = docSnap.data();
+                    window.promoVideosConfig = {
+                        placement: d.placement || 'after-hero',
+                        autoplayMode: d.autoplayMode || 'muted-auto',
+                        list: Array.isArray(d.list) ? d.list : []
+                    };
+                    localStorage.setItem('red_promo_videos_v1', JSON.stringify(window.promoVideosConfig));
+                    if (typeof window.renderPromoVideoShowcase === 'function') window.renderPromoVideoShowcase();
+                    if (document.getElementById('videoManagerOverlay')?.classList.contains('open') && typeof window.renderVideoManagerList === 'function') {
+                        window.renderVideoManagerList();
+                    }
+                }
+            });
+
+            onSnapshot(doc(db, "settings", "brand_assets"), (docSnap) => {
+                if (docSnap.exists()) {
+                    window.brandAssetsData = { ...window.brandAssetsData, ...docSnap.data() };
+                    localStorage.setItem('red_brand_assets_v1', JSON.stringify(window.brandAssetsData));
+                    if (typeof window.applyBrandAssetsUI === 'function') window.applyBrandAssetsUI();
                 }
             });
         }

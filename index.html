@@ -638,6 +638,9 @@
                     <button type="button" class="btn-primary admin-tool-btn supervisor-only-inline" style="background:rgba(192,38,211,0.1); border:1px solid #c026d3; color:#c026d3;" onclick="window.openSupervisorPanel()">
                         <i class="fa-solid fa-crown"></i> <span>Rechte</span>
                     </button>
+                    <button type="button" class="btn-primary admin-tool-btn mod-videos" style="background:rgba(217,0,0,0.1); border:1px solid var(--primary-red); color:var(--primary-red);" onclick="window.openVideoManagerModal('videos')">
+                        <i class="fa-solid fa-film"></i> <span>Videos &amp; Logo</span>
+                    </button>
                     <button type="button" class="btn-primary admin-tool-btn mod-theme" style="background:rgba(8,145,178,0.1); border:1px solid #0891b2; color:#0891b2;" onclick="window.openThemeEditor()">
                         <i class="fa-solid fa-palette"></i> <span>Design</span>
                     </button>
@@ -1023,10 +1026,32 @@
                             </div>
                         </div>
 
-                        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
-                            <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="invOptLogo" checked><span class="noble-checkbox-box"></span> RED-Logo</label>
-                            <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="invOptStamp" checked><span class="noble-checkbox-box"></span> Firmenstempel</label>
-                            <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="invOptSigLines" checked><span class="noble-checkbox-box"></span> Unterschriftenfelder</label>
+                        <div class="form-row" style="margin-bottom:10px;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Logo-Design auf dem Beleg</label>
+                                <select id="invLogoStyle" class="form-control">
+                                    <option value="round_text" selected>🔴 RED Rund-Logo + Schriftzug (Empfohlen)</option>
+                                    <option value="round">🔴 Nur RED Rund-Logo (Emblem)</option>
+                                    <option value="text">RED Klassik-Schriftzug</option>
+                                    <option value="none">— Ohne Logo —</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Stempel / Siegel-Design</label>
+                                <select id="invStampStyle" class="form-control">
+                                    <option value="classic" selected>🔷 Klassischer blauer Firmenstempel</option>
+                                    <option value="round_logo">🔴 RED Rund-Logo Siegelstempel</option>
+                                    <option value="both">⭐ Firmenstempel + RED-Siegel</option>
+                                    <option value="none">— Ohne Stempel —</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
+                            <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="invOptSigLines" checked><span class="noble-checkbox-box"></span> Unterschriftenfelder anzeigen</label>
+                            <button type="button" class="inv-arch-btn action-videos" style="height:28px; font-size:10px !important;" onclick="window.openVideoManagerModal('brand')" title="Rundes Marken-Logo ändern">
+                                <i class="fa-solid fa-image" style="color:var(--primary-red);"></i> Rund-Logo verwalten
+                            </button>
                         </div>
 
                         <div class="form-group" style="margin-bottom:0;">
@@ -1245,6 +1270,170 @@
             <div style="display:flex; gap:10px;">
                 <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none;" onclick="window.closeShopPhotoModal()">Abbrechen</button>
                 <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:2; justify-content:center;" onclick="window.saveShopPhotoItem()"><i class="fa-solid fa-floppy-disk"></i> Foto speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ZENTRIERTER KINO-MEDIA-PLAYER (VERGRÖSSERTE ANSICHT MIT VOLLSTEUERUNG) -->
+    <div class="custom-dialog-overlay" id="redVideoCenterOverlay">
+        <div class="custom-dialog-window rvp-center-window">
+            <div class="rvp-center-topbar">
+                <div class="rvp-center-title-wrap">
+                    <img id="rvpCenterBrandBadge" src="./red-logo-round.jpg" alt="RED" class="rvp-mini-brand" onerror="this.style.display='none'">
+                    <div style="min-width:0;">
+                        <strong id="rvpCenterTitle">RED Zulassungsdienst Berlin</strong>
+                        <span id="rvpCenterSub">Offizielles Info- &amp; Werbevideo</span>
+                    </div>
+                </div>
+                <button type="button" class="lightbox-top-close" onclick="window.closeVideoCenterModal()" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="rvp-center-stage" id="rvpCenterStage">
+                <video id="rvpCenterVideo" playsinline preload="metadata" onclick="window.rvpTogglePlay('center')"></video>
+                <button type="button" class="rvp-center-bigplay" id="rvpCenterBigPlay" onclick="window.rvpTogglePlay('center')" aria-label="Abspielen"><i class="fa-solid fa-play"></i></button>
+            </div>
+
+            <div class="rvp-controls-bar rvp-controls-center">
+                <div class="rvp-seek-row">
+                    <span class="rvp-time" id="rvpCenterTimeCur">0:00</span>
+                    <input type="range" id="rvpCenterSeek" class="rvp-range rvp-seek" min="0" max="100" step="0.1" value="0" oninput="window.rvpSeek('center', this.value)">
+                    <span class="rvp-time" id="rvpCenterTimeDur">0:00</span>
+                </div>
+                <div class="rvp-btn-row">
+                    <div class="rvp-btn-group">
+                        <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('center', -5)" title="5 Sekunden zurück"><i class="fa-solid fa-rotate-left"></i><span>5s</span></button>
+                        <button type="button" class="rvp-ctrl-btn rvp-btn-primary" id="rvpCenterPlayBtn" onclick="window.rvpTogglePlay('center')" title="Abspielen / Pause"><i class="fa-solid fa-pause"></i></button>
+                        <button type="button" class="rvp-ctrl-btn" onclick="window.rvpStop('center')" title="Stopp (auf Anfang)"><i class="fa-solid fa-stop"></i></button>
+                        <button type="button" class="rvp-ctrl-btn" onclick="window.rvpSkip('center', 5)" title="5 Sekunden vor"><i class="fa-solid fa-rotate-right"></i><span>5s</span></button>
+                    </div>
+                    <div class="rvp-vol-group">
+                        <button type="button" class="rvp-ctrl-btn" id="rvpCenterMuteBtn" onclick="window.rvpToggleMute('center')" title="Ton Ein/Aus"><i class="fa-solid fa-volume-high"></i></button>
+                        <input type="range" id="rvpCenterVol" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0.9" oninput="window.rvpSetVolume('center', this.value)" aria-label="Lautstärke">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUPERVISOR / ADMIN VIDEO- & MARKENLOGO-STUDIO -->
+    <div class="custom-dialog-overlay" id="videoManagerOverlay">
+        <div class="custom-dialog-window exec-studio-window" style="max-width:680px;">
+            <div class="exec-studio-header">
+                <div>
+                    <span class="sup-perms-eyebrow"><i class="fa-solid fa-film"></i> Supervisor Media Studio</span>
+                    <h3>Werbevideos, Player &amp; Marken-Logo</h3>
+                </div>
+                <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeVideoManagerModal()"></i>
+            </div>
+
+            <div class="sup-tab-bar">
+                <button type="button" class="sup-tab-btn active" id="vmTabBtnVideos" onclick="window.switchVideoManagerTab('videos')">
+                    <i class="fa-solid fa-clapperboard"></i> Werbevideos (<span id="vmVideoCount">1</span>)
+                </button>
+                <button type="button" class="sup-tab-btn" id="vmTabBtnBrand" onclick="window.switchVideoManagerTab('brand')">
+                    <i class="fa-solid fa-circle-dot"></i> Rundes RED-Logo
+                </button>
+            </div>
+
+            <!-- TAB 1: VIDEOS & PLATZIERUNG -->
+            <div class="exec-studio-body" id="vmPaneVideos">
+                <div class="service-config-section">
+                    <h4>1. Platzierung &amp; Verhalten auf der Website</h4>
+                    <div class="form-row" style="margin-bottom:0;">
+                        <div class="form-group" style="flex:1.4; margin-bottom:0;">
+                            <label>Wo soll der Video-Bereich erscheinen?</label>
+                            <select id="vmPlacementSelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
+                                <option value="after-hero">⭐ Direkt unter dem Hero (Empfohlen)</option>
+                                <option value="before-termin">📅 Direkt über der Terminbuchung</option>
+                                <option value="in-neukoelln">📍 Im Berlin-Neukölln Standort-Block</option>
+                                <option value="hidden">🚫 Aktuell ausblenden</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Start-Verhalten</label>
+                            <select id="vmAutoplaySelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
+                                <option value="muted-auto">🔇 Autoplay im Stumm-Modus (Empfohlen)</option>
+                                <option value="manual">▶️ Nur bei Klick starten</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-config-section">
+                    <h4 id="vmFormHeading">2. Video hinzufügen oder bearbeiten</h4>
+                    <input type="hidden" id="vmEditId">
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1.4;">
+                            <label>Video-Überschrift *</label>
+                            <input type="text" id="vmTitle" class="form-control" placeholder="z.B. Keine Wartenummer beim Amt!">
+                        </div>
+                        <div class="form-group">
+                            <label>Etikett (Badge)</label>
+                            <input type="text" id="vmBadge" class="form-control" placeholder="z.B. 30s Einblick">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kurzer Begleittext</label>
+                        <input type="text" id="vmDesc" class="form-control" placeholder="z.B. Anmelden, Abmelden &amp; Kennzeichenprägung direkt vor Ort.">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1.5;">
+                            <label>Video-Dateipfad oder MP4-Link *</label>
+                            <input type="text" id="vmUrl" class="form-control" placeholder="./werbevideo-1.mp4 oder https://...">
+                        </div>
+                        <div class="form-group">
+                            <label>Video-Format</label>
+                            <select id="vmAspect" class="form-control">
+                                <option value="9/16">📱 Hochformat (9:16 Reel)</option>
+                                <option value="16/9">🖥️ Querformat (16:9 Kino)</option>
+                                <option value="1/1">⬜ Quadratisch (1:1)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label>Oder kurzes Video (bis 650 KB) direkt hochladen</label>
+                        <label class="noble-file-upload" style="margin-top:0;">
+                            <input type="file" id="vmFileInput" accept="video/mp4,video/webm" onchange="window.handlePromoVideoFileSelect(this)">
+                            <span class="noble-file-trigger" id="vmFileLabel"><i class="fa-solid fa-cloud-arrow-up"></i> Video auswählen (für größere Videos Datei per GitHub als ./werbevideo-1.mp4 hochladen)</span>
+                        </label>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none; border-radius:10px;" onclick="window.resetVideoManagerForm()"><i class="fa-solid fa-rotate-left"></i> Neu</button>
+                        <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:2; justify-content:center; border-radius:10px;" onclick="window.savePromoVideoItem()"><i class="fa-solid fa-floppy-disk"></i> Video speichern</button>
+                    </div>
+                </div>
+
+                <div class="service-config-section" style="margin-bottom:0;">
+                    <h4>3. Hinterlegte Werbevideos</h4>
+                    <div id="vmVideosList" class="pm-pages-cards"></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: RUNDES RED-LOGO VERWALTEN (RECHNUNGEN, STEMPEL & FOOTER-ECKE) -->
+            <div class="exec-studio-body" id="vmPaneBrand" style="display:none;">
+                <div class="service-config-section" style="text-align:center;">
+                    <h4>Aktives rundes RED-Emblem (Rechnungen, Siegel &amp; Footer)</h4>
+                    <div class="brand-logo-preview-stage">
+                        <img id="vmBrandLogoPreview" src="./red-logo-round.jpg" alt="RED Rund-Logo">
+                    </div>
+                    <p style="font-size:11px; color:var(--text-muted); margin:8px 0 12px;">Wird automatisch kreisrund zugeschnitten und gestochen scharf in Rechnungen, Kostenvoranschlägen, Stempeln und der Footer-Ecke verwendet.</p>
+                    <label class="noble-file-upload" style="margin-top:0; margin-bottom:10px;">
+                        <input type="file" id="vmBrandFileInput" accept="image/*" onchange="window.handleBrandLogoUpload(this)">
+                        <span class="noble-file-trigger" id="vmBrandFileLabel"><i class="fa-solid fa-cloud-arrow-up"></i> Neues Logo vom Gerät hochladen &amp; sofort ersetzen</span>
+                    </label>
+                    <div class="form-group" style="text-align:left; margin-bottom:10px;">
+                        <label>Oder Dateiname / Bild-URL</label>
+                        <input type="text" id="vmBrandUrlInput" class="form-control" value="./red-logo-round.jpg" placeholder="./red-logo-round.jpg">
+                    </div>
+                    <label class="noble-checkbox-label" style="margin:0 0 12px; display:inline-flex;">
+                        <input type="checkbox" id="vmShowFooterLogo" checked onchange="window.saveBrandLogoSettings()">
+                        <span class="noble-checkbox-box"></span> Hochauflösendes Rund-Logo dezent in der Footer-Ecke anzeigen
+                    </label>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none; border-radius:10px;" onclick="window.resetBrandLogoDefault()">Standard</button>
+                        <button type="button" class="btn-primary" style="flex:2; justify-content:center; border-radius:10px;" onclick="window.saveBrandLogoSettings()"><i class="fa-solid fa-check"></i> Logo überall übernehmen</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1707,7 +1896,7 @@
                     <span class="sup-perms-eyebrow"><i class="fa-solid fa-crown"></i> Supervisor Zentrale</span>
                     <h3>Rechte &amp; Benutzerverwaltung</h3>
                 </div>
-                <span class="sup-perms-counter" id="supPermActiveCount">0 / 13 Aktiv</span>
+                <span class="sup-perms-counter" id="supPermActiveCount">0 / 14 Aktiv</span>
                 <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeSupervisorPanel()"></i>
             </div>
 
@@ -1761,6 +1950,11 @@
                 <label class="sup-perm-row">
                     <span class="sup-perm-left"><i class="fa-solid fa-camera" style="color:var(--primary-red);"></i><span class="sup-perm-text">Geschäftsfotos (Kienitzer Str. 6)</span></span>
                     <input type="checkbox" id="permShopgallery" onchange="window.updateSupervisorPermCounter()">
+                    <span class="sup-switch"></span>
+                </label>
+                <label class="sup-perm-row">
+                    <span class="sup-perm-left"><i class="fa-solid fa-film" style="color:var(--primary-red);"></i><span class="sup-perm-text">Werbevideos, Player &amp; Rund-Logo</span></span>
+                    <input type="checkbox" id="permVideos" onchange="window.updateSupervisorPermCounter()">
                     <span class="sup-switch"></span>
                 </label>
                 <label class="sup-perm-row">
@@ -2644,6 +2838,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- RED WERBEVIDEO SHOWCASE (POSITION PER SUPERVISOR-MANAGER FREI WÄHLBAR) -->
+        <section id="redVideoShowcaseHost" class="red-video-showcase-wrap"></section>
 
         <section id="dynamic-client-section-home" class="dynamic-block-container"></section>
 
@@ -3674,6 +3871,9 @@
     <!-- FOOTER -->
     <footer class="editable-section">
         <div class="section-edit-btn action-content" onclick="window.openContentEditor('footer')" style="right:5%; top:10px;"><i class="fa-solid fa-pencil"></i></div>
+        <button type="button" class="footer-corner-brand" id="footerCornerBrand" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="RED Zulassungsdienst &amp; Schilder Berlin – Nach oben">
+            <img id="footerCornerLogoImg" src="./red-logo-round.jpg" alt="RED Zulassungsdienst &amp; Schilder Berlin" loading="lazy" onerror="this.parentElement.style.display='none'">
+        </button>
         <div class="footer-links" id="dynamicFooterLinks">
             <a href="javascript:void(0)" onclick="window.switchView('view-home')">Startseite</a>
             <a href="javascript:void(0)" onclick="window.switchView('view-formulare')">Formulare</a>
