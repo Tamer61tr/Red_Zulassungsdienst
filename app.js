@@ -4137,10 +4137,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
                 document.activeElement.blur();
             }
+            overlay.classList.add('open');
             listEl.scrollTop = 0;
-            requestAnimationFrame(() => {
-                overlay.classList.add('open');
-            });
         };
 
         window.closeMobileSelectSheet = function() {
