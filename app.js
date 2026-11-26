@@ -2176,18 +2176,23 @@ window.escHtml = function(str) {
             window.openCalcEditModal(newItem.id);
         };
 
-        window.deleteCalcItem = async function(id) {
-            if(!confirm('Möchten Sie diese Kalkulator-Option wirklich löschen?')) return;
-            window.calcItemsData = window.calcItemsData.filter(i => i.id !== id);
-            localStorage.setItem('red_calc_items_v2', JSON.stringify(window.calcItemsData));
-            window.renderCalcItems(window.calcItemsData);
+        window.deleteCalcItem = function(id) {
+            window.openRedDeleteConfirm(
+                'Kalkulator-Option löschen?',
+                'Möchten Sie diese Position wirklich dauerhaft aus dem Schnell-Kalkulator entfernen?',
+                async () => {
+                    window.calcItemsData = window.calcItemsData.filter(i => i.id !== id);
+                    localStorage.setItem('red_calc_items_v2', JSON.stringify(window.calcItemsData));
+                    window.renderCalcItems(window.calcItemsData);
 
-            if(window.firebaseDb && window.firebaseSetDoc) {
-                try {
-                    await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "calc_items"), { list: window.calcItemsData });
-                    window.showToast('Option gelöscht!', 'success');
-                } catch(e) {}
-            }
+                    if(window.firebaseDb && window.firebaseSetDoc) {
+                        try {
+                            await window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "calc_items"), { list: window.calcItemsData });
+                            window.showToast('Option gelöscht!', 'success');
+                        } catch(e) {}
+                    }
+                }
+            );
         };
 
         window.applyCalcToBooking = function() {
@@ -3253,20 +3258,25 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('pmPageContent').value = page.content;
         };
 
-        window.deleteCustomPage = async function(id) {
-            if(!confirm('Möchten Sie diese Seite wirklich komplett löschen?')) return;
-            try {
-                await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", id));
-                window.showToast('Seite gelöscht!', 'success');
-            } catch(e) {
-                let localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
-                localPages = localPages.filter(p => p.id !== id);
-                localStorage.setItem('red_custom_pages', JSON.stringify(localPages));
-                window.customPagesData = localPages;
-                window.renderCustomPagesToDOM();
-                window.showToast('Seite lokal gelöscht.', 'success');
-            }
-            window.renderPageManagerList();
+        window.deleteCustomPage = function(id) {
+            window.openRedDeleteConfirm(
+                'Seite komplett löschen?',
+                'Möchten Sie diese benutzerdefinierte Seite wirklich unwiderruflich entfernen?',
+                async () => {
+                    try {
+                        await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDb, "custom_pages", id));
+                        window.showToast('Seite gelöscht!', 'success');
+                    } catch(e) {
+                        let localPages = JSON.parse(localStorage.getItem('red_custom_pages')) || [];
+                        localPages = localPages.filter(p => p.id !== id);
+                        localStorage.setItem('red_custom_pages', JSON.stringify(localPages));
+                        window.customPagesData = localPages;
+                        window.renderCustomPagesToDOM();
+                        window.showToast('Seite lokal gelöscht.', 'success');
+                    }
+                    window.renderPageManagerList();
+                }
+            );
         };
 
         window.renderPageManagerList = function() {
@@ -4387,7 +4397,10 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const d = document.getElementById('delDescText');
             if (t) t.innerText = title || 'Eintrag löschen?';
             if (d) d.innerText = desc || 'Möchten Sie diesen Datensatz wirklich entfernen?';
-            ov.style.zIndex = '9600';
+            if (ov.parentElement !== document.body || document.body.lastElementChild !== ov) {
+                document.body.appendChild(ov);
+            }
+            ov.style.zIndex = '99998';
             ov.classList.add('open');
         };
 
@@ -5215,11 +5228,11 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
             const rowsHtml = items.map((it, idx) => `
                 <tr>
-                    <td style="text-align:center; color:#555;">${idx + 1}</td>
+                    <td class="col-pos">${idx + 1}</td>
                     <td><strong>${esc(it.desc || 'Zulassungs- / Schilderservice')}</strong></td>
-                    <td style="text-align:center;">${it.qty || 1}</td>
-                    <td style="text-align:right;">${window.formatEuroDE(it.unitPrice)}</td>
-                    <td style="text-align:right; font-weight:700;">${window.formatEuroDE(it.lineTotal)}</td>
+                    <td class="col-qty">${it.qty || 1}</td>
+                    <td class="col-price">${window.formatEuroDE(it.unitPrice)}</td>
+                    <td class="col-total">${window.formatEuroDE(it.lineTotal)}</td>
                 </tr>
             `).join('');
 
@@ -5249,9 +5262,9 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             }
 
             const protocolChecklistHtml = isProtocol ? `
-                <div style="border:1.5px solid #222; border-radius:8px; padding:10px 14px; margin:14px 0; background:#fafafa; font-size:11.5px;">
-                    <strong style="display:block; color:#d90000; text-transform:uppercase; font-size:10.5px; margin-bottom:6px;">Übergebene Dokumente &amp; Kennzeichen (bitte ankreuzen):</strong>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;">
+                <div class="protocol-box">
+                    <strong class="protocol-title">Übergebene Dokumente &amp; Kennzeichen (bitte ankreuzen):</strong>
+                    <div class="protocol-grid">
                         <div>[ &nbsp; ] Zulassungsbescheinigung Teil I (Schein)</div>
                         <div>[ &nbsp; ] Zulassungsbescheinigung Teil II (Brief)</div>
                         <div>[ &nbsp; ] Personalausweis / Reisepass (Original)</div>
@@ -5263,7 +5276,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             ` : '';
 
             const payBoxHtml = isQuote
-                ? `<div class="pay-badge quote">📋 UNVERBINDLICHES DOKUMENT (${esc(rec.docTitle)})${rec.validUntil ? ' • GÜLTIG BIS ' + esc(rec.validUntil) : ''}</div>`
+                ? `<div class="pay-badge quote">UNVERBINDLICHES DOKUMENT (${esc(rec.docTitle)})${rec.validUntil ? ' • GÜLTIG BIS ' + esc(rec.validUntil) : ''}</div>`
                 : (rec.payStatus === 'paid'
                     ? `<div class="pay-badge paid">✓ BETRAG VON ${window.formatEuroDE(total)} DANKEND IN BAR ERHALTEN (${esc(rec.invDate)})</div>`
                     : `<div class="pay-badge open">ZAHLUNGSART: BARZAHLUNG BEI ÜBERGABE / ABHOLUNG</div>`);
@@ -5296,7 +5309,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         <small>Berlin, den ${esc(rec.invDate)} – <strong>Stempel &amp; Unterschrift RED Zulassungsdienst</strong></small>
                     </div>
                 </div>
-            ` : (rec.showStamp !== false ? `<div style="display:flex; justify-content:flex-end; margin-top:26px;">${stampHtml}</div>` : '');
+            ` : (rec.showStamp !== false ? `<div style="display:flex; justify-content:flex-end; margin-top:24px;">${stampHtml}</div>` : '');
 
             const printWin = window.open('', '_blank');
             if (!printWin) {
@@ -5308,814 +5321,217 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 <html lang="de">
                 <head>
                     <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
                     <title>${esc(rec.docTitle)} ${esc(rec.invNo)} - RED Zulassungsdienst Berlin</title>
                     <style>
+                        @page { size: A4 portrait; margin: 10mm 12mm; }
                         * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                        body { font-family: Arial, Helvetica, sans-serif; color: #141417; margin: 0; padding: 24px; background: #fff; font-size: 12.5px; line-height: 1.5; }
-                        .page { max-width: 790px; margin: 0 auto; }
-                        .no-print-bar { background: #111116; color: #fff; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-                        .no-print-btn { background: #d90000; color: #fff; border: none; padding: 9px 18px; border-radius: 7px; font-weight: 800; cursor: pointer; font-size: 12.5px; }
-                        .header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #d90000; padding-bottom: 14px; margin-bottom: 20px; gap: 20px; }
+                        html, body { margin: 0; padding: 0; width: 100%; background: #1e2028; font-family: Arial, Helvetica, sans-serif; color: #141417; -webkit-text-size-adjust: 100%; }
+
+                        /* Feste RED PDF-Viewer Steuerleiste oben */
+                        .viewer-toolbar {
+                            position: sticky; top: 0; z-index: 100;
+                            background: #0e0e14; color: #ffffff;
+                            border-bottom: 2.5px solid #d90000;
+                            padding: 10px 14px;
+                            display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+                            box-shadow: 0 6px 22px rgba(0,0,0,0.4);
+                        }
+                        .vt-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+                        .vt-info strong { font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                        .vt-info span { font-size: 10.5px; color: #a8a8b8; }
+                        .vt-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+                        .vt-btn {
+                            border: none; border-radius: 9px; padding: 10px 15px;
+                            font-size: 12px; font-weight: 800; cursor: pointer;
+                            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+                        }
+                        .vt-btn-pdf { background: #d90000; color: #fff; }
+                        .vt-btn-close { background: #262632; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+
+                        /* Echtes DIN-A4 Blatt im Viewer */
+                        .sheet-wrap { padding: 20px 14px 34px; display: flex; justify-content: center; }
+                        .page {
+                            width: 210mm; max-width: 100%; min-height: 297mm;
+                            background: #ffffff;
+                            border-radius: 6px;
+                            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+                            padding: 15mm 15mm 13mm;
+                            display: flex; flex-direction: column;
+                            font-size: 12.5px; line-height: 1.5;
+                        }
+                        .page-body { flex: 1 1 auto; }
+
+                        .header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #d90000; padding-bottom: 14px; margin-bottom: 18px; gap: 16px; }
                         .brand-red { font-size: 32px; font-weight: 900; color: #d90000; letter-spacing: 3px; line-height: 1; }
                         .brand-sub { font-size: 10px; font-weight: 800; letter-spacing: 1.1px; color: #141417; margin-top: 3px; }
                         .brand-plain { font-size: 20px; font-weight: 900; color: #141417; }
                         .sender-info { text-align: right; font-size: 11px; color: #444; line-height: 1.45; }
-                        .meta-grid { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
-                        .recipient-box { flex: 1.2; background: #f8f8fa; border: 1px solid #ddd; border-radius: 8px; padding: 12px 15px; }
+
+                        .meta-grid { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+                        .recipient-box { flex: 1.25; background: #f8f8fa; border: 1px solid #ddd; border-radius: 8px; padding: 12px 14px; }
                         .recipient-box .mini-sender { font-size: 9px; color: #666; text-decoration: underline; margin-bottom: 6px; }
-                        .invoice-meta { flex: 0.9; background: #f8f8fa; border: 1px solid #ddd; border-left: 4px solid #d90000; border-radius: 8px; padding: 12px 15px; font-size: 11.5px; }
-                        .invoice-meta div { display: flex; justify-content: space-between; margin-bottom: 4px; }
-                        h1 { font-size: 20px; margin: 0 0 12px; color: #141417; letter-spacing: 0.5px; text-transform: uppercase; }
+                        .invoice-meta { flex: 0.9; background: #f8f8fa; border: 1px solid #ddd; border-left: 4px solid #d90000; border-radius: 8px; padding: 12px 14px; font-size: 11.5px; }
+                        .invoice-meta div { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+
+                        h1 { font-size: 19px; margin: 0 0 12px; color: #141417; letter-spacing: 0.5px; text-transform: uppercase; }
+                        .protocol-box { border: 1.5px solid #222; border-radius: 8px; padding: 10px 14px; margin: 12px 0 14px; background: #fafafa; font-size: 11.5px; }
+                        .protocol-title { display: block; color: #d90000; text-transform: uppercase; font-size: 10.5px; margin-bottom: 6px; }
+                        .protocol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+
                         table.items { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
-                        table.items th { background: #14141c; color: #fff; padding: 9px 10px; font-size: 11px; text-transform: uppercase; text-align: left; }
-                        table.items td { padding: 9px 10px; border-bottom: 1px solid #ddd; vertical-align: top; }
-                        table.totals { width: 320px; margin-left: auto; border-collapse: collapse; font-size: 12.5px; }
+                        table.items th { background: #14141c; color: #fff; padding: 9px 9px; font-size: 10.5px; text-transform: uppercase; text-align: left; }
+                        table.items td { padding: 9px 9px; border-bottom: 1px solid #ddd; vertical-align: top; }
+                        .col-pos, .col-qty { text-align: center; white-space: nowrap; }
+                        .col-price, .col-total { text-align: right; white-space: nowrap; }
+                        .col-total { font-weight: 700; }
+
+                        table.totals { width: 320px; max-width: 100%; margin-left: auto; border-collapse: collapse; font-size: 12.5px; }
                         table.totals td { padding: 5px 8px; }
-                        table.totals td:last-child { text-align: right; font-weight: 700; }
+                        table.totals td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
                         table.totals tr.grand-total td { border-top: 2px solid #141417; font-size: 15px; font-weight: 900; color: #d90000; padding-top: 8px; }
-                        .pay-badge { margin-top: 15px; padding: 10px 14px; border-radius: 8px; font-weight: 900; font-size: 12px; text-align: center; letter-spacing: 0.4px; }
+
+                        .pay-badge { margin-top: 16px; padding: 10px 14px; border-radius: 8px; font-weight: 900; font-size: 12px; text-align: center; letter-spacing: 0.3px; }
                         .pay-badge.paid { background: #eafaf0; border: 1.5px solid #16a34a; color: #0b6e31; }
                         .pay-badge.open { background: #fff7ed; border: 1.5px solid #d97706; color: #9a3412; }
                         .pay-badge.quote { background: #eff6ff; border: 1.5px solid #007aff; color: #0050b3; }
                         .legal-note { font-size: 10.5px; color: #555; margin: 8px 0 0; }
                         .extra-note { margin-top: 10px; padding: 8px 12px; background: #fafafa; border-left: 3px solid #888; font-size: 11.5px; }
-                        .sig-area { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 42px; align-items: end; }
+
+                        .sig-area { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 44px; align-items: end; }
                         .sig-pad-line { border-bottom: 1.5px solid #111; min-height: 60px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; }
                         .sig-pad-line img { max-height: 56px; max-width: 100%; }
-                        .sig-col small { display: block; margin-top: 5px; font-size: 10.5px; color: #333; }
+                        .sig-col small { display: block; margin-top: 5px; font-size: 10px; color: #333; line-height: 1.35; }
                         .rubber-stamp {
-                            position: absolute; right: 10px; bottom: 26px; transform: rotate(-7deg);
+                            position: absolute; right: 6px; bottom: 26px; transform: rotate(-7deg);
                             border: 2.5px double #003a99; color: #003a99; border-radius: 6px;
-                            padding: 5px 10px; text-align: center; background: rgba(255,255,255,0.85);
-                            opacity: 0.88; pointer-events: none; line-height: 1.25;
+                            padding: 5px 9px; text-align: center; background: rgba(255,255,255,0.9);
+                            opacity: 0.9; pointer-events: none; line-height: 1.25;
                         }
-                        .stamp-top { font-size: 10.5px; font-weight: 900; letter-spacing: 0.8px; }
-                        .stamp-mid { font-size: 8.5px; font-weight: 700; margin: 2px 0; }
-                        .stamp-bot { font-size: 9px; font-weight: 900; color: #d90000; border-top: 1px solid #003a99; padding-top: 2px; }
-                        .doc-footer { margin-top: 30px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 10px; color: #666; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-                        @media print { .no-print-bar { display: none !important; } body { padding: 12px; } }
+                        .stamp-top { font-size: 10px; font-weight: 900; letter-spacing: 0.7px; }
+                        .stamp-mid { font-size: 8px; font-weight: 700; margin: 2px 0; }
+                        .stamp-bot { font-size: 8.5px; font-weight: 900; color: #d90000; border-top: 1px solid #003a99; padding-top: 2px; }
+
+                        .doc-footer {
+                            margin-top: auto; padding-top: 14px;
+                            border-top: 1px solid #ccc; font-size: 10px; color: #666;
+                            display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+                        }
+
+                        /* MOBIL-VORSCHAU: VOLLBREITES, SCHARF LESBARES DIN-A4 BLATT STATT MINI-ANSICHT */
+                        @media screen and (max-width: 820px) {
+                            .viewer-toolbar { padding: 9px 10px; }
+                            .vt-info span { display: none; }
+                            .vt-actions { width: 100%; }
+                            .vt-btn-pdf { flex: 1; justify-content: center; padding: 10px 10px; font-size: 12px; }
+                            .sheet-wrap { padding: 10px 8px 24px; }
+                            .page {
+                                width: 100%; min-height: 138vw;
+                                padding: 16px 13px 14px;
+                                border-radius: 10px;
+                                font-size: 12px;
+                            }
+                            .header-row { flex-direction: column; gap: 8px; padding-bottom: 10px; margin-bottom: 14px; }
+                            .brand-red { font-size: 26px; }
+                            .sender-info { text-align: left; font-size: 10.5px; }
+                            .meta-grid { flex-direction: column; gap: 10px; margin-bottom: 16px; }
+                            h1 { font-size: 16px; }
+                            .protocol-grid { grid-template-columns: 1fr; }
+                            table.items th, table.items td { padding: 7px 5px; font-size: 11px; }
+                            .col-pos { display: none; }
+                            table.totals { width: 100%; font-size: 12px; }
+                            .sig-area { grid-template-columns: 1fr; gap: 36px; margin-top: 32px; }
+                            .rubber-stamp { right: 4px; bottom: 24px; }
+                            .doc-footer { margin-top: 28px; font-size: 9.5px; }
+                        }
+
+                        /* ECHTER DIN-A4 DRUCK & PDF-SPEICHERN (IMMER EXAKTES DIN A4 AUF HANDY & PC) */
+                        @media print {
+                            html, body { background: #ffffff !important; }
+                            .viewer-toolbar { display: none !important; }
+                            .sheet-wrap { padding: 0 !important; display: block !important; }
+                            .page {
+                                width: 100% !important; max-width: none !important; min-height: 274mm !important;
+                                margin: 0 !important; padding: 2mm 1mm !important;
+                                box-shadow: none !important; border-radius: 0 !important;
+                                font-size: 12px !important;
+                            }
+                            .header-row { flex-direction: row !important; }
+                            .sender-info { text-align: right !important; }
+                            .meta-grid { flex-direction: row !important; }
+                            .col-pos { display: table-cell !important; }
+                            table.totals { width: 310px !important; }
+                            .sig-area { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+                            .protocol-grid { grid-template-columns: 1fr 1fr !important; }
+                        }
                     </style>
                 </head>
                 <body>
-                    <div class="page">
-                        <div class="no-print-bar">
-                            <span><strong>RED Beleg ${esc(rec.invNo)}:</strong> Fertig zum Drucken oder als PDF speichern</span>
-                            <button class="no-print-btn" onclick="window.print()">🖨️ Jetzt Drucken / Als PDF speichern</button>
+                    <div class="viewer-toolbar">
+                        <div class="vt-info">
+                            <strong>RED DIN-A4 Beleg ${esc(rec.invNo)}</strong>
+                            <span>${esc(rec.docTitle)} • ${esc(rec.custName)}</span>
                         </div>
-                        <div class="header-row">
-                            ${logoHtml}
-                            <div class="sender-info">
-                                <strong>RED Zulassungsdienst Berlin</strong><br>
-                                Inhaber: Tamer Yazici<br>
-                                Kienitzer Str. 6 • 12053 Berlin<br>
-                                Tel.: ${phone} • ${email}
-                                ${hasUstid ? `<br>USt-IdNr. / St.-Nr.: ${esc(rawUstid)}` : ''}
-                            </div>
-                        </div>
-                        <div class="meta-grid">
-                            <div class="recipient-box">
-                                <div class="mini-sender">RED Zulassungsdienst Berlin • Kienitzer Str. 6 • 12053 Berlin</div>
-                                <strong style="font-size:14px;">${esc(rec.custName)}</strong><br>
-                                ${rec.custAddr ? `${esc(rec.custAddr)}<br>` : ''}
-                                ${rec.custPhone ? `<span style="font-size:11px; color:#555;">Tel.: ${esc(rec.custPhone)}</span><br>` : ''}
-                                ${rec.plate ? `<span style="display:inline-block; margin-top:4px; font-size:11.5px; color:#333;"><strong>Kennzeichen:</strong> ${esc(rec.plate)}</span>` : ''}
-                                ${rec.vin ? `<span style="display:inline-block; margin-top:4px; margin-left:8px; font-size:11px; color:#555;"><strong>FIN:</strong> ${esc(rec.vin)}</span>` : ''}
-                            </div>
-                            <div class="invoice-meta">
-                                <div><span>Beleg-Nr.:</span><strong>${esc(rec.invNo)}</strong></div>
-                                <div><span>Datum:</span><strong>${esc(rec.invDate)}</strong></div>
-                                ${rec.validUntil && isQuote ? `<div><span>Gültig bis:</span><strong>${esc(rec.validUntil)}</strong></div>` : `<div><span>Leistungsdatum:</span><strong>${esc(rec.invDate)}</strong></div>`}
-                                ${rec.clientId ? `<div><span>Kunden-ID:</span><strong>${esc(rec.clientId)}</strong></div>` : ''}
-                                <div><span>Zahlungsart:</span><strong>Barzahlung</strong></div>
-                            </div>
-                        </div>
-                        <h1>${esc(rec.docTitle)}</h1>
-                        ${protocolChecklistHtml}
-                        <table class="items">
-                            <thead>
-                                <tr>
-                                    <th style="width:42px; text-align:center;">Pos.</th>
-                                    <th>Beschreibung / Leistung</th>
-                                    <th style="width:65px; text-align:center;">Menge</th>
-                                    <th style="width:105px; text-align:right;">Einzelpreis</th>
-                                    <th style="width:110px; text-align:right;">Gesamt</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rowsHtml}</tbody>
-                        </table>
-                        <table class="totals"><tbody>${totalsHtml}</tbody></table>
-                        ${taxLegalNote}
-                        ${rec.note ? `<div class="extra-note"><strong>Hinweis:</strong> ${esc(rec.note)}</div>` : ''}
-                        ${payBoxHtml}
-                        ${sigSectionHtml}
-                        <div class="doc-footer">
-                            <span>RED Zulassungsdienst Berlin • Inh. Tamer Yazici • Kienitzer Str. 6, 12053 Berlin</span>
-                            <span>Mo–Fr 09:00–20:00 Uhr • Tel.: ${phone}</span>
+                        <div class="vt-actions">
+                            <button type="button" class="vt-btn vt-btn-pdf" onclick="window.print()">🖨️ Als PDF speichern / Drucken</button>
+                            <button type="button" class="vt-btn vt-btn-close" onclick="window.close()">✕</button>
                         </div>
                     </div>
-                </body>
-                </html>
-            `);
-            printWin.document.close();
-        };
 
-        window.printCashInvoice = function() {
-            window.saveCurrentCashInvoice(true);
-        };
-        window.savedInvoicesData = JSON.parse(localStorage.getItem('red_saved_invoices_v1') || '[]');
-        window.editingInvoiceId = null;
-        window.invoiceArchiveFilter = 'all';
-        window._pendingLoadedSigDataUrl = '';
-
-        window.canAccessCashInvoice = function() {
-            return document.body.classList.contains('is-supervisor') ||
-                (document.body.classList.contains('is-admin') && window.adminPermissions?.invoice === true);
-        };
-
-        window.updateInvoiceCountBadges = function() {
-            const count = (window.savedInvoicesData || []).length;
-            const hdrBadge = document.getElementById('adminInvoicesCountBadge');
-            const tabBadge = document.getElementById('invArchiveTabCount');
-            if (hdrBadge) hdrBadge.innerText = String(count);
-            if (tabBadge) tabBadge.innerText = String(count);
-        };
-
-        window.getNextInvoiceNumber = function() {
-            const yr = window.getDynamicSystemYear();
-            const prefix = `RE-${yr}-`;
-            let maxNum = parseInt(localStorage.getItem(`red_invoice_seq_${yr}`) || '0', 10) || 0;
-            (window.savedInvoicesData || []).forEach(inv => {
-                if (inv.invNo && String(inv.invNo).startsWith(prefix)) {
-                    const n = parseInt(String(inv.invNo).replace(prefix, ''), 10);
-                    if (!isNaN(n) && n > maxNum) maxNum = n;
-                }
-            });
-            return `${prefix}${String(maxNum + 1).padStart(4, '0')}`;
-        };
-
-        window.persistSavedInvoices = async function() {
-            localStorage.setItem('red_saved_invoices_v1', JSON.stringify(window.savedInvoicesData));
-            window.updateInvoiceCountBadges();
-            window.renderSavedInvoicesArchive();
-            if (window.firebaseDb && window.firebaseSetDoc) {
-                try {
-                    await window.firebaseSetDoc(
-                        window.firebaseDoc(window.firebaseDb, "settings", "invoices_archive"),
-                        { list: window.savedInvoicesData, updatedAt: Date.now() },
-                        { merge: true }
-                    );
-                } catch (e) {
-                    console.error('Rechnungs-Archiv Sync Fehler:', e);
-                }
-            }
-        };
-
-        window.initInvoiceSignaturePad = function(restoreDataUrl = '') {
-            invSigCanvas = document.getElementById('invSignatureCanvas');
-            if (!invSigCanvas) return;
-            const rect = invSigCanvas.parentElement.getBoundingClientRect();
-            if (!rect.width || rect.width < 40) return;
-
-            const prevData = restoreDataUrl || window._pendingLoadedSigDataUrl || (hasDrawnInvSig ? invSigCanvas.toDataURL('image/png') : '');
-            invSigCanvas.width = Math.floor(rect.width);
-            invSigCanvas.height = Math.floor(rect.height || 115);
-            invSigCtx = invSigCanvas.getContext('2d');
-            invSigCtx.strokeStyle = '#001a66';
-            invSigCtx.lineWidth = 2.4;
-            invSigCtx.lineCap = 'round';
-            invSigCtx.lineJoin = 'round';
-
-            if (prevData && prevData.startsWith('data:image')) {
-                const img = new Image();
-                img.onload = () => {
-                    invSigCtx.drawImage(img, 0, 0, invSigCanvas.width, invSigCanvas.height);
-                    hasDrawnInvSig = true;
-                };
-                img.src = prevData;
-                window._pendingLoadedSigDataUrl = '';
-            }
-
-            const getPos = (e) => {
-                const r = invSigCanvas.getBoundingClientRect();
-                const cx = e.touches ? e.touches[0].clientX : e.clientX;
-                const cy = e.touches ? e.touches[0].clientY : e.clientY;
-                return { x: cx - r.left, y: cy - r.top };
-            };
-            const start = (e) => {
-                e.preventDefault();
-                isDrawingInvSig = true;
-                hasDrawnInvSig = true;
-                const p = getPos(e);
-                invSigCtx.beginPath();
-                invSigCtx.moveTo(p.x, p.y);
-            };
-            const move = (e) => {
-                if (!isDrawingInvSig) return;
-                e.preventDefault();
-                const p = getPos(e);
-                invSigCtx.lineTo(p.x, p.y);
-                invSigCtx.stroke();
-            };
-            const end = () => { isDrawingInvSig = false; };
-
-            invSigCanvas.onmousedown = start;
-            invSigCanvas.onmousemove = move;
-            invSigCanvas.ontouchstart = start;
-            invSigCanvas.ontouchmove = move;
-            invSigCanvas.ontouchend = end;
-            if (!window._invSigMouseUpBound) {
-                window._invSigMouseUpBound = true;
-                window.addEventListener('mouseup', () => { isDrawingInvSig = false; });
-            }
-        };
-
-        window.clearInvoiceSignature = function() {
-            window._pendingLoadedSigDataUrl = '';
-            hasDrawnInvSig = false;
-            if (!invSigCanvas || !invSigCtx) return;
-            invSigCtx.clearRect(0, 0, invSigCanvas.width, invSigCanvas.height);
-        };
-
-        window.switchInvoiceTab = function(tabName) {
-            const isArchive = (tabName === 'archive');
-            document.getElementById('invTabBtnCreate')?.classList.toggle('active', !isArchive);
-            document.getElementById('invTabBtnArchive')?.classList.toggle('active', isArchive);
-            document.getElementById('invPaneCreate')?.classList.toggle('active', !isArchive);
-            document.getElementById('invPaneArchive')?.classList.toggle('active', isArchive);
-
-            const createFoot = document.getElementById('invCreateFooter');
-            const archFoot = document.getElementById('invArchiveFooter');
-            if (createFoot) createFoot.style.display = isArchive ? 'none' : 'flex';
-            if (archFoot) archFoot.style.display = isArchive ? 'flex' : 'none';
-
-            const scrollBody = document.getElementById('invModalScrollBody');
-            if (scrollBody) scrollBody.scrollTop = 0;
-
-            if (isArchive) {
-                window.renderSavedInvoicesArchive();
-            } else {
-                setTimeout(() => {
-                    window.initInvoiceSignaturePad();
-                    if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
-                }, 60);
-            }
-        };
-
-        window.populateInvoiceQuickPick = function() {
-            const sel = document.getElementById('invClientQuickPick');
-            if (!sel) return;
-            sel.innerHTML = '<option value="">— Manuell eingeben —</option>';
-
-            (window.redApts || []).slice(0, 25).forEach((a, idx) => {
-                const opt = document.createElement('option');
-                opt.value = `apt:${idx}`;
-                opt.textContent = `📅 Termin: ${a.name || 'Kunde'} (${a.service || '-'})`;
-                sel.appendChild(opt);
-            });
-
-            Object.values(window.crmClientsDetail || {}).slice(0, 35).forEach((c) => {
-                const opt = document.createElement('option');
-                opt.value = `crm:${c.clientId}`;
-                opt.textContent = `🗂️ CRM: ${c.name || 'Kunde'} (${c.clientId})`;
-                sel.appendChild(opt);
-            });
-            if (typeof window.syncMobileSelectDisplay === 'function') window.syncMobileSelectDisplay(sel);
-        };
-
-        window.fillInvoiceFromQuickPick = function(val) {
-            if (!val) return;
-            if (val.startsWith('apt:')) {
-                const idx = parseInt(val.split(':')[1], 10);
-                const apt = (window.redApts || [])[idx];
-                if (!apt) return;
-                document.getElementById('invCustomerName').value = apt.name || '';
-                document.getElementById('invPlate').value = apt.wunschkennzeichen || '';
-                if (apt.service) {
-                    const cont = document.getElementById('invItemsContainer');
-                    if (cont) cont.innerHTML = '';
-                    const srvMatch = (window.servicesData || []).find(s => apt.service.toLowerCase().includes(s.title.toLowerCase()));
-                    const matchedPrice = srvMatch && !isNaN(parseFloat(srvMatch.price)) ? parseFloat(srvMatch.price) : 0;
-                    window.addInvoiceRow(apt.service, 1, matchedPrice);
-                }
-            } else if (val.startsWith('crm:')) {
-                const cid = val.substring(4);
-                const c = (window.crmClientsDetail || {})[cid];
-                if (!c) return;
-                document.getElementById('invCustomerName').value = c.name || '';
-                document.getElementById('invCustomerAddress').value = [c.address, c.city].filter(Boolean).join(', ');
-            }
-        };
-
-        window.addInvoiceRow = function(desc = '', qty = 1, unitPrice = 0) {
-            const container = document.getElementById('invItemsContainer');
-            if (!container) return;
-            const row = document.createElement('div');
-            row.className = 'inv-item-card';
-            row.innerHTML = `
-                <div class="inv-col-desc">
-                    <span class="inv-item-sublabel">Leistung / Bezeichnung</span>
-                    <input type="text" class="form-control inv-desc" placeholder="Leistung / Artikel" value="${window.escHtml(desc)}">
-                </div>
-                <div>
-                    <span class="inv-item-sublabel">Menge</span>
-                    <input type="number" class="form-control inv-qty" min="1" step="1" value="${qty}" oninput="window.recalcCashInvoice()">
-                </div>
-                <div>
-                    <span class="inv-item-sublabel">Einzelpreis (€)</span>
-                    <input type="text" inputmode="decimal" class="form-control inv-price" placeholder="0,00" value="${unitPrice ? String(unitPrice).replace('.', ',') : ''}" oninput="window.recalcCashInvoice()">
-                </div>
-                <button type="button" class="inv-del-row-btn" onclick="this.parentElement.remove(); window.recalcCashInvoice();" title="Entfernen"><i class="fa-solid fa-trash"></i></button>
-            `;
-            container.appendChild(row);
-            window.recalcCashInvoice();
-        };
-
-        window.parseEuroInput = function(raw) {
-            const num = parseFloat(String(raw || '0').replace(/\s+/g, '').replace(',', '.'));
-            return isNaN(num) || num < 0 ? 0 : num;
-        };
-
-        window.formatEuroDE = function(val) {
-            return Number(val || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-        };
-
-        window.recalcCashInvoice = function() {
-            const rows = document.querySelectorAll('#invItemsContainer .inv-item-card');
-            let total = 0;
-            rows.forEach(r => {
-                const qty = Math.max(1, parseFloat(r.querySelector('.inv-qty')?.value || '1') || 1);
-                const price = window.parseEuroInput(r.querySelector('.inv-price')?.value);
-                total += qty * price;
-            });
-
-            const taxMode = document.getElementById('invTaxMode')?.value || 'mwst19';
-            const totalEl = document.getElementById('invLiveTotal');
-            const hintEl = document.getElementById('invLiveTaxHint');
-            if (totalEl) totalEl.innerText = window.formatEuroDE(total);
-
-            if (hintEl) {
-                if (taxMode === 'mwst19') {
-                    const netto = total / 1.19;
-                    const mwst = total - netto;
-                    hintEl.innerText = `Netto ${window.formatEuroDE(netto)} • 19% MwSt. ${window.formatEuroDE(mwst)}`;
-                } else if (taxMode === 'klein') {
-                    hintEl.innerText = '§ 19 UStG (ohne MwSt.)';
-                } else {
-                    hintEl.innerText = 'Inkl. Service & Amtsgebühren';
-                }
-            }
-            return total;
-        };
-
-        window.updateInvoiceEditBanner = function() {
-            const banner = document.getElementById('invEditingBanner');
-            const codeLbl = document.getElementById('invEditingCodeLabel');
-            const tabLbl = document.getElementById('invTabCreateLabel');
-            if (window.editingInvoiceId) {
-                if (banner) banner.classList.add('active');
-                if (codeLbl) codeLbl.innerText = document.getElementById('invNumber')?.value || '';
-                if (tabLbl) tabLbl.innerText = 'Beleg bearbeiten';
-            } else {
-                if (banner) banner.classList.remove('active');
-                if (tabLbl) tabLbl.innerText = 'Neu erstellen';
-            }
-        };
-
-        window.resetCashInvoiceForm = function() {
-            window.editingInvoiceId = null;
-            document.getElementById('invDocTitle').value = 'RECHNUNG & BARQUITTUNG';
-            document.getElementById('invNumber').value = window.getNextInvoiceNumber();
-            document.getElementById('invDate').value = new Date().toLocaleDateString('de-DE');
-            document.getElementById('invCustomerName').value = '';
-            document.getElementById('invCustomerAddress').value = '';
-            document.getElementById('invPlate').value = '';
-            document.getElementById('invNote').value = '';
-            document.getElementById('invTaxMode').value = 'mwst19';
-            document.getElementById('invPayStatus').value = 'paid';
-            document.getElementById('invOptLogo').checked = true;
-            document.getElementById('invOptStamp').checked = true;
-            document.getElementById('invOptSigLines').checked = true;
-            const pick = document.getElementById('invClientQuickPick');
-            if (pick) pick.value = '';
-            const cont = document.getElementById('invItemsContainer');
-            if (cont) cont.innerHTML = '';
-            window.addInvoiceRow('Anmeldung mit Wunschkennzeichen (inkl. Gebühren, Schilder & Plakette)', 1, 100);
-            window.clearInvoiceSignature();
-            window.updateInvoiceEditBanner();
-            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
-        };
-
-        window.openCashInvoiceModal = function(startTab = 'create') {
-            if (!window.canAccessCashInvoice()) {
-                window.showToast('Der Supervisor hat die Bar-Rechnung für dieses Konto nicht freigeschaltet.', 'error');
-                return;
-            }
-            window.populateInvoiceQuickPick();
-            window.updateInvoiceCountBadges();
-
-            if (!window.editingInvoiceId && !document.getElementById('invNumber').value) {
-                document.getElementById('invNumber').value = window.getNextInvoiceNumber();
-            }
-            if (!document.getElementById('invDate').value) {
-                document.getElementById('invDate').value = new Date().toLocaleDateString('de-DE');
-            }
-            if (!document.querySelectorAll('#invItemsContainer .inv-item-card').length) {
-                window.addInvoiceRow('Anmeldung mit Wunschkennzeichen (inkl. Gebühren, Schilder & Plakette)', 1, 100);
-            }
-            window.updateInvoiceEditBanner();
-            document.getElementById('cashInvoiceOverlay').classList.add('open');
-            window.switchInvoiceTab(startTab === 'archive' ? 'archive' : 'create');
-            setTimeout(() => {
-                window.recalcCashInvoice();
-                if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
-            }, 80);
-        };
-
-        window.closeCashInvoiceModal = function() {
-            document.getElementById('cashInvoiceOverlay').classList.remove('open');
-        };
-
-        window.collectCashInvoiceRecord = function() {
-            const rows = Array.from(document.querySelectorAll('#invItemsContainer .inv-item-card'));
-            const items = rows.map(r => {
-                const desc = (r.querySelector('.inv-desc')?.value || '').trim();
-                const qty = Math.max(1, parseFloat(r.querySelector('.inv-qty')?.value || '1') || 1);
-                const unitPrice = window.parseEuroInput(r.querySelector('.inv-price')?.value);
-                return { desc, qty, unitPrice, lineTotal: qty * unitPrice };
-            }).filter(i => i.desc !== '' || i.lineTotal > 0);
-
-            if (items.length === 0) return null;
-            const total = items.reduce((s, i) => s + i.lineTotal, 0);
-            const sigDataUrl = (invSigCanvas && hasDrawnInvSig) ? invSigCanvas.toDataURL('image/png') : '';
-
-            return {
-                id: window.editingInvoiceId || ('inv-' + Date.now()),
-                docTitle: document.getElementById('invDocTitle')?.value || 'RECHNUNG & BARQUITTUNG',
-                invNo: (document.getElementById('invNumber')?.value || '').trim() || window.getNextInvoiceNumber(),
-                invDate: (document.getElementById('invDate')?.value || '').trim() || new Date().toLocaleDateString('de-DE'),
-                custName: (document.getElementById('invCustomerName')?.value || '').trim() || 'Barverkauf / Laufkunde',
-                custAddr: (document.getElementById('invCustomerAddress')?.value || '').trim(),
-                plate: (document.getElementById('invPlate')?.value || '').trim().toUpperCase(),
-                note: (document.getElementById('invNote')?.value || '').trim(),
-                taxMode: document.getElementById('invTaxMode')?.value || 'mwst19',
-                payStatus: document.getElementById('invPayStatus')?.value || 'paid',
-                showLogo: document.getElementById('invOptLogo')?.checked !== false,
-                showStamp: document.getElementById('invOptStamp')?.checked !== false,
-                showSigLines: document.getElementById('invOptSigLines')?.checked !== false,
-                sigDataUrl,
-                items,
-                total,
-                updatedAt: Date.now()
-            };
-        };
-
-        window.saveCurrentCashInvoice = async function(openPdfAfter = false) {
-            if (!window.canAccessCashInvoice()) {
-                window.showToast('Keine Berechtigung für Bar-Rechnungen.', 'error');
-                return;
-            }
-            const record = window.collectCashInvoiceRecord();
-            if (!record) {
-                window.showToast('Bitte mindestens eine Position mit Betrag eintragen.', 'error');
-                return;
-            }
-
-            const existingIdx = (window.savedInvoicesData || []).findIndex(x => x.id === record.id);
-            if (existingIdx > -1) {
-                record.createdAt = window.savedInvoicesData[existingIdx].createdAt || record.updatedAt;
-                window.savedInvoicesData[existingIdx] = record;
-            } else {
-                record.createdAt = Date.now();
-                window.savedInvoicesData.unshift(record);
-                const yr = window.getDynamicSystemYear();
-                const m = String(record.invNo).match(/(\d+)$/);
-                if (m) {
-                    const num = parseInt(m[1], 10);
-                    const prev = parseInt(localStorage.getItem(`red_invoice_seq_${yr}`) || '0', 10) || 0;
-                    if (num > prev) localStorage.setItem(`red_invoice_seq_${yr}`, String(num));
-                }
-            }
-
-            window.editingInvoiceId = record.id;
-            window.updateInvoiceEditBanner();
-
-            if (openPdfAfter) {
-                window.renderCashInvoicePdfWindow(record);
-            }
-
-            await window.persistSavedInvoices();
-            window.showToast(existingIdx > -1 ? `Beleg ${record.invNo} aktualisiert!` : `Beleg ${record.invNo} im Archiv gespeichert!`, 'success');
-        };
-
-        window.editSavedInvoice = function(invId) {
-            const rec = (window.savedInvoicesData || []).find(x => x.id === invId);
-            if (!rec) return;
-
-            window.editingInvoiceId = rec.id;
-            document.getElementById('invDocTitle').value = rec.docTitle || 'RECHNUNG & BARQUITTUNG';
-            document.getElementById('invNumber').value = rec.invNo || '';
-            document.getElementById('invDate').value = rec.invDate || '';
-            document.getElementById('invCustomerName').value = rec.custName || '';
-            document.getElementById('invCustomerAddress').value = rec.custAddr || '';
-            document.getElementById('invPlate').value = rec.plate || '';
-            document.getElementById('invNote').value = rec.note || '';
-            document.getElementById('invTaxMode').value = rec.taxMode || 'mwst19';
-            document.getElementById('invPayStatus').value = rec.payStatus || 'paid';
-            document.getElementById('invOptLogo').checked = rec.showLogo !== false;
-            document.getElementById('invOptStamp').checked = rec.showStamp !== false;
-            document.getElementById('invOptSigLines').checked = rec.showSigLines !== false;
-
-            const cont = document.getElementById('invItemsContainer');
-            if (cont) cont.innerHTML = '';
-            (rec.items || []).forEach(it => window.addInvoiceRow(it.desc, it.qty || 1, it.unitPrice || 0));
-
-            window.clearInvoiceSignature();
-            window._pendingLoadedSigDataUrl = rec.sigDataUrl || '';
-            window.updateInvoiceEditBanner();
-            window.switchInvoiceTab('create');
-            window.recalcCashInvoice();
-            window.showToast(`Beleg ${rec.invNo} zum Bearbeiten geladen.`, 'success');
-        };
-
-        window.printSavedInvoiceById = function(invId) {
-            const rec = (window.savedInvoicesData || []).find(x => x.id === invId);
-            if (!rec) return;
-            window.renderCashInvoicePdfWindow(rec);
-        };
-
-        window.toggleSavedInvoicePaid = async function(invId) {
-            const idx = (window.savedInvoicesData || []).findIndex(x => x.id === invId);
-            if (idx === -1) return;
-            const nextStatus = window.savedInvoicesData[idx].payStatus === 'paid' ? 'open' : 'paid';
-            window.savedInvoicesData[idx].payStatus = nextStatus;
-            window.savedInvoicesData[idx].updatedAt = Date.now();
-            await window.persistSavedInvoices();
-            window.showToast(nextStatus === 'paid' ? 'Als Bar Bezahlt markiert!' : 'Auf Offen umgestellt.', 'success');
-        };
-
-        window.deleteSavedInvoice = async function(invId) {
-            const rec = (window.savedInvoicesData || []).find(x => x.id === invId);
-            if (!rec) return;
-            if (!confirm(`Beleg ${rec.invNo} (${rec.custName}) wirklich dauerhaft löschen?`)) return;
-            window.savedInvoicesData = (window.savedInvoicesData || []).filter(x => x.id !== invId);
-            if (window.editingInvoiceId === invId) window.resetCashInvoiceForm();
-            await window.persistSavedInvoices();
-            window.showToast(`Beleg ${rec.invNo} gelöscht.`, 'success');
-        };
-
-        window.setInvoiceArchiveFilter = function(fKey) {
-            window.invoiceArchiveFilter = fKey || 'all';
-            document.querySelectorAll('#invArchiveFilterPills .admin-filter-pill').forEach(b => {
-                b.classList.toggle('active', b.getAttribute('data-inv-filter') === window.invoiceArchiveFilter);
-            });
-            window.renderSavedInvoicesArchive();
-        };
-
-        window.renderSavedInvoicesArchive = function() {
-            const listEl = document.getElementById('invArchiveList');
-            const all = window.savedInvoicesData || [];
-            window.updateInvoiceCountBadges();
-
-            let paidSum = 0, openSum = 0;
-            all.forEach(x => {
-                const t = Number(x.total) || 0;
-                if (x.payStatus === 'paid') paidSum += t;
-                else openSum += t;
-            });
-            if (document.getElementById('invStatCount')) document.getElementById('invStatCount').innerText = String(all.length);
-            if (document.getElementById('invStatPaidSum')) document.getElementById('invStatPaidSum').innerText = window.formatEuroDE(paidSum);
-            if (document.getElementById('invStatOpenSum')) document.getElementById('invStatOpenSum').innerText = window.formatEuroDE(openSum);
-
-            if (!listEl) return;
-            const q = (document.getElementById('invArchiveSearch')?.value || '').trim().toLowerCase();
-            const f = window.invoiceArchiveFilter || 'all';
-
-            const filtered = all.filter(rec => {
-                const statusMatch = (f === 'all') || (rec.payStatus === f);
-                const hay = `${rec.invNo || ''} ${rec.custName || ''} ${rec.plate || ''} ${rec.invDate || ''} ${(rec.items || []).map(i => i.desc).join(' ')}`.toLowerCase();
-                return statusMatch && (!q || hay.includes(q));
-            });
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = `<div style="text-align:center; padding:26px 14px; color:var(--text-muted); font-size:12px; background:var(--bg-input); border-radius:12px;">
-                    <i class="fa-solid fa-receipt" style="font-size:24px; opacity:0.5; display:block; margin-bottom:8px;"></i>
-                    Noch keine passenden Rechnungen oder Quittungen gespeichert.
-                </div>`;
-                return;
-            }
-
-            listEl.innerHTML = filtered.map(rec => {
-                const isPaid = rec.payStatus === 'paid';
-                const statusPill = isPaid
-                    ? `<span style="background:var(--green-bg-soft); color:var(--green-accent); font-size:9.5px; font-weight:900; padding:2px 8px; border-radius:6px;">✅ BAR BEZAHLT</span>`
-                    : `<span style="background:rgba(245,158,11,0.16); color:#d97706; font-size:9.5px; font-weight:900; padding:2px 8px; border-radius:6px;">⏳ OFFEN</span>`;
-                const itemsPreview = (rec.items || []).map(i => `${i.qty}× ${i.desc}`).join(' • ');
-
-                return `
-                    <div class="inv-archive-card ${isPaid ? '' : 'is-open'}">
-                        <div class="inv-arch-top">
-                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                                <span style="font-family:'Courier New', monospace; font-weight:900; font-size:11.5px; color:var(--primary-red); background:var(--bg-card); border:1px solid var(--glass-border); padding:2px 7px; border-radius:6px;">${window.escHtml(rec.invNo)}</span>
-                                <span style="font-size:10.5px; color:var(--text-muted); font-weight:700;">${window.escHtml(rec.invDate)}</span>
+                    <div class="sheet-wrap">
+                        <div class="page">
+                            <div class="page-body">
+                                <div class="header-row">
+                                    ${logoHtml}
+                                    <div class="sender-info">
+                                        <strong>RED Zulassungsdienst Berlin</strong><br>
+                                        Inhaber: Tamer Yazici<br>
+                                        Kienitzer Str. 6 • 12053 Berlin<br>
+                                        Tel.: ${phone} • ${email}
+                                        ${hasUstid ? `<br>USt-IdNr. / St.-Nr.: ${esc(rawUstid)}` : ''}
+                                    </div>
+                                </div>
+                                <div class="meta-grid">
+                                    <div class="recipient-box">
+                                        <div class="mini-sender">RED Zulassungsdienst Berlin • Kienitzer Str. 6 • 12053 Berlin</div>
+                                        <strong style="font-size:14px;">${esc(rec.custName)}</strong><br>
+                                        ${rec.custAddr ? `${esc(rec.custAddr)}<br>` : ''}
+                                        ${rec.custPhone ? `<span style="font-size:11px; color:#555;">Tel.: ${esc(rec.custPhone)}</span><br>` : ''}
+                                        ${rec.plate ? `<span style="display:inline-block; margin-top:4px; font-size:11.5px; color:#333;"><strong>Kennzeichen:</strong> ${esc(rec.plate)}</span>` : ''}
+                                        ${rec.vin ? `<span style="display:inline-block; margin-top:4px; margin-left:8px; font-size:11px; color:#555;"><strong>FIN:</strong> ${esc(rec.vin)}</span>` : ''}
+                                    </div>
+                                    <div class="invoice-meta">
+                                        <div><span>Beleg-Nr.:</span><strong>${esc(rec.invNo)}</strong></div>
+                                        <div><span>Datum:</span><strong>${esc(rec.invDate)}</strong></div>
+                                        ${rec.validUntil && isQuote ? `<div><span>Gültig bis:</span><strong>${esc(rec.validUntil)}</strong></div>` : `<div><span>Leistungsdatum:</span><strong>${esc(rec.invDate)}</strong></div>`}
+                                        ${rec.clientId ? `<div><span>Kunden-ID:</span><strong>${esc(rec.clientId)}</strong></div>` : ''}
+                                        <div><span>Zahlungsart:</span><strong>Barzahlung</strong></div>
+                                    </div>
+                                </div>
+                                <h1>${esc(rec.docTitle)}</h1>
+                                ${protocolChecklistHtml}
+                                <table class="items">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-pos" style="width:40px;">Pos.</th>
+                                            <th>Beschreibung / Leistung</th>
+                                            <th class="col-qty" style="width:55px;">Menge</th>
+                                            <th class="col-price" style="width:95px;">Einzelpreis</th>
+                                            <th class="col-total" style="width:100px;">Gesamt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${rowsHtml}</tbody>
+                                </table>
+                                <table class="totals"><tbody>${totalsHtml}</tbody></table>
+                                ${taxLegalNote}
+                                ${rec.note ? `<div class="extra-note"><strong>Hinweis:</strong> ${esc(rec.note)}</div>` : ''}
+                                ${payBoxHtml}
+                                ${sigSectionHtml}
                             </div>
-                            ${statusPill}
-                        </div>
-                        <div class="inv-arch-mid">
-                            <div style="min-width:0; flex:1;">
-                                <strong style="font-size:13.5px; color:var(--text-light); display:block;">${window.escHtml(rec.custName)}</strong>
-                                ${rec.plate ? `<span style="font-size:10.5px; font-weight:800; color:#007aff; display:inline-block; margin-top:2px;"><i class="fa-solid fa-id-card"></i> ${window.escHtml(rec.plate)}</span>` : ''}
-                                <div style="font-size:11px; color:var(--text-muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${window.escHtml(itemsPreview)}</div>
+                            <div class="doc-footer">
+                                <span>RED Zulassungsdienst Berlin • Inh. Tamer Yazici • Kienitzer Str. 6, 12053 Berlin</span>
+                                <span>Mo–Fr 09:00–20:00 Uhr • Tel.: ${phone}</span>
                             </div>
-                            <strong style="font-size:16px; font-weight:900; color:${isPaid ? 'var(--green-accent)' : '#d97706'}; white-space:nowrap;">${window.formatEuroDE(rec.total)}</strong>
-                        </div>
-                        <div class="inv-arch-actions">
-                            <button type="button" class="inv-arch-btn edit" onclick="window.editSavedInvoice('${rec.id}')"><i class="fa-solid fa-pen"></i> Bearbeiten</button>
-                            <button type="button" class="inv-arch-btn pdf" onclick="window.printSavedInvoiceById('${rec.id}')"><i class="fa-solid fa-file-pdf"></i> PDF / Druck</button>
-                            <button type="button" class="inv-arch-btn" onclick="window.toggleSavedInvoicePaid('${rec.id}')" title="${isPaid ? 'Auf Offen setzen' : 'Als Bezahlt markieren'}"><i class="fa-solid ${isPaid ? 'fa-rotate-left' : 'fa-check'}" style="color:${isPaid ? '#d97706' : 'var(--green-accent)'};"></i></button>
-                            <button type="button" class="inv-arch-btn del" onclick="window.deleteSavedInvoice('${rec.id}')" title="Beleg löschen"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        };
-
-        window.renderCashInvoicePdfWindow = function(rec) {
-            const esc = window.escHtml;
-            const phone = esc(window.dynamicContactData?.phone || '0178 378 38 75');
-            const email = esc(window.dynamicContactData?.email || 'Redzulassungsdienst@gmail.com');
-            const rawUstid = (window.dynamicContactData?.ustid || '').trim();
-            const hasUstid = rawUstid !== '' && !rawUstid.toLowerCase().includes('hier steuernummer');
-
-            const items = rec.items || [];
-            const total = Number(rec.total) || items.reduce((s, i) => s + (Number(i.lineTotal) || 0), 0);
-            const rowsHtml = items.map((it, idx) => `
-                <tr>
-                    <td style="text-align:center; color:#555;">${idx + 1}</td>
-                    <td><strong>${esc(it.desc || 'Zulassungs- / Schilderservice')}</strong></td>
-                    <td style="text-align:center;">${it.qty || 1}</td>
-                    <td style="text-align:right;">${window.formatEuroDE(it.unitPrice)}</td>
-                    <td style="text-align:right; font-weight:700;">${window.formatEuroDE(it.lineTotal)}</td>
-                </tr>
-            `).join('');
-
-            let totalsHtml = '', taxLegalNote = '';
-            if (rec.taxMode === 'mwst19') {
-                const netto = total / 1.19;
-                const mwst = total - netto;
-                totalsHtml = `
-                    <tr><td>Nettobetrag:</td><td>${window.formatEuroDE(netto)}</td></tr>
-                    <tr><td>zzgl. 19 % Umsatzsteuer:</td><td>${window.formatEuroDE(mwst)}</td></tr>
-                    <tr class="grand-total"><td>Gesamtbetrag (Brutto):</td><td>${window.formatEuroDE(total)}</td></tr>
-                `;
-            } else if (rec.taxMode === 'klein') {
-                totalsHtml = `<tr class="grand-total"><td>Gesamtbetrag:</td><td>${window.formatEuroDE(total)}</td></tr>`;
-                taxLegalNote = '<p class="legal-note">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>';
-            } else {
-                totalsHtml = `<tr class="grand-total"><td>Gesamtbetrag (Komplettpreis):</td><td>${window.formatEuroDE(total)}</td></tr>`;
-                taxLegalNote = '<p class="legal-note">Komplettbetrag inkl. Serviceleistung (inkl. gesetzl. MwSt.) sowie im Namen und für Rechnung des Kunden verauslagter amtlicher Behördengebühren (durchlaufende Posten gem. § 10 Abs. 1 Satz 5 UStG).</p>';
-            }
-
-            const payBoxHtml = rec.payStatus === 'paid'
-                ? `<div class="pay-badge paid">✓ BETRAG VON ${window.formatEuroDE(total)} DANKEND IN BAR ERHALTEN (${esc(rec.invDate)})</div>`
-                : `<div class="pay-badge open">ZAHLUNGSART: BARZAHLUNG BEI ÜBERGABE / ABHOLUNG</div>`;
-
-            const logoHtml = rec.showLogo !== false ? `
-                <div class="brand-logo">
-                    <div class="brand-red">RED</div>
-                    <div class="brand-sub">ZULASSUNGSDIENST &amp; SCHILDER BERLIN</div>
-                </div>
-            ` : `<div class="brand-plain">RED Zulassungsdienst Berlin</div>`;
-
-            const stampHtml = rec.showStamp !== false ? `
-                <div class="rubber-stamp">
-                    <div class="stamp-top">RED ZULASSUNGSDIENST</div>
-                    <div class="stamp-mid">Inh. Tamer Yazici • Kienitzer Str. 6<br>12053 Berlin • Tel. ${phone}</div>
-                    <div class="stamp-bot">${rec.payStatus === 'paid' ? '★ BAR BEZAHLT ★' : '★ BERLIN-NEUKÖLLN ★'}</div>
-                </div>
-            ` : '';
-
-            const sigSectionHtml = rec.showSigLines !== false ? `
-                <div class="sig-area">
-                    <div class="sig-col">
-                        <div class="sig-pad-line">${rec.sigDataUrl ? `<img src="${rec.sigDataUrl}" alt="Unterschrift">` : ''}</div>
-                        <small>Berlin, den ${esc(rec.invDate)} – <strong>Unterschrift Kunde (Leistung / Beleg erhalten)</strong></small>
-                    </div>
-                    <div class="sig-col" style="position:relative;">
-                        ${stampHtml}
-                        <div class="sig-pad-line"></div>
-                        <small>Berlin, den ${esc(rec.invDate)} – <strong>Stempel &amp; Unterschrift RED Zulassungsdienst</strong></small>
-                    </div>
-                </div>
-            ` : (rec.showStamp !== false ? `<div style="display:flex; justify-content:flex-end; margin-top:26px;">${stampHtml}</div>` : '');
-
-            const printWin = window.open('', '_blank');
-            if (!printWin) {
-                window.showToast('Bitte Pop-ups erlauben, um das Rechnungs-PDF zu öffnen.', 'error');
-                return;
-            }
-            printWin.document.write(`
-                <!DOCTYPE html>
-                <html lang="de">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>${esc(rec.docTitle)} ${esc(rec.invNo)} - RED Zulassungsdienst Berlin</title>
-                    <style>
-                        * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                        body { font-family: Arial, Helvetica, sans-serif; color: #141417; margin: 0; padding: 24px; background: #fff; font-size: 12.5px; line-height: 1.5; }
-                        .page { max-width: 790px; margin: 0 auto; }
-                        .no-print-bar { background: #111116; color: #fff; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-                        .no-print-btn { background: #d90000; color: #fff; border: none; padding: 9px 18px; border-radius: 7px; font-weight: 800; cursor: pointer; font-size: 12.5px; }
-                        .header-row { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #d90000; padding-bottom: 14px; margin-bottom: 20px; gap: 20px; }
-                        .brand-red { font-size: 32px; font-weight: 900; color: #d90000; letter-spacing: 3px; line-height: 1; }
-                        .brand-sub { font-size: 10px; font-weight: 800; letter-spacing: 1.1px; color: #141417; margin-top: 3px; }
-                        .brand-plain { font-size: 20px; font-weight: 900; color: #141417; }
-                        .sender-info { text-align: right; font-size: 11px; color: #444; line-height: 1.45; }
-                        .meta-grid { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
-                        .recipient-box { flex: 1.2; background: #f8f8fa; border: 1px solid #ddd; border-radius: 8px; padding: 12px 15px; }
-                        .recipient-box .mini-sender { font-size: 9px; color: #666; text-decoration: underline; margin-bottom: 6px; }
-                        .invoice-meta { flex: 0.9; background: #f8f8fa; border: 1px solid #ddd; border-left: 4px solid #d90000; border-radius: 8px; padding: 12px 15px; font-size: 11.5px; }
-                        .invoice-meta div { display: flex; justify-content: space-between; margin-bottom: 4px; }
-                        h1 { font-size: 20px; margin: 0 0 12px; color: #141417; letter-spacing: 0.5px; text-transform: uppercase; }
-                        table.items { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-                        table.items th { background: #14141c; color: #fff; padding: 9px 10px; font-size: 11px; text-transform: uppercase; text-align: left; }
-                        table.items td { padding: 9px 10px; border-bottom: 1px solid #ddd; vertical-align: top; }
-                        table.totals { width: 310px; margin-left: auto; border-collapse: collapse; font-size: 12.5px; }
-                        table.totals td { padding: 5px 8px; }
-                        table.totals td:last-child { text-align: right; font-weight: 700; }
-                        table.totals tr.grand-total td { border-top: 2px solid #141417; font-size: 15px; font-weight: 900; color: #d90000; padding-top: 8px; }
-                        .pay-badge { margin-top: 16px; padding: 10px 14px; border-radius: 8px; font-weight: 900; font-size: 12px; text-align: center; letter-spacing: 0.4px; }
-                        .pay-badge.paid { background: #eafaf0; border: 1.5px solid #16a34a; color: #0b6e31; }
-                        .pay-badge.open { background: #fff7ed; border: 1.5px solid #d97706; color: #9a3412; }
-                        .legal-note { font-size: 10.5px; color: #555; margin: 10px 0 0; }
-                        .extra-note { margin-top: 10px; padding: 8px 12px; background: #fafafa; border-left: 3px solid #888; font-size: 11.5px; }
-                        .sig-area { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 46px; align-items: end; }
-                        .sig-pad-line { border-bottom: 1.5px solid #111; min-height: 62px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; }
-                        .sig-pad-line img { max-height: 58px; max-width: 100%; }
-                        .sig-col small { display: block; margin-top: 5px; font-size: 10.5px; color: #333; }
-                        .rubber-stamp {
-                            position: absolute; right: 10px; bottom: 26px; transform: rotate(-7deg);
-                            border: 2.5px double #003a99; color: #003a99; border-radius: 6px;
-                            padding: 5px 10px; text-align: center; background: rgba(255,255,255,0.85);
-                            opacity: 0.88; pointer-events: none; line-height: 1.25;
-                        }
-                        .stamp-top { font-size: 10.5px; font-weight: 900; letter-spacing: 0.8px; }
-                        .stamp-mid { font-size: 8.5px; font-weight: 700; margin: 2px 0; }
-                        .stamp-bot { font-size: 9px; font-weight: 900; color: #d90000; border-top: 1px solid #003a99; padding-top: 2px; }
-                        .doc-footer { margin-top: 34px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 10px; color: #666; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-                        @media print { .no-print-bar { display: none !important; } body { padding: 12px; } }
-                    </style>
-                </head>
-                <body>
-                    <div class="page">
-                        <div class="no-print-bar">
-                            <span><strong>RED Beleg ${esc(rec.invNo)}:</strong> Fertig zum Drucken oder als PDF speichern</span>
-                            <button class="no-print-btn" onclick="window.print()">🖨️ Jetzt Drucken / Als PDF speichern</button>
-                        </div>
-                        <div class="header-row">
-                            ${logoHtml}
-                            <div class="sender-info">
-                                <strong>RED Zulassungsdienst Berlin</strong><br>
-                                Inhaber: Tamer Yazici<br>
-                                Kienitzer Str. 6 • 12053 Berlin<br>
-                                Tel.: ${phone} • ${email}
-                                ${hasUstid ? `<br>USt-IdNr. / St.-Nr.: ${esc(rawUstid)}` : ''}
-                            </div>
-                        </div>
-                        <div class="meta-grid">
-                            <div class="recipient-box">
-                                <div class="mini-sender">RED Zulassungsdienst Berlin • Kienitzer Str. 6 • 12053 Berlin</div>
-                                <strong style="font-size:14px;">${esc(rec.custName)}</strong><br>
-                                ${rec.custAddr ? `${esc(rec.custAddr)}<br>` : ''}
-                                ${rec.plate ? `<span style="display:inline-block; margin-top:5px; font-size:11.5px; color:#333;"><strong>Fahrzeug / Kennzeichen:</strong> ${esc(rec.plate)}</span>` : ''}
-                            </div>
-                            <div class="invoice-meta">
-                                <div><span>Beleg-Nr.:</span><strong>${esc(rec.invNo)}</strong></div>
-                                <div><span>Datum:</span><strong>${esc(rec.invDate)}</strong></div>
-                                <div><span>Leistungsdatum:</span><strong>${esc(rec.invDate)}</strong></div>
-                                <div><span>Zahlungsart:</span><strong>Barzahlung</strong></div>
-                            </div>
-                        </div>
-                        <h1>${esc(rec.docTitle)}</h1>
-                        <table class="items">
-                            <thead>
-                                <tr>
-                                    <th style="width:42px; text-align:center;">Pos.</th>
-                                    <th>Beschreibung / Leistung</th>
-                                    <th style="width:65px; text-align:center;">Menge</th>
-                                    <th style="width:105px; text-align:right;">Einzelpreis</th>
-                                    <th style="width:110px; text-align:right;">Gesamt</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rowsHtml}</tbody>
-                        </table>
-                        <table class="totals"><tbody>${totalsHtml}</tbody></table>
-                        ${taxLegalNote}
-                        ${rec.note ? `<div class="extra-note"><strong>Hinweis:</strong> ${esc(rec.note)}</div>` : ''}
-                        ${payBoxHtml}
-                        ${sigSectionHtml}
-                        <div class="doc-footer">
-                            <span>RED Zulassungsdienst Berlin • Inh. Tamer Yazici • Kienitzer Str. 6, 12053 Berlin</span>
-                            <span>Mo–Fr 09:00–20:00 Uhr • Tel.: ${phone}</span>
                         </div>
                     </div>
                 </body>

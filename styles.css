@@ -709,7 +709,8 @@
 
         #passChangeOverlay .custom-dialog-window { max-width: 380px; border-top-color: var(--gold-border); }
         #confirmModalOverlay .custom-dialog-window { max-width: 440px; border-top-color: #25D366; }
-        #deleteConfirmOverlay .custom-dialog-window { max-width: 400px; border-top-color: #ff3b30; }
+        #deleteConfirmOverlay { z-index: 99998 !important; }
+        #deleteConfirmOverlay .custom-dialog-window { max-width: 410px; border-top: 3.5px solid var(--primary-red); border-radius: 20px; padding: 26px 20px 22px; }
         #logoutConfirmOverlay .custom-dialog-window { max-width: 400px; }
         #tickerConfigOverlay .custom-dialog-window { max-width: 620px; border-top-color: #007aff; text-align: left; }
         #lightboxOverlay .custom-dialog-window { max-width: 640px; border-top-color: var(--gold-border); padding: 25px; }

@@ -136,21 +136,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
         };
 
-        window.deleteCRMClient = async function() {
+        window.deleteCRMClient = function() {
             const clientId = document.getElementById('crmEditClientId').value;
-            if(confirm('Möchten Sie diese Akte (mitsamt aller Notizen & Basisdaten) wirklich löschen?')) {
-                delete window.crmClientsDetail[clientId];
-                try {
-                    await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail });
-                    window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
-                } catch(e) {
-                    localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
-                    window.showToast('Lokal gelöscht.', 'success');
+            window.openRedDeleteConfirm(
+                'Kunden-Akte löschen?',
+                'Möchten Sie diese Kunden-Akte (mitsamt aller Notizen & Basisdaten) wirklich dauerhaft löschen?',
+                async () => {
+                    delete window.crmClientsDetail[clientId];
+                    try {
+                        await setDoc(doc(db, "settings", "crm_details"), { details: window.crmClientsDetail });
+                        window.showToast('Kunden-Akte aus Datenbank gelöscht.', 'success');
+                    } catch(e) {
+                        localStorage.setItem('red_crm_details', JSON.stringify(window.crmClientsDetail));
+                        window.showToast('Lokal gelöscht.', 'success');
+                    }
+                    window.closeCRMDetail();
+                    window.renderCRM();
+                    if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
                 }
-                window.closeCRMDetail();
-                window.renderCRM();
-                if(document.getElementById('crmViewAllOverlay').classList.contains('open')) window.renderCRMViewAll();
-            }
+            );
         };
 
         const ADMIN_AUTH_EMAILS = ['admin@red-berlin.de', 'supervisor@red-berlin.de'];
@@ -571,18 +575,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             }
         };
 
-        window.deleteServiceCard = async function(id) {
-            if(confirm("Möchten Sie diese Leistungskarte wirklich löschen?")) {
-                window.servicesData = window.servicesData.filter(s => s.id !== id);
-                try {
-                    await setDoc(doc(db, "settings", "services"), { list: window.servicesData });
-                    window.showToast('Karte gelöscht!', 'success');
-                } catch(e) {
-                    localStorage.setItem('red_services_v2', JSON.stringify(window.servicesData));
-                    window.renderServices(window.servicesData);
-                    window.showToast('Lokal gelöscht.', 'success');
+        window.deleteServiceCard = function(id) {
+            window.openRedDeleteConfirm(
+                'Leistungskarte löschen?',
+                'Möchten Sie diese Leistungskarte wirklich dauerhaft von der Startseite entfernen?',
+                async () => {
+                    window.servicesData = window.servicesData.filter(s => s.id !== id);
+                    try {
+                        await setDoc(doc(db, "settings", "services"), { list: window.servicesData });
+                        window.showToast('Karte gelöscht!', 'success');
+                    } catch(e) {
+                        localStorage.setItem('red_services_v2', JSON.stringify(window.servicesData));
+                        window.renderServices(window.servicesData);
+                        window.showToast('Lokal gelöscht.', 'success');
+                    }
                 }
-            }
+            );
         };
         
         window.customBlocksData = [];
@@ -738,18 +746,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             document.getElementById('btnCancelEditBlock').style.display = 'none';
         };
 
-        window.deleteCustomBlock = async function(id) {
-            if(!confirm('Baustein wirklich löschen?')) return;
-            try {
-                await deleteDoc(doc(db, "customblocks", id));
-                window.showToast('Gelöscht!', 'success');
-            } catch(err) {
-                let localBlocks = JSON.parse(localStorage.getItem('red_customblocks')) || [];
-                localBlocks = localBlocks.filter(b => b.id !== id);
-                localStorage.setItem('red_customblocks', JSON.stringify(localBlocks));
-                window.renderCustomBlocks(localBlocks);
-                window.showToast('Lokal gelöscht.', 'success');
-            }
+        window.deleteCustomBlock = function(id) {
+            window.openRedDeleteConfirm(
+                'Infoblock löschen?',
+                'Möchten Sie diesen Baustein wirklich dauerhaft entfernen?',
+                async () => {
+                    try {
+                        await deleteDoc(doc(db, "customblocks", id));
+                        window.showToast('Gelöscht!', 'success');
+                    } catch(err) {
+                        let localBlocks = JSON.parse(localStorage.getItem('red_customblocks')) || [];
+                        localBlocks = localBlocks.filter(b => b.id !== id);
+                        localStorage.setItem('red_customblocks', JSON.stringify(localBlocks));
+                        window.renderCustomBlocks(localBlocks);
+                        window.showToast('Lokal gelöscht.', 'success');
+                    }
+                }
+            );
         };
 
         // --- HEADER-AUTO, LOGO & TICKER STUDIO ---
@@ -2398,21 +2411,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             }
         };
         
-        window.adminDeleteForm = async function(formId) {
-            if(confirm('Möchten Sie dieses Formular aus der Übersicht entfernen?')) {
-                if(window.allFormsMap[formId]) {
-                    window.allFormsMap[formId].deleted = true;
-                }
-                localStorage.setItem('red_forms_clean_v2', JSON.stringify(getActiveFormsList()));
-                renderFormsList(getActiveFormsList());
+        window.adminDeleteForm = function(formId) {
+            window.openRedDeleteConfirm(
+                'Formular entfernen?',
+                'Möchten Sie dieses Formular aus der Formular-Übersicht entfernen?',
+                async () => {
+                    if(window.allFormsMap[formId]) {
+                        window.allFormsMap[formId].deleted = true;
+                    }
+                    localStorage.setItem('red_forms_clean_v2', JSON.stringify(getActiveFormsList()));
+                    renderFormsList(getActiveFormsList());
 
-                try {
-                    await setDoc(doc(db, "forms", formId), { deleted: true }, { merge: true });
-                    window.showToast('Formular entfernt.', 'success');
-                } catch(e) {
-                    window.showToast('Lokal entfernt.', 'success');
+                    try {
+                        await setDoc(doc(db, "forms", formId), { deleted: true }, { merge: true });
+                        window.showToast('Formular entfernt.', 'success');
+                    } catch(e) {
+                        window.showToast('Lokal entfernt.', 'success');
+                    }
                 }
-            }
+            );
         };
 
         function dataURItoBlob(dataURI) {
@@ -2632,19 +2649,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             renderGalleryList(e.detail);
         });
         
-        window.deleteGalleryImage = async function(cardId) {
-            if(confirm('Möchten Sie dieses Fahrzeug dauerhaft entfernen?')) {
-                try {
-                    await deleteDoc(doc(db, "cars", cardId));
-                    window.showToast('Fahrzeug entfernt.', 'success');
-                } catch(err) {
-                    const el = document.getElementById(cardId);
-                    if(el) el.remove();
-                    
-                    let localCarsList = JSON.parse(localStorage.getItem('red_local_cars_gallery_v2')) || [];
-                    localCarsList = localCarsList.filter(c => c.id !== cardId);
-                    localStorage.setItem('red_local_cars_gallery_v2', JSON.stringify(localCarsList));
-                    window.showToast('Erfolgreich entfernt.', 'success');
+        window.deleteGalleryImage = function(cardId) {
+            window.openRedDeleteConfirm(
+                'Fahrzeug entfernen?',
+                'Möchten Sie dieses Fahrzeug wirklich dauerhaft aus der Galerie löschen?',
+                async () => {
+                    try {
+                        await deleteDoc(doc(db, "cars", cardId));
+                        window.showToast('Fahrzeug entfernt.', 'success');
+                    } catch(err) {
+                        const el = document.getElementById(cardId);
+                        if(el) el.remove();
+                        
+                        let localCarsList = JSON.parse(localStorage.getItem('red_local_cars_gallery_v2')) || [];
+                        localCarsList = localCarsList.filter(c => c.id !== cardId);
+                        localStorage.setItem('red_local_cars_gallery_v2', JSON.stringify(localCarsList));
+                        window.showToast('Erfolgreich entfernt.', 'success');
+                    }
                 }
-            }
+            );
         };
