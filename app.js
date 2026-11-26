@@ -3547,6 +3547,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         if(this.id === 'digitalVollmachtOverlay') window.closeDigitalVollmachtModal();
                         if(this.id === 'kaufvertragOverlay') window.closeKaufvertragModal();
                         if(this.id === 'cashInvoiceOverlay') window.closeCashInvoiceModal();
+                        if(this.id === 'shopPhotoEditOverlay') window.closeShopPhotoModal();
                         if(this.id === 'viralShareOverlay') window.closeViralShareModal();
                         if(this.id === 'pwaInstallOverlay') window.closePwaInstallModal();
                         if(this.id === 'callbackRequestOverlay') window.closeCallbackModal();
@@ -3908,9 +3909,9 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('lightboxTitle').innerText = title;
             const container = document.getElementById('lightboxImageContainer');
             if(mediaUrl.includes("data:video") || mediaUrl.endsWith(".mp4") || mediaUrl.startsWith("blob:")) {
-                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:cover; border-radius: 12px;"></video>`;
+                container.innerHTML = `<video src="${mediaUrl}" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:contain; border-radius: 12px;"></video>`;
             } else {
-                container.innerHTML = `<img src="${mediaUrl}" alt="${title}" style="width:100%; height:100%; object-fit:cover; border-radius: 12px;">`;
+                container.innerHTML = `<img src="${mediaUrl}" alt="${window.escHtml(title)}" style="width:100%; height:100%; object-fit:contain; border-radius: 12px;">`;
             }
             document.getElementById('lightboxOverlay').classList.add('open');
         };
@@ -5309,7 +5310,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                         <small>Berlin, den ${esc(rec.invDate)} – <strong>Stempel &amp; Unterschrift RED Zulassungsdienst</strong></small>
                     </div>
                 </div>
-            ` : (rec.showStamp !== false ? `<div style="display:flex; justify-content:flex-end; margin-top:24px;">${stampHtml}</div>` : '');
+            ` : (rec.showStamp !== false ? `<div class="stamp-standalone-wrap">${stampHtml}</div>` : '');
 
             const printWin = window.open('', '_blank');
             if (!printWin) {
@@ -5408,6 +5409,14 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                             padding: 5px 9px; text-align: center; background: rgba(255,255,255,0.9);
                             opacity: 0.9; pointer-events: none; line-height: 1.25;
                         }
+                        .stamp-standalone-wrap {
+                            display: flex; justify-content: flex-end; align-items: center;
+                            margin: 22px 0 6px; padding-right: 4px;
+                        }
+                        .stamp-standalone-wrap .rubber-stamp {
+                            position: relative !important; right: auto !important; bottom: auto !important;
+                            display: inline-block; transform: rotate(-5deg);
+                        }
                         .stamp-top { font-size: 10px; font-weight: 900; letter-spacing: 0.7px; }
                         .stamp-mid { font-size: 8px; font-weight: 700; margin: 2px 0; }
                         .stamp-bot { font-size: 8.5px; font-weight: 900; color: #d90000; border-top: 1px solid #003a99; padding-top: 2px; }
@@ -5441,7 +5450,8 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                             .col-pos { display: none; }
                             table.totals { width: 100%; font-size: 12px; }
                             .sig-area { grid-template-columns: 1fr; gap: 36px; margin-top: 32px; }
-                            .rubber-stamp { right: 4px; bottom: 24px; }
+                            .sig-col .rubber-stamp { right: 4px; bottom: 34px; }
+                            .stamp-standalone-wrap { justify-content: center; margin: 18px 0 4px; }
                             .doc-footer { margin-top: 28px; font-size: 9.5px; }
                         }
 
@@ -5543,3 +5553,268 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         window.printCashInvoice = function() {
             window.saveCurrentCashInvoice(true);
         };
+
+        // =========================================================================
+        // GESCHÄFTS-SHOWROOM GALERIE (KIENITZER STR. 6 – MIT ADMIN UPLOAD/EDIT/DELETE)
+        // =========================================================================
+        const DEFAULT_SHOP_PHOTOS = [
+            {
+                id: 'shop-1',
+                title: 'Annahmestelle Kienitzer Str. 6',
+                subtitle: 'Direkt an der U8 Boddinstraße • Berlin-Neukölln',
+                badge: 'Standort',
+                url: './laden-aussen.jpg'
+            },
+            {
+                id: 'shop-2',
+                title: 'Eigene Schilderpresse vor Ort',
+                subtitle: 'Standard-Alu & 3D-Carbon sofort zum Mitnehmen',
+                badge: 'Prägung',
+                url: './schilderpresse.jpg'
+            },
+            {
+                id: 'shop-3',
+                title: 'Präzisions-Heißprägung',
+                subtitle: 'Fertige Kennzeichen in nur 3–5 Minuten',
+                badge: 'Sofort-Service',
+                url: './heisspraege.jpg'
+            },
+            {
+                id: 'shop-4',
+                title: 'Modernes Büro & Empfang',
+                subtitle: 'Schnelle 5-Minuten-Abgabe ohne Wartezeit',
+                badge: 'Büro & Empfang',
+                url: './laden-innen.jpg'
+            }
+        ];
+
+        window.shopPhotosData = JSON.parse(localStorage.getItem('red_shop_gallery_v1') || 'null') || DEFAULT_SHOP_PHOTOS.map(p => ({ ...p }));
+
+        window.persistShopPhotos = async function() {
+            localStorage.setItem('red_shop_gallery_v1', JSON.stringify(window.shopPhotosData));
+            window.renderShopGallery();
+            if (window.firebaseDb && window.firebaseSetDoc) {
+                try {
+                    await window.firebaseSetDoc(
+                        window.firebaseDoc(window.firebaseDb, "settings", "shop_gallery"),
+                        { list: window.shopPhotosData, updatedAt: Date.now() },
+                        { merge: true }
+                    );
+                } catch (e) {
+                    console.error('Shop-Galerie Sync Fehler:', e);
+                }
+            }
+        };
+
+        window.handleShopImgError = function(imgEl, photoId) {
+            const card = imgEl.closest('.shop-photo-card');
+            const isAdmin = document.body.classList.contains('is-supervisor') ||
+                (document.body.classList.contains('is-admin') && document.body.classList.contains('perm-content'));
+            if (!isAdmin) {
+                if (card) card.style.display = 'none';
+                const visibleCards = document.querySelectorAll('#shopGalleryGrid .shop-photo-card:not([style*="display: none"])').length;
+                const wrap = document.getElementById('realShopGalleryWrap');
+                if (wrap && visibleCards === 0) wrap.style.display = 'none';
+            } else {
+                const mediaBox = imgEl.parentElement;
+                imgEl.remove();
+                if (mediaBox) {
+                    const ph = document.createElement('div');
+                    ph.className = 'shop-photo-missing-box';
+                    ph.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span>Bild noch nicht hochgeladen.<br>Auf den grünen Stift tippen zum Hochladen!</span>`;
+                    mediaBox.appendChild(ph);
+                }
+            }
+        };
+
+        window.renderShopGallery = function() {
+            const grid = document.getElementById('shopGalleryGrid');
+            const wrap = document.getElementById('realShopGalleryWrap');
+            if (!grid || !wrap) return;
+
+            const list = Array.isArray(window.shopPhotosData) ? window.shopPhotosData : [];
+            const isAdmin = document.body.classList.contains('is-supervisor') ||
+                (document.body.classList.contains('is-admin') && document.body.classList.contains('perm-content'));
+
+            if (list.length === 0 && !isAdmin) {
+                wrap.style.display = 'none';
+                return;
+            }
+            wrap.style.display = 'block';
+            grid.innerHTML = '';
+
+            if (list.length === 0 && isAdmin) {
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:22px; background:var(--bg-input); border-radius:12px; font-size:12px; color:var(--text-muted);">Keine Geschäftsfotos aktiv – über „+ Foto hinzufügen“ oder „Standard“ sofort wieder befüllen.</div>`;
+                return;
+            }
+
+            list.forEach(photo => {
+                const card = document.createElement('figure');
+                card.className = 'shop-photo-card';
+                card.onclick = () => window.openLightbox(photo.title || 'RED Zulassungsdienst Berlin', photo.url || '');
+
+                card.innerHTML = `
+                    <div class="shop-photo-media">
+                        ${photo.badge ? `<span class="shop-photo-badge">${window.escHtml(photo.badge)}</span>` : ''}
+                        <div class="shop-photo-admin-btns action-content">
+                            <button type="button" class="mini-admin-btn edit" onclick="event.stopPropagation(); window.openShopPhotoModal('${photo.id}')" title="Foto bearbeiten oder ersetzen"><i class="fa-solid fa-pencil"></i></button>
+                            <button type="button" class="mini-admin-btn del" onclick="event.stopPropagation(); window.deleteShopPhoto('${photo.id}')" title="Foto entfernen"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <img src="${window.escHtml(photo.url)}" alt="${window.escHtml(photo.title)}" loading="lazy" decoding="async" onerror="window.handleShopImgError(this, '${photo.id}')">
+                        <span class="shop-photo-zoom" aria-hidden="true"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                    </div>
+                    <figcaption class="shop-photo-caption">
+                        <strong>${window.escHtml(photo.title || 'RED Berlin')}</strong>
+                        ${photo.subtitle ? `<span>${window.escHtml(photo.subtitle)}</span>` : ''}
+                    </figcaption>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        window.setShopModalPreview = function(src) {
+            const box = document.getElementById('shopPhotoPreviewBox');
+            if (!box) return;
+            if (src) {
+                box.innerHTML = `<img src="${window.escHtml(src)}" alt="Vorschau">`;
+            } else {
+                box.innerHTML = `<i class="fa-solid fa-image" style="font-size:28px; color:var(--text-muted);"></i><span>Noch kein Bild ausgewählt</span>`;
+            }
+        };
+
+        window.previewShopPhotoUrl = function(val) {
+            const clean = String(val || '').trim();
+            if (clean) {
+                document.getElementById('shopPhotoDataUrl').value = '';
+                window.setShopModalPreview(clean);
+            }
+        };
+
+        window.compressImageFileToDataUrl = function(file, maxEdge = 960, quality = 0.78) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('Lesefehler'));
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('Bildfehler'));
+                    img.onload = () => {
+                        let w = img.naturalWidth || img.width;
+                        let h = img.naturalHeight || img.height;
+                        if (w > maxEdge || h > maxEdge) {
+                            if (w >= h) { h = Math.round(h * (maxEdge / w)); w = maxEdge; }
+                            else { w = Math.round(w * (maxEdge / h)); h = maxEdge; }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        window.handleShopPhotoFileSelect = async function(input) {
+            const file = input.files && input.files[0];
+            const lbl = document.getElementById('shopPhotoFileLabel');
+            if (!file) return;
+            if (lbl) lbl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Optimiere Foto...`;
+            try {
+                const compressed = await window.compressImageFileToDataUrl(file, 960, 0.78);
+                document.getElementById('shopPhotoDataUrl').value = compressed;
+                document.getElementById('shopPhotoUrlInput').value = '';
+                window.setShopModalPreview(compressed);
+                if (lbl) lbl.innerHTML = `<i class="fa-solid fa-check" style="color:#25D366;"></i> ${window.escHtml(file.name)} (Optimiert)`;
+            } catch (err) {
+                window.showToast('Foto konnte nicht verarbeitet werden.', 'error');
+                if (lbl) lbl.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Foto auswählen (wird automatisch optimiert)`;
+            }
+        };
+
+        window.openShopPhotoModal = function(photoId = '') {
+            const isEdit = !!photoId;
+            const item = isEdit ? (window.shopPhotosData || []).find(p => p.id === photoId) : null;
+
+            document.getElementById('shopPhotoModalHeading').innerHTML = isEdit
+                ? '<i class="fa-solid fa-pen"></i> Geschäftsfoto bearbeiten / ersetzen'
+                : '<i class="fa-solid fa-plus"></i> Neues Geschäftsfoto hinzufügen';
+            document.getElementById('shopPhotoEditId').value = item ? item.id : '';
+            document.getElementById('shopPhotoTitle').value = item ? (item.title || '') : '';
+            document.getElementById('shopPhotoSub').value = item ? (item.subtitle || '') : '';
+            const badgeSel = document.getElementById('shopPhotoBadge');
+            if (badgeSel) {
+                badgeSel.value = item ? (item.badge || 'Standort') : 'Standort';
+                if (typeof window.syncMobileSelectDisplay === 'function') window.syncMobileSelectDisplay(badgeSel);
+            }
+            const existingUrl = item ? (item.url || '') : '';
+            document.getElementById('shopPhotoDataUrl').value = existingUrl.startsWith('data:') ? existingUrl : '';
+            document.getElementById('shopPhotoUrlInput').value = existingUrl.startsWith('data:') ? '' : existingUrl;
+            document.getElementById('shopPhotoFileInput').value = '';
+            document.getElementById('shopPhotoFileLabel').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Foto auswählen (wird automatisch optimiert)`;
+            window.setShopModalPreview(existingUrl);
+
+            document.getElementById('shopPhotoEditOverlay').classList.add('open');
+        };
+
+        window.closeShopPhotoModal = function() {
+            document.getElementById('shopPhotoEditOverlay').classList.remove('open');
+        };
+
+        window.saveShopPhotoItem = async function() {
+            const editId = document.getElementById('shopPhotoEditId').value;
+            const title = document.getElementById('shopPhotoTitle').value.trim();
+            const subtitle = document.getElementById('shopPhotoSub').value.trim();
+            const badge = document.getElementById('shopPhotoBadge').value || 'Standort';
+            const dataUrl = document.getElementById('shopPhotoDataUrl').value.trim();
+            const rawUrl = document.getElementById('shopPhotoUrlInput').value.trim();
+            const finalUrl = dataUrl || rawUrl;
+
+            if (!title) { window.showToast('Bitte eine Überschrift für das Foto eingeben.', 'error'); return; }
+            if (!finalUrl) { window.showToast('Bitte ein Foto auswählen oder einen Bildpfad eintragen.', 'error'); return; }
+
+            if (editId) {
+                const idx = window.shopPhotosData.findIndex(p => p.id === editId);
+                if (idx > -1) {
+                    window.shopPhotosData[idx] = { id: editId, title, subtitle, badge, url: finalUrl };
+                }
+            } else {
+                window.shopPhotosData.push({ id: 'shop-' + Date.now(), title, subtitle, badge, url: finalUrl });
+            }
+
+            await window.persistShopPhotos();
+            window.closeShopPhotoModal();
+            window.showToast(editId ? 'Geschäftsfoto aktualisiert!' : 'Neues Geschäftsfoto veröffentlicht!', 'success');
+        };
+
+        window.deleteShopPhoto = function(photoId) {
+            const item = (window.shopPhotosData || []).find(p => p.id === photoId);
+            if (!item) return;
+            window.openRedDeleteConfirm(
+                'Geschäftsfoto löschen?',
+                `Möchten Sie „${item.title}“ wirklich aus der Geschäftsgalerie entfernen?`,
+                async () => {
+                    window.shopPhotosData = window.shopPhotosData.filter(p => p.id !== photoId);
+                    await window.persistShopPhotos();
+                    window.showToast('Foto entfernt.', 'success');
+                }
+            );
+        };
+
+        window.restoreDefaultShopPhotos = function() {
+            window.openRedDeleteConfirm(
+                'Standard-Fotos laden?',
+                'Möchten Sie die 4 Standard-Geschäftsfotos (Kienitzer Str. 6) wiederherstellen?',
+                async () => {
+                    window.shopPhotosData = DEFAULT_SHOP_PHOTOS.map(p => ({ ...p }));
+                    await window.persistShopPhotos();
+                    window.showToast('Alle 4 Standard-Geschäftsfotos wiederhergestellt!', 'success');
+                }
+            );
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.renderShopGallery();
+        });

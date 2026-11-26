@@ -1103,6 +1103,69 @@
         </div>
     </div>
 
+    <!-- ADMIN-MODAL: GESCHÄFTSFOTOS HOCHLADEN / BEARBEITEN / ERSETZEN -->
+    <div class="custom-dialog-overlay" id="shopPhotoEditOverlay">
+        <div class="custom-dialog-window" style="max-width:500px; border-top-color:var(--primary-red); text-align:left;">
+            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeShopPhotoModal()"></i>
+            <h3 id="shopPhotoModalHeading" style="color:var(--primary-red); font-weight:900; margin-bottom:6px; text-align:center;">
+                <i class="fa-solid fa-camera"></i> Geschäftsfoto verwalten
+            </h3>
+            <p style="color:var(--text-muted); font-size:11px; margin-bottom:14px; text-align:center;">
+                Handy-Fotos werden automatisch gestochen scharf komprimiert und sofort online synchronisiert.
+            </p>
+
+            <input type="hidden" id="shopPhotoEditId">
+            <input type="hidden" id="shopPhotoDataUrl">
+
+            <div class="shop-modal-preview-box" id="shopPhotoPreviewBox">
+                <i class="fa-solid fa-image" style="font-size:28px; color:var(--text-muted);"></i>
+                <span>Noch kein Bild ausgewählt</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="flex:1.4;">
+                    <label>Überschrift / Titel *</label>
+                    <input type="text" id="shopPhotoTitle" class="form-control" placeholder="z.B. Annahmestelle Kienitzer Str. 6">
+                </div>
+                <div class="form-group">
+                    <label>Kategorie-Etikett</label>
+                    <select id="shopPhotoBadge" class="form-control">
+                        <option value="Standort">Standort</option>
+                        <option value="Prägung">Prägung</option>
+                        <option value="Sofort-Service">Sofort-Service</option>
+                        <option value="Büro &amp; Empfang">Büro &amp; Empfang</option>
+                        <option value="3D-Carbon">3D-Carbon</option>
+                        <option value="Team">Team</option>
+                        <option value="Neu">Neu</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Kurze Beschreibung (Unterzeile)</label>
+                <input type="text" id="shopPhotoSub" class="form-control" placeholder="z.B. Direkt an der U8 Boddinstraße – ohne Wartezeit">
+            </div>
+
+            <div class="form-group">
+                <label>Foto vom Smartphone / PC wählen (Hochladen oder Ersetzen)</label>
+                <label class="noble-file-upload" style="margin-top:0;">
+                    <input type="file" id="shopPhotoFileInput" accept="image/*" onchange="window.handleShopPhotoFileSelect(this)">
+                    <span class="noble-file-trigger" id="shopPhotoFileLabel"><i class="fa-solid fa-cloud-arrow-up"></i> Foto auswählen (wird automatisch optimiert)</span>
+                </label>
+            </div>
+
+            <div class="form-group" style="margin-bottom:14px;">
+                <label>Oder direkter Dateiname / Bild-URL (Optional)</label>
+                <input type="text" id="shopPhotoUrlInput" class="form-control" placeholder="./laden-aussen.jpg" oninput="window.previewShopPhotoUrl(this.value)">
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none;" onclick="window.closeShopPhotoModal()">Abbrechen</button>
+                <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:2; justify-content:center;" onclick="window.saveShopPhotoItem()"><i class="fa-solid fa-floppy-disk"></i> Foto speichern</button>
+            </div>
+        </div>
+    </div>
+
     <!-- VIRAL SHARE & QR-CODE VISITENKARTE MODAL -->
     <div class="custom-dialog-overlay" id="viralShareOverlay">
         <div class="custom-dialog-window">
@@ -1903,7 +1966,7 @@
     <div class="custom-dialog-overlay" id="lightboxOverlay">
         <div class="custom-dialog-window">
             <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeLightbox()"></i>
-            <div style="width:100%; height:320px; background:#000; border-radius:12px; overflow:hidden; margin-bottom:15px; margin-top:15px;" id="lightboxImageContainer"></div>
+            <div style="width:100%; height:min(66dvh, 480px); background:#0c0c12; border-radius:14px; overflow:hidden; margin-bottom:14px; margin-top:14px; display:flex; align-items:center; justify-content:center;" id="lightboxImageContainer"></div>
             <h3 id="lightboxTitle" style="color:var(--gold-accent); text-transform:uppercase; font-size:16px;"></h3>
         </div>
     </div>
@@ -2790,25 +2853,24 @@
                     </div>
                 </div>
 
-                <!-- ECHTE GESCHÄFTSFOTOS (ERSCHEINEN AUTOMATISCH, SOBALD DU DIE JPGs HOCHLÄDST) -->
-                <div id="realShopGalleryWrap" style="display:none; margin-top:16px;">
-                    <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px;">
-                        <i class="fa-solid fa-camera" style="color:var(--primary-red);"></i> Einblick in unser Geschäft – Kienitzer Str. 6, Berlin-Neukölln
+                <!-- PROFI SHOWROOM-GALERIE: UNSER GESCHÄFT IN DER KIENITZER STR. 6 -->
+                <div id="realShopGalleryWrap" class="shop-gallery-block">
+                    <div class="shop-gallery-header">
+                        <div class="shop-gallery-title-group">
+                            <span class="shop-gallery-eyebrow"><i class="fa-solid fa-camera"></i> Echt • Persönlich • Direkt vor Ort</span>
+                            <h3>Einblick in unser Geschäft – Kienitzer Str. 6</h3>
+                            <p>Modernes Büro &amp; eigene Profi-Schilderprägung (Standard &amp; 3D-Carbon) in Berlin-Neukölln – zum Vergrößern Foto antippen.</p>
+                        </div>
+                        <div class="shop-admin-controls action-content">
+                            <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.openShopPhotoModal()">
+                                <i class="fa-solid fa-plus"></i> Foto hinzufügen
+                            </button>
+                            <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.restoreDefaultShopPhotos()" title="Standard-Fotos wiederherstellen">
+                                <i class="fa-solid fa-rotate-left"></i> Standard
+                            </button>
+                        </div>
                     </div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
-                        <figure class="real-shop-photo-card" style="display:none; margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--glass-border); background:var(--bg-input);">
-                            <img src="./laden-aussen.jpg" alt="RED Zulassungsdienst Berlin-Neukölln Außenansicht Kienitzer Str. 6" loading="lazy" style="width:100%; height:170px; object-fit:cover; display:block;" onload="this.parentElement.style.display='block'; document.getElementById('realShopGalleryWrap').style.display='block';" onerror="this.parentElement.remove();">
-                            <figcaption style="padding:8px 10px; font-size:11px; font-weight:700; color:var(--text-light);">Annahmestelle Kienitzer Str. 6</figcaption>
-                        </figure>
-                        <figure class="real-shop-photo-card" style="display:none; margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--glass-border); background:var(--bg-input);">
-                            <img src="./schilderpresse.jpg" alt="Kfz-Kennzeichen Sofortprägung in Berlin-Neukölln" loading="lazy" style="width:100%; height:170px; object-fit:cover; display:block;" onload="this.parentElement.style.display='block'; document.getElementById('realShopGalleryWrap').style.display='block';" onerror="this.parentElement.remove();">
-                            <figcaption style="padding:8px 10px; font-size:11px; font-weight:700; color:var(--text-light);">Kennzeichen-Sofortprägung vor Ort</figcaption>
-                        </figure>
-                        <figure class="real-shop-photo-card" style="display:none; margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--glass-border); background:var(--bg-input);">
-                            <img src="./laden-innen.jpg" alt="RED Zulassungsdienst Berlin Kundenempfang ohne Wartezeit" loading="lazy" style="width:100%; height:170px; object-fit:cover; display:block;" onload="this.parentElement.style.display='block'; document.getElementById('realShopGalleryWrap').style.display='block';" onerror="this.parentElement.remove();">
-                            <figcaption style="padding:8px 10px; font-size:11px; font-weight:700; color:var(--text-light);">Schnelle Abgabe ohne Wartezeit</figcaption>
-                        </figure>
-                    </div>
+                    <div class="shop-gallery-grid" id="shopGalleryGrid"></div>
                 </div>
             </div>
         </section>

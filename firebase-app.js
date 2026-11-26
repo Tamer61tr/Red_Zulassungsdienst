@@ -189,6 +189,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 
                 window.startAdminCrmListener();
                 window.startAdminInvoicesListener();
+                if (typeof window.renderShopGallery === 'function') window.renderShopGallery();
                 if (typeof window.startAdminAppointmentsListener === 'function') {
                     window.startAdminAppointmentsListener();
                 }
@@ -381,6 +382,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                     const data = docSnap.data();
                     localStorage.setItem('red_page_content', JSON.stringify(data));
                     window.applyPageContent(data);
+                }
+            });
+
+            onSnapshot(doc(db, "settings", "shop_gallery"), (docSnap) => {
+                if(docSnap.exists() && Array.isArray(docSnap.data().list)) {
+                    window.shopPhotosData = docSnap.data().list;
+                    localStorage.setItem('red_shop_gallery_v1', JSON.stringify(window.shopPhotosData));
+                    if (typeof window.renderShopGallery === 'function') window.renderShopGallery();
                 }
             });
         }
