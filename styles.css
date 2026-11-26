@@ -3827,8 +3827,9 @@
             scroll-padding-top: calc(var(--dynamic-header-h, 130px) + 12px);
         }
         .view-section,
-        section[id] {
-            scroll-margin-top: calc(var(--dynamic-header-h, 130px) + 12px);
+        section[id],
+        #realShopGalleryWrap {
+            scroll-margin-top: calc(var(--dynamic-header-h, 130px) + 14px);
         }
         .compass-doc-list li span {
             min-width: 0;

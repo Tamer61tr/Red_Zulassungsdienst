@@ -110,12 +110,29 @@ window.escHtml = function(str) {
         window.desktopNavGo = function(targetId) {
             const headerEl = document.getElementById('header-wrapper');
             if (headerEl) headerEl.classList.remove('header-compact');
+            if (typeof window.syncBodyScrollLock === 'function') window.syncBodyScrollLock();
+
             const isHome = (document.querySelector('.view-section.active')?.id === 'view-home');
-            if (!isHome) window.switchView('view-home');
+            if (!isHome) {
+                window.switchView('view-home');
+            }
+
+            const scrollToExactTarget = (smooth = true) => {
+                const target = document.getElementById(targetId);
+                if (!target) return;
+                const headerH = headerEl ? Math.ceil(headerEl.getBoundingClientRect().height) : 130;
+                const y = Math.max(0, Math.round(target.getBoundingClientRect().top + window.scrollY - headerH - 14));
+                window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' });
+            };
+
+            setTimeout(() => scrollToExactTarget(true), isHome ? 80 : 240);
             setTimeout(() => {
                 const target = document.getElementById(targetId);
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, isHome ? 20 : 120);
+                if (!target) return;
+                const headerH = headerEl ? Math.ceil(headerEl.getBoundingClientRect().height) : 130;
+                const diff = target.getBoundingClientRect().top - (headerH + 14);
+                if (Math.abs(diff) > 35) scrollToExactTarget(true);
+            }, isHome ? 480 : 650);
         };
 
         window.jumpToBookingFromTicker = function() {
