@@ -86,6 +86,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                     if (document.getElementById('cashInvoiceOverlay')?.classList.contains('open')) {
                         window.renderSavedInvoicesArchive();
                     }
+                    if (document.getElementById('crmOverlay')?.classList.contains('open') && typeof window.renderCRM === 'function') {
+                        window.renderCRM();
+                    }
                 }
             });
         };
@@ -1826,12 +1829,20 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
         };
 
         window.cancelDelete = function() {
-            document.getElementById('deleteConfirmOverlay').classList.remove('open');
+            const ov = document.getElementById('deleteConfirmOverlay');
+            if (ov) { ov.classList.remove('open'); ov.style.zIndex = ''; }
             window.deleteTargetId = null;
             window.deleteNoteTargetId = null;
+            window._customConfirmCallback = null;
         };
 
         window.confirmDelete = async function() {
+            if (typeof window._customConfirmCallback === 'function') {
+                const cb = window._customConfirmCallback;
+                window.cancelDelete();
+                await cb();
+                return;
+            }
             if(window.deleteNoteTargetId) {
                 const currentList = window.redApts && window.redApts.length ? window.redApts : localAppointments;
                 const index = currentList.findIndex(a => a.id === window.deleteTargetId);

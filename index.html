@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-    <link rel="stylesheet" href="./styles.css?v=7">
+    <link rel="stylesheet" href="./styles.css?v=8">
 </head>
 
 <body data-theme="light">
@@ -851,12 +851,12 @@
         </div>
     </div>
 
-    <!-- BAR-RECHNUNG & QUITTUNGS-ARCHIV PRO (SUPERVISOR & FREIGESCHALTETER ADMIN) -->
+    <!-- RED BELEG-, RECHNUNGS- & DOKUMENTEN-SUITE PRO (SUPERVISOR & FREIGESCHALTETER ADMIN) -->
     <div class="custom-dialog-overlay" id="cashInvoiceOverlay">
         <div class="custom-dialog-window">
             <div class="inv-modal-header">
-                <h3><i class="fa-solid fa-file-invoice-dollar"></i> Bar-Rechnung &amp; Quittungen</h3>
-                <p>Rechnungen &amp; Quittungen erstellen, automatisch in der Cloud speichern, bearbeiten und als DIN-A4 PDF ausdrucken.</p>
+                <h3><i class="fa-solid fa-file-invoice-dollar"></i> RED Rechnungen, Angebote &amp; Belege</h3>
+                <p>Bar-Rechnungen, Quittungen, Angebote, Kostenvoranschläge &amp; Übergabeprotokolle erstellen, verknüpfen, bearbeiten &amp; als PDF drucken.</p>
                 <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeCashInvoiceModal()"></i>
             </div>
 
@@ -874,28 +874,38 @@
                 <div class="inv-pane active" id="invPaneCreate">
                     <div class="inv-edit-banner" id="invEditingBanner">
                         <span><i class="fa-solid fa-pen"></i> Bearbeitungsmodus: <strong id="invEditingCodeLabel"></strong></span>
-                        <button type="button" class="inv-arch-btn" onclick="window.resetCashInvoiceForm()"><i class="fa-solid fa-plus"></i> Stattdessen Neu</button>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <button type="button" class="inv-arch-btn pdf" id="invConvertToRechnungBtn" style="display:none;" onclick="window.convertCurrentDocToInvoice()"><i class="fa-solid fa-arrow-right-arrow-left"></i> In Rechnung umwandeln</button>
+                            <button type="button" class="inv-arch-btn" onclick="window.resetCashInvoiceForm()"><i class="fa-solid fa-plus"></i> Neu</button>
+                        </div>
                     </div>
 
+                    <input type="hidden" id="invLinkedClientId">
+
                     <div class="service-config-section">
-                        <h4>1. Kopfdaten &amp; Kunde</h4>
-                        <div class="form-group">
-                            <label>Kunde schnell aus Terminen / CRM laden (Optional)</label>
-                            <select id="invClientQuickPick" class="form-control" onchange="window.fillInvoiceFromQuickPick(this.value)">
-                                <option value="">— Manuell eingeben —</option>
-                            </select>
-                        </div>
+                        <h4>1. RED Dokumenten-Vorlage &amp; Kopfdaten</h4>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Beleg-Art</label>
-                                <select id="invDocTitle" class="form-control">
-                                    <option value="RECHNUNG & BARQUITTUNG">Rechnung &amp; Barquittung</option>
-                                    <option value="RECHNUNG">Rechnung</option>
-                                    <option value="BARQUITTUNG">Barquittung</option>
+                            <div class="form-group" style="flex:1.5;">
+                                <label>RED Dokumenten-Vorlage (Select-Ordner)</label>
+                                <select id="invDocTitle" class="form-control" onchange="window.onInvoiceDocTypeChange()">
+                                    <optgroup label="💶 Abrechnung &amp; Barzahlung">
+                                        <option value="RECHNUNG & BARQUITTUNG">Rechnung &amp; Barquittung (RE)</option>
+                                        <option value="RECHNUNG">Rechnung (RE)</option>
+                                        <option value="BARQUITTUNG">Barquittung (QU)</option>
+                                    </optgroup>
+                                    <optgroup label="📋 Angebot &amp; Kalkulation">
+                                        <option value="ANGEBOT">Angebot – Zulassungsservice (AN)</option>
+                                        <option value="KOSTENVORANSCHLAG">Kostenvoranschlag (KV)</option>
+                                    </optgroup>
+                                    <optgroup label="🗂️ Zulassungs-Protokolle &amp; Korrektur">
+                                        <option value="AUFTRAGSBESTÄTIGUNG">Auftragsbestätigung (AB)</option>
+                                        <option value="ÜBERGABEPROTOKOLL">Übergabeprotokoll Papiere &amp; Schilder (UP)</option>
+                                        <option value="GUTSCHRIFT / STORNO">Gutschrift / Storno-Beleg (GS)</option>
+                                    </optgroup>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Beleg-Nr.</label>
+                                <label>Beleg-Nr. (Automatisch)</label>
                                 <input type="text" id="invNumber" class="form-control" placeholder="RE-2026-0001">
                             </div>
                             <div class="form-group">
@@ -903,34 +913,64 @@
                                 <input type="text" id="invDate" class="form-control" placeholder="TT.MM.JJJJ">
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label>Kunde direkt aus Terminen / CRM laden (Brücke)</label>
+                            <select id="invClientQuickPick" class="form-control" onchange="window.fillInvoiceFromQuickPick(this.value)">
+                                <option value="">— Manuell eingeben —</option>
+                            </select>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Kundenname / Firma *</label>
                                 <input type="text" id="invCustomerName" class="form-control" placeholder="Vor- und Nachname oder Firma">
                             </div>
                             <div class="form-group">
+                                <label>Telefon / WhatsApp (für 1-Klick-Versand)</label>
+                                <input type="tel" id="invCustomerPhone" class="form-control" placeholder="z.B. 0178 ...">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
                                 <label>Kennzeichen / Fahrzeug (Optional)</label>
                                 <input type="text" id="invPlate" class="form-control" placeholder="z.B. B - XY 1234" style="text-transform:uppercase;">
                             </div>
+                            <div class="form-group">
+                                <label>FIN / Fahrgestell-Nr. (Optional)</label>
+                                <input type="text" id="invVin" class="form-control" placeholder="z.B. WVWZZZ..." style="text-transform:uppercase;">
+                            </div>
                         </div>
-                        <div class="form-group" style="margin-bottom:0;">
-                            <label>Kundenanschrift (Optional)</label>
-                            <input type="text" id="invCustomerAddress" class="form-control" placeholder="Straße, Hausnr., PLZ Berlin">
+                        <div class="form-row" style="margin-bottom:0;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Kundenanschrift (Optional)</label>
+                                <input type="text" id="invCustomerAddress" class="form-control" placeholder="Straße, Hausnr., PLZ Berlin">
+                            </div>
+                            <div class="form-group" id="invValidUntilGroup" style="display:none; margin-bottom:0;">
+                                <label>Gültig bis (Angebot / KV)</label>
+                                <input type="text" id="invValidUntil" class="form-control" placeholder="TT.MM.JJJJ">
+                            </div>
+                        </div>
+
+                        <div class="inv-bridge-row" id="invFormBridgeRow" style="display:none;">
+                            <button type="button" class="inv-arch-btn edit" onclick="window.jumpFromInvoiceToCrm()"><i class="fa-solid fa-address-book"></i> Kundenakte im CRM öffnen</button>
+                            <button type="button" class="inv-arch-btn pdf" onclick="window.sendCurrentInvoiceToWhatsApp()"><i class="fa-brands fa-whatsapp"></i> Beleg-Info per WhatsApp</button>
                         </div>
                     </div>
 
                     <div class="service-config-section">
-                        <h4>2. Leistungen &amp; Beträge (antippen zum Hinzufügen)</h4>
+                        <h4>2. Leistungen, Preise &amp; Rabatt (1-Klick-Auswahl)</h4>
                         <div class="inv-quick-bar">
                             <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Anmeldung mit Wunschkennzeichen (inkl. Gebühren, Schilder & Plakette)', 1, 100)">+ Anm. Wunsch 100 €</button>
                             <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Anmeldung mit Zufallskennzeichen (inkl. Gebühren, Schilder & Plakette)', 1, 90)">+ Anm. Zufall 90 €</button>
                             <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Ummeldung mit gleichem Kennzeichen', 1, 70)">+ Ummeldung 70 €</button>
-                            <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Abmeldung (regulär)', 1, 30)">+ Abm. 30 €</button>
-                            <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Online-Abmeldung', 1, 20)">+ Online-Abm. 20 €</button>
+                            <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Abmeldung (regulär vor Ort)', 1, 30)">+ Abm. 30 €</button>
+                            <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Online-Abmeldung (digital)', 1, 20)">+ Online-Abm. 20 €</button>
                             <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Kurzzeitkennzeichen (6 Tage)', 1, 120)">+ Kurzzeit 120 €</button>
                             <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Zoll- / Ausfuhrkennzeichen (30 Tage)', 1, 350)">+ Zoll 350 €</button>
                             <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('1 Paar Kfz-Kennzeichen (Sofortprägung)', 1, 30)">+ 1 Paar 30 €</button>
                             <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Einzelnes Kfz-Kennzeichen (1 Stück)', 1, 15)">+ 1 Schild 15 €</button>
+                            <button type="button" class="inv-quick-chip" onclick="window.addInvoiceRow('Grüne Feinstaubplakette (Stufe 4)', 1, 10)">+ Plakette 10 €</button>
                             <button type="button" class="inv-quick-chip" style="border-color:var(--primary-red); color:var(--primary-red);" onclick="window.addInvoiceRow('', 1, 0)">+ Freie Position</button>
                         </div>
 
@@ -942,13 +982,19 @@
                         </div>
                         <div id="invItemsContainer"></div>
 
-                        <div class="form-group" style="margin-top:10px; margin-bottom:0;">
-                            <label>Steuer-Ausweis auf dem Beleg</label>
-                            <select id="invTaxMode" class="form-control" onchange="window.recalcCashInvoice()">
-                                <option value="mwst19">Inkl. 19 % MwSt. (Netto + MwSt. ausweisen)</option>
-                                <option value="komplett">Komplettpreis inkl. MwSt. &amp; verauslagter Amtsgebühren</option>
-                                <option value="klein">Kleinunternehmer (§ 19 UStG – ohne MwSt.)</option>
-                            </select>
+                        <div class="form-row" style="margin-top:10px; margin-bottom:0;">
+                            <div class="form-group" style="flex:1.6; margin-bottom:0;">
+                                <label>Steuer-Ausweis auf dem Beleg</label>
+                                <select id="invTaxMode" class="form-control" onchange="window.recalcCashInvoice()">
+                                    <option value="mwst19">Inkl. 19 % MwSt. (Netto + MwSt. ausweisen)</option>
+                                    <option value="komplett">Komplettpreis inkl. MwSt. &amp; verauslagter Amtsgebühren</option>
+                                    <option value="klein">Kleinunternehmer (§ 19 UStG – ohne MwSt.)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:0.7; margin-bottom:0;">
+                                <label>Nachlass / Rabatt (€)</label>
+                                <input type="text" inputmode="decimal" id="invDiscount" class="form-control" placeholder="0,00" oninput="window.recalcCashInvoice()">
+                            </div>
                         </div>
                     </div>
 
@@ -956,14 +1002,15 @@
                         <h4>3. Zahlungsstatus, Logo, Stempel &amp; Unterschrift</h4>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Zahlungsstatus</label>
+                                <label>Status / Zahlungsart</label>
                                 <select id="invPayStatus" class="form-control">
                                     <option value="paid">Betrag dankend in BAR erhalten (Bezahlt)</option>
                                     <option value="open">Zahlbar in BAR bei Übergabe / Abholung</option>
+                                    <option value="quote">Unverbindlich (Angebot / Kostenvoranschlag)</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Zusatzhinweis (Optional)</label>
+                                <label>Zusatzhinweis auf dem Beleg (Optional)</label>
                                 <input type="text" id="invNote" class="form-control" placeholder="z.B. Papiere & Schilder vollständig übergeben">
                             </div>
                         </div>
@@ -979,15 +1026,27 @@
                                 <label>Optionale digitale Unterschrift (leer = mit Stift unterschreiben):</label>
                                 <button type="button" onclick="window.clearInvoiceSignature()" style="background:none; border:none; color:var(--primary-red); font-size:11px !important; font-weight:800; cursor:pointer;"><i class="fa-solid fa-eraser"></i> Löschen</button>
                             </div>
-                            <div class="signature-pad-wrapper" style="height:115px;">
+                            <div class="signature-pad-wrapper" style="height:112px;">
                                 <canvas id="invSignatureCanvas"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 2: GESPEICHERTE RECHNUNGEN & QUITTUNGEN (ARCHIV + EDIT) -->
+                <!-- TAB 2: GESPEICHERTE RECHNUNGEN, ANGEBOTE & QUITTUNGEN (ARCHIV + EDIT) -->
                 <div class="inv-pane" id="invPaneArchive">
+                    <!-- KUNDEN-FILTER-BANNER (WENN AUS CRM FÜR EINEN KUNDEN GEÖFFNET) -->
+                    <div class="inv-client-filter-bar" id="invClientFilterBar" style="display:none;">
+                        <div style="display:flex; align-items:center; gap:7px; min-width:0;">
+                            <i class="fa-solid fa-user-check" style="color:var(--primary-red);"></i>
+                            <span style="font-size:11.5px; font-weight:800; color:var(--text-light); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Nur Belege von: <strong id="invClientFilterName" style="color:var(--primary-red);"></strong></span>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-shrink:0;">
+                            <button type="button" class="inv-arch-btn pdf" onclick="window.createNewInvoiceForFilteredCustomer()"><i class="fa-solid fa-plus"></i> Neu</button>
+                            <button type="button" class="inv-arch-btn" onclick="window.clearInvoiceCustomerFilter()"><i class="fa-solid fa-xmark"></i> Alle</button>
+                        </div>
+                    </div>
+
                     <div class="inv-archive-kpis">
                         <div class="inv-kpi-card" style="--kpi-accent:#007aff;">
                             <strong id="invStatCount">0</strong>
@@ -999,16 +1058,17 @@
                         </div>
                         <div class="inv-kpi-card" style="--kpi-accent:#d97706;">
                             <strong id="invStatOpenSum">0,00 €</strong>
-                            <span>Noch Offen</span>
+                            <span>Offen / Angebot</span>
                         </div>
                     </div>
 
                     <div class="inv-archive-controls">
-                        <input type="text" id="invArchiveSearch" class="form-control" placeholder="🔍 Suche nach Beleg-Nr., Kunde, Kennzeichen..." oninput="window.renderSavedInvoicesArchive()">
+                        <input type="text" id="invArchiveSearch" class="form-control" placeholder="🔍 Suche nach Beleg-Nr., Kunde, Kennzeichen, Vorlage..." oninput="window.renderSavedInvoicesArchive()">
                         <div class="inv-archive-filter-pills" id="invArchiveFilterPills">
                             <button type="button" class="admin-filter-pill active" data-inv-filter="all" onclick="window.setInvoiceArchiveFilter('all')">Alle</button>
                             <button type="button" class="admin-filter-pill" data-inv-filter="paid" onclick="window.setInvoiceArchiveFilter('paid')">Bezahlt</button>
                             <button type="button" class="admin-filter-pill" data-inv-filter="open" onclick="window.setInvoiceArchiveFilter('open')">Offen</button>
+                            <button type="button" class="admin-filter-pill" data-inv-filter="quote" onclick="window.setInvoiceArchiveFilter('quote')">Angebote</button>
                         </div>
                     </div>
 
@@ -1016,7 +1076,7 @@
                 </div>
             </div>
 
-            <!-- FESTER FUSSBEREICH (IMMER SICHTBAR – KEIN VERLORENER BUTTON) -->
+            <!-- FESTER FUSSBEREICH -->
             <div class="inv-modal-footer" id="invCreateFooter">
                 <div>
                     <span style="font-size:9.5px; text-transform:uppercase; color:var(--text-muted); font-weight:800; display:block;">Gesamtbetrag</span>
@@ -1036,8 +1096,8 @@
                 </div>
             </div>
             <div class="inv-modal-footer" id="invArchiveFooter" style="display:none; justify-content:flex-end;">
-                <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; width:100%; justify-content:center;" onclick="window.resetCashInvoiceForm(); window.switchInvoiceTab('create');">
-                    <i class="fa-solid fa-plus"></i> Neue Bar-Rechnung / Quittung erstellen
+                <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; width:100%; justify-content:center;" onclick="window.createNewInvoiceFromArchiveFooter()">
+                    <i class="fa-solid fa-plus"></i> Neuen Beleg / Rechnung / Angebot erstellen
                 </button>
             </div>
         </div>
@@ -1354,7 +1414,15 @@
                 <textarea id="crmEditNotes" class="form-control" rows="3" style="resize:vertical;"></textarea>
             </div>
             
-            <div style="display:flex; gap:10px; margin-top:15px;">
+            <div class="mod-invoice" style="gap:8px; margin-top:12px; width:100%; flex-wrap:wrap;">
+                <button type="button" class="btn-primary btn-green-adaptive" style="flex:1; justify-content:center; padding:10px 12px; font-size:11px !important;" onclick="window.openInvoicesForCrmClient(document.getElementById('crmEditClientId').value, false)">
+                    <i class="fa-solid fa-receipt"></i> Belege dieses Kunden
+                </button>
+                <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:1; justify-content:center; padding:10px 12px; font-size:11px !important;" onclick="window.openInvoicesForCrmClient(document.getElementById('crmEditClientId').value, true)">
+                    <i class="fa-solid fa-file-circle-plus"></i> Neue Rechnung / Angebot
+                </button>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px;">
                 <button class="btn-primary" style="background:transparent; border:1px solid #ff3b30; color:#ff3b30; flex:1; justify-content:center;" onclick="window.deleteCRMClient()"><i class="fa-solid fa-trash"></i> Akte löschen</button>
                 <button class="btn-primary" style="flex:2; justify-content:center;" onclick="window.saveCRMDetail()"><i class="fa-solid fa-floppy-disk"></i> Akte Speichern</button>
             </div>
@@ -2647,45 +2715,48 @@
         <!-- LOKALE LEISTUNGSABSCHNITTE BERLIN-NEUKÖLLN & ECHTE VERTRAUENSANKER -->
         <section id="neukoelln-lokal" class="compass-wrapper" style="margin-top:32px;">
             <div class="compass-box" style="text-align:left; border-top:3px solid var(--primary-red);">
-                <div style="text-align:center; margin-bottom:22px;">
+                <div style="text-align:center; margin-bottom:20px;">
                     <span style="display:inline-block; background:rgba(217,0,0,0.09); color:var(--primary-red); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:4px 12px; border-radius:50px; margin-bottom:8px;">
                         <i class="fa-solid fa-location-dot"></i> Berlin-Neukölln • Kienitzer Str. 6
                     </span>
-                    <h2 style="font-size:clamp(19px, 2.8vw, 26px); font-weight:900; text-transform:uppercase; color:var(--text-light); margin:0;">
+                    <h2 style="font-size:clamp(18px, 2.6vw, 25px); font-weight:900; text-transform:uppercase; color:var(--text-light); margin:0;">
                         Ihr Zulassungs- &amp; Schilderdienst direkt vor Ort in Neukölln
                     </h2>
-                    <p style="font-size:12px; color:var(--text-muted); max-width:660px; margin:6px auto 0;">
-                        Persönlicher Service ohne Behörden-Wartezeit – direkt an der U8 Boddinstraße, nahe Hermannplatz und Stadtautobahn A100 (Ausfahrt Britzer Damm).
+                    <p style="font-size:12px; color:var(--text-muted); max-width:820px; margin:7px auto 0; line-height:1.5;">
+                        Persönlicher Service ohne Behörden-Wartezeit – direkt an der U8&nbsp;Boddinstraße, nahe Hermannplatz &amp; A100&nbsp;(Ausfahrt Britzer&nbsp;Damm).
                     </p>
                 </div>
 
-                <!-- 3 LOKALE SEO-LEISTUNGSABSCHNITTE -->
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:14px; margin-bottom:22px;">
-                    <article style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:18px;">
-                        <h3 style="font-size:14px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin-bottom:8px;">
-                            <i class="fa-solid fa-file-signature"></i> Kfz-Zulassung Berlin-Neukölln
-                        </h3>
-                        <p style="font-size:12px; color:var(--text-light); line-height:1.6; margin:0;">
-                            Wir übernehmen Ihre komplette <strong>Anmeldung</strong> (90 € mit Zufallskennzeichen / 100 € mit Wunschkennzeichen inkl. amtlicher Gebühren, Kennzeichen &amp; grüner Umweltplakette), <strong>Ummeldung</strong> (70 €) sowie <strong>Abmeldung</strong> (30 € vor Ort / 20 € online) beim LABO Berlin – ohne eigene Terminsuche.
-                        </p>
+                <!-- 3 KOMPAKTE, STRUKTURIERTE LOKALE LEISTUNGSKARTEN -->
+                <div class="nk-seo-grid">
+                    <article class="nk-seo-card">
+                        <h3><i class="fa-solid fa-file-signature"></i> Kfz-Zulassung Neukölln</h3>
+                        <ul class="nk-feature-list">
+                            <li><i class="fa-solid fa-check"></i><span><strong>Anmeldung Komplett:</strong> 90&nbsp;€ (Zufall) / 100&nbsp;€ (Wunsch) – inkl. Gebühren, Schilder &amp; Plakette</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>Ummeldung:</strong> 70&nbsp;€ mit Kennzeichenübernahme</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>Abmeldung:</strong> 30&nbsp;€ vor Ort / 20&nbsp;€ online</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>LABO Berlin:</strong> Direkte Abwicklung ohne eigene Terminsuche</span></li>
+                        </ul>
                     </article>
 
-                    <article style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:18px;">
-                        <h3 style="font-size:14px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin-bottom:8px;">
-                            <i class="fa-solid fa-id-card"></i> Sofortprägung Kienitzer Str. 6
-                        </h3>
-                        <p style="font-size:12px; color:var(--text-light); line-height:1.6; margin:0;">
-                            Alle <strong>Kfz-Kennzeichen prägen wir in 3–5 Minuten sofort zum Mitnehmen</strong> direkt vor Ort (15 € / Stück, 30 € / Paar): Euro-Standard, kurze Schilder, E-, H-, Saison- &amp; Motorradschilder sowie <strong>6-Tage-Kurzzeitkennzeichen</strong> (120 €) und <strong>30-Tage-Zollkennzeichen</strong> (350 €).
-                        </p>
+                    <article class="nk-seo-card">
+                        <h3><i class="fa-solid fa-id-card"></i> Sofortprägung Kienitzer Str. 6</h3>
+                        <ul class="nk-feature-list">
+                            <li><i class="fa-solid fa-check"></i><span><strong>Sofort zum Mitnehmen:</strong> Prägung in 3–5&nbsp;Min. vor Ort</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>Kfz-Schilder:</strong> 15&nbsp;€ / Stück • 30&nbsp;€ / Paar (Euro, Kurz, E, H, Saison, Motorrad)</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>Kurzzeitkennzeichen:</strong> 6&nbsp;Tage für 120&nbsp;€</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>Zoll- / Ausfuhrkennzeichen:</strong> 30&nbsp;Tage für 350&nbsp;€</span></li>
+                        </ul>
                     </article>
 
-                    <article style="background:var(--bg-input); border:1px solid var(--glass-border); border-radius:14px; padding:18px;">
-                        <h3 style="font-size:14px; font-weight:900; color:var(--primary-red); text-transform:uppercase; margin-bottom:8px;">
-                            <i class="fa-solid fa-car"></i> Auto Ankauf Berlin-Neukölln
-                        </h3>
-                        <p style="font-size:12px; color:var(--text-light); line-height:1.6; margin:0;">
-                            Verkaufen Sie Ihr Fahrzeug direkt und unkompliziert in Berlin: <strong>Auto Ankauf jeglicher Art</strong> – auch ohne TÜV, mit hoher Laufleistung oder Schäden. Faire Bewertung vor Ort, <strong>sofortige Barauszahlung</strong> und kostenlose amtliche Abmeldung inklusive.
-                        </p>
+                    <article class="nk-seo-card">
+                        <h3><i class="fa-solid fa-car"></i> Auto Ankauf Berlin-Neukölln</h3>
+                        <ul class="nk-feature-list">
+                            <li><i class="fa-solid fa-check"></i><span><strong>Jeder Zustand:</strong> Auch ohne TÜV, hohe Laufleistung oder Schäden</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>Sofort Bargeld:</strong> Faire Bewertung &amp; direkte Auszahlung vor Ort</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>0&nbsp;€ Abmeldung:</strong> Kostenlose amtliche Stilllegung inklusive</span></li>
+                            <li><i class="fa-solid fa-check"></i><span><strong>Direkt &amp; seriös:</strong> Persönlich durch Inhaber Tamer&nbsp;Yazici</span></li>
+                        </ul>
                     </article>
                 </div>
 
@@ -3230,8 +3301,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-    <script src="./app.js?v=7" defer></script>
-    <script type="module" src="./firebase-app.js?v=7"></script>
+<script src="./app.js?v=8" defer></script>
+    <script type="module" src="./firebase-app.js?v=8"></script>
 
 </body>
 </html>
