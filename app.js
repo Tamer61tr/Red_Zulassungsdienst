@@ -55,10 +55,12 @@ window.escHtml = function(str) {
             } else if (activeView === 'view-home') {
                 const y = window.scrollY + 180;
                 const terminEl = document.getElementById('termin');
+                const galEl = document.getElementById('realShopGalleryWrap');
                 const toolsEl = document.getElementById('wunschkennzeichen-section');
                 const leistEl = document.getElementById('leistungen');
 
                 if (terminEl && y >= terminEl.offsetTop) activeKey = '';
+                else if (galEl && y >= galEl.offsetTop - 80) activeKey = 'galerie';
                 else if (toolsEl && y >= toolsEl.offsetTop) activeKey = 'tools';
                 else if (leistEl && y >= leistEl.offsetTop) activeKey = 'leistungen';
             }
@@ -2445,18 +2447,46 @@ window.escHtml = function(str) {
             }
         };
 
+        window.syncThemeStudioInputs = function() {
+            setTimeout(() => {
+                const style = getComputedStyle(document.body);
+                const toHex = (v, fb) => /^#[0-9a-f]{6}$/i.test((v || '').trim()) ? v.trim() : fb;
+                if (document.getElementById('tePrimary')) document.getElementById('tePrimary').value = toHex(style.getPropertyValue('--primary-red'), '#d90000');
+                if (document.getElementById('teText')) document.getElementById('teText').value = toHex(style.getPropertyValue('--text-light'), '#141417');
+                if (document.getElementById('teBg')) document.getElementById('teBg').value = toHex(style.getPropertyValue('--bg-dark'), '#eceef3');
+                if (document.getElementById('teCard')) document.getElementById('teCard').value = toHex(style.getPropertyValue('--bg-card'), '#ffffff');
+                if (document.getElementById('teInput')) document.getElementById('teInput').value = toHex(style.getPropertyValue('--bg-input'), '#f0f0f5');
+                window.updateThemeStudioPreview();
+            }, 60);
+        };
+
+        window.updateThemeStudioPreview = function() {
+            const p = document.getElementById('tePrimary')?.value || '#d90000';
+            const t = document.getElementById('teText')?.value || '#141417';
+            const bg = document.getElementById('teBg')?.value || '#eceef3';
+            const card = document.getElementById('teCard')?.value || '#ffffff';
+            const inp = document.getElementById('teInput')?.value || '#f0f0f5';
+            const rad = document.getElementById('teRadius')?.value || '20px';
+            const brad = document.getElementById('teBtnRadius')?.value || '50px';
+            const glow = document.getElementById('teGlowStyle')?.value || '0 10px 25px rgba(0, 0, 0, 0.08)';
+
+            const setHex = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = String(val).toUpperCase(); };
+            setHex('tePrimaryHex', p); setHex('teTextHex', t); setHex('teBgHex', bg); setHex('teCardHex', card); setHex('teInputHex', inp);
+
+            const stage = document.getElementById('teLiveStage');
+            const cEl = document.getElementById('teLiveCard');
+            const iEl = document.getElementById('teLiveInput');
+            const bEl = document.getElementById('teLiveBtn');
+            if (stage) stage.style.background = bg;
+            if (cEl) { cEl.style.background = card; cEl.style.color = t; cEl.style.borderRadius = rad; cEl.style.boxShadow = glow; }
+            if (iEl) { iEl.style.background = inp; iEl.style.color = t; }
+            if (bEl) { bEl.style.background = p; bEl.style.borderRadius = brad; }
+        };
+
         window.openThemeEditor = function() {
             if(!window.isAuthorized) return;
             document.getElementById('themeEditorOverlay').classList.add('open');
-            
-            const style = getComputedStyle(document.body);
-            document.getElementById('tePrimary').value = style.getPropertyValue('--primary-red').trim() || '#d90000';
-            document.getElementById('teText').value = style.getPropertyValue('--text-light').trim() || '#141417';
-            document.getElementById('teBg').value = style.getPropertyValue('--bg-dark').trim() || '#f2f2f7';
-            document.getElementById('teCard').value = style.getPropertyValue('--bg-card').trim() || '#ffffff';
-            if(document.getElementById('teInput')) {
-                document.getElementById('teInput').value = style.getPropertyValue('--bg-input').trim() || '#f0f0f5';
-            }
+            window.syncThemeStudioInputs();
         };
 
         window.closeThemeEditor = function() {
@@ -3240,21 +3270,87 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             document.getElementById('pageManagerOverlay').classList.add('open');
             window.renderPageManagerList();
         };
-        window.closePageManager = function() {
-            document.getElementById('pageManagerOverlay').classList.remove('open');
+        window.resetPageManagerForm = function() {
             document.getElementById('pmEditingPageId').value = '';
             document.getElementById('pmPageTitle').value = '';
+            if (document.getElementById('pmPageSubtitle')) document.getElementById('pmPageSubtitle').value = '';
+            if (document.getElementById('pmPageIcon')) document.getElementById('pmPageIcon').value = 'fa-file-lines';
+            if (document.getElementById('pmShowMenu')) document.getElementById('pmShowMenu').checked = true;
+            if (document.getElementById('pmShowFooter')) document.getElementById('pmShowFooter').checked = true;
             document.getElementById('pmPageContent').value = '';
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+        };
+
+        window.closePageManager = function() {
+            document.getElementById('pageManagerOverlay').classList.remove('open');
+            window.resetPageManagerForm();
+        };
+
+        window.applyPageTemplate = function(tplKey) {
+            const templates = {
+                about: {
+                    title: 'Über RED Berlin',
+                    sub: 'Persönlicher Kfz-Zulassungsdienst in der Kienitzer Str. 6, 12053 Berlin',
+                    icon: 'fa-building',
+                    content: '<h3>Ihr zuverlässiger Partner in Berlin-Neukölln</h3>\nWillkommen beim RED Zulassungsdienst Berlin (Inhaber: Tamer Yazici). Wir übernehmen für Privat- und Gewerbekunden sämtliche Behördengänge beim LABO Berlin – schnell, transparent und ohne Wartezeit.\n\n<ul><li>Direkt an der U7 Karl-Marx-Straße &amp; U8 Boddinstraße</li><li>Eigene Profi-Schilderpresse vor Ort (Standard &amp; 3D-Carbon)</li><li>Persönliche Beratung Mo–Fr von 09:00 bis 20:00 Uhr</li></ul>'
+                },
+                b2b: {
+                    title: 'Händler & Gewerbe',
+                    sub: 'Feste Konditionen & Express-Abwicklung für Autohäuser und Flotten',
+                    icon: 'fa-handshake',
+                    content: '<h3>Maßgeschneiderter B2B-Zulassungsservice</h3>\nFür Gebrauchtwagenhändler, Werkstätten und Firmenflotten bieten wir feste Abgabezeiten, Sammel-Anmeldungen sowie Kurzzeit- und Zollkennzeichen auf Abruf.\n\n<ul><li>Direkter Draht ohne Callcenter</li><li>Zuverlässige 24h-Abwicklung nach Absprache</li><li>Vorab-Prüfung der Unterlagen per WhatsApp</li></ul>'
+                },
+                prices: {
+                    title: 'Preisübersicht',
+                    sub: 'Transparente Komplettpreise ohne versteckte Kosten',
+                    icon: 'fa-euro-sign',
+                    content: '<h3>Unsere aktuellen Festpreise</h3>\n<ul><li><strong>Anmeldung mit Wunschkennzeichen:</strong> 100 € (inkl. Gebühren, Schilder &amp; Plakette)</li><li><strong>Anmeldung mit Zufallskennzeichen:</strong> 90 € (inkl. Gebühren, Schilder &amp; Plakette)</li><li><strong>Ummeldung:</strong> 70 €</li><li><strong>Abmeldung:</strong> 30 € vor Ort / 20 € online</li><li><strong>Kurzzeitkennzeichen (6 Tage):</strong> 120 €</li><li><strong>Zollkennzeichen (30 Tage):</strong> 350 €</li></ul>'
+                },
+                notice: {
+                    title: 'Aktuelle Hinweise',
+                    sub: 'Öffnungszeiten & wichtige Mitteilungen für unsere Kunden',
+                    icon: 'fa-bullhorn',
+                    content: '<h3>Aktuelle Kundeninformation</h3>\nHier finden Sie aktuelle Hinweise zu unseren Öffnungszeiten, Feiertagen und LABO-Bearbeitungszeiten in Berlin.'
+                }
+            };
+            const t = templates[tplKey];
+            if (!t) return;
+            document.getElementById('pmPageTitle').value = t.title;
+            if (document.getElementById('pmPageSubtitle')) document.getElementById('pmPageSubtitle').value = t.sub;
+            if (document.getElementById('pmPageIcon')) document.getElementById('pmPageIcon').value = t.icon;
+            document.getElementById('pmPageContent').value = t.content;
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+            window.showToast(`Vorlage „${t.title}“ geladen – einfach anpassen & speichern!`, 'success');
+        };
+
+        window.insertPageFormat = function(kind) {
+            const ta = document.getElementById('pmPageContent');
+            if (!ta) return;
+            const snippets = {
+                h3: '\n<h3>Neue Überschrift</h3>\n',
+                bold: '<strong>Wichtiger Text</strong>',
+                list: '\n<ul>\n  <li>Punkt 1</li>\n  <li>Punkt 2</li>\n</ul>\n',
+                box: '\n<div style="background:var(--bg-input); border-left:4px solid var(--primary-red); padding:12px 14px; border-radius:10px; margin:12px 0;"><strong>Hinweis:</strong> Ihr Text hier...</div>\n',
+                cta: '\n<button type="button" class="btn-primary" style="margin-top:12px;" onclick="window.desktopNavGo(\'termin\')"><i class="fa-regular fa-calendar-check"></i> Jetzt Wunschtermin sichern</button>\n'
+            };
+            const ins = snippets[kind] || '';
+            const start = ta.selectionStart || ta.value.length;
+            ta.value = ta.value.slice(0, start) + ins + ta.value.slice(ta.selectionEnd || start);
+            ta.focus();
         };
 
         window.saveCustomPage = async function() {
             const title = document.getElementById('pmPageTitle').value.trim();
+            const subtitle = (document.getElementById('pmPageSubtitle')?.value || '').trim();
+            const icon = document.getElementById('pmPageIcon')?.value || 'fa-file-lines';
+            const showMenu = document.getElementById('pmShowMenu')?.checked !== false;
+            const showFooter = document.getElementById('pmShowFooter')?.checked !== false;
             const content = document.getElementById('pmPageContent').value;
             const editId = document.getElementById('pmEditingPageId').value;
 
             if(!title) { window.showToast('Bitte einen Seitentitel eingeben.', 'error'); return; }
 
-            const pageData = { title: title, content: content, timestamp: Date.now() };
+            const pageData = { title, subtitle, icon, showMenu, showFooter, content, timestamp: Date.now() };
 
             try {
                 if(editId) {
@@ -3278,9 +3374,7 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 window.showToast('Seite lokal gespeichert.', 'success');
             }
 
-            document.getElementById('pmEditingPageId').value = '';
-            document.getElementById('pmPageTitle').value = '';
-            document.getElementById('pmPageContent').value = '';
+            window.resetPageManagerForm();
             window.renderPageManagerList();
         };
 
@@ -3288,8 +3382,14 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             const page = window.customPagesData.find(p => p.id === id);
             if(!page) return;
             document.getElementById('pmEditingPageId').value = page.id;
-            document.getElementById('pmPageTitle').value = page.title;
-            document.getElementById('pmPageContent').value = page.content;
+            document.getElementById('pmPageTitle').value = page.title || '';
+            if (document.getElementById('pmPageSubtitle')) document.getElementById('pmPageSubtitle').value = page.subtitle || '';
+            if (document.getElementById('pmPageIcon')) document.getElementById('pmPageIcon').value = page.icon || 'fa-file-lines';
+            if (document.getElementById('pmShowMenu')) document.getElementById('pmShowMenu').checked = page.showMenu !== false;
+            if (document.getElementById('pmShowFooter')) document.getElementById('pmShowFooter').checked = page.showFooter !== false;
+            document.getElementById('pmPageContent').value = page.content || '';
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+            document.querySelector('#pageManagerOverlay .exec-studio-body')?.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.deleteCustomPage = function(id) {
@@ -3315,20 +3415,28 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
 
         window.renderPageManagerList = function() {
             const list = document.getElementById('pmPagesList');
+            const badge = document.getElementById('pmPageCountBadge');
+            if (badge) badge.innerText = `${window.customPagesData.length} Seiten`;
+            if (!list) return;
             list.innerHTML = '';
             if(window.customPagesData.length === 0) {
-                list.innerHTML = '<tr><td colspan="2" style="color:var(--text-muted);">Keine benutzerdefinierten Seiten vorhanden.</td></tr>';
+                list.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:12px; background:var(--bg-card); border-radius:10px;">Noch keine eigenen Unterseiten erstellt – oben eine Vorlage wählen oder frei schreiben.</div>';
                 return;
             }
             window.customPagesData.forEach(p => {
+                const loc = [p.showMenu !== false ? 'Menü' : '', p.showFooter !== false ? 'Footer' : ''].filter(Boolean).join(' • ') || 'Versteckt';
                 list.innerHTML += `
-                    <tr>
-                        <td style="font-weight:bold;">${p.title}</td>
-                        <td style="text-align:right;">
-                            <button class="btn-primary" style="padding:4px 8px; background:transparent; border:1px solid #ff9500; color:#ff9500; font-size:11px;" onclick="window.editCustomPage('${p.id}')"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-primary" style="padding:4px 8px; background:#ff3b30; font-size:11px;" onclick="window.deleteCustomPage('${p.id}')"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
+                    <div class="pm-page-card">
+                        <div class="pm-page-info">
+                            <strong><i class="fa-solid ${window.escHtml(p.icon || 'fa-file-lines')}" style="color:var(--primary-red); margin-right:6px;"></i>${window.escHtml(p.title)}</strong>
+                            <span>Sichtbar: ${loc}</span>
+                        </div>
+                        <div class="pm-page-actions">
+                            <button type="button" class="apt-btn" onclick="window.closePageManager(); window.switchView('view-${p.id}');" title="Seite ansehen"><i class="fa-solid fa-eye"></i></button>
+                            <button type="button" class="apt-btn edit" onclick="window.editCustomPage('${p.id}')" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="apt-btn delete" onclick="window.deleteCustomPage('${p.id}')" title="Löschen"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
                 `;
             });
         };
@@ -3349,28 +3457,33 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
                 view.className = 'view-section dynamic-custom-page';
                 view.innerHTML = `
                     <div class="subpage-nav-bar">
-                     <button type="button" class="subpage-back-btn" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
-                 </div>
-                    <div class="booking-wrapper" style="margin-top:15px;">
-                        <h2 style="color:var(--primary-red); margin-bottom:20px; font-weight:900; text-transform:uppercase;">${page.title}</h2>
-                        <div style="white-space:pre-wrap; color:var(--text-light); line-height:1.8;">${page.content}</div>
+                        <button type="button" class="subpage-back-btn" onclick="window.switchView('view-home')"><i class="fa-solid fa-arrow-left"></i> Zurück zur Startseite</button>
+                    </div>
+                    <div class="booking-wrapper" style="margin-top:15px; text-align:left;">
+                        <h2 style="color:var(--primary-red); margin-bottom:6px; font-weight:900; text-transform:uppercase;"><i class="fa-solid ${window.escHtml(page.icon || 'fa-file-lines')}" style="margin-right:8px;"></i>${window.escHtml(page.title)}</h2>
+                        ${page.subtitle ? `<p style="color:var(--text-muted); font-size:12.5px; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--glass-border);">${window.escHtml(page.subtitle)}</p>` : ''}
+                        <div style="white-space:pre-wrap; color:var(--text-light); line-height:1.75; font-size:13.5px;">${page.content}</div>
                     </div>
                 `;
                 document.body.appendChild(view);
 
-                const aMenu = document.createElement('a');
-                aMenu.className = 'dynamic-menu-item';
-                aMenu.href = "javascript:void(0)";
-                aMenu.onclick = () => { window.toggleMenu(); window.switchView('view-' + page.id); };
-                aMenu.innerHTML = `<i class="fa-solid fa-file-lines" style="color:var(--primary-red);"></i> ${page.title}`;
-                menuContainer.appendChild(aMenu);
+                if (page.showMenu !== false) {
+                    const aMenu = document.createElement('a');
+                    aMenu.className = 'dynamic-menu-item';
+                    aMenu.href = "javascript:void(0)";
+                    aMenu.onclick = () => { window.toggleMenu(); window.switchView('view-' + page.id); };
+                    aMenu.innerHTML = `<i class="fa-solid ${window.escHtml(page.icon || 'fa-file-lines')}" style="color:var(--primary-red);"></i> ${window.escHtml(page.title)}`;
+                    menuContainer.appendChild(aMenu);
+                }
 
-                const aFooter = document.createElement('a');
-                aFooter.className = 'dynamic-footer-item';
-                aFooter.href = "javascript:void(0)";
-                aFooter.onclick = () => { window.switchView('view-' + page.id); };
-                aFooter.innerText = page.title;
-                footerLinks.insertBefore(aFooter, footerLinks.children[3]); 
+                if (page.showFooter !== false) {
+                    const aFooter = document.createElement('a');
+                    aFooter.className = 'dynamic-footer-item';
+                    aFooter.href = "javascript:void(0)";
+                    aFooter.onclick = () => { window.switchView('view-' + page.id); };
+                    aFooter.innerText = page.title;
+                    footerLinks.insertBefore(aFooter, footerLinks.children[3]);
+                }
             });
         };
 
@@ -5732,6 +5845,20 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
             if (!grid || !wrap) return;
 
             const list = Array.isArray(window.shopPhotosData) ? window.shopPhotosData : [];
+            // Automatische Aktualisierung des alten Untertitels auf PLZ + U7 Karl-Marx-Str. & U8 Boddinstraße
+            let migratedShopText = false;
+            list.forEach(p => {
+                if (p && p.id === 'shop-1' && p.subtitle && !p.subtitle.toLowerCase().includes('karl-marx')) {
+                    p.subtitle = '12053\u00A0Berlin • U7\u00A0Karl-Marx-Str. & U8\u00A0Boddinstraße';
+                    migratedShopText = true;
+                }
+            });
+            if (migratedShopText) {
+                localStorage.setItem('red_shop_gallery_v1', JSON.stringify(list));
+                if (window.isAuthorized && window.firebaseDb && window.firebaseSetDoc) {
+                    window.firebaseSetDoc(window.firebaseDoc(window.firebaseDb, "settings", "shop_gallery"), { list, updatedAt: Date.now() }, { merge: true }).catch(() => {});
+                }
+            }
             const isAdmin = document.body.classList.contains('is-supervisor') ||
                 (document.body.classList.contains('is-admin') && document.body.classList.contains('perm-shopgallery'));
 
@@ -5969,3 +6096,80 @@ window.renderHeaderCarIcon = function(carType, carAnim, carColor) {
         document.addEventListener('DOMContentLoaded', () => {
             window.renderShopGallery();
         });
+
+        // =========================================================================
+        // PASSWORT-MANAGER PRO & SUPERVISOR BENUTZER-TAB HELFER
+        // =========================================================================
+        window.togglePasswordVis = function(inputId, btnEl) {
+            const inp = document.getElementById(inputId);
+            if (!inp) return;
+            const show = inp.type === 'password';
+            inp.type = show ? 'text' : 'password';
+            if (btnEl) btnEl.innerHTML = show ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+        };
+
+        window.fillGeneratedPass = function(targetId, confirmId = '') {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+            let pw = 'Red!';
+            for (let i = 0; i < 8; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+            const el = document.getElementById(targetId);
+            if (el) { el.value = pw; el.type = 'text'; }
+            if (confirmId) {
+                const cel = document.getElementById(confirmId);
+                if (cel) { cel.value = pw; cel.type = 'text'; }
+            }
+            window.updatePasswordStrength();
+            window.showToast('Sicheres Passwort generiert – bitte notieren!', 'success');
+        };
+
+        window.copyPasswordInput = function(inputId) {
+            const val = document.getElementById(inputId)?.value || '';
+            if (!val) { window.showToast('Kein Passwort zum Kopieren eingegeben.', 'error'); return; }
+            navigator.clipboard?.writeText(val).then(() => window.showToast('Passwort kopiert!', 'success')).catch(() => {});
+        };
+
+        window.updatePasswordStrength = function() {
+            const pw = document.getElementById('newPassInput')?.value || '';
+            const pw2 = document.getElementById('newPassConfirmInput')?.value || '';
+            const fill = document.getElementById('pwStrengthFill');
+            const lbl = document.getElementById('pwStrengthLabel');
+
+            const hasLen = pw.length >= 6;
+            const hasMix = /[a-z]/.test(pw) && /[A-Z]/.test(pw) && /\d/.test(pw);
+            const matches = pw.length > 0 && pw === pw2;
+
+            const markChk = (id, ok) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.toggle('ok', ok);
+                const ic = el.querySelector('i');
+                if (ic) ic.className = ok ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
+            };
+            markChk('pwChkLen', hasLen);
+            markChk('pwChkStrong', hasMix);
+            markChk('pwChkMatch', matches);
+
+            if (!fill || !lbl) return;
+            let score = 0;
+            if (pw.length >= 6) score += 35;
+            if (pw.length >= 10) score += 20;
+            if (hasMix) score += 30;
+            if (/[^A-Za-z0-9]/.test(pw)) score += 15;
+
+            fill.style.width = pw ? Math.min(100, score) + '%' : '0%';
+            if (!pw) { fill.style.background = '#ff3b30'; lbl.innerText = 'Bitte neues Passwort eingeben'; }
+            else if (score < 50) { fill.style.background = '#ff3b30'; lbl.innerText = 'Schwach – bitte länger oder mit Zahlen wählen'; }
+            else if (score < 80) { fill.style.background = '#f59e0b'; lbl.innerText = 'Mittel – gut nutzbar'; }
+            else { fill.style.background = '#16a34a'; lbl.innerText = 'Stark – sehr sicher!'; }
+        };
+
+        window.switchSupervisorTab = function(tabKey) {
+            const isUsers = tabKey === 'users';
+            document.getElementById('supTabBtnPerms')?.classList.toggle('active', !isUsers);
+            document.getElementById('supTabBtnUsers')?.classList.toggle('active', isUsers);
+            document.getElementById('supPanePerms')?.classList.toggle('active', !isUsers);
+            document.getElementById('supPaneUsers')?.classList.toggle('active', isUsers);
+            if (isUsers && typeof window.renderSupervisorUsersList === 'function') {
+                window.renderSupervisorUsersList();
+            }
+        };

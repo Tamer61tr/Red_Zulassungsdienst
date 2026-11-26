@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDoc, updateDoc, setDoc, query, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDa10ia02K0vsHgzj-iTf4S6BwKzQruqyY",
@@ -157,12 +157,439 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
             );
         };
 
-        const ADMIN_AUTH_EMAILS = ['admin@red-berlin.de', 'supervisor@red-berlin.de'];
+        const CORE_ADMIN_EMAILS = ['admin@red-berlin.de', 'supervisor@red-berlin.de'];
         const USER_LOGIN_ALIASES = {
             'tamer yazici': 'admin@red-berlin.de',
             'admin': 'admin@red-berlin.de',
             'musadmin': 'supervisor@red-berlin.de',
             'supervisor': 'supervisor@red-berlin.de'
+        };
+
+        window.customAdminUsers = JSON.parse(localStorage.getItem('red_custom_admin_users_v1') || '{}');
+        window.selectedPermTargetEmail = 'admin@red-berlin.de';
+        window.isAuthorized = false;
+        window.loggedInUser = null;
+        window.loggedInEmail = '';
+
+        function resolveUserPermsObject(raw) {
+            return {
+                leads: raw?.leads !== false,
+                prices: raw?.prices !== false,
+                customblocks: raw?.customblocks !== false,
+                content: raw?.content !== false,
+                companydata: raw?.companydata !== false,
+                forms: raw?.forms !== false,
+                cars: raw?.cars !== false,
+                ticker: raw?.ticker !== false,
+                crm: raw?.crm !== false,
+                pages: raw?.pages !== false,
+                theme: raw?.theme !== false,
+                invoice: raw?.invoice === true,
+                shopgallery: raw?.shopgallery === true
+            };
+        }
+
+        function setPermCheckboxesFromObj(p) {
+            const map = {
+                permLeads: p.leads, permPrices: p.prices, permCustomblocks: p.customblocks,
+                permContent: p.content, permCompanydata: p.companydata, permForms: p.forms,
+                permCars: p.cars, permTicker: p.ticker, permCrm: p.crm,
+                permPages: p.pages, permTheme: p.theme, permInvoice: p.invoice, permShopgallery: p.shopgallery
+            };
+            Object.entries(map).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.checked = val === true;
+            });
+            if (typeof window.updateSupervisorPermCounter === 'function') window.updateSupervisorPermCounter();
+        }
+
+        window.refreshSupervisorUserSelect = function() {
+            const sel = document.getElementById('supTargetUserSelect');
+            const cntBadge = document.getElementById('supUserCountBadge');
+            const customList = Object.values(window.customAdminUsers || {});
+            if (cntBadge) cntBadge.innerText = String(2 + customList.length);
+            if (!sel) return;
+
+            const prevVal = window.selectedPermTargetEmail || sel.value || 'admin@red-berlin.de';
+            sel.innerHTML = `<option value="admin@red-berlin.de">Tamer Yazici (Standard Admin)</option>`;
+            customList.forEach(u => {
+                if (u.role === 'supervisor') return;
+                const opt = document.createElement('option');
+                opt.value = u.email;
+                opt.textContent = `${u.name || u.email} (${u.email})${u.active === false ? ' [Gesperrt]' : ''}`;
+                sel.appendChild(opt);
+            });
+            sel.value = Array.from(sel.options).some(o => o.value === prevVal) ? prevVal : 'admin@red-berlin.de';
+            window.selectedPermTargetEmail = sel.value;
+            if (typeof window.syncMobileSelectDisplay === 'function') window.syncMobileSelectDisplay(sel);
+        };
+
+        window.onSupervisorTargetUserChange = function(targetEmail) {
+            window.selectedPermTargetEmail = (targetEmail || 'admin@red-berlin.de').toLowerCase();
+            if (window.selectedPermTargetEmail === 'admin@red-berlin.de') {
+                const saved = JSON.parse(localStorage.getItem('red_admin_perms') || 'null') || window.adminPermissions;
+                setPermCheckboxesFromObj(resolveUserPermsObject(saved));
+            } else {
+                const u = (window.customAdminUsers || {})[window.selectedPermTargetEmail];
+                setPermCheckboxesFromObj(resolveUserPermsObject(u?.perms || {}));
+            }
+        };
+
+        window.renderSupervisorUsersList = function() {
+            const box = document.getElementById('supUsersList');
+            window.refreshSupervisorUserSelect();
+            if (!box) return;
+
+            const coreCards = `
+                <div class="sup-user-card">
+                    <div class="sup-user-meta">
+                        <strong>Supervisor (Hauptkonto)</strong>
+                        <span>supervisor@red-berlin.de</span>
+                        <span class="sup-user-role-tag">👑 Vollzugriff · Geschützt</span>
+                    </div>
+                </div>
+                <div class="sup-user-card">
+                    <div class="sup-user-meta">
+                        <strong>Tamer Yazici (Standard-Admin)</strong>
+                        <span>admin@red-berlin.de</span>
+                        <span class="sup-user-role-tag" style="background:var(--green-bg-soft); color:var(--green-accent);">Admin · Aktiv</span>
+                    </div>
+                    <div class="sup-user-actions">
+                        <button type="button" class="inv-arch-btn edit" onclick="window.selectedPermTargetEmail='admin@red-berlin.de'; window.refreshSupervisorUserSelect(); window.onSupervisorTargetUserChange('admin@red-berlin.de'); window.switchSupervisorTab('perms');"><i class="fa-solid fa-sliders"></i> Rechte</button>
+                    </div>
+                </div>
+            `;
+
+            const customCards = Object.values(window.customAdminUsers || {}).map(u => {
+                const isActive = u.active !== false;
+                const isSup = u.role === 'supervisor';
+                return `
+                    <div class="sup-user-card ${isActive ? '' : 'is-disabled'}">
+                        <div class="sup-user-meta">
+                            <strong>${window.escHtml(u.name || 'Mitarbeiter')}${u.alias ? ` <small style="color:var(--text-muted); font-weight:700;">(${window.escHtml(u.alias)})</small>` : ''}</strong>
+                            <span>${window.escHtml(u.email)}</span>
+                            <span class="sup-user-role-tag" style="${isActive ? (isSup ? '' : 'background:var(--green-bg-soft); color:var(--green-accent);') : 'background:rgba(128,128,140,0.2); color:var(--text-muted);'}">${isSup ? '👑 Supervisor' : '👤 Admin / Mitarbeiter'} · ${isActive ? 'Aktiv' : 'Gesperrt'}</span>
+                        </div>
+                        <div class="sup-user-actions">
+                            ${!isSup ? `<button type="button" class="inv-arch-btn edit" onclick="window.selectedPermTargetEmail='${window.escHtml(u.email)}'; window.refreshSupervisorUserSelect(); window.onSupervisorTargetUserChange('${window.escHtml(u.email)}'); window.switchSupervisorTab('perms');"><i class="fa-solid fa-sliders"></i> Rechte</button>` : ''}
+                            <button type="button" class="inv-arch-btn" onclick="window.toggleCustomUserActive('${window.escHtml(u.email)}')" title="${isActive ? 'Konto sperren' : 'Konto aktivieren'}"><i class="fa-solid ${isActive ? 'fa-lock' : 'fa-lock-open'}" style="color:${isActive ? '#d97706' : 'var(--green-accent)'};"></i></button>
+                            <button type="button" class="inv-arch-btn del" onclick="window.deleteCustomUserEntry('${window.escHtml(u.email)}')" title="Benutzer entfernen"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            box.innerHTML = coreCards + customCards;
+        };
+
+        window.createSupervisorUser = async function() {
+            if (!document.body.classList.contains('is-supervisor')) {
+                window.showToast('Nur der Supervisor darf neue Benutzer anlegen.', 'error');
+                return;
+            }
+            const name = (document.getElementById('newUserFullName')?.value || '').trim();
+            const alias = (document.getElementById('newUserAlias')?.value || '').trim().toLowerCase();
+            const email = (document.getElementById('newUserEmail')?.value || '').trim().toLowerCase();
+            const role = document.getElementById('newUserRole')?.value || 'admin';
+            const password = document.getElementById('newUserPassword')?.value || '';
+            const btn = document.getElementById('btnCreateNewUser');
+
+            if (!name || !email || !email.includes('@')) {
+                window.showToast('Bitte Name und eine gültige E-Mail-Adresse eingeben.', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                window.showToast('Das Start-Passwort muss mindestens 6 Zeichen lang sein.', 'error');
+                return;
+            }
+
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Konto wird erstellt...'; }
+            let authCreatedNote = '';
+            try {
+                // Sekundäre App-Instanz verhindert, dass der Supervisor abgemeldet wird
+                const secAppName = 'RedUserCreator_' + Date.now();
+                const secApp = initializeApp(firebaseConfig, secAppName);
+                const secAuth = getAuth(secApp);
+                try {
+                    await createUserWithEmailAndPassword(secAuth, email, password);
+                    await signOut(secAuth);
+                } catch (authErr) {
+                    if (authErr.code === 'auth/email-already-in-use') {
+                        authCreatedNote = ' (Bestehendes Firebase-Konto verknüpft)';
+                    } else {
+                        throw authErr;
+                    }
+                }
+
+                const newEntry = {
+                    name, alias, email, role, active: true,
+                    perms: resolveUserPermsObject({ leads: true, crm: true, prices: true, forms: true, invoice: false, shopgallery: false, pages: false, theme: false, companydata: false, customblocks: false, content: false, cars: false, ticker: false }),
+                    createdAt: Date.now()
+                };
+                window.customAdminUsers[email] = newEntry;
+                localStorage.setItem('red_custom_admin_users_v1', JSON.stringify(window.customAdminUsers));
+                await setDoc(doc(db, "settings", "admin_users"), { users: window.customAdminUsers, updatedAt: Date.now() }, { merge: true });
+
+                document.getElementById('newUserFullName').value = '';
+                document.getElementById('newUserAlias').value = '';
+                document.getElementById('newUserEmail').value = '';
+                document.getElementById('newUserPassword').value = '';
+
+                window.renderSupervisorUsersList();
+                window.showToast(`Benutzer ${name} erfolgreich angelegt!${authCreatedNote}`, 'success');
+            } catch (err) {
+                console.error('Benutzer anlegen Fehler:', err);
+                window.showToast('Fehler beim Anlegen: ' + (err.message || err.code), 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-check"></i> Benutzer jetzt anlegen & freischalten'; }
+            }
+        };
+
+        window.toggleCustomUserActive = async function(email) {
+            const u = window.customAdminUsers[email];
+            if (!u) return;
+            u.active = u.active === false ? true : false;
+            localStorage.setItem('red_custom_admin_users_v1', JSON.stringify(window.customAdminUsers));
+            await setDoc(doc(db, "settings", "admin_users"), { users: window.customAdminUsers, updatedAt: Date.now() }, { merge: true }).catch(() => {});
+            window.renderSupervisorUsersList();
+            window.showToast(u.active ? `Konto ${u.name} aktiviert.` : `Konto ${u.name} gesperrt.`, 'success');
+        };
+
+        window.deleteCustomUserEntry = function(email) {
+            const u = window.customAdminUsers[email];
+            if (!u) return;
+            window.openRedDeleteConfirm(
+                `Benutzer „${u.name}“ entfernen?`,
+                `Soll der Zugriff für ${email} dauerhaft aus dem RED-System entfernt werden?`,
+                async () => {
+                    delete window.customAdminUsers[email];
+                    localStorage.setItem('red_custom_admin_users_v1', JSON.stringify(window.customAdminUsers));
+                    await setDoc(doc(db, "settings", "admin_users"), { users: window.customAdminUsers, updatedAt: Date.now() }).catch(() => {});
+                    window.selectedPermTargetEmail = 'admin@red-berlin.de';
+                    window.renderSupervisorUsersList();
+                    window.showToast(`Benutzer ${u.name} entfernt.`, 'success');
+                }
+            );
+        };
+
+        let adminUsersUnsub = null;
+        window.startAdminUsersListener = function() {
+            if (!window.isAuthorized || adminUsersUnsub) return;
+            adminUsersUnsub = onSnapshot(doc(db, "settings", "admin_users"), (docSnap) => {
+                if (docSnap.exists() && docSnap.data().users) {
+                    window.customAdminUsers = docSnap.data().users;
+                    localStorage.setItem('red_custom_admin_users_v1', JSON.stringify(window.customAdminUsers));
+                    window.renderSupervisorUsersList();
+                    const me = window.customAdminUsers[window.loggedInEmail];
+                    if (me && !document.body.classList.contains('is-supervisor')) {
+                        if (me.active === false) {
+                            signOut(auth).catch(() => {});
+                            window.showToast('Ihr Zugang wurde vom Supervisor gesperrt.', 'error');
+                        } else if (me.perms) {
+                            window.applyAdminModulePermissions(me.perms);
+                        }
+                    }
+                }
+            }, () => {});
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            const email = (user?.email || '').toLowerCase();
+            if (user && email) {
+                let customUsers = window.customAdminUsers || {};
+                try {
+                    const uSnap = await getDoc(doc(db, "settings", "admin_users"));
+                    if (uSnap.exists() && uSnap.data().users) {
+                        customUsers = uSnap.data().users;
+                        window.customAdminUsers = customUsers;
+                        localStorage.setItem('red_custom_admin_users_v1', JSON.stringify(customUsers));
+                    }
+                } catch (e) {}
+
+                const customProfile = customUsers[email];
+                const isCore = CORE_ADMIN_EMAILS.includes(email);
+                if (!isCore && (!customProfile || customProfile.active === false)) {
+                    await signOut(auth).catch(() => {});
+                    window.showToast('Konto nicht freigeschaltet oder gesperrt.', 'error');
+                    return;
+                }
+
+                const isSupervisor = (email === 'supervisor@red-berlin.de') || (customProfile?.role === 'supervisor');
+                window.isAuthorized = true;
+                window.loggedInEmail = email;
+                window.loggedInUser = isSupervisor ? (customProfile?.name || 'Supervisor') : (customProfile?.name || 'Tamer Yazici');
+
+                document.body.classList.add('is-admin');
+                document.body.classList.toggle('is-supervisor', isSupervisor);
+
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('dashboardBox').style.display = 'block';
+                if (document.getElementById('loggedInUser')) {
+                    document.getElementById('loggedInUser').innerText = `${window.loggedInUser} (${email})`;
+                }
+
+                if (customProfile && !isSupervisor && customProfile.perms) {
+                    window.applyAdminModulePermissions(customProfile.perms);
+                } else {
+                    const localPerms = JSON.parse(localStorage.getItem('red_admin_perms') || 'null');
+                    window.applyAdminModulePermissions(localPerms || window.adminPermissions);
+                }
+
+                window.startAdminCrmListener();
+                window.startAdminInvoicesListener();
+                window.startAdminUsersListener();
+                if (typeof window.renderShopGallery === 'function') window.renderShopGallery();
+                if (typeof window.startAdminAppointmentsListener === 'function') {
+                    window.startAdminAppointmentsListener();
+                }
+                window.renderSupervisorUsersList();
+                setTimeout(window.syncHeaderHeight, 80);
+            } else {
+                window.isAuthorized = false;
+                window.loggedInUser = null;
+                window.loggedInEmail = '';
+                document.body.classList.remove('is-admin', 'is-supervisor', 'perm-leads', 'perm-prices', 'perm-blocks', 'perm-content', 'perm-data', 'perm-forms', 'perm-cars', 'perm-ticker', 'perm-crm', 'perm-pages', 'perm-theme', 'perm-invoice', 'perm-shopgallery');
+
+                if (crmUnsubscribe) { crmUnsubscribe(); crmUnsubscribe = null; }
+                if (invoicesUnsubscribe) { invoicesUnsubscribe(); invoicesUnsubscribe = null; }
+                if (adminUsersUnsub) { adminUsersUnsub(); adminUsersUnsub = null; }
+                if (typeof window.stopAdminAppointmentsListener === 'function') {
+                    window.stopAdminAppointmentsListener();
+                }
+                window.crmClientsDetail = {};
+                window.savedInvoicesData = [];
+                window.redApts = [];
+                localStorage.removeItem('red_crm_details');
+                localStorage.removeItem('red_saved_invoices_v1');
+                localStorage.removeItem('red_local_apts');
+                localStorage.removeItem('red_admin_saved');
+                localStorage.removeItem('red_logged_in_user');
+
+                if (document.getElementById('dashboardBox')) document.getElementById('dashboardBox').style.display = 'none';
+                if (document.getElementById('authBox')) document.getElementById('authBox').style.display = 'block';
+                setTimeout(window.syncHeaderHeight, 80);
+            }
+        });
+
+        window.tryLogin = async function() {
+            const rawUser = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value;
+            const remember = document.getElementById('rememberMe').checked;
+
+            if (!rawUser || !pass) {
+                window.showToast('Bitte E-Mail und Passwort eingeben.', 'error');
+                return;
+            }
+
+            const lowerRaw = rawUser.toLowerCase();
+            let email = USER_LOGIN_ALIASES[lowerRaw] || lowerRaw;
+            if (!email.includes('@')) {
+                const aliasHit = Object.values(window.customAdminUsers || {}).find(u => u.alias && u.alias.toLowerCase() === lowerRaw);
+                if (aliasHit) email = aliasHit.email;
+            }
+            if (!email.includes('@')) {
+                window.showToast('Bitte vollständige E-Mail-Adresse eingeben.', 'error');
+                return;
+            }
+
+            try {
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                await signInWithEmailAndPassword(auth, email, pass);
+                document.getElementById('adminPass').value = '';
+                window.showToast('Sicher über Firebase angemeldet!', 'success');
+            } catch (err) {
+                console.error('Firebase Login Fehler:', err.code, err.message);
+                if (err.code === 'auth/too-many-requests') {
+                    window.showToast('Zu viele Versuche – bitte kurz warten.', 'error');
+                } else {
+                    window.showToast('E-Mail oder Passwort ist falsch!', 'error');
+                }
+            }
+        };
+
+        window.triggerLogoutConfirm = function() { document.getElementById('logoutConfirmOverlay').classList.add('open'); };
+        window.cancelLogout = function() { document.getElementById('logoutConfirmOverlay').classList.remove('open'); };
+        window.executeLogout = async function() {
+            try { await signOut(auth); } catch (e) {}
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPass').value = '';
+            window.cancelLogout();
+            window.showToast('Erfolgreich abgemeldet.', 'success');
+        };
+
+        window.changePassPrompt = function() {
+            if (!window.isAuthorized) return;
+            const lbl = document.getElementById('pwActiveAccountLabel');
+            if (lbl) lbl.innerText = `${window.loggedInUser || 'Admin'} (${window.loggedInEmail || auth.currentUser?.email || ''})`;
+            document.getElementById('newPassInput').value = '';
+            if (document.getElementById('newPassConfirmInput')) document.getElementById('newPassConfirmInput').value = '';
+            if (typeof window.updatePasswordStrength === 'function') window.updatePasswordStrength();
+            document.getElementById('passChangeOverlay').classList.add('open');
+        };
+        window.closePassPrompt = function() {
+            document.getElementById('passChangeOverlay').classList.remove('open');
+            document.getElementById('newPassInput').value = '';
+            if (document.getElementById('newPassConfirmInput')) document.getElementById('newPassConfirmInput').value = '';
+        };
+        window.confirmPassChange = async function() {
+            const newP = document.getElementById('newPassInput').value.trim();
+            const confirmP = document.getElementById('newPassConfirmInput')?.value.trim() ?? newP;
+            if (!auth.currentUser) return;
+            if (newP.length < 6) {
+                window.showToast('Passwort muss mindestens 6 Zeichen lang sein!', 'error');
+                return;
+            }
+            if (newP !== confirmP) {
+                window.showToast('Die beiden Passwörter stimmen nicht überein!', 'error');
+                return;
+            }
+            try {
+                await updatePassword(auth.currentUser, newP);
+                window.closePassPrompt();
+                window.showToast('Passwort sicher in Firebase aktualisiert!', 'success');
+            } catch (err) {
+                if (err.code === 'auth/requires-recent-login') {
+                    window.showToast('Bitte kurz abmelden und neu einloggen, um das Passwort zu ändern.', 'error');
+                } else {
+                    window.showToast('Fehler beim Ändern: ' + err.message, 'error');
+                }
+            }
+        };
+
+        window.saveSupervisorPerms = async function() {
+            const targetEmail = (window.selectedPermTargetEmail || 'admin@red-berlin.de').toLowerCase();
+            const perms = {
+                leads: document.getElementById('permLeads').checked,
+                prices: document.getElementById('permPrices').checked,
+                customblocks: document.getElementById('permCustomblocks').checked,
+                content: document.getElementById('permContent').checked,
+                companydata: document.getElementById('permCompanydata').checked,
+                forms: document.getElementById('permForms').checked,
+                cars: document.getElementById('permCars').checked,
+                ticker: document.getElementById('permTicker').checked,
+                crm: document.getElementById('permCrm').checked,
+                pages: document.getElementById('permPages').checked,
+                theme: document.getElementById('permTheme').checked,
+                invoice: document.getElementById('permInvoice')?.checked === true,
+                shopgallery: document.getElementById('permShopgallery')?.checked === true,
+                timestamp: Date.now()
+            };
+
+            try {
+                if (targetEmail === 'admin@red-berlin.de') {
+                    await setDoc(doc(db, "settings", "admin_permissions"), perms);
+                    localStorage.setItem('red_admin_perms', JSON.stringify(perms));
+                    window.showToast('Rechte für Standard-Admin aktualisiert!', 'success');
+                } else if (window.customAdminUsers[targetEmail]) {
+                    window.customAdminUsers[targetEmail].perms = perms;
+                    localStorage.setItem('red_custom_admin_users_v1', JSON.stringify(window.customAdminUsers));
+                    await setDoc(doc(db, "settings", "admin_users"), { users: window.customAdminUsers, updatedAt: Date.now() }, { merge: true });
+                    window.showToast(`Rechte für ${window.customAdminUsers[targetEmail].name} aktualisiert!`, 'success');
+                }
+            } catch (e) {
+                window.showToast('Lokal gespeichert.', 'success');
+            }
+            window.closeSupervisorPanel();
         };
 
         window.isAuthorized = false;

@@ -361,8 +361,8 @@
             <!-- DIREKTE DESKTOP-NAVIGATION (NUR AB 1024px SICHTBAR) -->
             <div class="desktop-header-nav" id="desktopHeaderNav" aria-label="Hauptnavigation">
                 <a href="javascript:void(0)" class="dhn-link" data-nav-key="leistungen" onclick="window.desktopNavGo('leistungen')">Leistungen</a>
-                <a href="javascript:void(0)" class="dhn-link" data-nav-key="tools" onclick="window.desktopNavGo('wunschkennzeichen-section')">Tools</a>
-                <a href="javascript:void(0)" class="dhn-link" data-nav-key="view-formulare" onclick="window.switchView('view-formulare')">Formulare</a>
+                <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-sliders" style="color:var(--primary-red);"></i> Online-Tools & Rechner</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.desktopNavGo('realShopGalleryWrap');"><i class="fa-solid fa-camera" style="color:var(--primary-red);"></i> Unser Geschäft &amp; Bilder</a>
                 <a href="javascript:void(0)" class="dhn-link" data-nav-key="view-ankauf" onclick="window.switchView('view-ankauf')">Auto Ankauf</a>
                 <a href="javascript:void(0)" class="dhn-cta" data-nav-key="termin" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Termin</a>
             </div>
@@ -431,6 +431,7 @@
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('leistungen').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-gears" style="color:var(--primary-red);"></i> Leistungen</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('zulassungs-kompass').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-compass" style="color:var(--primary-red);"></i> Zulassungs-Kompass</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-home'); window.scrollTo({top: document.getElementById('wunschkennzeichen-section').offsetTop - 110, behavior: 'smooth'});"><i class="fa-solid fa-sliders" style="color:var(--primary-red);"></i> Online-Tools & Rechner</a>
+        <a href="javascript:void(0)" onclick="window.toggleMenu(); window.desktopNavGo('realShopGalleryWrap');"><i class="fa-solid fa-camera" style="color:var(--primary-red);"></i> Unser Geschäft &amp; Bilder</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openDigitalVollmachtModal('Allgemeine Vollmacht & SEPA-Mandat');"><i class="fa-solid fa-signature" style="color:var(--primary-red);"></i> Digitale Vollmacht</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.openKaufvertragModal();"><i class="fa-solid fa-handshake" style="color:var(--primary-red);"></i> Kfz-Kaufvertrag</a>
         <a href="javascript:void(0)" onclick="window.toggleMenu(); window.switchView('view-formulare');"><i class="fa-solid fa-file-pdf" style="color:var(--primary-red);"></i> Formulare</a>
@@ -1267,82 +1268,119 @@
         </div>
     </div>
 
-    <!-- ERWEITERTER GLOBALER DESIGN-, EFFEKT- & FARB-MANAGER -->
+    <!-- EXECUTIVE DESIGN-, EFFEKT- & FARB-STUDIO -->
     <div class="custom-dialog-overlay" id="themeEditorOverlay">
-        <div class="custom-dialog-window">
-            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeThemeEditor()"></i>
-            <h3 style="color:#00a8cc; font-weight:900; margin-bottom:8px; text-align:center;"><i class="fa-solid fa-palette"></i> Globaler Design-, Effekt- & Farb-Manager</h3>
-            <p style="color:var(--text-muted); font-size:11px; margin-bottom:15px; text-align:center;">Wählen Sie ein Schnell-Preset oder passen Sie Farben, Kontraste, Ecken-Rundungen und Leuchteffekte global an.</p>
-            
-            <div style="display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;">
-                <button type="button" class="btn-primary" style="flex:1; background:#ffffff; color:#111; border:1px solid #ccc; padding:8px 12px; font-size:11px !important; box-shadow:none;" onclick="window.changeTheme('light', true)"><i class="fa-solid fa-sun" style="color:#ff9500;"></i> Hell (Standard)</button>
-                <button type="button" class="btn-primary" style="flex:1; background:#0e0e12; color:#fff; border:1px solid #333; padding:8px 12px; font-size:11px !important; box-shadow:none;" onclick="window.changeTheme('dark', true)"><i class="fa-solid fa-moon" style="color:#00ffff;"></i> Argon Dunkel</button>
-                <button type="button" class="btn-primary" style="flex:1; background:#1f150a; color:#fcf6ba; border:1px solid #d4af37; padding:8px 12px; font-size:11px !important; box-shadow:none;" onclick="window.changeTheme('gold', true)"><i class="fa-solid fa-crown" style="color:#d4af37;"></i> Royal Gold</button>
+        <div class="custom-dialog-window exec-studio-window">
+            <div class="exec-studio-header">
+                <div>
+                    <span class="sup-perms-eyebrow"><i class="fa-solid fa-palette"></i> Design Studio</span>
+                    <h3>Globaler Design-, Effekt- &amp; Farb-Manager</h3>
+                </div>
+                <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeThemeEditor()"></i>
             </div>
 
-            <div class="service-config-section">
-                <h4>1. Eigene Farbpalette</h4>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Hauptfarbe (Akzente & Buttons)</label>
-                        <input type="color" id="tePrimary" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#d90000">
-                    </div>
-                    <div class="form-group">
-                        <label>Standard Textfarbe</label>
-                        <input type="color" id="teText" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#141417">
+            <div class="exec-studio-body">
+                <!-- LIVE-VORSCHAU -->
+                <div class="te-live-stage" id="teLiveStage">
+                    <div class="te-live-card" id="teLiveCard">
+                        <span class="te-live-pill">Live-Vorschau</span>
+                        <strong id="teLiveTitle">RED Zulassungsdienst Berlin</strong>
+                        <p id="teLiveText">So wirken Farben, Ecken, Buttons &amp; Schatten auf Ihrer Website.</p>
+                        <div class="te-live-row">
+                            <span class="te-live-input" id="teLiveInput">Beispiel-Eingabefeld</span>
+                            <span class="te-live-btn" id="teLiveBtn">Termin buchen</span>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Seiten-Hintergrund</label>
-                        <input type="color" id="teBg" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#f2f2f7">
+
+                <!-- 6 SCHNELL-PRESETS -->
+                <div class="te-preset-grid">
+                    <button type="button" class="te-preset-btn" onclick="window.changeTheme('light', true); window.syncThemeStudioInputs();"><span class="te-dot" style="background:#ffffff; border-color:#d90000;"></span> Hell Standard</button>
+                    <button type="button" class="te-preset-btn" onclick="window.changeTheme('dark', true); window.syncThemeStudioInputs();"><span class="te-dot" style="background:#0e0e12; border-color:#ff1a1a;"></span> Argon Dunkel</button>
+                    <button type="button" class="te-preset-btn" onclick="window.changeTheme('gold', true); window.syncThemeStudioInputs();"><span class="te-dot" style="background:#1f150a; border-color:#d4af37;"></span> Royal Gold</button>
+                    <button type="button" class="te-preset-btn" onclick="window.changeTheme('sapphire', true); window.syncThemeStudioInputs();"><span class="te-dot" style="background:#0f172a; border-color:#3b82f6;"></span> Sapphire Pro</button>
+                    <button type="button" class="te-preset-btn" onclick="window.changeTheme('emerald', true); window.syncThemeStudioInputs();"><span class="te-dot" style="background:#022c22; border-color:#10b981;"></span> Emerald</button>
+                    <button type="button" class="te-preset-btn" onclick="window.changeTheme('stealth', true); window.syncThemeStudioInputs();"><span class="te-dot" style="background:#000000; border-color:#ffffff;"></span> Stealth Black</button>
+                </div>
+
+                <div class="service-config-section">
+                    <h4>1. Eigene Farbpalette (mit HEX-Anzeige)</h4>
+                    <div class="te-color-grid">
+                        <div class="form-group">
+                            <label>Hauptfarbe (Akzent)</label>
+                            <div class="admin-color-wrap">
+                                <input type="color" id="tePrimary" value="#d90000" oninput="window.updateThemeStudioPreview()">
+                                <span id="tePrimaryHex">#D90000</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Textfarbe</label>
+                            <div class="admin-color-wrap">
+                                <input type="color" id="teText" value="#141417" oninput="window.updateThemeStudioPreview()">
+                                <span id="teTextHex">#141417</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Hintergrund</label>
+                            <div class="admin-color-wrap">
+                                <input type="color" id="teBg" value="#eceef3" oninput="window.updateThemeStudioPreview()">
+                                <span id="teBgHex">#ECEEF3</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Karten &amp; Boxen</label>
+                            <div class="admin-color-wrap">
+                                <input type="color" id="teCard" value="#ffffff" oninput="window.updateThemeStudioPreview()">
+                                <span id="teCardHex">#FFFFFF</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Eingabefelder</label>
+                            <div class="admin-color-wrap">
+                                <input type="color" id="teInput" value="#f0f0f5" oninput="window.updateThemeStudioPreview()">
+                                <span id="teInputHex">#F0F0F5</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Karten & Boxen</label>
-                        <input type="color" id="teCard" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#ffffff">
+                </div>
+
+                <div class="service-config-section" style="margin-bottom:0;">
+                    <h4>2. Formen, Button-Stil &amp; Effekte</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Karten-Rundung</label>
+                            <select id="teRadius" class="form-control" onchange="window.updateThemeStudioPreview()">
+                                <option value="8px">Kantig / Sportlich (8px)</option>
+                                <option value="14px">Modern Business (14px)</option>
+                                <option value="20px" selected>Argon Standard (20px)</option>
+                                <option value="26px">Ultra Soft (26px)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Button-Form</label>
+                            <select id="teBtnRadius" class="form-control" onchange="window.updateThemeStudioPreview()">
+                                <option value="50px" selected>Rund / Pill (50px)</option>
+                                <option value="12px">Modern Abgerundet (12px)</option>
+                                <option value="6px">Markant / Eckig (6px)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Eingabefelder (Inputs)</label>
-                        <input type="color" id="teInput" class="form-control" style="padding: 2px; height: 42px; cursor: pointer;" value="#f0f0f5">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Karten-Schatten &amp; Leuchteffekt</label>
+                        <select id="teGlowStyle" class="form-control" onchange="window.updateThemeStudioPreview()">
+                            <option value="0 10px 25px rgba(0, 0, 0, 0.08)">Clean Business (Hellmodus)</option>
+                            <option value="0 14px 35px rgba(0, 0, 0, 0.55)">Tiefer Argon Schatten (Dunkelmodus)</option>
+                            <option value="0 0 28px rgba(217, 0, 0, 0.34)">RED Marken-Leuchten</option>
+                            <option value="0 0 26px rgba(212, 175, 55, 0.35)">Royal Gold Glow</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <div class="service-config-section">
-                <h4>2. Formen, Button-Design & Leuchteffekte</h4>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Karten-Rundung (Radius)</label>
-                        <select id="teRadius" class="form-control">
-                            <option value="8px">Kantig / Sportlich (8px)</option>
-                            <option value="14px">Modern Business (14px)</option>
-                            <option value="20px" selected>Argon Standard (20px)</option>
-                            <option value="28px">Ultra Soft (28px)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Button-Form</label>
-                        <select id="teBtnRadius" class="form-control">
-                            <option value="50px" selected>Rund / Pill-Style (50px)</option>
-                            <option value="12px">Modern Abgerundet (12px)</option>
-                            <option value="6px">Markant / Eckig (6px)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Karten-Schatten & Glow</label>
-                        <select id="teGlowStyle" class="form-control">
-                            <option value="0 10px 25px rgba(0, 0, 0, 0.08)">Clean Business (Für Hellmodus)</option>
-                            <option value="0 14px 35px rgba(0, 0, 0, 0.55)">Tiefer Argon Schatten (Für Dunkelmodus)</option>
-                            <option value="0 0 28px rgba(230, 0, 0, 0.35)">Intensives Rot-Leuchten</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="exec-studio-footer">
+                <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none; border-radius:11px;" onclick="window.resetCustomTheme()"><i class="fa-solid fa-rotate-left"></i> Standard</button>
+                <button type="button" class="btn-primary" style="flex:2; justify-content:center; border-radius:11px;" onclick="window.saveCustomTheme()"><i class="fa-solid fa-wand-magic-sparkles"></i> Design global speichern</button>
             </div>
-            
-            <button class="btn-primary" style="background:#00a8cc; color:#fff; width:100%; justify-content:center; margin-top:5px;" onclick="window.saveCustomTheme()"><i class="fa-solid fa-wand-magic-sparkles"></i> Eigenes Design global anwenden & speichern</button>
-            <button class="btn-primary" style="background:transparent; border:1px solid var(--text-muted); color:var(--text-light); width:100%; justify-content:center; margin-top:10px;" onclick="window.resetCustomTheme()"><i class="fa-solid fa-rotate-left"></i> Auf Hellmodus-Standard zurücksetzen</button>
         </div>
     </div>
 
@@ -1572,57 +1610,127 @@
         </div>
     </div>
 
+    <!-- EXECUTIVE SEITEN MANAGER (PAGE BUILDER STUDIO) -->
     <div class="custom-dialog-overlay" id="pageManagerOverlay">
-        <div class="custom-dialog-window">
-            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closePageManager()"></i>
-            <h3 style="color:#ff9500; font-weight:900; margin-bottom:15px; text-align:center;"><i class="fa-solid fa-file-circle-plus"></i> Seiten Manager (Page Builder)</h3>
-            <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px; text-align:left;">Erstellen Sie neue HTML-Unterseiten. Diese erscheinen automatisch im Burger-Menü und Footer.</p>
-            
-            <div style="display:flex; gap:10px; margin-bottom: 20px; flex-wrap: wrap;">
-                <input type="text" id="pmPageTitle" class="form-control" placeholder="Titel der Seite (z.B. Über uns)" style="flex:1; min-width: 200px;">
-                <button class="btn-primary" style="background:#ff9500; color:#000;" onclick="window.saveCustomPage()"><i class="fa-solid fa-plus"></i> Seite Speichern</button>
-            </div>
-            
-            <div class="form-group" style="text-align:left;">
-                <label>Seiteninhalt (HTML oder normaler Text erlaubt)</label>
-                <textarea id="pmPageContent" class="form-control" rows="6" style="resize:vertical;" placeholder="Schreiben Sie hier den Text für Ihre neue Seite..."></textarea>
-            </div>
-            
-            <input type="hidden" id="pmEditingPageId">
-
-            <div style="margin-top: 30px; text-align:left;">
-                <h4 style="color:#ff9500; font-size: 13px; margin-bottom:10px;">Vorhandene Seiten</h4>
-                <div class="table-responsive" style="max-height: 200px;">
-                    <table class="crm-table" style="width:100%;">
-                        <tbody id="pmPagesList"></tbody>
-                    </table>
+        <div class="custom-dialog-window exec-studio-window" style="max-width:760px;">
+            <div class="exec-studio-header">
+                <div>
+                    <span class="sup-perms-eyebrow"><i class="fa-solid fa-layer-group"></i> CMS · Page Builder</span>
+                    <h3>Seiten Manager</h3>
                 </div>
+                <span class="sup-perms-counter" id="pmPageCountBadge">0 Seiten</span>
+                <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closePageManager()"></i>
+            </div>
+
+            <div class="exec-studio-body">
+                <input type="hidden" id="pmEditingPageId">
+
+                <div class="service-config-section">
+                    <h4>1. Schnell-Vorlagen (1-Klick Start)</h4>
+                    <div class="inv-quick-bar" style="margin-bottom:4px;">
+                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('about')">🏢 Über RED Berlin</button>
+                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('b2b')">🚗 Händler &amp; Gewerbe</button>
+                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('prices')">💶 Preisübersicht</button>
+                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('notice')">📢 Wichtige Info / Urlaub</button>
+                    </div>
+                </div>
+
+                <div class="service-config-section">
+                    <h4>2. Seitenkopf, Symbol &amp; Sichtbarkeit</h4>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1.6;">
+                            <label>Seitentitel *</label>
+                            <input type="text" id="pmPageTitle" class="form-control" placeholder="z.B. Über uns / Händler-Service">
+                        </div>
+                        <div class="form-group">
+                            <label>Menü-Symbol</label>
+                            <select id="pmPageIcon" class="form-control">
+                                <option value="fa-file-lines">📄 Dokument</option>
+                                <option value="fa-building">🏢 Über uns / Firma</option>
+                                <option value="fa-handshake">🤝 Händler / B2B</option>
+                                <option value="fa-euro-sign">💶 Preise</option>
+                                <option value="fa-bullhorn">📢 Aktuelles / Info</option>
+                                <option value="fa-car">🚗 Fahrzeuge</option>
+                                <option value="fa-star">⭐ Aktion / Spezial</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Kurzer Untertitel (Optional)</label>
+                        <input type="text" id="pmPageSubtitle" class="form-control" placeholder="z.B. Ihr Partner für Kfz-Zulassung in Berlin-Neukölln">
+                    </div>
+                    <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowMenu" checked><span class="noble-checkbox-box"></span> Im Hauptmenü anzeigen</label>
+                        <label class="noble-checkbox-label" style="margin:0;"><input type="checkbox" id="pmShowFooter" checked><span class="noble-checkbox-box"></span> Im Footer verlinken</label>
+                    </div>
+                </div>
+
+                <div class="service-config-section">
+                    <h4>3. Seiteninhalt &amp; Formatierung</h4>
+                    <div class="pm-format-bar">
+                        <button type="button" class="pm-fmt-btn" onclick="window.insertPageFormat('h3')"><i class="fa-solid fa-heading"></i> Überschrift</button>
+                        <button type="button" class="pm-fmt-btn" onclick="window.insertPageFormat('bold')"><i class="fa-solid fa-bold"></i> Fett</button>
+                        <button type="button" class="pm-fmt-btn" onclick="window.insertPageFormat('list')"><i class="fa-solid fa-list-ul"></i> Liste</button>
+                        <button type="button" class="pm-fmt-btn" onclick="window.insertPageFormat('box')"><i class="fa-solid fa-square-check"></i> Info-Box</button>
+                        <button type="button" class="pm-fmt-btn" onclick="window.insertPageFormat('cta')"><i class="fa-solid fa-calendar-check"></i> Termin-Button</button>
+                    </div>
+                    <textarea id="pmPageContent" class="form-control" rows="6" style="resize:vertical; margin-top:8px;" placeholder="Schreiben Sie hier Ihren Text oder nutzen Sie die Schnell-Buttons oben..."></textarea>
+                </div>
+
+                <div class="service-config-section" style="margin-bottom:0;">
+                    <h4>4. Vorhandene Unterseiten</h4>
+                    <div id="pmPagesList" class="pm-pages-cards"></div>
+                </div>
+            </div>
+
+            <div class="exec-studio-footer">
+                <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none; border-radius:11px;" onclick="window.resetPageManagerForm()"><i class="fa-solid fa-rotate-left"></i> Neu</button>
+                <button type="button" class="btn-primary" style="flex:2; justify-content:center; border-radius:11px;" onclick="window.saveCustomPage()"><i class="fa-solid fa-floppy-disk"></i> Seite speichern &amp; veröffentlichen</button>
             </div>
         </div>
     </div>
 
-    <!-- SUPERVISOR RECHTE-ZENTRALE (EXECUTIVE RED DESIGN – 1-ZEILIG & MOBIL OPTIMIERT) -->
+    <!-- SUPERVISOR RECHTE- & BENUTZER-ZENTRALE (2 TABS + HÄKCHEN + NEUER BENUTZER) -->
     <div class="custom-dialog-overlay" id="supervisorPermsOverlay">
         <div class="custom-dialog-window sup-perms-window">
             <div class="sup-perms-header">
                 <div class="sup-perms-title-block">
-                    <span class="sup-perms-eyebrow"><i class="fa-solid fa-crown"></i> Supervisor Steuerung</span>
-                    <h3>Rechte- &amp; Modul-Zentrale</h3>
+                    <span class="sup-perms-eyebrow"><i class="fa-solid fa-crown"></i> Supervisor Zentrale</span>
+                    <h3>Rechte &amp; Benutzerverwaltung</h3>
                 </div>
                 <span class="sup-perms-counter" id="supPermActiveCount">0 / 13 Aktiv</span>
                 <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closeSupervisorPanel()"></i>
             </div>
 
-            <div class="sup-perms-quickbar">
-                <button type="button" class="sup-qbtn sup-qbtn-all" onclick="window.toggleAllSupervisorPerms(true)">
-                    <i class="fa-solid fa-check-double"></i> Alle freigeben
+            <!-- 2 TABS: RECHTE VS. BENUTZER ANLEGEN -->
+            <div class="sup-tab-bar">
+                <button type="button" class="sup-tab-btn active" id="supTabBtnPerms" onclick="window.switchSupervisorTab('perms')">
+                    <i class="fa-solid fa-shield-halved"></i> Rechte &amp; Module
                 </button>
-                <button type="button" class="sup-qbtn sup-qbtn-none" onclick="window.toggleAllSupervisorPerms(false)">
-                    <i class="fa-solid fa-lock"></i> Alle sperren
+                <button type="button" class="sup-tab-btn" id="supTabBtnUsers" onclick="window.switchSupervisorTab('users')">
+                    <i class="fa-solid fa-user-plus"></i> Benutzer (<span id="supUserCountBadge">2</span>)
                 </button>
             </div>
 
-            <div class="sup-perms-list">
+            <!-- TAB 1: RECHTE & HÄKCHEN PRO KONTO -->
+            <div class="sup-tab-pane active" id="supPanePerms">
+                <div class="sup-target-user-bar">
+                    <label for="supTargetUserSelect"><i class="fa-solid fa-user-gear" style="color:var(--primary-red);"></i> Konto wählen:</label>
+                    <select id="supTargetUserSelect" class="form-control" onchange="window.onSupervisorTargetUserChange(this.value)">
+                        <option value="admin@red-berlin.de">Tamer Yazici (admin@red-berlin.de)</option>
+                    </select>
+                </div>
+
+                <div class="sup-perms-quickbar">
+                    <button type="button" class="sup-qbtn sup-qbtn-all" onclick="window.toggleAllSupervisorPerms(true)">
+                        <i class="fa-solid fa-check-double"></i> Alle anhaken
+                    </button>
+                    <button type="button" class="sup-qbtn sup-qbtn-none" onclick="window.toggleAllSupervisorPerms(false)">
+                        <i class="fa-solid fa-lock"></i> Alle sperren
+                    </button>
+                </div>
+
+                <div class="sup-perms-list">
                 <div class="sup-perm-cat">Aufträge, Kunden &amp; Finanzen</div>
                 <label class="sup-perm-row">
                     <span class="sup-perm-left"><i class="fa-solid fa-satellite-dish" style="color:var(--primary-red);"></i><span class="sup-perm-text">Live-Leads &amp; Terminliste</span></span>
@@ -1696,9 +1804,60 @@
             </div>
 
             <div class="sup-perms-footer">
-                <button type="button" class="btn-primary" style="width:100%; justify-content:center; border-radius:12px;" onclick="window.saveSupervisorPerms()">
-                    <i class="fa-solid fa-shield-halved"></i> Berechtigungen sofort anwenden
-                </button>
+                    <button type="button" class="btn-primary" style="width:100%; justify-content:center; border-radius:12px;" onclick="window.saveSupervisorPerms()">
+                        <i class="fa-solid fa-check"></i> Rechte für gewähltes Konto speichern
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: NEUE BENUTZER ANLEGEN & VERWALTEN (NUR SUPERVISOR) -->
+            <div class="sup-tab-pane" id="supPaneUsers">
+                <div class="sup-users-scroll">
+                    <div class="service-config-section" style="margin-bottom:12px;">
+                        <h4><i class="fa-solid fa-user-plus"></i> Neuen Benutzer anlegen</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Vollständiger Name *</label>
+                                <input type="text" id="newUserFullName" class="form-control" placeholder="z.B. Max Mustermann">
+                            </div>
+                            <div class="form-group">
+                                <label>Login-Kürzel (Optional)</label>
+                                <input type="text" id="newUserAlias" class="form-control" placeholder="z.B. max">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1.4;">
+                                <label>Login E-Mail *</label>
+                                <input type="email" id="newUserEmail" class="form-control" placeholder="mitarbeiter@red-berlin.de">
+                            </div>
+                            <div class="form-group">
+                                <label>Rolle</label>
+                                <select id="newUserRole" class="form-control">
+                                    <option value="admin">Admin / Mitarbeiter (Rechte per Häkchen)</option>
+                                    <option value="supervisor">Supervisor (Vollzugriff)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label>Start-Passwort (mind. 6 Zeichen) *</label>
+                                <button type="button" class="pw-mini-link" onclick="window.fillGeneratedPass('newUserPassword')"><i class="fa-solid fa-wand-magic-sparkles"></i> Generieren</button>
+                            </div>
+                            <div class="pw-input-wrap">
+                                <input type="password" id="newUserPassword" class="form-control" placeholder="Sicheres Start-Passwort">
+                                <button type="button" class="pw-eye-btn" onclick="window.togglePasswordVis('newUserPassword', this)" aria-label="Anzeigen"><i class="fa-regular fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <button type="button" id="btnCreateNewUser" class="btn-primary" style="width:100%; justify-content:center; border-radius:11px; background:#16a34a;" onclick="window.createSupervisorUser()">
+                            <i class="fa-solid fa-user-check"></i> Benutzer jetzt anlegen &amp; freischalten
+                        </button>
+                    </div>
+
+                    <div class="service-config-section" style="margin-bottom:0;">
+                        <h4><i class="fa-solid fa-users-gear"></i> Vorhandene Konten</h4>
+                        <div id="supUsersList" class="sup-users-list"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1883,12 +2042,61 @@
         </div>
     </div>
 
+    <!-- PASSWORT-MANAGER PRO (SICHERHEITS-PRÜFUNG + GENERATOR) -->
     <div class="custom-dialog-overlay" id="passChangeOverlay">
-        <div class="custom-dialog-window">
-            <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closePassPrompt()"></i>
-            <h3 style="color:var(--gold-accent); font-weight:900; margin-bottom:15px;"><i class="fa-solid fa-key"></i> Neues Passwort</h3>
-            <input type="password" id="newPassInput" class="form-control" style="text-align:center;" placeholder="Neues Passwort eingeben">
-            <button class="btn-primary" style="background:var(--gold-border); color:#fff; width:100%; justify-content:center; margin-top:10px;" onclick="window.confirmPassChange()">Speichern</button>
+        <div class="custom-dialog-window exec-studio-window" style="max-width:440px;">
+            <div class="exec-studio-header">
+                <div>
+                    <span class="sup-perms-eyebrow"><i class="fa-solid fa-shield-halved"></i> Konto-Sicherheit</span>
+                    <h3>Passwort-Manager</h3>
+                </div>
+                <i class="fa-solid fa-xmark close-dialog-btn" onclick="window.closePassPrompt()"></i>
+            </div>
+
+            <div class="exec-studio-body">
+                <div class="pw-account-banner">
+                    <i class="fa-solid fa-user-lock"></i>
+                    <div>
+                        <span>Angemeldetes Konto</span>
+                        <strong id="pwActiveAccountLabel">—</strong>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label>Neues Passwort *</label>
+                        <div style="display:flex; gap:10px;">
+                            <button type="button" class="pw-mini-link" onclick="window.fillGeneratedPass('newPassInput', 'newPassConfirmInput')"><i class="fa-solid fa-wand-magic-sparkles"></i> Generieren</button>
+                            <button type="button" class="pw-mini-link" onclick="window.copyPasswordInput('newPassInput')"><i class="fa-regular fa-copy"></i> Kopieren</button>
+                        </div>
+                    </div>
+                    <div class="pw-input-wrap">
+                        <input type="password" id="newPassInput" class="form-control" placeholder="Mindestens 6 Zeichen" oninput="window.updatePasswordStrength()">
+                        <button type="button" class="pw-eye-btn" onclick="window.togglePasswordVis('newPassInput', this)" aria-label="Anzeigen"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="pw-strength-track"><div class="pw-strength-fill" id="pwStrengthFill"></div></div>
+                    <span class="pw-strength-label" id="pwStrengthLabel">Bitte neues Passwort eingeben</span>
+                </div>
+
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label>Neues Passwort wiederholen *</label>
+                    <div class="pw-input-wrap">
+                        <input type="password" id="newPassConfirmInput" class="form-control" placeholder="Passwort zur Bestätigung wiederholen" oninput="window.updatePasswordStrength()" onkeypress="if(event.key==='Enter') window.confirmPassChange()">
+                        <button type="button" class="pw-eye-btn" onclick="window.togglePasswordVis('newPassConfirmInput', this)" aria-label="Anzeigen"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div class="pw-checks-list">
+                    <span id="pwChkLen"><i class="fa-regular fa-circle"></i> Mindestens 6 Zeichen</span>
+                    <span id="pwChkStrong"><i class="fa-regular fa-circle"></i> Groß-/Kleinbuchstaben &amp; Zahl</span>
+                    <span id="pwChkMatch"><i class="fa-regular fa-circle"></i> Beide Eingaben identisch</span>
+                </div>
+            </div>
+
+            <div class="exec-studio-footer">
+                <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none; border-radius:11px;" onclick="window.closePassPrompt()">Abbrechen</button>
+                <button type="button" class="btn-primary" style="flex:2; justify-content:center; border-radius:11px;" onclick="window.confirmPassChange()"><i class="fa-solid fa-key"></i> Passwort aktualisieren</button>
+            </div>
         </div>
     </div>
 
