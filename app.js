@@ -6611,7 +6611,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (row) row.style.display = (m1 === 'custom' || m2 === 'custom') ? 'flex' : 'none';
         };
 
-        // --- PLAYER KERN-ENGINE V23 (EINHEITLICHE STEUERUNG OHNE KONFLIKTE) ---
+        // --- PLAYER KERN-ENGINE V24 (60 FPS, SYNCHRONES PLAY, SEEKED-LOCK & VOLLSTEUERUNG) ---
         window.getRvpEl = function(key) {
             return document.getElementById(key === 'center' ? 'rvpCenterVideo' : `rvpVid-${key}`);
         };
@@ -6625,12 +6625,14 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     isSeeking: false,
                     pendingTime: null,
                     seekLockUntil: 0,
+                    lastScrubTs: 0,
                     volume: 0.85,
                     muted: true,
                     quality: '1080',
                     phase: 'video',
                     timerId: null,
-                    introShown: false
+                    introShown: false,
+                    sourceKey: ''
                 };
             }
             return window._rvpStates[key];
@@ -6640,6 +6642,29 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const list = window.promoVideosConfig?.list || [];
             const st = window.getRvpState(key);
             return list[st.videoIdx] || list[0] || null;
+        };
+
+        // 60-fps Animations-Loop für butterweiche Zeitleiste während der Wiedergabe
+        window._rvpRafId = null;
+        window.rvpEnsureRafLoop = function() {
+            if (window._rvpRafId) return;
+            const tick = () => {
+                let anyActive = false;
+                Object.keys(window._rvpStates).forEach(k => {
+                    const v = window.getRvpEl(k);
+                    const st = window._rvpStates[k];
+                    if (v && st && (!v.paused || st.isSeeking || Date.now() < st.seekLockUntil)) {
+                        anyActive = true;
+                        window.rvpSyncTimeOnly(k);
+                    }
+                });
+                if (anyActive) {
+                    window._rvpRafId = requestAnimationFrame(tick);
+                } else {
+                    window._rvpRafId = null;
+                }
+            };
+            window._rvpRafId = requestAnimationFrame(tick);
         };
 
         window.buildVideoBadgeIconHtml = function(iconKey) {
@@ -6665,7 +6690,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             el.innerHTML = `<i class="${iconCls}"></i><span>${text}</span>`;
             el.classList.add('show');
             clearTimeout(el._hudTimer);
-            el._hudTimer = setTimeout(() => el.classList.remove('show'), 720);
+            el._hudTimer = setTimeout(() => el.classList.remove('show'), 750);
         };
 
         window.rvpHideBumper = function(key) {
@@ -6745,7 +6770,6 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 v.classList.remove('rvp-q-4k', 'rvp-q-hdr', 'rvp-q-1080', 'rvp-q-720', 'rvp-q-480');
                 if (meta.cls) v.classList.add(meta.cls);
 
-                // Falls für diese Qualitätsstufe eine separate MP4 hinterlegt wurde, nahtlos umschalten
                 if (item) {
                     const targetSrc = (meta.urlField && item[meta.urlField]) ? item[meta.urlField] : item.url;
                     const curSrcAttr = v.getAttribute('data-rvp-src') || v.getAttribute('src') || '';
@@ -6758,7 +6782,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                             if (resumeAt > 0.2 && isFinite(v.duration)) {
                                 try { v.currentTime = Math.min(resumeAt, v.duration - 0.15); } catch (e) {}
                             }
-                            if (wasPlaying) v.play().catch(() => {});
+                            if (wasPlaying) window.rvpSafePlay(key);
                             window.rvpSyncUi(key);
                         };
                         v.addEventListener('loadedmetadata', restorePos, { once: true });
@@ -6780,33 +6804,21 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             }
         };
 
-        window.rvpSyncUi = function(key) {
+        window.rvpGetDuration = function(v) {
+            if (!v) return 0;
+            if (isFinite(v.duration) && v.duration > 0) return v.duration;
+            if (v.seekable && v.seekable.length > 0) {
+                const end = v.seekable.end(v.seekable.length - 1);
+                if (isFinite(end) && end > 0) return end;
+            }
+            return 0;
+        };
+
+        window.rvpSyncTimeOnly = function(key) {
             const v = window.getRvpEl(key);
             if (!v) return;
             const st = window.getRvpState(key);
-            const isPlayingVisual = st.phase === 'intro' || st.phase === 'outro' || !v.paused;
-
-            const playBtn = document.getElementById(`rvpPlayBtn-${key}`);
-            if (playBtn) {
-                playBtn.innerHTML = isPlayingVisual ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
-            }
-
-            const isMuted = st.muted || v.muted || st.volume <= 0.001;
-            const muteBtn = document.getElementById(`rvpMuteBtn-${key}`);
-            if (muteBtn) {
-                muteBtn.innerHTML = isMuted
-                    ? '<i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i>'
-                    : (st.volume < 0.5 ? '<i class="fa-solid fa-volume-low"></i>' : '<i class="fa-solid fa-volume-high"></i>');
-            }
-
-            const volSlider = document.getElementById(`rvpVol-${key}`);
-            if (volSlider) {
-                const effVol = isMuted ? 0 : st.volume;
-                volSlider.value = effVol.toFixed(2);
-                volSlider.style.setProperty('--pct', Math.round(effVol * 100) + '%');
-            }
-
-            const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+            const dur = window.rvpGetDuration(v);
             const lockActive = st.isSeeking || Date.now() < st.seekLockUntil;
             const cur = (lockActive && st.pendingTime !== null)
                 ? st.pendingTime
@@ -6823,6 +6835,35 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 seekEl.value = pct.toFixed(2);
                 seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
             }
+        };
+
+        window.rvpSyncUi = function(key) {
+            const v = window.getRvpEl(key);
+            if (!v) return;
+            const st = window.getRvpState(key);
+            const isPlayingVisual = st.phase === 'intro' || st.phase === 'outro' || !v.paused || st.desiredPlaying;
+
+            const playBtn = document.getElementById(`rvpPlayBtn-${key}`);
+            if (playBtn) {
+                playBtn.innerHTML = isPlayingVisual ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
+            }
+
+            const isMuted = st.muted || st.volume <= 0.001;
+            const muteBtn = document.getElementById(`rvpMuteBtn-${key}`);
+            if (muteBtn) {
+                muteBtn.innerHTML = isMuted
+                    ? '<i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i>'
+                    : (st.volume < 0.5 ? '<i class="fa-solid fa-volume-low"></i>' : '<i class="fa-solid fa-volume-high"></i>');
+            }
+
+            const volSlider = document.getElementById(`rvpVol-${key}`);
+            if (volSlider) {
+                const effVol = isMuted ? 0 : st.volume;
+                volSlider.value = effVol.toFixed(2);
+                volSlider.style.setProperty('--pct', Math.round(effVol * 100) + '%');
+            }
+
+            window.rvpSyncTimeOnly(key);
 
             const unmutePill = document.getElementById(`rvpUnmute-${key}`);
             if (unmutePill) {
@@ -6834,21 +6875,38 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             }
         };
 
+        // WICHTIG: Niemals v.volume auf 0 überschreiben beim Muten – nur v.muted schalten!
+        window.rvpApplyAudioToEl = function(key) {
+            const v = window.getRvpEl(key);
+            const st = window.getRvpState(key);
+            if (!v) return;
+            const safeVol = Math.max(0.05, Math.min(1, Number(st.volume) || 0.85));
+            v.muted = !!st.muted;
+            try { v.volume = safeVol; } catch (e) {}
+        };
+
         window.rvpSafePlay = function(key) {
             const v = window.getRvpEl(key);
             const st = window.getRvpState(key);
             if (!v) return;
-            v.muted = st.muted;
-            try { v.volume = st.muted ? 0 : Math.max(0.05, st.volume); } catch (e) {}
+            window.rvpApplyAudioToEl(key);
             const p = v.play();
-            if (p && typeof p.catch === 'function') {
-                p.catch(() => {
+            window.rvpEnsureRafLoop();
+            if (p && typeof p.then === 'function') {
+                p.then(() => {
+                    window.rvpSyncUi(key);
+                }).catch(() => {
+                    // Fallback falls Browser unmuted Autoplay blockiert
                     st.muted = true;
                     v.muted = true;
-                    v.play().catch(() => {
-                        st.desiredPlaying = false;
-                        window.rvpSyncUi(key);
-                    });
+                    const p2 = v.play();
+                    if (p2 && typeof p2.catch === 'function') {
+                        p2.catch(() => {
+                            st.desiredPlaying = false;
+                            st.userPaused = true;
+                            window.rvpSyncUi(key);
+                        });
+                    }
                     window.rvpSyncUi(key);
                 });
             }
@@ -6881,14 +6939,26 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             }
         };
 
+        // SOFORTIGE REAKTION BEI PLAY / PAUSE (SYNCHRON IM KLICK -> KEIN MOBILE-BLOCK)
         window.rvpTogglePlay = function(key) {
             const v = window.getRvpEl(key);
             const st = window.getRvpState(key);
             if (!v) return;
 
-            if (st.phase === 'intro' || st.phase === 'outro' || !v.paused) {
+            // Wenn Nutzer während Intro tippt -> direkt ins Video springen & abspielen
+            if (st.phase === 'intro' || st.phase === 'outro') {
                 window.rvpHideBumper(key);
                 window.stopRedStudioAudio();
+                st.desiredPlaying = true;
+                st.userPaused = false;
+                st.introShown = true;
+                window.rvpSafePlay(key);
+                window.rvpShowHud(key, 'fa-solid fa-play', 'Abspielen');
+                window.rvpSyncUi(key);
+                return;
+            }
+
+            if (!v.paused) {
                 st.desiredPlaying = false;
                 st.userPaused = true;
                 v.pause();
@@ -6899,18 +6969,11 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
             st.desiredPlaying = true;
             st.userPaused = false;
+            st.introShown = true;
             window.rvpPauseOtherPlayers(key);
+            window.rvpSafePlay(key);
             window.rvpShowHud(key, 'fa-solid fa-play', 'Abspielen');
-
-            const item = window.getRvpItem(key);
-            const mode = item?.logoMode || 'both';
-            const wantsIntro = (mode === 'intro' || mode === 'both') && !st.introShown && (v.currentTime || 0) < 0.25;
-            if (wantsIntro) {
-                window.rvpStartWithIntroIfNeeded(key, true);
-            } else {
-                window.rvpSafePlay(key);
-                window.rvpSyncUi(key);
-            }
+            window.rvpSyncUi(key);
         };
 
         window.rvpStop = function(key) {
@@ -6924,12 +6987,10 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             st.introShown = false;
             st.isSeeking = false;
             st.pendingTime = 0;
-            st.seekLockUntil = Date.now() + 350;
+            st.seekLockUntil = Date.now() + 900;
             v.pause();
             try { v.currentTime = 0; } catch (e) {}
-            const seekEl = document.getElementById(`rvpSeek-${key}`);
-            if (seekEl) { seekEl.value = 0; seekEl.style.setProperty('--pct', '0%'); }
-            window.rvpShowHud(key, 'fa-solid fa-stop', 'Gestoppt');
+            window.rvpShowHud(key, 'fa-solid fa-stop', 'Gestoppt (0:00)');
             window.rvpSyncUi(key);
         };
 
@@ -6945,35 +7006,27 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             }
 
             const executeJump = () => {
-                const dur = isFinite(v.duration) && v.duration > 0
-                    ? v.duration
-                    : (v.seekable && v.seekable.length ? v.seekable.end(v.seekable.length - 1) : 0);
+                const dur = window.rvpGetDuration(v);
+                const lockActive = Date.now() < st.seekLockUntil && st.pendingTime !== null;
+                const base = lockActive ? st.pendingTime : (isFinite(v.currentTime) ? v.currentTime : 0);
 
-                const base = (Date.now() < st.seekLockUntil && st.pendingTime !== null)
-                    ? st.pendingTime
-                    : (isFinite(v.currentTime) ? v.currentTime : 0);
-
-                const maxT = dur > 0.2 ? dur - 0.12 : Math.max(0, base + Math.max(0, deltaSec));
+                const maxT = dur > 0.25 ? dur - 0.12 : Math.max(0, base + Math.max(0, deltaSec));
                 const target = Math.max(0, Math.min(maxT, base + deltaSec));
 
                 st.pendingTime = target;
-                st.seekLockUntil = Date.now() + 550;
+                st.seekLockUntil = Date.now() + 1200;
 
                 try { v.currentTime = target; } catch (e) {}
 
-                const seekEl = document.getElementById(`rvpSeek-${key}`);
-                if (seekEl && dur > 0) {
-                    const pct = Math.min(100, Math.max(0, (target / dur) * 100));
-                    seekEl.value = pct.toFixed(2);
-                    seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
-                }
-                const curEl = document.getElementById(`rvpTimeCur-${key}`);
-                if (curEl) curEl.innerText = window.formatVideoTime(target);
-
-                if (st.desiredPlaying && !st.userPaused) {
+                if (st.desiredPlaying && !st.userPaused && v.paused) {
                     window.rvpSafePlay(key);
                 }
-                window.rvpShowHud(key, deltaSec < 0 ? 'fa-solid fa-rotate-left' : 'fa-solid fa-rotate-right', deltaSec < 0 ? '−5 Sek.' : '+5 Sek.');
+                window.rvpEnsureRafLoop();
+                window.rvpShowHud(
+                    key,
+                    deltaSec < 0 ? 'fa-solid fa-rotate-left' : 'fa-solid fa-rotate-right',
+                    `${deltaSec < 0 ? '−5s' : '+5s'} (${window.formatVideoTime(target)})`
+                );
                 window.rvpSyncUi(key);
             };
 
@@ -6989,16 +7042,15 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             const v = window.getRvpEl(key);
             const st = window.getRvpState(key);
             if (!v) return;
-            if (st.muted || v.muted || st.volume <= 0.001) {
+            if (st.muted || st.volume <= 0.001) {
                 st.muted = false;
                 if (st.volume <= 0.05) st.volume = 0.85;
-                v.muted = false;
-                try { v.volume = st.volume; } catch (e) {}
+                window.rvpApplyAudioToEl(key);
                 window.rvpPauseOtherPlayers(key);
                 window.rvpShowHud(key, 'fa-solid fa-volume-high', `Ton ${Math.round(st.volume * 100)}%`);
             } else {
                 st.muted = true;
-                v.muted = true;
+                window.rvpApplyAudioToEl(key);
                 window.stopRedStudioAudio();
                 window.rvpShowHud(key, 'fa-solid fa-volume-xmark', 'Stumm');
             }
@@ -7013,25 +7065,55 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (st.volume <= 0.05) st.volume = 0.85;
             st.desiredPlaying = true;
             st.userPaused = false;
-            v.muted = false;
-            try { v.volume = st.volume; } catch (e) {}
+            st.introShown = true;
+            window.rvpHideBumper(key);
             window.rvpPauseOtherPlayers(key);
             window.rvpSafePlay(key);
-            window.rvpShowHud(key, 'fa-solid fa-volume-high', 'Ton aktiv');
+            window.rvpShowHud(key, 'fa-solid fa-volume-high', `Ton ${Math.round(st.volume * 100)}%`);
             window.rvpSyncUi(key);
         };
 
-        window.rvpSetVolume = function(key, val) {
+        window.rvpSetVolume = function(key, val, showHud = false) {
             const v = window.getRvpEl(key);
             const st = window.getRvpState(key);
             if (!v) return;
             const num = Math.max(0, Math.min(1, parseFloat(val) || 0));
-            st.volume = num;
-            st.muted = num <= 0.001;
-            v.muted = st.muted;
-            try { v.volume = num; } catch (e) {}
-            if (!st.muted) window.rvpPauseOtherPlayers(key);
+            const wasMuted = st.muted;
+            st.volume = num > 0 ? num : st.volume;
+            st.muted = num <= 0.005;
+            if (!st.muted) st.volume = num;
+            window.rvpApplyAudioToEl(key);
+            if (wasMuted && !st.muted) window.rvpPauseOtherPlayers(key);
+            if (showHud) {
+                window.rvpShowHud(
+                    key,
+                    st.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high',
+                    st.muted ? 'Stumm (0%)' : `Lautstärke ${Math.round(st.volume * 100)}%`
+                );
+            }
             window.rvpSyncUi(key);
+        };
+
+        window.rvpStepVolume = function(key, delta) {
+            const st = window.getRvpState(key);
+            const cur = st.muted ? 0 : (st.volume || 0);
+            const next = Math.max(0, Math.min(1, Math.round((cur + delta) * 20) / 20));
+            window.rvpSetVolume(key, next, true);
+        };
+
+        window.rvpToggleFullscreen = function(key) {
+            const v = window.getRvpEl(key);
+            const stage = key === 'center' ? document.getElementById('rvpCenterStage') : v;
+            if (!v) return;
+            if (document.fullscreenElement) {
+                document.exitFullscreen?.().catch(() => {});
+            } else if (stage && stage.requestFullscreen) {
+                stage.requestFullscreen().catch(() => {
+                    if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+                });
+            } else if (v.webkitEnterFullscreen) {
+                v.webkitEnterFullscreen();
+            }
         };
 
         window.rvpHandleEnded = function(key) {
@@ -7069,7 +7151,7 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             if (host.dataset.rvpControlsBound === '1') return;
             host.dataset.rvpControlsBound = '1';
 
-            // 1. Einheitlicher Click-Delegator für ALLE Buttons & Qualitäts-Optionen (kein Touch/Click-Doppelkonflikt)
+            // 1. Einziger zentraler Klick-Handler (liest immer live window.getRvpState(key)!)
             host.addEventListener('click', (e) => {
                 const qOpt = e.target.closest('button[data-rvp-qual]');
                 if (qOpt) {
@@ -7084,14 +7166,18 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 e.preventDefault();
                 e.stopPropagation();
 
+                const curSt = window.getRvpState(key);
                 const act = actEl.getAttribute('data-rvp-act');
                 if (act === 'play') window.rvpTogglePlay(key);
                 else if (act === 'stop') window.rvpStop(key);
                 else if (act === 'back5') window.rvpSkip(key, -5);
                 else if (act === 'fwd5') window.rvpSkip(key, 5);
                 else if (act === 'mute') window.rvpToggleMute(key);
+                else if (act === 'voldown') window.rvpStepVolume(key, -0.15);
+                else if (act === 'volup') window.rvpStepVolume(key, 0.15);
                 else if (act === 'unmute') window.rvpUnmuteAndPlay(key);
-                else if (act === 'expand') window.openVideoCenterModal(st.videoIdx, key);
+                else if (act === 'expand') window.openVideoCenterModal(curSt.videoIdx, key);
+                else if (act === 'fullscreen') window.rvpToggleFullscreen(key);
                 else if (act === 'qual-toggle') {
                     const menu = document.getElementById(`rvpQualMenu-${key}`);
                     document.querySelectorAll('.rvp-qual-menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
@@ -7099,58 +7185,83 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 }
             });
 
-            // 2. Saubere Seekbar-Steuerung (erst beim Ziehen visuell aktualisieren, beim Loslassen präzise springen)
+            // 2. Zeitleiste (mit Live-Scrub + globalem Loslass-Schutz, klemmt niemals!)
             const seekEl = document.getElementById(`rvpSeek-${key}`);
             if (seekEl) {
                 const startSeek = () => {
-                    st.isSeeking = true;
-                    if (st.phase === 'intro' || st.phase === 'outro') {
+                    const s = window.getRvpState(key);
+                    s.isSeeking = true;
+                    if (s.phase === 'intro' || s.phase === 'outro') {
                         window.rvpHideBumper(key);
                         window.stopRedStudioAudio();
                     }
+                    window.addEventListener('pointerup', finishSeek, { once: true });
+                    window.addEventListener('pointercancel', finishSeek, { once: true });
                 };
-                const previewSeek = () => {
+
+                const scrubSeek = () => {
+                    const s = window.getRvpState(key);
                     const pct = Math.max(0, Math.min(100, parseFloat(seekEl.value) || 0));
                     seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
-                    const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
-                    if (dur > 0) {
-                        const t = (pct / 100) * dur;
-                        st.pendingTime = t;
-                        const curEl = document.getElementById(`rvpTimeCur-${key}`);
-                        if (curEl) curEl.innerText = window.formatVideoTime(t);
-                    }
-                };
-                const commitSeek = () => {
-                    const pct = Math.max(0, Math.min(100, parseFloat(seekEl.value) || 0));
-                    seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
-                    const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+                    const dur = window.rvpGetDuration(v);
                     if (dur > 0) {
                         const target = Math.max(0, Math.min(dur - 0.1, (pct / 100) * dur));
-                        st.pendingTime = target;
-                        st.seekLockUntil = Date.now() + 500;
+                        s.pendingTime = target;
+                        s.seekLockUntil = Date.now() + 900;
+                        const curEl = document.getElementById(`rvpTimeCur-${key}`);
+                        if (curEl) curEl.innerText = window.formatVideoTime(target);
+                        // Sanft gedrosseltes Live-Vorschau-Spulen beim Ziehen
+                        const now = Date.now();
+                        if (now - s.lastScrubTs > 85) {
+                            s.lastScrubTs = now;
+                            try { v.currentTime = target; } catch (e) {}
+                        }
+                    }
+                };
+
+                const finishSeek = () => {
+                    const s = window.getRvpState(key);
+                    if (!s.isSeeking) return;
+                    const pct = Math.max(0, Math.min(100, parseFloat(seekEl.value) || 0));
+                    seekEl.style.setProperty('--pct', pct.toFixed(2) + '%');
+                    const dur = window.rvpGetDuration(v);
+                    if (dur > 0) {
+                        const target = Math.max(0, Math.min(dur - 0.1, (pct / 100) * dur));
+                        s.pendingTime = target;
+                        s.seekLockUntil = Date.now() + 1000;
                         try { v.currentTime = target; } catch (e) {}
                     }
-                    st.isSeeking = false;
+                    s.isSeeking = false;
+                    window.rvpEnsureRafLoop();
                     window.rvpSyncUi(key);
                 };
 
                 seekEl.addEventListener('pointerdown', startSeek);
-                seekEl.addEventListener('input', previewSeek);
-                seekEl.addEventListener('change', commitSeek);
-                seekEl.addEventListener('pointerup', commitSeek);
-                seekEl.addEventListener('pointercancel', commitSeek);
+                seekEl.addEventListener('input', scrubSeek);
+                seekEl.addEventListener('change', finishSeek);
             }
 
-            // 3. Saubere Lautstärke-Steuerung
+            // 3. Lautstärke-Slider (direkte visuelle & akustische Reaktion)
             const volEl = document.getElementById(`rvpVol-${key}`);
             if (volEl) {
-                const onVol = () => window.rvpSetVolume(key, volEl.value);
-                volEl.addEventListener('input', onVol);
-                volEl.addEventListener('change', onVol);
+                volEl.addEventListener('input', () => window.rvpSetVolume(key, volEl.value, false));
+                volEl.addEventListener('change', () => window.rvpSetVolume(key, volEl.value, true));
             }
 
-            // 4. Video-Events
-            ['timeupdate', 'loadedmetadata', 'durationchange', 'play', 'pause', 'seeked'].forEach(ev => {
+            // 4. Video-Events inkl. sauberer Seek-Freigabe bei 'seeked'
+            v.addEventListener('seeked', () => {
+                const s = window.getRvpState(key);
+                if (!s.isSeeking) {
+                    s.seekLockUntil = 0;
+                    s.pendingTime = null;
+                }
+                window.rvpSyncUi(key);
+            });
+            v.addEventListener('play', () => {
+                window.rvpEnsureRafLoop();
+                window.rvpSyncUi(key);
+            });
+            ['pause', 'loadedmetadata', 'durationchange', 'timeupdate'].forEach(ev => {
                 v.addEventListener(ev, () => window.rvpSyncUi(key));
             });
             v.addEventListener('ended', () => window.rvpHandleEnded(key));
@@ -7162,6 +7273,17 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                 if (!e.target.closest('.rvp-qual-wrap')) {
                     document.querySelectorAll('.rvp-qual-menu.open').forEach(m => m.classList.remove('open'));
                 }
+            });
+            // Desktop-Tastatursteuerung im vergrößerten Kino-Player
+            document.addEventListener('keydown', (e) => {
+                if (!document.getElementById('redVideoCenterOverlay')?.classList.contains('open')) return;
+                if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+                if (e.code === 'Space') { e.preventDefault(); window.rvpTogglePlay('center'); }
+                else if (e.key === 'ArrowLeft') { e.preventDefault(); window.rvpSkip('center', -5); }
+                else if (e.key === 'ArrowRight') { e.preventDefault(); window.rvpSkip('center', 5); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); window.rvpStepVolume('center', 0.15); }
+                else if (e.key === 'ArrowDown') { e.preventDefault(); window.rvpStepVolume('center', -0.15); }
+                else if (e.key === 'm' || e.key === 'M') { e.preventDefault(); window.rvpToggleMute('center'); }
             });
         }
 
@@ -7189,11 +7311,15 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
             const st = window.getRvpState('center');
             st.videoIdx = idx;
+            st.sourceKey = sourceKey;
             st.desiredPlaying = true;
             st.userPaused = false;
             st.muted = false;
             st.volume = resumeVol;
-            st.introShown = resumeTime > 0.4;
+            st.introShown = true;
+            st.isSeeking = false;
+            st.pendingTime = resumeTime;
+            st.seekLockUntil = resumeTime > 0.2 ? (Date.now() + 900) : 0;
             window.rvpHideBumper('center');
 
             if (centerV.getAttribute('data-rvp-src') !== item.url) {
@@ -7203,31 +7329,42 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
             window.bindRvpPlayerControls('center', idx);
             window.rvpApplyQualityProfile('center', resumeQual, false);
 
-            const beginCenter = () => {
-                if (resumeTime > 0.4 && isFinite(centerV.duration)) {
-                    try { centerV.currentTime = Math.min(resumeTime, centerV.duration - 0.15); } catch (e) {}
-                    window.rvpSafePlay('center');
-                    window.rvpSyncUi('center');
-                } else {
-                    window.rvpStartWithIntroIfNeeded('center', true);
-                }
-            };
-            if (centerV.readyState >= 1) beginCenter();
-            else centerV.addEventListener('loadedmetadata', beginCenter, { once: true });
-
             ov.classList.add('open');
+
+            // SYNCHRON im Klick-Handler starten -> Ton & Wiedergabe funktionieren sofort auf Handy & PC!
+            if (resumeTime > 0.2 && centerV.readyState >= 1) {
+                try { centerV.currentTime = Math.min(resumeTime, Math.max(0, (centerV.duration || resumeTime) - 0.15)); } catch (e) {}
+            } else if (resumeTime > 0.2) {
+                centerV.addEventListener('loadedmetadata', () => {
+                    try { centerV.currentTime = Math.min(resumeTime, Math.max(0, (centerV.duration || resumeTime) - 0.15)); } catch (e) {}
+                }, { once: true });
+            }
+            window.rvpSafePlay('center');
+            window.rvpSyncUi('center');
         };
 
         window.closeVideoCenterModal = function() {
             const ov = document.getElementById('redVideoCenterOverlay');
             const centerV = window.getRvpEl('center');
             const st = window.getRvpState('center');
+            const handoffTime = centerV && isFinite(centerV.currentTime) ? centerV.currentTime : 0;
+            const srcKey = st.sourceKey || 'inline-0';
+
             st.desiredPlaying = false;
             st.userPaused = true;
             window.rvpHideBumper('center');
             window.stopRedStudioAudio();
             if (centerV) centerV.pause();
             if (ov) ov.classList.remove('open');
+
+            const inlineV = window.getRvpEl(srcKey);
+            if (inlineV && handoffTime > 0.2) {
+                const iSt = window.getRvpState(srcKey);
+                iSt.pendingTime = handoffTime;
+                iSt.seekLockUntil = Date.now() + 700;
+                try { inlineV.currentTime = handoffTime; } catch (e) {}
+                window.rvpSyncUi(srcKey);
+            }
         };
 
         window.editCurrentPromoVideo = function(videoId = '') {
@@ -7305,7 +7442,9 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                             </div>
                             <div class="rvp-vol-group">
                                 <button type="button" class="rvp-ctrl-btn" id="rvpMuteBtn-${key}" data-rvp-act="mute" title="Ton Ein/Aus"><i class="fa-solid fa-volume-xmark" style="color:var(--primary-red);"></i></button>
-                                <input type="range" id="rvpVol-${key}" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0" style="--pct:0%;" aria-label="Lautstärke">
+                                <button type="button" class="rvp-ctrl-btn rvp-vol-step" data-rvp-act="voldown" title="Leiser"><i class="fa-solid fa-minus"></i></button>
+                                <input type="range" id="rvpVol-${key}" class="rvp-range rvp-vol" min="0" max="1" step="0.02" value="0" style="--pct:0%;" aria-label="Lautstärke">
+                                <button type="button" class="rvp-ctrl-btn rvp-vol-step" data-rvp-act="volup" title="Lauter"><i class="fa-solid fa-plus"></i></button>
                                 <div class="rvp-qual-wrap">
                                     <button type="button" class="rvp-ctrl-btn rvp-qual-btn" id="rvpQualBtn-${key}" data-rvp-act="qual-toggle" title="Bildqualität (4K / HDR / Full HD / HD / SD)"><span>${qShort}</span></button>
                                     <div class="rvp-qual-menu" id="rvpQualMenu-${key}">
@@ -7470,12 +7609,14 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
                     isSeeking: false,
                     pendingTime: null,
                     seekLockUntil: 0,
+                    lastScrubTs: 0,
                     volume: 0.85,
                     muted: true,
                     quality: item?.defaultQuality || '1080',
                     phase: 'video',
                     timerId: null,
-                    introShown: false
+                    introShown: false,
+                    sourceKey: ''
                 };
                 window.bindRvpPlayerControls(key, idx);
                 if (auto) {

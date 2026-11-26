@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-   <link rel="stylesheet" href="./styles.css?v=23">
+   <link rel="stylesheet" href="./styles.css?v=24">
 </head>
 
 <body data-theme="light">
@@ -1313,9 +1313,11 @@
                     </div>
                     <div class="rvp-vol-group">
                         <button type="button" class="rvp-ctrl-btn" id="rvpMuteBtn-center" data-rvp-act="mute" title="Ton Ein/Aus"><i class="fa-solid fa-volume-high"></i></button>
-                        <input type="range" id="rvpVol-center" class="rvp-range rvp-vol" min="0" max="1" step="0.05" value="0.9" style="--pct:90%;" aria-label="Lautstärke">
+                        <button type="button" class="rvp-ctrl-btn rvp-vol-step" data-rvp-act="voldown" title="Leiser"><i class="fa-solid fa-minus"></i></button>
+                        <input type="range" id="rvpVol-center" class="rvp-range rvp-vol" min="0" max="1" step="0.02" value="0.9" style="--pct:90%;" aria-label="Lautstärke">
+                        <button type="button" class="rvp-ctrl-btn rvp-vol-step" data-rvp-act="volup" title="Lauter"><i class="fa-solid fa-plus"></i></button>
                         <div class="rvp-qual-wrap">
-                            <button type="button" class="rvp-ctrl-btn rvp-qual-btn" id="rvpQualBtn-center" data-rvp-act="qual-toggle" title="Bildqualität (4K / HDR / Full HD / HD / SD)"><span>HD</span></button>
+                            <button type="button" class="rvp-ctrl-btn rvp-qual-btn" id="rvpQualBtn-center" data-rvp-act="qual-toggle" title="Bildqualität (4K / HDR / Full HD / HD / SD)"><span>FHD</span></button>
                             <div class="rvp-qual-menu" id="rvpQualMenu-center">
                                 <button type="button" data-rvp-qual="4k"><strong>4K UHD</strong><span>2160p Ultra</span></button>
                                 <button type="button" data-rvp-qual="hdr"><strong>HDR10</strong><span>Kino-Kontrast</span></button>
@@ -1325,6 +1327,7 @@
                                 <button type="button" data-rvp-qual="auto"><strong>Auto</strong><span>Original</span></button>
                             </div>
                         </div>
+                        <button type="button" class="rvp-ctrl-btn" data-rvp-act="fullscreen" title="Echtes Vollbild"><i class="fa-solid fa-expand"></i></button>
                     </div>
                 </div>
             </div>
@@ -4324,8 +4327,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-<script src="./app.js?v=23" defer></script>
-    <script type="module" src="./firebase-app.js?v=23"></script>
+<script src="./app.js?v=24" defer></script>
+    <script type="module" src="./firebase-app.js?v=24"></script>
 
 </body>
 </html>

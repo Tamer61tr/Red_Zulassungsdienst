@@ -1,10 +1,10 @@
-const CACHE_NAME = 'red-berlin-pwa-v23';
+const CACHE_NAME = 'red-berlin-pwa-v24';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './styles.css?v=23',
-  './app.js?v=23',
-  './firebase-app.js?v=23',
+  './styles.css?v=24',
+  './app.js?v=24',
+  './firebase-app.js?v=24',
   './manifest.json',
   './icon-180.png',
   './icon-192.png',
@@ -35,7 +35,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith('.mp4') || url.pathname.endsWith('.webm')) return;
+  if (req.headers.has('range') || /\.(mp4|webm|mov|m4v|mp3|ogg|wav)$/i.test(url.pathname)) return;
 
   const isCodeOrPage = req.mode === 'navigate'
     || url.pathname.endsWith('/')

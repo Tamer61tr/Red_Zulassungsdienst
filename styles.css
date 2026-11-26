@@ -6738,6 +6738,51 @@
             .vm-prev-frame { width: 82px; max-height: 120px; }
         }
 
+        /* =========================================================================
+           PLAYER V24: FLÜSSIGE AUDIO-TASTEN (−/+), TOUCH-SLIDER & KINO-STABILITÄT
+           ========================================================================= */
+        .rvp-vol-step {
+            min-width: 26px !important;
+            width: 26px !important;
+            padding: 0 !important;
+            font-size: 10px !important;
+        }
+        .rvp-range {
+            -webkit-tap-highlight-color: transparent;
+            padding: 6px 0;
+            background-clip: content-box !important;
+            height: 18px !important;
+        }
+        .rvp-vol-group {
+            gap: 5px !important;
+        }
+        .rvp-vol {
+            width: 62px;
+        }
+        @media (max-width: 768px) {
+            .rvp-vol-group {
+                gap: 4px !important;
+            }
+            .rvp-vol-step {
+                min-width: 30px !important;
+                width: 30px !important;
+                height: 36px !important;
+                font-size: 11px !important;
+            }
+            .rvp-vol-group .rvp-ctrl-btn {
+                height: 36px !important;
+                min-width: 34px !important;
+            }
+            .rvp-vol-group .rvp-qual-btn {
+                min-width: 40px !important;
+                padding: 0 5px !important;
+            }
+            .rvp-vol-group .rvp-vol {
+                min-width: 44px;
+                flex: 1;
+            }
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
