@@ -696,6 +696,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                     if (typeof window.applyBrandAssetsUI === 'function') window.applyBrandAssetsUI();
                 }
             });
+
+            onSnapshot(doc(db, "settings", "video_upload_cfg"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const remote = docSnap.data();
+                    const cur = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v1') || 'null') || {};
+                    const merged = {
+                        ...cur,
+                        provider: remote.provider || cur.provider || 'cloudinary',
+                        cloudName: remote.cloudName || cur.cloudName || '',
+                        cloudPreset: remote.cloudPreset || cur.cloudPreset || ''
+                    };
+                    localStorage.setItem('red_free_video_upload_cfg_v1', JSON.stringify(merged));
+                    if (document.getElementById('videoManagerOverlay')?.classList.contains('open') && typeof window.loadFreeUploadSettingsIntoForm === 'function') {
+                        window.loadFreeUploadSettingsIntoForm();
+                    }
+                }
+            });
         }
 
         window.saveContactInfo = async function() {

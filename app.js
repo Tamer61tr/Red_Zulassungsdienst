@@ -8254,17 +8254,34 @@ window.rvpBindDirectTap = function(el, onTap) {
                 tempV.src = srcUrl;
             });
         };
+// --- KOSTENLOSER MB-UPLOAD V30 (CLOUDINARY FIX + VERBINDUNGSTEST + GITHUB + SOFORT-LOKAL) ---
+        window.normalizeCloudinaryCloudName = function(raw) {
+            let s = String(raw || '').trim();
+            if (!s) return '';
+            // Falls jemand die komplette CLOUDINARY_URL (cloudinary://key:sec@cloudname) einfügt:
+            if (s.includes('@')) s = s.split('@').pop();
+            // Falls jemand eine URL (https://res.cloudinary.com/cloudname/...) einfügt:
+            const urlMatch = s.match(/res\.cloudinary\.com\/([^\/\s?#]+)/i);
+            if (urlMatch) s = urlMatch[1];
+            return s.replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
+        };
 
-// --- KOSTENLOSER MB-UPLOAD (0 €: CLOUDINARY FREE BIS 100 MB ODER GITHUB BIS 25 MB) ---
         window.getFreeUploadSettings = function() {
             const saved = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v1') || 'null') || {};
+            const liveProv = document.getElementById('vmUploadProvider')?.value;
+            const liveCloud = document.getElementById('vmCloudName')?.value;
+            const livePreset = document.getElementById('vmCloudPreset')?.value;
+            const liveRepo = document.getElementById('vmGhRepo')?.value;
+            const liveBranch = document.getElementById('vmGhBranch')?.value;
+            const liveToken = document.getElementById('vmGhToken')?.value;
+
             return {
-                provider: saved.provider || 'cloudinary',
-                cloudName: (saved.cloudName || '').trim(),
-                cloudPreset: (saved.cloudPreset || '').trim(),
-                ghRepo: (saved.ghRepo || '').trim(),
-                ghBranch: (saved.ghBranch || 'main').trim() || 'main',
-                ghToken: (saved.ghToken || '').trim()
+                provider: liveProv || saved.provider || 'cloudinary',
+                cloudName: window.normalizeCloudinaryCloudName(liveCloud !== undefined && liveCloud !== '' ? liveCloud : saved.cloudName),
+                cloudPreset: String(livePreset !== undefined && livePreset !== '' ? livePreset : (saved.cloudPreset || '')).trim(),
+                ghRepo: String(liveRepo !== undefined && liveRepo !== '' ? liveRepo : (saved.ghRepo || '')).trim(),
+                ghBranch: String(liveBranch !== undefined && liveBranch !== '' ? liveBranch : (saved.ghBranch || 'main')).trim() || 'main',
+                ghToken: String(liveToken !== undefined && liveToken !== '' ? liveToken : (saved.ghToken || '')).trim()
             };
         };
 
@@ -8272,28 +8289,35 @@ window.rvpBindDirectTap = function(el, onTap) {
             const p = document.getElementById('vmUploadProvider')?.value || 'cloudinary';
             const cWrap = document.getElementById('vmCfgCloudinaryWrap');
             const gWrap = document.getElementById('vmCfgGithubWrap');
+            const lWrap = document.getElementById('vmCfgLocalWrap');
             const badge = document.getElementById('vmUploadProviderBadge');
             if (cWrap) cWrap.style.display = p === 'cloudinary' ? 'block' : 'none';
             if (gWrap) gWrap.style.display = p === 'github' ? 'block' : 'none';
-            if (badge) badge.innerText = p === 'github' ? 'GitHub Repo' : 'Cloudinary Free';
+            if (lWrap) lWrap.style.display = p === 'local' ? 'block' : 'none';
+            if (badge) badge.innerText = p === 'github' ? 'GitHub Repo' : (p === 'local' ? 'Sofort-Lokal' : 'Cloudinary Free');
         };
 
         window.loadFreeUploadSettingsIntoForm = function() {
-            const cfg = window.getFreeUploadSettings();
-            const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-            setV('vmUploadProvider', cfg.provider);
-            setV('vmCloudName', cfg.cloudName);
-            setV('vmCloudPreset', cfg.cloudPreset);
-            setV('vmGhRepo', cfg.ghRepo);
-            setV('vmGhBranch', cfg.ghBranch);
-            setV('vmGhToken', cfg.ghToken);
+            const saved = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v1') || 'null') || {};
+            const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+            setV('vmUploadProvider', saved.provider || 'cloudinary');
+            setV('vmCloudName', saved.cloudName || '');
+            setV('vmCloudPreset', saved.cloudPreset || '');
+            setV('vmGhRepo', saved.ghRepo || '');
+            setV('vmGhBranch', saved.ghBranch || 'main');
+            setV('vmGhToken', saved.ghToken || '');
             window.toggleFreeUploadProviderFields();
         };
 
-        window.saveFreeUploadSettings = function() {
+        window.saveFreeUploadSettings = function(silent = false) {
+            const rawCloud = document.getElementById('vmCloudName')?.value || '';
+            const cleanCloud = window.normalizeCloudinaryCloudName(rawCloud);
+            if (cleanCloud && rawCloud !== cleanCloud && document.getElementById('vmCloudName')) {
+                document.getElementById('vmCloudName').value = cleanCloud;
+            }
             const cfg = {
                 provider: document.getElementById('vmUploadProvider')?.value || 'cloudinary',
-                cloudName: (document.getElementById('vmCloudName')?.value || '').trim(),
+                cloudName: cleanCloud,
                 cloudPreset: (document.getElementById('vmCloudPreset')?.value || '').trim(),
                 ghRepo: (document.getElementById('vmGhRepo')?.value || '').trim(),
                 ghBranch: (document.getElementById('vmGhBranch')?.value || 'main').trim() || 'main',
@@ -8301,9 +8325,89 @@ window.rvpBindDirectTap = function(el, onTap) {
             };
             localStorage.setItem('red_free_video_upload_cfg_v1', JSON.stringify(cfg));
             window.toggleFreeUploadProviderFields();
-            const det = document.getElementById('vmFreeUploadCfgDetails');
-            if (det) det.open = false;
-            window.showToast('Kostenloser Upload-Speicher gespeichert!', 'success');
+
+            // Nicht-geheime Cloudinary-Daten auch in Firebase sichern (für Handy & PC synchron!)
+            if (window.firebaseDb && window.firebaseSetDoc && cfg.cloudName && cfg.cloudPreset) {
+                window.firebaseSetDoc(
+                    window.firebaseDoc(window.firebaseDb, "settings", "video_upload_cfg"),
+                    { provider: cfg.provider === 'github' ? 'cloudinary' : cfg.provider, cloudName: cfg.cloudName, cloudPreset: cfg.cloudPreset, updatedAt: Date.now() },
+                    { merge: true }
+                ).catch(() => {});
+            }
+
+            if (!silent) {
+                const det = document.getElementById('vmFreeUploadCfgDetails');
+                if (det) det.open = false;
+                window.showToast('Upload-Speicher gespeichert!', 'success');
+            }
+        };
+
+        window.explainUploadErrorDE = function(rawMsg) {
+            const m = String(rawMsg || '');
+            if (/unknown api key/i.test(m) || /api_key/i.test(m)) {
+                return 'Cloudinary meldet „Unknown API key“: Bitte prüfe zwei Dinge: 1) Im Feld „Cloud-Name“ darf NICHT dein API-Key stehen, sondern dein Cloud-Name vom Dashboard. 2) Dein Upload-Preset muss in Cloudinary unter Settings → Upload → Upload presets auf „Unsigned“ stehen!';
+            }
+            if (/unsigned/i.test(m) || /whitelist/i.test(m)) {
+                return 'Dein Cloudinary Upload-Preset steht noch auf „Signed“. Bitte in Cloudinary unter Settings → Upload → Upload presets auf „Unsigned“ umstellen und speichern!';
+            }
+            if (/upload preset not found/i.test(m) || /preset/i.test(m)) {
+                return 'Das Cloudinary Upload-Preset wurde nicht gefunden – bitte exakte Schreibweise (Groß-/Kleinschreibung) prüfen.';
+            }
+            if (/cloud_name/i.test(m) || /invalid cloud/i.test(m)) {
+                return 'Der Cloudinary Cloud-Name stimmt nicht – bitte direkt vom Cloudinary-Dashboard kopieren.';
+            }
+            return m || 'Upload fehlgeschlagen.';
+        };
+
+        window.testFreeUploadConnection = async function() {
+            const cfg = window.getFreeUploadSettings();
+            if (cfg.provider === 'local') {
+                window.showToast('Sofort-Lokal ist sofort einsatzbereit!', 'success');
+                return;
+            }
+            if (cfg.provider === 'github') {
+                if (!cfg.ghRepo || !cfg.ghToken) {
+                    window.showToast('Bitte GitHub Repo und Token eintragen.', 'error');
+                    return;
+                }
+                try {
+                    const r = await fetch(`https://api.github.com/repos/${cfg.ghRepo}`, {
+                        headers: { Authorization: `Bearer ${cfg.ghToken}`, Accept: 'application/vnd.github+json' }
+                    });
+                    if (r.ok) window.showToast('✅ GitHub-Verbindung erfolgreich!', 'success');
+                    else window.showToast(`GitHub Fehler (${r.status}): Repo-Name oder Token prüfen.`, 'error');
+                } catch (e) {
+                    window.showToast('GitHub nicht erreichbar.', 'error');
+                }
+                return;
+            }
+
+            if (!cfg.cloudName || !cfg.cloudPreset) {
+                window.showToast('Bitte Cloud-Name und Unsigned Upload-Preset eintragen.', 'error');
+                return;
+            }
+            if (/^\d{8,}$/.test(cfg.cloudName)) {
+                window.showToast('Im Feld „Cloud-Name“ steht eine Zahl (API-Key)! Bitte den echten Cloud-Name (z.B. dxyz123) eintragen.', 'error');
+                return;
+            }
+
+            // Winziger 1x1-Test-Upload prüft Cloud-Name + Unsigned-Preset in 1 Sekunde
+            try {
+                const tinyPng = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+                const fd = new FormData();
+                fd.append('file', tinyPng);
+                fd.append('upload_preset', cfg.cloudPreset);
+                const resp = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(cfg.cloudName)}/image/upload`, { method: 'POST', body: fd });
+                const data = await resp.json().catch(() => ({}));
+                if (resp.ok && data.secure_url) {
+                    window.saveFreeUploadSettings(true);
+                    window.showToast('✅ Cloudinary perfekt verbunden! Video-Upload bis 100 MB ist bereit.', 'success');
+                } else {
+                    window.showToast(window.explainUploadErrorDE(data.error?.message || `Fehler ${resp.status}`), 'error');
+                }
+            } catch (e) {
+                window.showToast('Netzwerkfehler beim Cloudinary-Test.', 'error');
+            }
         };
 
         window.buildCloudinaryAutoTiers = function(secureUrl, meta) {
@@ -8322,15 +8426,23 @@ window.rvpBindDirectTap = function(el, onTap) {
         window.uploadVideoFree = function(fileOrBlob, fileName, onProgress) {
             const cfg = window.getFreeUploadSettings();
 
-            // 1. CLOUDINARY FREE (0 €, keine Kreditkarte, bis 100 MB/Video + Auto-Auflösungen)
+            if (cfg.provider === 'local') {
+                return window.rvpSaveBlobToIdb(fileOrBlob).then(idbUrl => ({ url: idbUrl, provider: 'local' }));
+            }
+
             if (cfg.provider === 'cloudinary') {
                 if (!cfg.cloudName || !cfg.cloudPreset) {
                     const det = document.getElementById('vmFreeUploadCfgDetails');
                     if (det) det.open = true;
-                    return Promise.reject(new Error('Bitte oben kurz deinen kostenlosen Cloudinary Cloud-Name & Upload-Preset eintragen (oder auf GitHub umschalten).'));
+                    return Promise.reject(new Error('Bitte unter „Upload-Speicher einstellen“ Cloud-Name & Unsigned Upload-Preset eintragen.'));
+                }
+                if (/^\d{8,}$/.test(cfg.cloudName)) {
+                    const det = document.getElementById('vmFreeUploadCfgDetails');
+                    if (det) det.open = true;
+                    return Promise.reject(new Error('Im Feld „Cloud-Name“ steht dein API-Key statt dem Cloud-Name!'));
                 }
                 if (fileOrBlob.size > 100 * 1024 * 1024) {
-                    return Promise.reject(new Error('Cloudinary Free erlaubt bis 100 MB pro Video. Bitte Video kurz komprimieren.'));
+                    return Promise.reject(new Error('Cloudinary Free erlaubt bis 100 MB pro Video.'));
                 }
                 return new Promise((resolve, reject) => {
                     const fd = new FormData();
@@ -8350,7 +8462,7 @@ window.rvpBindDirectTap = function(el, onTap) {
                             if (xhr.status >= 200 && xhr.status < 300 && res.secure_url) {
                                 resolve({ url: res.secure_url, provider: 'cloudinary' });
                             } else {
-                                reject(new Error(res.error?.message || `Cloudinary Fehler (${xhr.status})`));
+                                reject(new Error(window.explainUploadErrorDE(res.error?.message || `Cloudinary Fehler (${xhr.status})`)));
                             }
                         } catch (e) {
                             reject(new Error('Antwort von Cloudinary ungültig.'));
@@ -8361,14 +8473,13 @@ window.rvpBindDirectTap = function(el, onTap) {
                 });
             }
 
-            // 2. DIREKT IN DEIN GITHUB-REPO (0 €, bis 25 MB pro Video)
             if (!cfg.ghRepo || !cfg.ghRepo.includes('/') || !cfg.ghToken) {
                 const det = document.getElementById('vmFreeUploadCfgDetails');
                 if (det) det.open = true;
-                return Promise.reject(new Error('Bitte oben dein GitHub-Repo (z.B. Tamer61tr/...) und Token eintragen.'));
+                return Promise.reject(new Error('Bitte GitHub-Repo (z.B. Tamer61tr/...) und Token eintragen.'));
             }
             if (fileOrBlob.size > 25 * 1024 * 1024) {
-                return Promise.reject(new Error('GitHub-Direktupload unterstützt bis 25 MB. Für Videos bis 100 MB einfach auf Cloudinary Free (0 €) umschalten!'));
+                return Promise.reject(new Error('GitHub-Direktupload unterstützt bis 25 MB.'));
             }
 
             return new Promise((resolve, reject) => {
@@ -8408,6 +8519,123 @@ window.rvpBindDirectTap = function(el, onTap) {
                 };
                 reader.readAsDataURL(fileOrBlob);
             });
+        };
+
+        window.processSelectedVideoFile = async function(file) {
+            if (!file) return;
+            window._vmLastSelectedFile = file;
+            const errBox = document.getElementById('vmUploadErrorActions');
+            if (errBox) errBox.style.display = 'none';
+
+            const sizeTxt = window.formatFileSizeMB(file.size);
+            const meta = await window.inspectVideoFileMetadata(file);
+            window._vmLastDetectedMeta = meta;
+            window._vmLastDetectedAspect = meta.aspect;
+
+            if (document.getElementById('vmAspect')) {
+                document.getElementById('vmAspect').value = meta.aspect;
+                window.syncQuickVideoAspectPills();
+            }
+            if (document.getElementById('vmDefaultQuality')) {
+                document.getElementById('vmDefaultQuality').value = meta.quality;
+            }
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
+
+            const metaBox = document.getElementById('vmDetectedMetaBox');
+            if (metaBox) {
+                metaBox.style.display = 'flex';
+                metaBox.innerHTML = `
+                    <span class="vm-meta-chip is-hi"><i class="fa-solid fa-wand-magic-sparkles"></i> Erkannt: ${meta.qualityLabel}</span>
+                    ${meta.width ? `<span class="vm-meta-chip">${meta.width} × ${meta.height} px</span>` : ''}
+                    <span class="vm-meta-chip">Format ${meta.aspect}</span>
+                    <span class="vm-meta-chip">${sizeTxt}</span>
+                    ${meta.duration ? `<span class="vm-meta-chip">${window.formatVideoTime(meta.duration)}</span>` : ''}
+                `;
+            }
+
+            const ensureTitleFilled = () => {
+                const tEl = document.getElementById('vmTitle');
+                if (tEl && !tEl.value.trim()) {
+                    const cleanTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ').trim();
+                    tEl.value = cleanTitle || `RED Berlin Video #${(window.promoVideosConfig?.list?.length || 0) + 1}`;
+                }
+            };
+
+            try {
+                window.setVmUploadProgress(true, 4, `Lade „${file.name}“ (${sizeTxt}) hoch...`);
+                const result = await window.uploadVideoFree(file, file.name, (pct, sent, total) => {
+                    window.setVmUploadProgress(true, pct, `Upload: ${window.formatFileSizeMB(sent)} / ${window.formatFileSizeMB(total)}`);
+                });
+
+                document.getElementById('vmUrl').value = result.url;
+                if (result.provider === 'cloudinary') {
+                    const tiers = window.buildCloudinaryAutoTiers(result.url, meta);
+                    if (tiers) {
+                        if (tiers['4k'] && document.getElementById('vmUrl4k')) document.getElementById('vmUrl4k').value = tiers['4k'];
+                        if (tiers['1080'] && document.getElementById('vmUrl1080')) document.getElementById('vmUrl1080').value = tiers['1080'];
+                        if (tiers['720'] && document.getElementById('vmUrl720')) document.getElementById('vmUrl720').value = tiers['720'];
+                        if (tiers['480'] && document.getElementById('vmUrl480')) document.getElementById('vmUrl480').value = tiers['480'];
+                    }
+                } else if (result.provider === 'github') {
+                    const slotMap = { '4k': 'vmUrl4k', '1080': 'vmUrl1080', '720': 'vmUrl720', '480': 'vmUrl480' };
+                    const targetSlot = slotMap[meta.quality];
+                    if (targetSlot && document.getElementById(targetSlot)) document.getElementById(targetSlot).value = result.url;
+                }
+
+                ensureTitleFilled();
+                await window.savePromoVideoItem(true);
+                window.setVmUploadProgress(true, 100, `✅ Hochgeladen & automatisch gespeichert (${meta.qualityLabel}, ${sizeTxt})!`);
+                setTimeout(() => window.setVmUploadProgress(false), 3000);
+                window.updateVideoStudioLivePreview();
+                window.showToast(`Video (${sizeTxt}) erfolgreich hochgeladen & platziert!`, 'success');
+            } catch (err) {
+                console.error('Video Upload Fehler:', err);
+                window.setVmUploadProgress(false);
+                const msg = err.message || 'Upload fehlgeschlagen.';
+                if (errBox) {
+                    const errTxt = document.getElementById('vmUploadErrorText');
+                    if (errTxt) errTxt.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#ff3b30;"></i> ${window.escHtml(msg)}`;
+                    errBox.style.display = 'block';
+                }
+                const setupDet = document.getElementById('vmFreeUploadCfgDetails');
+                if (setupDet) setupDet.open = true;
+                window.showToast(msg, 'error');
+            }
+        };
+
+        window.handlePromoVideoFileSelect = async function(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            await window.processSelectedVideoFile(file);
+            input.value = '';
+        };
+
+        window.retryLastVideoUpload = function() {
+            if (!window._vmLastSelectedFile) {
+                window.showToast('Bitte erst ein Video auswählen.', 'error');
+                return;
+            }
+            window.processSelectedVideoFile(window._vmLastSelectedFile);
+        };
+
+        window.saveLastVideoLocallyNow = async function() {
+            const file = window._vmLastSelectedFile;
+            if (!file) return;
+            try {
+                const idbUrl = await window.rvpSaveBlobToIdb(file);
+                document.getElementById('vmUrl').value = idbUrl;
+                const tEl = document.getElementById('vmTitle');
+                if (tEl && !tEl.value.trim()) {
+                    tEl.value = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ').trim() || 'RED Video';
+                }
+                const errBox = document.getElementById('vmUploadErrorActions');
+                if (errBox) errBox.style.display = 'none';
+                await window.savePromoVideoItem(true);
+                window.updateVideoStudioLivePreview();
+                window.showToast('Video sofort lokal gespeichert & aktiv!', 'success');
+            } catch (e) {
+                window.showToast('Konnte lokal nicht gespeichert werden.', 'error');
+            }
         };
 
         window.handlePromoVideoFileSelect = async function(input) {

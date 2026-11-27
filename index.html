@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-   <link rel="stylesheet" href="./styles.css?v=29">
+   <link rel="stylesheet" href="./styles.css?v=30">
 </head>
 
 <body data-theme="light">
@@ -1353,16 +1353,578 @@
                     <i class="fa-solid fa-circle-dot"></i> Rundes RED-Logo
                 </button>
             </div>
-
-            <!-- TAB 1: MULTI-VIDEO STUDIO (SEPARATE POSITIONEN + NEBENEINANDER + AUTO-SAVE) -->
+<!-- TAB 1: MULTI-VIDEO STUDIO V30 (KOMPAKTE AKKORDEONS + STABILER UPLOAD) -->
             <div class="exec-studio-body" id="vmPaneVideos">
-                <!-- SCHNELLSTART-LEISTE: NEUES SEPARATES VIDEO + AUTO-SAVE STATUS -->
+                <!-- SCHNELLSTART-LEISTE -->
                 <div class="vm-quick-add-hero">
                     <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; padding:9px 14px; border-radius:10px; font-size:11.5px !important;" onclick="window.startAddNewPromoVideo()">
-                        <i class="fa-solid fa-plus"></i> Neues separates Video hinzufügen
+                        <i class="fa-solid fa-plus"></i> Neues separates Video
                     </button>
-                    <span id="vmAutoSaveStatus" class="vm-autosave-pill"><i class="fa-solid fa-cloud-check"></i> Auto-Speichern aktiv</span>
+                    <span id="vmAutoSaveStatus" class="vm-autosave-pill"><i class="fa-solid fa-check"></i> Auto-Speichern aktiv</span>
                 </div>
+
+                <!-- BEARBEITUNGS-BANNER -->
+                <div class="inv-edit-banner" id="vmEditBanner" style="margin-bottom:10px;">
+                    <span id="vmEditBannerText"><i class="fa-solid fa-pen"></i> Bearbeite Video: <strong id="vmEditBannerName"></strong></span>
+                    <button type="button" class="inv-arch-btn" style="background:#16a34a; color:#fff; border-color:#16a34a;" onclick="window.startAddNewPromoVideo()"><i class="fa-solid fa-plus"></i> Neu</button>
+                </div>
+
+                <!-- AKKORDEON 0: LIVE-VORSCHAU (BEI BEDARF AUFKLAPPEN) -->
+                <details class="vm-acc" id="vmAccPreview">
+                    <summary>
+                        <span><i class="fa-solid fa-eye"></i> Live-Vorschau ansehen</span>
+                        <span id="vmPreviewModePill" class="vm-acc-pill">Bereit</span>
+                    </summary>
+                    <div class="vm-acc-body">
+                        <div id="vmLivePreviewStage" class="vm-live-preview-stage"></div>
+                    </div>
+                </details>
+
+                <div id="vmVideoEditorSection">
+                    <input type="hidden" id="vmEditId">
+                    <span id="vmFormHeading" style="display:none;"></span>
+
+                    <!-- AKKORDEON 1: POSITION & VIDEO-UPLOAD (STANDARDMÄSSIG OFFEN) -->
+                    <details class="vm-acc" id="vmAccUpload" open>
+                        <summary>
+                            <span><i class="fa-solid fa-cloud-arrow-up"></i> 1. Position &amp; Video hochladen</span>
+                            <span id="vmUploadProviderBadge" class="vm-acc-pill">Cloudinary Free</span>
+                        </summary>
+                        <div class="vm-acc-body">
+                            <div class="vm-placement-spotlight">
+                                <label for="vmVideoPlacement"><i class="fa-solid fa-location-dot" style="color:var(--primary-red);"></i> Position dieses Videos auf der Website</label>
+                                <select id="vmVideoPlacement" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                    <option value="after-hero">⭐ Oben – Direkt unter dem Hero (Startseite)</option>
+                                    <option value="after-leistungen">📋 Oben-Mitte – Nach „Unsere Leistungen“</option>
+                                    <option value="after-kompass">🧭 Mitte – Nach Zulassungs-Kompass</option>
+                                    <option value="after-tools">🛠️ Mitte-Unten – Nach Online-Tools</option>
+                                    <option value="in-neukoelln">📍 Unten-Mitte – Im Berlin-Neukölln Block</option>
+                                    <option value="before-termin">📅 Unten – Direkt über Terminbuchung</option>
+                                    <option value="after-termin">📞 Ganz unten – Nach Terminbuchung</option>
+                                    <option value="page-formulare">📄 Unterseite – Formulare</option>
+                                    <option value="page-ankauf">🚗 Unterseite – Auto Ankauf</option>
+                                    <option value="hidden">🚫 Ausgeblendet (Entwurf)</option>
+                                </select>
+                            </div>
+
+                            <!-- UPLOAD-SPEICHER EINRICHTEN (EINGEKLAPPT) -->
+                            <details class="vm-acc vm-acc-sub" id="vmFreeUploadCfgDetails">
+                                <summary>
+                                    <span><i class="fa-solid fa-gear"></i> Upload-Speicher einstellen (0 €)</span>
+                                    <span class="vm-acc-pill">Setup</span>
+                                </summary>
+                                <div class="vm-acc-body">
+                                    <div class="form-group" style="margin-bottom:8px;">
+                                        <label>Speicher-Modus (alle 0 €)</label>
+                                        <select id="vmUploadProvider" class="form-control" onchange="window.toggleFreeUploadProviderFields(); window.saveFreeUploadSettings(true);">
+                                            <option value="cloudinary" selected>☁️ Cloudinary Free (bis 100 MB + Auto 4K/FHD/HD/SD)</option>
+                                            <option value="github">🐙 GitHub Direkt-Upload (bis 25 MB ins Repo)</option>
+                                            <option value="local">⚡ Sofort-Lokal (0 Setup – direkt auf diesem Gerät)</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="vmCfgCloudinaryWrap">
+                                        <div class="form-row" style="margin-bottom:6px;">
+                                            <div class="form-group" style="margin-bottom:0;">
+                                                <label>Cloudinary Cloud-Name (NICHT API-Key!) *</label>
+                                                <input type="text" id="vmCloudName" class="form-control" placeholder="z.B. dxyz12345" oninput="window.saveFreeUploadSettings(true)">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom:0;">
+                                                <label>Unsigned Upload-Preset *</label>
+                                                <input type="text" id="vmCloudPreset" class="form-control" placeholder="z.B. red_videos" oninput="window.saveFreeUploadSettings(true)">
+                                            </div>
+                                        </div>
+                                        <div class="vm-cloud-hint">
+                                            <strong>Wichtig gegen „Unknown API key“:</strong><br>
+                                            1) <strong>Cloud-Name</strong> steht oben im Cloudinary-Dashboard (Buchstaben+Zahlen, kein API-Key).<br>
+                                            2) Unter <em>Settings → Upload → Upload presets</em> dein Preset öffnen und <strong>Signing Mode</strong> auf <strong>Unsigned</strong> stellen &amp; speichern.
+                                        </div>
+                                    </div>
+
+                                    <div id="vmCfgGithubWrap" style="display:none;">
+                                        <div class="form-row" style="margin-bottom:6px;">
+                                            <div class="form-group" style="margin-bottom:0;">
+                                                <label>GitHub Benutzer / Repo *</label>
+                                                <input type="text" id="vmGhRepo" class="form-control" placeholder="Tamer61tr/dein-repo-name" oninput="window.saveFreeUploadSettings(true)">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom:0;">
+                                                <label>Branch</label>
+                                                <input type="text" id="vmGhBranch" class="form-control" value="main" oninput="window.saveFreeUploadSettings(true)">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:6px;">
+                                            <label>GitHub Token (nur lokal gespeichert) *</label>
+                                            <input type="password" id="vmGhToken" class="form-control" placeholder="github_pat_... oder ghp_..." oninput="window.saveFreeUploadSettings(true)">
+                                        </div>
+                                    </div>
+
+                                    <div id="vmCfgLocalWrap" style="display:none; font-size:11px; color:var(--text-muted); margin-bottom:8px;">
+                                        Speichert Videos sofort lokal im Browser (ideal zum sofortigen Testen ohne Cloud-Konto).
+                                    </div>
+
+                                    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+                                        <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" style="flex:1; justify-content:center;" onclick="window.testFreeUploadConnection()">
+                                            <i class="fa-solid fa-plug-circle-check"></i> Verbindung testen
+                                        </button>
+                                        <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" style="flex:1; justify-content:center;" onclick="window.saveFreeUploadSettings(false)">
+                                            <i class="fa-solid fa-check"></i> Speichern
+                                        </button>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- VIDEO-DATEI WÄHLEN -->
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label>Video vom Gerät hochladen (MP4 / MOV / WebM)</label>
+                                <label class="noble-file-upload" style="margin-top:0;">
+                                    <input type="file" id="vmFileInput" accept="video/*,.mp4,.mov,.webm,.m4v" onchange="window.handlePromoVideoFileSelect(this)">
+                                    <span class="noble-file-trigger" id="vmFileLabel"><i class="fa-solid fa-film"></i> Video auswählen &amp; hochladen</span>
+                                </label>
+                            </div>
+
+                            <div id="vmDetectedMetaBox" class="vm-detected-meta" style="display:none;"></div>
+
+                            <div id="vmUploadErrorActions" class="vm-upload-err-box" style="display:none;">
+                                <div id="vmUploadErrorText" style="font-size:11px; line-height:1.45; margin-bottom:7px;"></div>
+                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                    <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" style="flex:1; justify-content:center;" onclick="window.retryLastVideoUpload()"><i class="fa-solid fa-rotate-right"></i> Erneut hochladen</button>
+                                    <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" style="flex:1; justify-content:center;" onclick="window.saveLastVideoLocallyNow()"><i class="fa-solid fa-bolt"></i> Sofort lokal nutzen</button>
+                                </div>
+                            </div>
+
+                            <div id="vmUploadProgressWrap" class="vm-upload-progress" style="display:none;">
+                                <div class="vm-upload-progress-head">
+                                    <span id="vmUploadStatusTxt">Wird hochgeladen...</span>
+                                    <strong id="vmUploadPctTxt">0%</strong>
+                                </div>
+                                <div class="vm-upload-bar-track"><div id="vmUploadBarFill" class="vm-upload-bar-fill"></div></div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Video-URL / Dateipfad *</label>
+                                <input type="text" id="vmUrl" class="form-control" placeholder="./werbevideo-1.mp4 oder Cloud-Link" oninput="window.onVideoStudioFieldChange(false)">
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- AKKORDEON 2: ÜBERSCHRIFT, BADGE, BESCHREIBUNG & HIGHLIGHTS (ZUGEKLAPPT) -->
+                    <details class="vm-acc" id="vmAccTexts">
+                        <summary>
+                            <span><i class="fa-solid fa-pen-nib"></i> 2. Überschrift, Badge &amp; Texte</span>
+                            <span class="vm-acc-pill">Inhalt</span>
+                        </summary>
+                        <div class="vm-acc-body">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1.4;">
+                                    <label>Video-Überschrift *</label>
+                                    <input type="text" id="vmTitle" class="form-control" placeholder="z.B. Keine Wartenummer beim Amt!" oninput="window.onVideoStudioFieldChange(false)">
+                                </div>
+                                <div class="form-group">
+                                    <label>Etikett-Text (Badge)</label>
+                                    <input type="text" id="vmBadge" class="form-control" placeholder="z.B. 30s Live-Einblick" oninput="window.onVideoStudioFieldChange(false)">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Badge-Logo / Symbol</label>
+                                    <select id="vmBadgeIcon" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="live-dot">🔴 LIVE-Logo (Pulsierender LIVE-Punkt)</option>
+                                        <option value="live-wave">📡 LIVE-Signal (Funkwelle + LIVE)</option>
+                                        <option value="round-logo">⭕ RED Rund-Logo (Mini-Emblem)</option>
+                                        <option value="play">▶️ Play-Symbol</option>
+                                        <option value="bolt">⚡ Express-Blitz</option>
+                                        <option value="fire">🔥 Highlight / Aktion</option>
+                                        <option value="star">⭐ Premium / Top-Tipp</option>
+                                        <option value="camera">🎥 Kamera / Studio</option>
+                                        <option value="shield">🛡️ Original / Geprüft</option>
+                                        <option value="none">— Kein Symbol —</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Standard-Bildqualität</label>
+                                    <select id="vmDefaultQuality" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="hdr">✨ HDR10 Kino</option>
+                                        <option value="4k">💎 4K Ultra HD (2160p)</option>
+                                        <option value="1080" selected>📺 Full HD (1080p)</option>
+                                        <option value="720">🎬 HD (720p)</option>
+                                        <option value="480">📱 SD (480p)</option>
+                                        <option value="auto">⚙️ Auto (Original)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Beschreibungstext</label>
+                                <textarea id="vmDesc" class="form-control" rows="2" style="resize:vertical;" placeholder="Kurze Beschreibung..." oninput="window.onVideoStudioFieldChange(false)"></textarea>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>3 Highlight-Punkte (1 Punkt pro Zeile)</label>
+                                <textarea id="vmHighlights" class="form-control" rows="3" style="resize:vertical;" placeholder="Keine Wartenummer beim Amt&#10;Sofort-Kennzeichenprägung vor Ort&#10;An-, Um-, Abmeldung &amp; Kurzzeit" oninput="window.onVideoStudioFieldChange(false)"></textarea>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- AKKORDEON 3: 4K / FULL HD / HD / SD STUFEN (ZUGEKLAPPT) -->
+                    <details class="vm-acc" id="vmQualitySlotsDetails">
+                        <summary>
+                            <span><i class="fa-solid fa-sliders"></i> 3. 4K / Full HD / HD / SD Stufen</span>
+                            <span class="vm-acc-pill">Qualität</span>
+                        </summary>
+                        <div class="vm-acc-body">
+                            <div class="vm-autoconv-banner">
+                                <div style="flex:1; min-width:170px;">
+                                    <strong style="display:block; font-size:11px; color:var(--text-light);"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary-red);"></i> Auto-Konverter</strong>
+                                    <span style="font-size:10px; color:var(--text-muted);">Erzeugt Full HD / HD / SD automatisch (bei Cloudinary passiert das bereits sofort beim Upload).</span>
+                                </div>
+                                <button type="button" id="vmAutoConvertBtn" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.autoConvertVideoQualities()">
+                                    <i class="fa-solid fa-gears"></i> Konvertieren
+                                </button>
+                            </div>
+                            <div class="vm-qslot-grid">
+                                <div class="form-group">
+                                    <label>4K UHD (2160p)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl4k" class="form-control" placeholder="4K Link">
+                                        <label class="vm-qslot-up-btn" title="4K Video hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('4k', this)"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Full HD (1080p)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl1080" class="form-control" placeholder="1080p Link">
+                                        <label class="vm-qslot-up-btn" title="Full HD hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('1080', this)"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>HD (720p)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl720" class="form-control" placeholder="720p Link">
+                                        <label class="vm-qslot-up-btn" title="HD hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('720', this)"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>SD (480p)</label>
+                                    <div class="vm-qslot-row">
+                                        <input type="text" id="vmUrl480" class="form-control" placeholder="480p Link">
+                                        <label class="vm-qslot-up-btn" title="SD hochladen"><i class="fa-solid fa-upload"></i><input type="file" accept="video/*" onchange="window.uploadQualitySlotFile('480', this)"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- AKKORDEON 4: FORMAT, POSITIONIERUNG & 12 RAHMENDESIGNS (ZUGEKLAPPT) -->
+                    <details class="vm-acc" id="vmAccFrame">
+                        <summary>
+                            <span><i class="fa-solid fa-up-down-left-right"></i> 4. Format, Ausrichtung &amp; 12 Rahmen</span>
+                            <span class="vm-acc-pill">Design</span>
+                        </summary>
+                        <div class="vm-acc-body">
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label>Video-Format</label>
+                                <div class="vm-aspect-pills" id="vmAspectQuickPills">
+                                    <button type="button" class="vm-aspect-pill active" data-aspect="9/16" onclick="window.setQuickVideoAspect('9/16')">📱 Hoch</button>
+                                    <button type="button" class="vm-aspect-pill" data-aspect="16/9" onclick="window.setQuickVideoAspect('16/9')">🖥️ Quer</button>
+                                    <button type="button" class="vm-aspect-pill" data-aspect="1/1" onclick="window.setQuickVideoAspect('1/1')">⬜ 1:1</button>
+                                    <button type="button" class="vm-aspect-pill" data-aspect="4/5" onclick="window.setQuickVideoAspect('4/5')">📸 4:5</button>
+                                    <button type="button" class="vm-aspect-pill" data-aspect="auto" onclick="window.setQuickVideoAspect('auto')">✨ Auto</button>
+                                </div>
+                                <select id="vmAspect" class="form-control" onchange="window.syncQuickVideoAspectPills(); window.onVideoStudioFieldChange(true);">
+                                    <option value="9/16" selected>📱 Hochformat (9:16 Reel)</option>
+                                    <option value="16/9">🖥️ Querformat (16:9 Kino)</option>
+                                    <option value="1/1">⬜ Quadratisch (1:1)</option>
+                                    <option value="4/5">📸 Hochformat (4:5 Feed)</option>
+                                    <option value="3/4">🖼️ Hochformat (3:4)</option>
+                                    <option value="4/3">📺 Querformat (4:3)</option>
+                                    <option value="21/9">🎬 Kino Breitbild (21:9)</option>
+                                    <option value="auto">✨ Automatisch</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Player-Position (Desktop)</label>
+                                    <select id="vmShowcaseSide" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="left">⬅️ Video Links / Text Rechts</option>
+                                        <option value="right">➡️ Video Rechts / Text Links</option>
+                                        <option value="center">⬆️ Zentriert (Kino oben)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Player-Größe</label>
+                                    <select id="vmPlayerSize" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="compact">Kompakt</option>
+                                        <option value="normal" selected>Standard</option>
+                                        <option value="large">Groß / Kino</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row" style="margin-bottom:0;">
+                                <div class="form-group">
+                                    <label>Einpassung</label>
+                                    <select id="vmVideoFit" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="cover" selected>Rahmen füllen (Cover)</option>
+                                        <option value="contain">Komplettes Bild (Contain)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Bildausschnitt</label>
+                                    <select id="vmVideoPos" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="center center" selected>Mitte</option>
+                                        <option value="center top">Oben (Gesichter)</option>
+                                        <option value="center bottom">Unten</option>
+                                        <option value="left center">Links</option>
+                                        <option value="right center">Rechts</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Rahmen-Design (12 Stile)</label>
+                                    <select id="vmFrameStyle" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="classic" selected>🔴 RED Standard</option>
+                                        <option value="cinema">🔥 Kino Rot-Glow</option>
+                                        <option value="neon-red">⚡ Berlin Neon-Rot</option>
+                                        <option value="gold">👑 Royal Gold Luxus</option>
+                                        <option value="carbon">🏁 3D-Carbon Sport</option>
+                                        <option value="chrome">⚙️ Chrom-Silber</option>
+                                        <option value="glass">💎 Frosted Glass</option>
+                                        <option value="phone">📱 Smartphone Bezel</option>
+                                        <option value="cinema-bar">🎬 Kino-Leinwand</option>
+                                        <option value="berlin-flag">🇩🇪 Schwarz-Rot-Gold</option>
+                                        <option value="white-studio">⬜ Clean White Studio</option>
+                                        <option value="minimal">✨ Ultra-Minimal</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- AKKORDEON 5: SCHRIFTARTEN, GRÖSSEN & FARBEN (ZUGEKLAPPT) -->
+                    <details class="vm-acc" id="vmAccFonts">
+                        <summary>
+                            <span><i class="fa-solid fa-font"></i> 5. Schriftarten, Größen &amp; Farben</span>
+                            <span class="vm-acc-pill">Typografie</span>
+                        </summary>
+                        <div class="vm-acc-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Schriftart Überschrift</label>
+                                    <select id="vmTitleFont" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="'Montserrat', sans-serif" selected>Montserrat</option>
+                                        <option value="'Oswald', sans-serif">Oswald (Kino)</option>
+                                        <option value="'Playfair Display', serif">Playfair Display (Edel)</option>
+                                        <option value="Impact, 'Arial Narrow', sans-serif">Impact (Werbe-Power)</option>
+                                        <option value="Georgia, serif">Georgia</option>
+                                        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                                        <option value="Verdana, sans-serif">Verdana</option>
+                                        <option value="'Courier New', monospace">Courier</option>
+                                        <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">System Native</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Schriftart Fließtext</label>
+                                    <select id="vmBodyFont" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="'Montserrat', sans-serif" selected>Montserrat</option>
+                                        <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">System Native</option>
+                                        <option value="Verdana, sans-serif">Verdana</option>
+                                        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                                        <option value="Georgia, serif">Georgia</option>
+                                        <option value="'Playfair Display', serif">Playfair Display</option>
+                                        <option value="'Courier New', monospace">Courier</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Titel Desktop</label>
+                                    <select id="vmTitleSizeD" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="18px">18px</option>
+                                        <option value="22px">22px</option>
+                                        <option value="26px" selected>26px</option>
+                                        <option value="30px">30px</option>
+                                        <option value="35px">35px</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Titel Mobil</label>
+                                    <select id="vmTitleSizeM" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="15px">15px</option>
+                                        <option value="17px" selected>17px</option>
+                                        <option value="20px">20px</option>
+                                        <option value="23px">23px</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ausrichtung</label>
+                                    <select id="vmTextAlign" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="left" selected>Links</option>
+                                        <option value="center">Mitte</option>
+                                        <option value="right">Rechts</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Schriftstil</label>
+                                    <select id="vmTitleCase" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="uppercase" selected>GROSS</option>
+                                        <option value="none">Normal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Fließtext-Größe</label>
+                                    <select id="vmBodySize" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="11.5px">11.5px</option>
+                                        <option value="13px" selected>13px</option>
+                                        <option value="14.5px">14.5px</option>
+                                        <option value="16px">16px</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="te-color-grid">
+                                <div class="form-group">
+                                    <label>Überschrift-Farbe</label>
+                                    <div class="vm-color-combo">
+                                        <select id="vmTitleColorMode" class="form-control" onchange="window.onVideoStudioFieldChange(true)"><option value="auto" selected>Auto</option><option value="custom">Eigene</option></select>
+                                        <input type="color" id="vmTitleColor" value="#d90000" oninput="document.getElementById('vmTitleColorMode').value='custom'; window.onVideoStudioFieldChange(false)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Text-Farbe</label>
+                                    <div class="vm-color-combo">
+                                        <select id="vmDescColorMode" class="form-control" onchange="window.onVideoStudioFieldChange(true)"><option value="auto" selected>Auto</option><option value="custom">Eigene</option></select>
+                                        <input type="color" id="vmDescColor" value="#55555c" oninput="document.getElementById('vmDescColorMode').value='custom'; window.onVideoStudioFieldChange(false)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Highlight-Farbe</label>
+                                    <div class="vm-color-combo">
+                                        <select id="vmHighColorMode" class="form-control" onchange="window.onVideoStudioFieldChange(true)"><option value="auto" selected>Auto</option><option value="custom">Eigene</option></select>
+                                        <input type="color" id="vmHighColor" value="#0b6e31" oninput="document.getElementById('vmHighColorMode').value='custom'; window.onVideoStudioFieldChange(false)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Badge-Farbe</label>
+                                    <div class="vm-color-combo">
+                                        <select id="vmBadgeColorMode" class="form-control" onchange="window.onVideoStudioFieldChange(true)"><option value="auto" selected>Auto</option><option value="custom">Eigene</option></select>
+                                        <input type="color" id="vmBadgeBgColor" value="#d90000" oninput="document.getElementById('vmBadgeColorMode').value='custom'; window.onVideoStudioFieldChange(false)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- AKKORDEON 6: INTRO & OUTRO LOGO, SEKUNDEN & MUSIK (ZUGEKLAPPT) -->
+                    <details class="vm-acc" id="vmAccBumper">
+                        <summary>
+                            <span><i class="fa-solid fa-music"></i> 6. Intro/Outro-Logo, Sekunden &amp; Musik</span>
+                            <span class="vm-acc-pill">12 Sounds</span>
+                        </summary>
+                        <div class="vm-acc-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Logo-Einblendung</label>
+                                    <select id="vmLogoMode" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="both">🔴 Vor &amp; nach dem Video</option>
+                                        <option value="intro">▶️ Nur vor dem Video</option>
+                                        <option value="outro">⏹️ Nur nach dem Video</option>
+                                        <option value="none">— Ohne Logo —</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Logo-Darstellung</label>
+                                    <select id="vmLogoStyle" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="round_title">🔴 Rund-Logo + Schriftzug</option>
+                                        <option value="round">🔴 Nur Rund-Logo</option>
+                                        <option value="wordmark">RED Text-Logo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Intro-Dauer</label>
+                                    <select id="vmIntroSec" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="0.5">0,5 Sek.</option><option value="1">1 Sek.</option><option value="1.5">1,5 Sek.</option><option value="2">2 Sek.</option><option value="2.5" selected>2,5 Sek.</option><option value="3">3 Sek.</option><option value="3.5">3,5 Sek.</option><option value="4">4 Sek.</option><option value="5">5 Sek.</option><option value="6">6 Sek.</option><option value="7">7 Sek.</option><option value="8">8 Sek.</option><option value="10">10 Sek.</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Outro-Dauer</label>
+                                    <select id="vmOutroSec" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                                        <option value="0.5">0,5 Sek.</option><option value="1">1 Sek.</option><option value="1.5">1,5 Sek.</option><option value="2">2 Sek.</option><option value="2.5">2,5 Sek.</option><option value="3" selected>3 Sek.</option><option value="3.5">3,5 Sek.</option><option value="4">4 Sek.</option><option value="5">5 Sek.</option><option value="6">6 Sek.</option><option value="7">7 Sek.</option><option value="8">8 Sek.</option><option value="10">10 Sek.</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <label>Intro-Musik</label>
+                                        <button type="button" class="pw-mini-link" onclick="window.previewSelectedVideoMusic('intro')"><i class="fa-solid fa-volume-high"></i> Vorhören</button>
+                                    </div>
+                                    <select id="vmIntroMusic" class="form-control" onchange="window.toggleCustomVideoAudioFields(); window.onVideoStudioFieldChange(true);">
+                                        <option value="cinema-whoosh">🎬 Cinema Deep Impact</option><option value="sport-rev">🏎️ Sport-Turbo Sweep</option><option value="engine-start">🔥 Motor-Start &amp; Boost</option><option value="berlin-bass">🔊 Berlin Deep Bass</option><option value="news-flash">📡 Live-News Broadcast</option><option value="luxury-chime">✨ Showroom Edel-Klang</option><option value="vip-harp">👑 VIP Gold-Harfe</option><option value="piano-rise">🎹 Modern Piano</option><option value="pulse-beat">⚡ Modern Tech Pulse</option><option value="cyber-synth">🚀 Synth-Swell</option><option value="victory-chord">🏆 Finale Akkord</option><option value="soft-bell">🔔 Sanfter Gong</option><option value="none">🔇 Keine Musik</option><option value="custom">🎵 Eigene MP3...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <label>Outro-Musik</label>
+                                        <button type="button" class="pw-mini-link" onclick="window.previewSelectedVideoMusic('outro')"><i class="fa-solid fa-volume-high"></i> Vorhören</button>
+                                    </div>
+                                    <select id="vmOutroMusic" class="form-control" onchange="window.toggleCustomVideoAudioFields(); window.onVideoStudioFieldChange(true);">
+                                        <option value="victory-chord">🏆 Finale Akkord</option><option value="soft-bell">🔔 Sanfter Gong</option><option value="luxury-chime">✨ Showroom Edel-Klang</option><option value="vip-harp">👑 VIP Gold-Harfe</option><option value="piano-rise">🎹 Modern Piano</option><option value="cinema-whoosh">🎬 Cinema Deep Impact</option><option value="berlin-bass">🔊 Berlin Deep Bass</option><option value="sport-rev">🏎️ Sport-Turbo Sweep</option><option value="engine-start">🔥 Motor-Start &amp; Boost</option><option value="news-flash">📡 Live-News Broadcast</option><option value="pulse-beat">⚡ Modern Tech Pulse</option><option value="cyber-synth">🚀 Synth-Swell</option><option value="none">🔇 Keine Musik</option><option value="custom">🎵 Eigene MP3...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row" id="vmCustomAudioRow" style="display:none; margin-bottom:0;">
+                                <div class="form-group" style="margin-bottom:0;"><label>Eigene Intro MP3</label><input type="text" id="vmIntroCustomAudio" class="form-control" placeholder="./intro.mp3"></div>
+                                <div class="form-group" style="margin-bottom:0;"><label>Eigene Outro MP3</label><input type="text" id="vmOutroCustomAudio" class="form-control" placeholder="./outro.mp3"></div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- AKKORDEON 7: GLOBALE OPTIONEN (ZUGEKLAPPT) -->
+                    <details class="vm-acc" id="vmAccGlobal">
+                        <summary>
+                            <span><i class="fa-solid fa-sliders"></i> 7. Globale Optionen (Nebeneinander / Autoplay)</span>
+                            <span class="vm-acc-pill">Global</span>
+                        </summary>
+                        <div class="vm-acc-body">
+                            <div class="form-row" style="margin-bottom:0;">
+                                <div class="form-group">
+                                    <label>Bereichs-Kategorie</label>
+                                    <input type="text" id="vmSectionEyebrow" class="form-control" value="RED Berlin in Aktion" oninput="window.updateVideoStudioLivePreview(); window.scheduleAutoSavePromoVideo();">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mehrere Videos an gleicher Stelle</label>
+                                    <select id="vmMultiModeSelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
+                                        <option value="grid" selected>🎞️ Nebeneinander (2er / 3er / 4er)</option>
+                                        <option value="playlist">🎬 1 Player mit Tabs</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Start-Verhalten</label>
+                                    <select id="vmAutoplaySelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
+                                        <option value="muted-auto">🔇 Autoplay Stumm</option>
+                                        <option value="manual">▶️ Nur bei Klick</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- AKKORDEON 8: ALLE HINTERLEGTEN VIDEOS (STANDARDMÄSSIG OFFEN) -->
+                <details class="vm-acc" id="vmAccList" open>
+                    <summary>
+                        <span><i class="fa-solid fa-layer-group"></i> Hinterlegte Videos &amp; Positionen</span>
+                        <span class="vm-acc-pill">Verwalten</span>
+                    </summary>
+                    <div class="vm-acc-body">
+                        <div id="vmVideosList" class="pm-pages-cards"></div>
+                    </div>
+                </details>
+
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button type="button" class="btn-primary" style="background:var(--bg-input); border:1px solid var(--glass-border); color:var(--text-light); flex:1; justify-content:center; box-shadow:none; border-radius:10px;" onclick="window.startAddNewPromoVideo()"><i class="fa-solid fa-plus"></i> Weiteres Video</button>
+                    <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; flex:1.6; justify-content:center; border-radius:10px;" onclick="window.savePromoVideoItem(false)"><i class="fa-solid fa-floppy-disk"></i> Jetzt speichern</button>
+                </div>
+            </div>
 
                 <!-- LIVE-VORSCHAU FÜR POSITIONIERUNG, DARSTELLUNG, QUALITÄT & SCHRIFTEN -->
                 <div class="vm-live-preview-wrap">
@@ -2340,15 +2902,20 @@
                     <button type="button" class="inv-arch-btn" onclick="window.resetPageManagerForm()"><i class="fa-solid fa-plus"></i> Neue Seite</button>
                 </div>
 
-                <div class="service-config-section">
-                    <h4>1. Schnell-Vorlagen (1-Klick Start)</h4>
-                    <div class="inv-quick-bar" style="margin-bottom:4px;">
-                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('about')">🏢 Über RED Berlin</button>
-                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('b2b')">🚗 Händler &amp; Gewerbe</button>
-                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('prices')">💶 Preisübersicht</button>
-                        <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('notice')">📢 Wichtige Info / Urlaub</button>
+                <details class="vm-acc">
+                    <summary>
+                        <span><i class="fa-solid fa-wand-magic-sparkles"></i> 1. Schnell-Vorlagen (1-Klick Start)</span>
+                        <span class="vm-acc-pill">4 Vorlagen</span>
+                    </summary>
+                    <div class="vm-acc-body">
+                        <div class="inv-quick-bar" style="margin-bottom:0;">
+                            <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('about')">🏢 Über RED Berlin</button>
+                            <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('b2b')">🚗 Händler &amp; Gewerbe</button>
+                            <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('prices')">💶 Preisübersicht</button>
+                            <button type="button" class="inv-quick-chip" onclick="window.applyPageTemplate('notice')">📢 Wichtige Info / Urlaub</button>
+                        </div>
                     </div>
-                </div>
+                </details>
 
                 <div class="service-config-section">
                     <h4>2. Seitenkopf, Symbol &amp; Sichtbarkeit</h4>
@@ -4456,8 +5023,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-<script src="./app.js?v=29" defer></script>
-    <script type="module" src="./firebase-app.js?v=29"></script>
+<script src="./app.js?v=30" defer></script>
+    <script type="module" src="./firebase-app.js?v=30"></script>
 
 </body>
 </html>
