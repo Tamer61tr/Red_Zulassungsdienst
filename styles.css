@@ -7279,6 +7279,44 @@
             }
         }
 
+        /* =========================================================================
+           V31: STUDIO-MODAL HINTERGRUND-SPERRE & SAUBERES INNEN-SCROLLEN (MOBIL)
+           ========================================================================= */
+        html.studio-modal-lock,
+        body.studio-modal-lock {
+            overflow: hidden !important;
+            overscroll-behavior: none !important;
+            touch-action: none !important;
+        }
+        #videoManagerOverlay,
+        #pageManagerOverlay {
+            overscroll-behavior: contain !important;
+            touch-action: none !important;
+        }
+        #videoManagerOverlay .exec-studio-window,
+        #pageManagerOverlay .exec-studio-window {
+            display: flex !important;
+            flex-direction: column !important;
+            max-height: 90dvh !important;
+            overflow: hidden !important;
+            touch-action: auto !important;
+        }
+        #videoManagerOverlay .exec-studio-header,
+        #videoManagerOverlay .sup-tab-bar,
+        #pageManagerOverlay .exec-studio-header {
+            flex-shrink: 0 !important;
+        }
+        #videoManagerOverlay .exec-studio-body,
+        #pageManagerOverlay .exec-studio-body {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain !important;
+            touch-action: pan-y !important;
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }

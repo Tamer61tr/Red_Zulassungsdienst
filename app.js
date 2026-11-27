@@ -204,6 +204,7 @@ window.escHtml = function(str) {
             if (!window._isBodyScrollLocked) return;
             if (e.target && e.target.closest && e.target.closest('.signature-pad-wrapper')) return;
             if (e.target && e.target.closest && e.target.closest('.rvp-controls-bar')) return;
+            if (e.target && e.target.closest && e.target.closest('.exec-studio-body')) return;
             if (e.target && e.target.closest && e.target.closest('#cashInvoiceOverlay')) return;
             const scrollInfo = window.findActiveScrollableInsideOverlay(e.target);
             if (!scrollInfo) {
@@ -8054,7 +8055,18 @@ window.rvpBindDirectTap = function(el, onTap) {
 
             window.renderVideoManagerList();
             window.switchVideoManagerTab(startTab === 'brand' ? 'brand' : 'videos');
-            document.getElementById('videoManagerOverlay').classList.add('open');
+            const ov = document.getElementById('videoManagerOverlay');
+            if (ov) {
+                ov.classList.add('open');
+                if (ov.dataset.backdropGuard !== '1') {
+                    ov.dataset.backdropGuard = '1';
+                    ov.addEventListener('touchmove', (ev) => {
+                        if (!ev.target.closest('.exec-studio-body')) ev.preventDefault();
+                    }, { passive: false });
+                }
+            }
+            document.documentElement.classList.add('studio-modal-lock');
+            document.body.classList.add('studio-modal-lock');
 
             if (!skipAutoEdit && !document.getElementById('vmEditId')?.value && (cfg.list || []).length > 0) {
                 window.editPromoVideoItem(cfg.list[0].id, true);
@@ -8067,7 +8079,9 @@ window.rvpBindDirectTap = function(el, onTap) {
 
         window.closeVideoManagerModal = function() {
             window.stopRedStudioAudio();
-            document.getElementById('videoManagerOverlay').classList.remove('open');
+            document.getElementById('videoManagerOverlay')?.classList.remove('open');
+            document.documentElement.classList.remove('studio-modal-lock');
+            document.body.classList.remove('studio-modal-lock');
         };
 
         window.saveVideoSettingsOnly = async function() {
