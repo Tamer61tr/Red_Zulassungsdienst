@@ -7317,6 +7317,58 @@
             touch-action: pan-y !important;
         }
 
+        /* =========================================================================
+           V32: PLAYER LADE-STATUS, FEHLER-HINWEIS & KOMPAKTE MOBIL-TOASTS
+           ========================================================================= */
+        .rvp-media-status {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            background: rgba(8, 8, 13, 0.84);
+            color: #ffffff;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 8px;
+            padding: 18px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        .rvp-media-status.show {
+            display: flex;
+        }
+        .rvp-media-status i {
+            font-size: 24px;
+            color: #ff1e1e;
+        }
+        .rvp-media-status button {
+            margin-top: 4px;
+            background: var(--primary-red);
+            color: #ffffff;
+            border: none;
+            border-radius: 9px;
+            padding: 7px 13px;
+            font-size: 11px !important;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            #toast-container {
+                bottom: calc(14px + var(--safe-bottom)) !important;
+                max-width: calc(100vw - 24px) !important;
+            }
+            #toast-container .toast {
+                font-size: 11.5px !important;
+                padding: 10px 14px !important;
+                line-height: 1.35 !important;
+                max-height: 110px;
+                overflow-y: auto;
+            }
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }

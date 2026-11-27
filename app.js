@@ -6773,20 +6773,16 @@ const DEFAULT_VIDEO_HIGHLIGHTS = [
 
                 if (item) {
                     const targetSrc = (meta.urlField && item[meta.urlField]) ? item[meta.urlField] : item.url;
-                    const curSrcAttr = v.getAttribute('data-rvp-src') || v.getAttribute('src') || '';
+                    const curSrcAttr = v.getAttribute('data-rvp-src') || '';
                     if (targetSrc && targetSrc !== curSrcAttr) {
                         const resumeAt = isFinite(v.currentTime) ? v.currentTime : 0;
                         const wasPlaying = st.desiredPlaying && !v.paused;
                         v.setAttribute('data-rvp-src', targetSrc);
-                        v.src = targetSrc;
-                        const restorePos = () => {
-                            if (resumeAt > 0.2 && isFinite(v.duration)) {
-                                try { v.currentTime = Math.min(resumeAt, v.duration - 0.15); } catch (e) {}
-                            }
-                            if (wasPlaying) window.rvpSafePlay(key);
-                            window.rvpSyncUi(key);
-                        };
-                        v.addEventListener('loadedmetadata', restorePos, { once: true });
+                        if (typeof window.rvpAttachMediaSrc === 'function') {
+                            window.rvpAttachMediaSrc(v, targetSrc, { key, resumeAt, autoPlay: wasPlaying });
+                        } else {
+                            v.src = targetSrc;
+                        }
                     }
                 }
             }
@@ -7367,28 +7363,19 @@ window.rvpBindDirectTap = function(el, onTap) {
             st.seekLockUntil = resumeTime > 0.2 ? (Date.now() + 900) : 0;
             window.rvpHideBumper('center');
 
-            if (centerV.getAttribute('data-rvp-src') !== item.url) {
-                centerV.setAttribute('data-rvp-src', item.url);
-                if (typeof window.rvpAttachMediaSrc === 'function') {
-                    window.rvpAttachMediaSrc(centerV, item.url);
-                } else {
-                    centerV.src = item.url;
-                }
-            }
             window.bindRvpPlayerControls('center', idx);
             window.rvpApplyQualityProfile('center', resumeQual, false);
-
             ov.classList.add('open');
 
-            // SYNCHRON im Klick-Handler starten -> Ton & Wiedergabe funktionieren sofort auf Handy & PC!
-            if (resumeTime > 0.2 && centerV.readyState >= 1) {
-                try { centerV.currentTime = Math.min(resumeTime, Math.max(0, (centerV.duration || resumeTime) - 0.15)); } catch (e) {}
-            } else if (resumeTime > 0.2) {
-                centerV.addEventListener('loadedmetadata', () => {
+            if (centerV.getAttribute('data-rvp-src') !== item.url || !centerV.getAttribute('src')) {
+                centerV.setAttribute('data-rvp-src', item.url);
+                window.rvpAttachMediaSrc(centerV, item.url, { key: 'center', resumeAt: resumeTime, autoPlay: true });
+            } else {
+                if (resumeTime > 0.2 && centerV.readyState >= 1) {
                     try { centerV.currentTime = Math.min(resumeTime, Math.max(0, (centerV.duration || resumeTime) - 0.15)); } catch (e) {}
-                }, { once: true });
+                }
+                window.rvpSafePlay('center');
             }
-            window.rvpSafePlay('center');
             window.rvpSyncUi('center');
         };
 
@@ -7454,8 +7441,10 @@ window.rvpBindDirectTap = function(el, onTap) {
 
         window.zonePlaylistActiveId = {};
 
-        // --- AUTOMATISCHER LOKALER VIDEO-SPEICHER (INDEXEDDB) FÜR SOFORTIGE MB-UPLOADS OHNE SETUP ---
+// --- RED CLOUD GRATIS ENGINE (0 € FIRESTORE-CHUNKS BIS 20 MB + INDEXEDDB-TURBO-CACHE) ---
         window._rvpBlobUrlCache = {};
+        window._rvpFetchPromises = {};
+
         window.rvpOpenIdb = function() {
             return new Promise((resolve, reject) => {
                 if (!window.indexedDB) { reject(new Error('IndexedDB nicht verfügbar')); return; }
@@ -7469,51 +7458,248 @@ window.rvpBindDirectTap = function(el, onTap) {
             });
         };
 
+        window.rvpPutBlobInIdb = async function(key, blob) {
+            try {
+                const idb = await window.rvpOpenIdb();
+                await new Promise((resolve, reject) => {
+                    const tx = idb.transaction('videos', 'readwrite');
+                    tx.objectStore('videos').put(blob, key);
+                    tx.oncomplete = resolve;
+                    tx.onerror = () => reject(tx.error);
+                });
+            } catch (e) {}
+            window._rvpBlobUrlCache[key] = URL.createObjectURL(blob);
+            return window._rvpBlobUrlCache[key];
+        };
+
         window.rvpSaveBlobToIdb = async function(blob) {
             const id = 'idb://vid_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
-            const idb = await window.rvpOpenIdb();
-            await new Promise((resolve, reject) => {
-                const tx = idb.transaction('videos', 'readwrite');
-                tx.objectStore('videos').put(blob, id);
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error);
-            });
-            window._rvpBlobUrlCache[id] = URL.createObjectURL(blob);
+            await window.rvpPutBlobInIdb(id, blob);
             return id;
         };
 
-        window.rvpResolveIdbUrl = async function(idbKey) {
-            if (!idbKey || !String(idbKey).startsWith('idb://')) return idbKey;
-            if (window._rvpBlobUrlCache[idbKey]) return window._rvpBlobUrlCache[idbKey];
+        window.rvpGetBlobFromIdb = async function(key) {
             try {
                 const idb = await window.rvpOpenIdb();
-                const blob = await new Promise((resolve) => {
+                return await new Promise((resolve) => {
                     const tx = idb.transaction('videos', 'readonly');
-                    const r = tx.objectStore('videos').get(idbKey);
+                    const r = tx.objectStore('videos').get(key);
                     r.onsuccess = () => resolve(r.result || null);
                     r.onerror = () => resolve(null);
                 });
-                if (blob) {
-                    const objUrl = URL.createObjectURL(blob);
-                    window._rvpBlobUrlCache[idbKey] = objUrl;
-                    return objUrl;
-                }
-            } catch (e) {}
-            return '';
+            } catch (e) {
+                return null;
+            }
         };
 
-        window.rvpAttachMediaSrc = function(videoEl, rawUrl) {
-            if (!videoEl || !rawUrl) return;
-            if (String(rawUrl).startsWith('idb://')) {
-                window.rvpResolveIdbUrl(rawUrl).then((realUrl) => {
-                    if (realUrl && videoEl) {
-                        videoEl.src = realUrl;
-                        try { videoEl.load(); } catch (e) {}
+        window.rvpBytesToBase64 = function(uint8) {
+            let bin = '';
+            const step = 0x8000;
+            for (let i = 0; i < uint8.length; i += step) {
+                bin += String.fromCharCode.apply(null, uint8.subarray(i, i + step));
+            }
+            return btoa(bin);
+        };
+
+        window.rvpBase64ToBytes = function(b64) {
+            const bin = atob(b64);
+            const len = bin.length;
+            const arr = new Uint8Array(len);
+            for (let i = 0; i < len; i++) arr[i] = bin.charCodeAt(i);
+            return arr;
+        };
+
+        // Kostenloser Cloud-Upload (0 €, ohne API-Key, bis 20 MB, sofort auf ALLEN Geräten abspielbar!)
+        window.uploadVideoToFirestoreFree = async function(fileOrBlob, onProgress) {
+            if (!window.firebaseDb || !window.firebaseSetDoc || !window.firebaseDoc) {
+                throw new Error('Datenbank noch nicht bereit – bitte 2 Sekunden warten und erneut versuchen.');
+            }
+            if (fileOrBlob.size > 20 * 1024 * 1024) {
+                throw new Error('Video ist größer als 20 MB. Bitte kurz verkleinern (oder unter Setup auf Cloudinary Free bis 100 MB umschalten).');
+            }
+            const buf = await fileOrBlob.arrayBuffer();
+            const bytes = new Uint8Array(buf);
+            const CHUNK_RAW = 360 * 1024; // ~490 KB Base64 pro Paket -> sicher unter 1 MB Firestore-Limit
+            const totalChunks = Math.max(1, Math.ceil(bytes.length / CHUNK_RAW));
+            const vidKey = 'v_' + Date.now() + '_' + Math.floor(Math.random() * 9000 + 1000);
+            const fsUrl = 'fs://' + vidKey;
+            const mimeType = fileOrBlob.type || 'video/mp4';
+
+            for (let i = 0; i < totalChunks; i++) {
+                const slice = bytes.subarray(i * CHUNK_RAW, Math.min(bytes.length, (i + 1) * CHUNK_RAW));
+                const b64 = window.rvpBytesToBase64(slice);
+                await window.firebaseSetDoc(
+                    window.firebaseDoc(window.firebaseDb, 'settings', `vidchunk_${vidKey}_${i}`),
+                    { d: b64, i, k: vidKey }
+                );
+                if (typeof onProgress === 'function') {
+                    const pct = Math.min(95, Math.round(((i + 1) / totalChunks) * 95));
+                    onProgress(pct, Math.min(bytes.length, (i + 1) * CHUNK_RAW), bytes.length);
+                }
+            }
+
+            await window.firebaseSetDoc(
+                window.firebaseDoc(window.firebaseDb, 'settings', `vidchunk_${vidKey}_meta`),
+                { count: totalChunks, mimeType, size: bytes.length, createdAt: Date.now() }
+            );
+
+            // Direkt lokal cachen -> 0 ms Ladezeit auf diesem Gerät
+            await window.rvpPutBlobInIdb(fsUrl, fileOrBlob);
+            if (typeof onProgress === 'function') onProgress(100, bytes.length, bytes.length);
+            return { url: fsUrl, provider: 'firebase-free' };
+        };
+
+        window.rvpDeleteFirestoreChunks = async function(rawUrl) {
+            if (!rawUrl || !String(rawUrl).startsWith('fs://')) return;
+            if (!window.firebaseDb || !window.firebaseGetDoc || !window.firebaseDeleteDoc) return;
+            const vidKey = String(rawUrl).slice(5);
+            try {
+                const mSnap = await window.firebaseGetDoc(window.firebaseDoc(window.firebaseDb, 'settings', `vidchunk_${vidKey}_meta`));
+                const count = mSnap.exists() ? (Number(mSnap.data().count) || 0) : 0;
+                const tasks = [window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDb, 'settings', `vidchunk_${vidKey}_meta`)).catch(() => {})];
+                for (let i = 0; i < count; i++) {
+                    tasks.push(window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDb, 'settings', `vidchunk_${vidKey}_${i}`)).catch(() => {}));
+                }
+                await Promise.all(tasks);
+            } catch (e) {}
+        };
+
+        window.rvpResolveMediaUrl = async function(rawUrl) {
+            if (!rawUrl) return '';
+            const str = String(rawUrl).trim();
+            if (!str.startsWith('fs://') && !str.startsWith('idb://')) return str;
+
+            if (window._rvpBlobUrlCache[str]) return window._rvpBlobUrlCache[str];
+
+            // 1. Erst schnellen lokalen Cache prüfen
+            const cachedBlob = await window.rvpGetBlobFromIdb(str);
+            if (cachedBlob) {
+                const objUrl = URL.createObjectURL(cachedBlob);
+                window._rvpBlobUrlCache[str] = objUrl;
+                return objUrl;
+            }
+
+            // Altes rein lokales Video existiert auf einem fremden Gerät nicht
+            if (str.startsWith('idb://')) return '';
+
+            // 2. RED Cloud Gratis (fs://) Pakete aus Firestore laden & lokal cachen
+            if (window._rvpFetchPromises[str]) return window._rvpFetchPromises[str];
+
+            window._rvpFetchPromises[str] = (async () => {
+                try {
+                    if (!window.firebaseDb || !window.firebaseGetDoc) return '';
+                    const vidKey = str.slice(5);
+                    const mSnap = await window.firebaseGetDoc(window.firebaseDoc(window.firebaseDb, 'settings', `vidchunk_${vidKey}_meta`));
+                    if (!mSnap.exists()) return '';
+                    const meta = mSnap.data();
+                    const count = Number(meta.count) || 0;
+                    if (count <= 0) return '';
+
+                    const snaps = await Promise.all(
+                        Array.from({ length: count }, (_, i) =>
+                            window.firebaseGetDoc(window.firebaseDoc(window.firebaseDb, 'settings', `vidchunk_${vidKey}_${i}`))
+                        )
+                    );
+                    const parts = [];
+                    for (const s of snaps) {
+                        if (!s.exists() || !s.data().d) return '';
+                        parts.push(window.rvpBase64ToBytes(s.data().d));
+                    }
+                    const fullBlob = new Blob(parts, { type: meta.mimeType || 'video/mp4' });
+                    return await window.rvpPutBlobInIdb(str, fullBlob);
+                } catch (e) {
+                    console.error('RED Cloud Video Laden Fehler:', e);
+                    return '';
+                } finally {
+                    delete window._rvpFetchPromises[str];
+                }
+            })();
+
+            return window._rvpFetchPromises[str];
+        };
+
+        window.rvpSetStageStatus = function(key, html) {
+            if (!key) return;
+            const box = document.getElementById(`rvpStatus-${key}`);
+            if (!box) return;
+            if (!html) {
+                box.classList.remove('show');
+                box.innerHTML = '';
+            } else {
+                box.innerHTML = html;
+                box.classList.add('show');
+            }
+        };
+
+        window.rvpAttachMediaSrc = async function(videoEl, rawUrl, opts = {}) {
+            if (!videoEl) return;
+            const key = opts.key || '';
+            const isSpecial = String(rawUrl || '').startsWith('fs://') || String(rawUrl || '').startsWith('idb://');
+
+            if (key && isSpecial && !window._rvpBlobUrlCache[rawUrl]) {
+                window.rvpSetStageStatus(key, '<i class="fa-solid fa-spinner fa-spin"></i><span>Video wird geladen...</span>');
+            }
+
+            const resolved = await window.rvpResolveMediaUrl(rawUrl);
+            if (!resolved) {
+                if (key) {
+                    const isMgr = window.canManagePromoVideos();
+                    const item = window.getRvpItem(key);
+                    const msg = String(rawUrl || '').startsWith('idb://')
+                        ? 'Dieses Video war nur lokal auf dem anderen Gerät gespeichert. Bitte über den Stift einmal neu hochladen (jetzt automatisch für alle Geräte!).'
+                        : 'Video-Quelle nicht erreichbar. Bitte im Video-Studio neu wählen.';
+                    window.rvpSetStageStatus(
+                        key,
+                        `<i class="fa-solid fa-film"></i><span>${msg}</span>` +
+                        (isMgr && item ? `<button type="button" onclick="event.stopPropagation(); window.editCurrentPromoVideo('${item.id}')"><i class="fa-solid fa-upload"></i> Jetzt neu hochladen</button>` : '')
+                    );
+                }
+                return;
+            }
+
+            // Fehler-Listener für defekte Video-URLs
+            if (videoEl.dataset.rvpErrBound !== '1') {
+                videoEl.dataset.rvpErrBound = '1';
+                videoEl.addEventListener('error', () => {
+                    if (key) {
+                        const isMgr = window.canManagePromoVideos();
+                        const item = window.getRvpItem(key);
+                        window.rvpSetStageStatus(
+                            key,
+                            `<i class="fa-solid fa-triangle-exclamation"></i><span>Video konnte nicht abgespielt werden.</span>` +
+                            (isMgr && item ? `<button type="button" onclick="event.stopPropagation(); window.editCurrentPromoVideo('${item.id}')"><i class="fa-solid fa-pencil"></i> Video prüfen</button>` : '')
+                        );
                     }
                 });
-            } else {
-                videoEl.src = rawUrl;
+                videoEl.addEventListener('loadeddata', () => {
+                    if (key) window.rvpSetStageStatus(key, '');
+                });
             }
+
+            if (key) window.rvpSetStageStatus(key, '');
+            videoEl.src = resolved;
+            try { videoEl.load(); } catch (e) {}
+
+            const onReady = () => {
+                if (key) window.rvpSetStageStatus(key, '');
+                const dur = window.rvpGetDuration(videoEl);
+                if (opts.resumeAt && opts.resumeAt > 0.2 && dur > 0.3) {
+                    try { videoEl.currentTime = Math.min(opts.resumeAt, dur - 0.15); } catch (e) {}
+                } else if (!opts.autoPlay && dur > 0.2) {
+                    // Erzwingt auf iOS & Android sofort das erste Video-Bild statt schwarzem Bildschirm
+                    try { videoEl.currentTime = 0.05; } catch (e) {}
+                }
+                if (key) {
+                    const st = window.getRvpState(key);
+                    if (opts.autoPlay || (st.desiredPlaying && !st.userPaused)) {
+                        window.rvpSafePlay(key);
+                    }
+                    window.rvpSyncUi(key);
+                }
+            };
+
+            if (videoEl.readyState >= 1) onReady();
+            else videoEl.addEventListener('loadedmetadata', onReady, { once: true });
         };
 
         window.normalizePromoVideosConfig = function(cfg) {
@@ -7596,8 +7782,8 @@ window.rvpBindDirectTap = function(el, onTap) {
             const defQ = item.defaultQuality || '1080';
             const qShort = (RVP_QUALITY_META[defQ] || RVP_QUALITY_META['1080']).short;
             const effAspect = (!item.aspect || item.aspect === 'auto') ? (item.detectedAspect || '9/16') : item.aspect;
-            const isIdb = String(item.url || '').startsWith('idb://');
-            const initialSrcAttr = isIdb ? '' : `src="${window.escHtml(item.url)}"`;
+            const isCloudOrIdb = String(item.url || '').startsWith('fs://') || String(item.url || '').startsWith('idb://');
+            const initialSrcAttr = isCloudOrIdb ? '' : `src="${window.escHtml(item.url)}"`;
 
             return `
                 <div class="rvp-player-shell${frameCls}" id="rvpHost-${key}">
@@ -7607,6 +7793,7 @@ window.rvpBindDirectTap = function(el, onTap) {
                             <button type="button" class="rvp-expand-fab" data-rvp-act="expand" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
                         </div>
                         <video id="rvpVid-${key}" ${initialSrcAttr} data-rvp-src="${window.escHtml(item.url)}" style="${fitStyle}" muted playsinline webkit-playsinline preload="auto" data-rvp-act="play"></video>
+                        <div class="rvp-media-status" id="rvpStatus-${key}"></div>
                         <div class="rvp-bumper-overlay" id="rvpBumper-${key}"></div>
                         <div class="rvp-hud-toast" id="rvpHud-${key}"></div>
                         <button type="button" class="rvp-unmute-callout" id="rvpUnmute-${key}" data-rvp-act="unmute">
@@ -7819,9 +8006,6 @@ window.rvpBindDirectTap = function(el, onTap) {
                 const v = window.getRvpEl(key);
                 if (!v) return;
                 v.muted = true;
-                if (String(item.url || '').startsWith('idb://')) {
-                    window.rvpAttachMediaSrc(v, item.url);
-                }
                 window._rvpStates[key] = {
                     videoIdx: idx,
                     desiredPlaying: auto,
@@ -7839,9 +8023,18 @@ window.rvpBindDirectTap = function(el, onTap) {
                     sourceKey: ''
                 };
                 window.bindRvpPlayerControls(key, idx);
-                if (auto) {
+                const needsAsyncSrc = String(item.url || '').startsWith('fs://') || String(item.url || '').startsWith('idb://');
+                if (needsAsyncSrc) {
+                    window.rvpAttachMediaSrc(v, item.url, { key, autoPlay: auto });
+                } else if (auto) {
                     window.rvpStartWithIntroIfNeeded(key, true);
                 } else {
+                    v.addEventListener('loadedmetadata', () => {
+                        if (v.paused && window.rvpGetDuration(v) > 0.2) {
+                            try { v.currentTime = 0.05; } catch (e) {}
+                        }
+                        window.rvpSyncUi(key);
+                    }, { once: true });
                     window.rvpSyncUi(key);
                 }
 
@@ -8281,7 +8474,7 @@ window.rvpBindDirectTap = function(el, onTap) {
         };
 
         window.getFreeUploadSettings = function() {
-            const saved = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v1') || 'null') || {};
+            const saved = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v2') || 'null') || {};
             const liveProv = document.getElementById('vmUploadProvider')?.value;
             const liveCloud = document.getElementById('vmCloudName')?.value;
             const livePreset = document.getElementById('vmCloudPreset')?.value;
@@ -8290,7 +8483,7 @@ window.rvpBindDirectTap = function(el, onTap) {
             const liveToken = document.getElementById('vmGhToken')?.value;
 
             return {
-                provider: liveProv || saved.provider || 'cloudinary',
+                provider: liveProv || saved.provider || 'firebase-free',
                 cloudName: window.normalizeCloudinaryCloudName(liveCloud !== undefined && liveCloud !== '' ? liveCloud : saved.cloudName),
                 cloudPreset: String(livePreset !== undefined && livePreset !== '' ? livePreset : (saved.cloudPreset || '')).trim(),
                 ghRepo: String(liveRepo !== undefined && liveRepo !== '' ? liveRepo : (saved.ghRepo || '')).trim(),
@@ -8300,21 +8493,21 @@ window.rvpBindDirectTap = function(el, onTap) {
         };
 
         window.toggleFreeUploadProviderFields = function() {
-            const p = document.getElementById('vmUploadProvider')?.value || 'cloudinary';
+            const p = document.getElementById('vmUploadProvider')?.value || 'firebase-free';
+            const fWrap = document.getElementById('vmCfgFirebaseFreeWrap');
             const cWrap = document.getElementById('vmCfgCloudinaryWrap');
             const gWrap = document.getElementById('vmCfgGithubWrap');
-            const lWrap = document.getElementById('vmCfgLocalWrap');
             const badge = document.getElementById('vmUploadProviderBadge');
+            if (fWrap) fWrap.style.display = p === 'firebase-free' ? 'block' : 'none';
             if (cWrap) cWrap.style.display = p === 'cloudinary' ? 'block' : 'none';
             if (gWrap) gWrap.style.display = p === 'github' ? 'block' : 'none';
-            if (lWrap) lWrap.style.display = p === 'local' ? 'block' : 'none';
-            if (badge) badge.innerText = p === 'github' ? 'GitHub Repo' : (p === 'local' ? 'Sofort-Lokal' : 'Cloudinary Free');
+            if (badge) badge.innerText = p === 'cloudinary' ? 'Cloudinary Free' : (p === 'github' ? 'GitHub Repo' : 'RED Cloud Gratis');
         };
 
         window.loadFreeUploadSettingsIntoForm = function() {
-            const saved = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v1') || 'null') || {};
+            const saved = JSON.parse(localStorage.getItem('red_free_video_upload_cfg_v2') || 'null') || {};
             const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
-            setV('vmUploadProvider', saved.provider || 'cloudinary');
+            setV('vmUploadProvider', saved.provider || 'firebase-free');
             setV('vmCloudName', saved.cloudName || '');
             setV('vmCloudPreset', saved.cloudPreset || '');
             setV('vmGhRepo', saved.ghRepo || '');
@@ -8330,25 +8523,15 @@ window.rvpBindDirectTap = function(el, onTap) {
                 document.getElementById('vmCloudName').value = cleanCloud;
             }
             const cfg = {
-                provider: document.getElementById('vmUploadProvider')?.value || 'cloudinary',
+                provider: document.getElementById('vmUploadProvider')?.value || 'firebase-free',
                 cloudName: cleanCloud,
                 cloudPreset: (document.getElementById('vmCloudPreset')?.value || '').trim(),
                 ghRepo: (document.getElementById('vmGhRepo')?.value || '').trim(),
                 ghBranch: (document.getElementById('vmGhBranch')?.value || 'main').trim() || 'main',
                 ghToken: (document.getElementById('vmGhToken')?.value || '').trim()
             };
-            localStorage.setItem('red_free_video_upload_cfg_v1', JSON.stringify(cfg));
+            localStorage.setItem('red_free_video_upload_cfg_v2', JSON.stringify(cfg));
             window.toggleFreeUploadProviderFields();
-
-            // Nicht-geheime Cloudinary-Daten auch in Firebase sichern (für Handy & PC synchron!)
-            if (window.firebaseDb && window.firebaseSetDoc && cfg.cloudName && cfg.cloudPreset) {
-                window.firebaseSetDoc(
-                    window.firebaseDoc(window.firebaseDb, "settings", "video_upload_cfg"),
-                    { provider: cfg.provider === 'github' ? 'cloudinary' : cfg.provider, cloudName: cfg.cloudName, cloudPreset: cfg.cloudPreset, updatedAt: Date.now() },
-                    { merge: true }
-                ).catch(() => {});
-            }
-
             if (!silent) {
                 const det = document.getElementById('vmFreeUploadCfgDetails');
                 if (det) det.open = false;
@@ -8375,8 +8558,8 @@ window.rvpBindDirectTap = function(el, onTap) {
 
         window.testFreeUploadConnection = async function() {
             const cfg = window.getFreeUploadSettings();
-            if (cfg.provider === 'local') {
-                window.showToast('Sofort-Lokal ist sofort einsatzbereit!', 'success');
+            if (cfg.provider === 'firebase-free') {
+                window.showToast('✅ RED Cloud Gratis (0 €, bis 20 MB) ist sofort aktiv – kein API-Key nötig!', 'success');
                 return;
             }
             if (cfg.provider === 'github') {
@@ -8440,8 +8623,8 @@ window.rvpBindDirectTap = function(el, onTap) {
         window.uploadVideoFree = function(fileOrBlob, fileName, onProgress) {
             const cfg = window.getFreeUploadSettings();
 
-            if (cfg.provider === 'local') {
-                return window.rvpSaveBlobToIdb(fileOrBlob).then(idbUrl => ({ url: idbUrl, provider: 'local' }));
+            if (!cfg.provider || cfg.provider === 'firebase-free') {
+                return window.uploadVideoToFirestoreFree(fileOrBlob, onProgress);
             }
 
             if (cfg.provider === 'cloudinary') {
@@ -9102,6 +9285,7 @@ window.savePromoVideoItem = async function(silent = false) {
                 'Werbevideo löschen?',
                 `Möchten Sie „${item.title}“ wirklich dauerhaft entfernen?`,
                 async () => {
+                    if (item.url) window.rvpDeleteFirestoreChunks(item.url);
                     window.promoVideosConfig.list = (window.promoVideosConfig.list || []).filter(v => v.id !== id);
                     window.activePromoVideoIdx = 0;
                     if (document.getElementById('vmEditId')?.value === id) window.resetVideoManagerForm();

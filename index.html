@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-   <link rel="stylesheet" href="./styles.css?v=31">
+   <link rel="stylesheet" href="./styles.css?v=32">
 </head>
 
 <body data-theme="light">
@@ -1387,7 +1387,7 @@
                     <details class="vm-acc" id="vmAccUpload" open>
                         <summary>
                             <span><i class="fa-solid fa-cloud-arrow-up"></i> 1. Position &amp; Video hochladen</span>
-                            <span id="vmUploadProviderBadge" class="vm-acc-pill">Cloudinary Free</span>
+                            <span id="vmUploadProviderBadge" class="vm-acc-pill">RED Cloud Gratis</span>
                         </summary>
                         <div class="vm-acc-body">
                             <div class="vm-placement-spotlight">
@@ -1408,20 +1408,24 @@
 
                             <details class="vm-acc vm-acc-sub" id="vmFreeUploadCfgDetails">
                                 <summary>
-                                    <span><i class="fa-solid fa-gear"></i> Upload-Speicher einstellen (0 €)</span>
-                                    <span class="vm-acc-pill">Setup</span>
+                                    <span><i class="fa-solid fa-gear"></i> Upload-Speicher (Standard: RED Cloud 0 €)</span>
+                                    <span class="vm-acc-pill">Aktiv</span>
                                 </summary>
                                 <div class="vm-acc-body">
                                     <div class="form-group" style="margin-bottom:8px;">
                                         <label>Speicher-Modus (alle 0 €)</label>
                                         <select id="vmUploadProvider" class="form-control" onchange="window.toggleFreeUploadProviderFields(); window.saveFreeUploadSettings(true);">
-                                            <option value="cloudinary" selected>☁️ Cloudinary Free (bis 100 MB + Auto 4K/FHD/HD/SD)</option>
-                                            <option value="github">🐙 GitHub Direkt-Upload (bis 25 MB ins Repo)</option>
-                                            <option value="local">⚡ Sofort-Lokal (0 Setup – direkt auf diesem Gerät)</option>
+                                            <option value="firebase-free" selected>⚡ RED Cloud Gratis (Empfohlen – 0 €, sofort ohne Einrichtung, bis 20 MB)</option>
+                                            <option value="cloudinary">☁️ Cloudinary Free (optional für 20–100 MB Videos)</option>
+                                            <option value="github">🐙 GitHub Direkt-Upload (optional bis 25 MB)</option>
                                         </select>
                                     </div>
 
-                                    <div id="vmCfgCloudinaryWrap">
+                                    <div id="vmCfgFirebaseFreeWrap" style="font-size:11px; color:var(--green-accent); background:rgba(22,163,74,0.1); border:1px solid rgba(22,163,74,0.35); border-radius:9px; padding:8px 10px; margin-bottom:8px; line-height:1.45;">
+                                        <strong>✅ Sofort einsatzbereit (0 € &amp; ohne API-Key):</strong> Videos bis <strong>20 MB</strong> werden automatisch in deiner kostenlosen RED-Datenbank gespeichert und laufen sofort auf allen Handys &amp; PCs.
+                                    </div>
+
+                                    <div id="vmCfgCloudinaryWrap" style="display:none;">
                                         <div class="form-row" style="margin-bottom:6px;">
                                             <div class="form-group" style="margin-bottom:0;">
                                                 <label>Cloudinary Cloud-Name (NICHT API-Key!) *</label>
@@ -4451,8 +4455,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-<script src="./app.js?v=31" defer></script>
-    <script type="module" src="./firebase-app.js?v=31"></script>
+<script src="./app.js?v=32" defer></script>
+    <script type="module" src="./firebase-app.js?v=32"></script>
 
 </body>
 </html>
