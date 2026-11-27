@@ -7067,6 +7067,87 @@
             .vm-qslot-grid { grid-template-columns: 1fr; }
         }
 
+        /* =========================================================================
+           V29: MULTI-ZONE SEPARATE VIDEOS (2/3/4 NEBENEINANDER) & AUTO-SAVE UI
+           ========================================================================= */
+        .vm-quick-add-hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 9px 11px;
+            margin-bottom: 10px;
+        }
+        .vm-autosave-pill {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: var(--green-accent);
+            background: rgba(22, 163, 74, 0.12);
+            border: 1px solid rgba(22, 163, 74, 0.35);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+        .vm-autosave-pill.is-saving {
+            color: #d97706;
+            background: rgba(217, 119, 6, 0.12);
+            border-color: rgba(217, 119, 6, 0.4);
+        }
+        .vm-placement-spotlight {
+            background: rgba(217, 0, 0, 0.06);
+            border: 1.5px solid rgba(217, 0, 0, 0.32);
+            border-radius: 12px;
+            padding: 10px 11px;
+            margin-bottom: 11px;
+        }
+        .vm-placement-spotlight label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 900;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+        .vm-card-pos-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .vm-card-pos-select {
+            flex: 1;
+            min-width: 170px;
+            padding: 5px 8px !important;
+            font-size: 10.5px !important;
+            min-height: 30px !important;
+            border-radius: 8px !important;
+        }
+        .rvp-zone-host {
+            max-width: 1100px;
+            margin: 18px auto 24px;
+            padding: 0 5%;
+            box-sizing: border-box;
+        }
+        .rvp-zone-host:empty { display: none; margin: 0; padding: 0; }
+        .rvp-multi-grid.cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 1180px) {
+            .rvp-multi-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .rvp-multi-grid.cols-4 { grid-template-columns: 1fr; gap: 14px; }
+            .vm-quick-add-hero .btn-primary { width: 100%; justify-content: center; }
+        }
+
         /* Respektiert System-Einstellung „Bewegung reduzieren“ (Akku & Barrierefreiheit) */
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }

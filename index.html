@@ -125,7 +125,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'" referrerpolicy="no-referrer">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" referrerpolicy="no-referrer"></noscript>
     
-   <link rel="stylesheet" href="./styles.css?v=28">
+   <link rel="stylesheet" href="./styles.css?v=29">
 </head>
 
 <body data-theme="light">
@@ -1354,41 +1354,37 @@
                 </button>
             </div>
 
-            <!-- TAB 1: VIDEOS, LIVE-VORSCHAU, 4K/HDR, POSITIONIERUNG, SCHRIFTEN & INTRO/OUTRO -->
+            <!-- TAB 1: MULTI-VIDEO STUDIO (SEPARATE POSITIONEN + NEBENEINANDER + AUTO-SAVE) -->
             <div class="exec-studio-body" id="vmPaneVideos">
+                <!-- SCHNELLSTART-LEISTE: NEUES SEPARATES VIDEO + AUTO-SAVE STATUS -->
+                <div class="vm-quick-add-hero">
+                    <button type="button" class="btn-primary" style="background:#16a34a; color:#fff; padding:9px 14px; border-radius:10px; font-size:11.5px !important;" onclick="window.startAddNewPromoVideo()">
+                        <i class="fa-solid fa-plus"></i> Neues separates Video hinzufügen
+                    </button>
+                    <span id="vmAutoSaveStatus" class="vm-autosave-pill"><i class="fa-solid fa-cloud-check"></i> Auto-Speichern aktiv</span>
+                </div>
+
                 <!-- LIVE-VORSCHAU FÜR POSITIONIERUNG, DARSTELLUNG, QUALITÄT & SCHRIFTEN -->
                 <div class="vm-live-preview-wrap">
                     <div class="vm-live-preview-bar">
-                        <span><i class="fa-solid fa-eye" style="color:var(--primary-red);"></i> Live-Vorschau (Positionierung, Darstellung, Qualität &amp; Schriften)</span>
-                        <span id="vmPreviewModePill" class="vm-preview-pill">4K / HDR bereit</span>
+                        <span><i class="fa-solid fa-eye" style="color:var(--primary-red);"></i> Live-Vorschau (Position, Darstellung, Qualität &amp; Schriften)</span>
+                        <span id="vmPreviewModePill" class="vm-preview-pill">Auto-Save bereit</span>
                     </div>
                     <div id="vmLivePreviewStage" class="vm-live-preview-stage"></div>
                 </div>
 
                 <div class="service-config-section">
-                    <h4>1. Bereichs-Überschrift, Multi-Video-Ansicht &amp; Platzierung</h4>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Bereichs-Kategorie (klein oben)</label>
-                            <input type="text" id="vmSectionEyebrow" class="form-control" value="RED Berlin in Aktion" placeholder="z.B. RED Berlin in Aktion" oninput="window.updateVideoStudioLivePreview()" onblur="window.saveVideoSettingsOnly()">
-                        </div>
-                        <div class="form-group">
-                            <label>Ansicht (1, 2 oder 3 Videos)</label>
-                            <select id="vmLayoutSelect" class="form-control" onchange="window.updateVideoStudioLivePreview(); window.saveVideoSettingsOnly();">
-                                <option value="showcase">🎬 1 Haupt-Video + Playlist-Auswahl</option>
-                                <option value="grid-2">🎞️ 2 Videos nebeneinander (Showroom)</option>
-                                <option value="grid-3">🎥 3 Videos nebeneinander (3er-Kino)</option>
-                            </select>
-                        </div>
-                    </div>
+                    <h4>1. Globale Video-Optionen (gelten für alle Bereiche)</h4>
                     <div class="form-row" style="margin-bottom:0;">
-                        <div class="form-group" style="flex:1.4; margin-bottom:0;">
-                            <label>Wo soll der Video-Bereich erscheinen?</label>
-                            <select id="vmPlacementSelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
-                                <option value="after-hero">⭐ Direkt unter dem Hero (Empfohlen)</option>
-                                <option value="before-termin">📅 Direkt über der Terminbuchung</option>
-                                <option value="in-neukoelln">📍 Im Berlin-Neukölln Standort-Block</option>
-                                <option value="hidden">🚫 Aktuell ausblenden</option>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Bereichs-Kategorie (klein oben)</label>
+                            <input type="text" id="vmSectionEyebrow" class="form-control" value="RED Berlin in Aktion" placeholder="z.B. RED Berlin in Aktion" oninput="window.updateVideoStudioLivePreview(); window.scheduleAutoSavePromoVideo();">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Wenn 2–4 Videos an gleicher Stelle liegen</label>
+                            <select id="vmMultiModeSelect" class="form-control" onchange="window.saveVideoSettingsOnly()">
+                                <option value="grid" selected>🎞️ Nebeneinander anzeigen (2er / 3er / 4er-Reihe)</option>
+                                <option value="playlist">🎬 Als 1 großer Player mit Video-Tabs</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
@@ -1401,13 +1397,30 @@
                     </div>
                 </div>
 
-                <div class="service-config-section">
+                <div class="service-config-section" id="vmVideoEditorSection">
                     <div class="inv-edit-banner" id="vmEditBanner" style="margin-bottom:10px;">
-                        <span><i class="fa-solid fa-pen"></i> Bearbeite Video: <strong id="vmEditBannerName"></strong></span>
-                        <button type="button" class="inv-arch-btn" onclick="window.resetVideoManagerForm()"><i class="fa-solid fa-plus"></i> Neues Video</button>
+                        <span id="vmEditBannerText"><i class="fa-solid fa-pen"></i> Bearbeite Video: <strong id="vmEditBannerName"></strong></span>
+                        <button type="button" class="inv-arch-btn" style="background:#16a34a; color:#fff; border-color:#16a34a;" onclick="window.startAddNewPromoVideo()"><i class="fa-solid fa-plus"></i> + Weiteres Video</button>
                     </div>
-                    <h4 id="vmFormHeading">2. Video-Inhalt, Qualität (4K/HDR/FHD/HD/SD) &amp; Quellen</h4>
+                    <h4 id="vmFormHeading">2. Video-Position, Inhalt, Qualität &amp; Design</h4>
                     <input type="hidden" id="vmEditId">
+
+                    <!-- EIGENE POSITION AUF DER SEITE FÜR GENAU DIESES VIDEO -->
+                    <div class="vm-placement-spotlight">
+                        <label for="vmVideoPlacement"><i class="fa-solid fa-location-dot" style="color:var(--primary-red);"></i> Position genau dieses Videos auf der Website (für Nebeneinander einfach gleiche Stelle wählen)</label>
+                        <select id="vmVideoPlacement" class="form-control" onchange="window.onVideoStudioFieldChange(true)">
+                            <option value="after-hero">⭐ Oben – Direkt unter dem Hero (Startseite)</option>
+                            <option value="after-leistungen">📋 Oben-Mitte – Direkt nach „Unsere Leistungen“</option>
+                            <option value="after-kompass">🧭 Mitte – Direkt nach Zulassungs-Kompass</option>
+                            <option value="after-tools">🛠️ Mitte-Unten – Direkt nach Online-Tools</option>
+                            <option value="in-neukoelln">📍 Unten-Mitte – Im Berlin-Neukölln Standort-Block</option>
+                            <option value="before-termin">📅 Unten – Direkt über der Terminbuchung</option>
+                            <option value="after-termin">📞 Ganz unten – Nach Terminbuchung / vor Kontakt</option>
+                            <option value="page-formulare">📄 Unterseite – Formulare</option>
+                            <option value="page-ankauf">🚗 Unterseite – Auto Ankauf</option>
+                            <option value="hidden">🚫 Ausgeblendet (nur Entwurf)</option>
+                        </select>
+                    </div>
 
                     <div class="form-row">
                         <div class="form-group" style="flex:1.4;">
@@ -4443,8 +4456,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js" defer></script>
 
-<script src="./app.js?v=28" defer></script>
-    <script type="module" src="./firebase-app.js?v=28"></script>
+<script src="./app.js?v=29" defer></script>
+    <script type="module" src="./firebase-app.js?v=29"></script>
 
 </body>
 </html>

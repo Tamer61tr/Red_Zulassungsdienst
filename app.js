@@ -7368,7 +7368,11 @@ window.rvpBindDirectTap = function(el, onTap) {
 
             if (centerV.getAttribute('data-rvp-src') !== item.url) {
                 centerV.setAttribute('data-rvp-src', item.url);
-                centerV.src = item.url;
+                if (typeof window.rvpAttachMediaSrc === 'function') {
+                    window.rvpAttachMediaSrc(centerV, item.url);
+                } else {
+                    centerV.src = item.url;
+                }
             }
             window.bindRvpPlayerControls('center', idx);
             window.rvpApplyQualityProfile('center', resumeQual, false);
@@ -7433,21 +7437,155 @@ window.rvpBindDirectTap = function(el, onTap) {
             window.renderPromoVideoShowcase();
         };
 
-        window.positionVideoShowcaseHost = function(placement) {
-            const host = document.getElementById('redVideoShowcaseHost');
-            const viewHome = document.getElementById('view-home');
-            if (!host || !viewHome) return;
+// --- ALLE VERFÜGBAREN VIDEO-POSITIONEN AUF DER WEBSITE ---
+        window.RED_VIDEO_ZONES = [
+            { key: 'after-hero',       label: '⭐ Oben – Direkt unter dem Hero',           short: 'Oben (unter Hero)' },
+            { key: 'after-leistungen', label: '📋 Oben-Mitte – Nach „Unsere Leistungen“',  short: 'Nach Leistungen' },
+            { key: 'after-kompass',    label: '🧭 Mitte – Nach Zulassungs-Kompass',        short: 'Mitte (Kompass)' },
+            { key: 'after-tools',      label: '🛠️ Mitte-Unten – Nach Online-Tools',        short: 'Nach Online-Tools' },
+            { key: 'in-neukoelln',     label: '📍 Unten-Mitte – Im Berlin-Neukölln Block', short: 'Neukölln-Block' },
+            { key: 'before-termin',    label: '📅 Unten – Direkt über Terminbuchung',      short: 'Vor Termin' },
+            { key: 'after-termin',     label: '📞 Ganz unten – Nach Terminbuchung',        short: 'Nach Termin' },
+            { key: 'page-formulare',   label: '📄 Unterseite – Formulare',                 short: 'Seite: Formulare' },
+            { key: 'page-ankauf',      label: '🚗 Unterseite – Auto Ankauf',               short: 'Seite: Auto Ankauf' },
+            { key: 'hidden',           label: '🚫 Ausgeblendet (Entwurf)',                 short: 'Ausgeblendet' }
+        ];
 
-            if (placement === 'before-termin') {
-                const terminSec = document.getElementById('termin');
-                if (terminSec && terminSec.parentNode) terminSec.parentNode.insertBefore(host, terminSec);
-            } else if (placement === 'in-neukoelln') {
-                const nkSec = document.getElementById('neukoelln-lokal');
-                if (nkSec && nkSec.parentNode) nkSec.parentNode.insertBefore(host, nkSec.nextSibling);
+        window.zonePlaylistActiveId = {};
+
+        // --- AUTOMATISCHER LOKALER VIDEO-SPEICHER (INDEXEDDB) FÜR SOFORTIGE MB-UPLOADS OHNE SETUP ---
+        window._rvpBlobUrlCache = {};
+        window.rvpOpenIdb = function() {
+            return new Promise((resolve, reject) => {
+                if (!window.indexedDB) { reject(new Error('IndexedDB nicht verfügbar')); return; }
+                const req = indexedDB.open('red_berlin_video_blobs_v1', 1);
+                req.onupgradeneeded = () => {
+                    const idb = req.result;
+                    if (!idb.objectStoreNames.contains('videos')) idb.createObjectStore('videos');
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        };
+
+        window.rvpSaveBlobToIdb = async function(blob) {
+            const id = 'idb://vid_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
+            const idb = await window.rvpOpenIdb();
+            await new Promise((resolve, reject) => {
+                const tx = idb.transaction('videos', 'readwrite');
+                tx.objectStore('videos').put(blob, id);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error);
+            });
+            window._rvpBlobUrlCache[id] = URL.createObjectURL(blob);
+            return id;
+        };
+
+        window.rvpResolveIdbUrl = async function(idbKey) {
+            if (!idbKey || !String(idbKey).startsWith('idb://')) return idbKey;
+            if (window._rvpBlobUrlCache[idbKey]) return window._rvpBlobUrlCache[idbKey];
+            try {
+                const idb = await window.rvpOpenIdb();
+                const blob = await new Promise((resolve) => {
+                    const tx = idb.transaction('videos', 'readonly');
+                    const r = tx.objectStore('videos').get(idbKey);
+                    r.onsuccess = () => resolve(r.result || null);
+                    r.onerror = () => resolve(null);
+                });
+                if (blob) {
+                    const objUrl = URL.createObjectURL(blob);
+                    window._rvpBlobUrlCache[idbKey] = objUrl;
+                    return objUrl;
+                }
+            } catch (e) {}
+            return '';
+        };
+
+        window.rvpAttachMediaSrc = function(videoEl, rawUrl) {
+            if (!videoEl || !rawUrl) return;
+            if (String(rawUrl).startsWith('idb://')) {
+                window.rvpResolveIdbUrl(rawUrl).then((realUrl) => {
+                    if (realUrl && videoEl) {
+                        videoEl.src = realUrl;
+                        try { videoEl.load(); } catch (e) {}
+                    }
+                });
             } else {
-                const dynHome = document.getElementById('dynamic-client-section-home');
-                if (dynHome && dynHome.parentNode) dynHome.parentNode.insertBefore(host, dynHome);
+                videoEl.src = rawUrl;
             }
+        };
+
+        window.normalizePromoVideosConfig = function(cfg) {
+            if (!cfg || typeof cfg !== 'object') return DEFAULT_PROMO_VIDEOS_CFG;
+            if (!cfg.multiMode) cfg.multiMode = (cfg.layoutMode === 'showcase' ? 'grid' : 'grid');
+            if (!cfg.sectionEyebrow) cfg.sectionEyebrow = 'RED Berlin in Aktion';
+            const fallbackZone = cfg.placement || 'after-hero';
+            if (Array.isArray(cfg.list)) {
+                cfg.list.forEach((v) => {
+                    if (v && !v.placement) v.placement = fallbackZone;
+                });
+            }
+            return cfg;
+        };
+        window.normalizePromoVideosConfig(window.promoVideosConfig);
+
+        window.getOrCreateVideoZoneHost = function(zoneKey) {
+            if (zoneKey === 'after-hero') {
+                const primary = document.getElementById('redVideoShowcaseHost');
+                if (primary) {
+                    const dynHome = document.getElementById('dynamic-client-section-home');
+                    if (dynHome && dynHome.parentNode && primary.nextElementSibling !== dynHome) {
+                        dynHome.parentNode.insertBefore(primary, dynHome);
+                    }
+                    return primary;
+                }
+            }
+
+            const hostId = `redVideoZone-${zoneKey}`;
+            let host = document.getElementById(hostId);
+            if (!host) {
+                host = document.createElement('section');
+                host.id = hostId;
+                host.className = 'rvp-zone-host';
+            }
+
+            const mountAfter = (elId) => {
+                const ref = document.getElementById(elId);
+                if (ref && ref.parentNode) ref.parentNode.insertBefore(host, ref.nextSibling);
+            };
+            const mountBefore = (elId) => {
+                const ref = document.getElementById(elId);
+                if (ref && ref.parentNode) ref.parentNode.insertBefore(host, ref);
+            };
+
+            if (zoneKey === 'after-leistungen') mountAfter('leistungen');
+            else if (zoneKey === 'after-kompass') mountAfter('zulassungs-kompass');
+            else if (zoneKey === 'after-tools') mountAfter('wunschkennzeichen-section');
+            else if (zoneKey === 'in-neukoelln') mountAfter('neukoelln-lokal');
+            else if (zoneKey === 'before-termin') mountBefore('termin');
+            else if (zoneKey === 'after-termin') mountAfter('termin');
+            else if (zoneKey === 'page-formulare') mountAfter('dynamic-client-section-formulare');
+            else if (zoneKey === 'page-ankauf') mountAfter('dynamic-client-section-ankauf');
+
+            return host;
+        };
+
+        window.selectZonePlaylistVideo = function(zoneKey, videoId) {
+            window.zonePlaylistActiveId[zoneKey] = videoId;
+            window.renderPromoVideoShowcase();
+        };
+
+        window.changeVideoPlacementQuick = async function(videoId, newPlacement) {
+            const list = window.promoVideosConfig?.list || [];
+            const item = list.find(v => v.id === videoId);
+            if (!item) return;
+            item.placement = newPlacement;
+            if (document.getElementById('vmEditId')?.value === videoId && document.getElementById('vmVideoPlacement')) {
+                document.getElementById('vmVideoPlacement').value = newPlacement;
+            }
+            const zLabel = (window.RED_VIDEO_ZONES.find(z => z.key === newPlacement) || {}).short || newPlacement;
+            await window.persistPromoVideosConfig();
+            window.showToast(`Video verschoben nach: ${zLabel}`, 'success');
         };
 
         window.buildInlinePlayerShellHtml = function(key, item, videoIdx, autoStart) {
@@ -7456,15 +7594,18 @@ window.rvpBindDirectTap = function(el, onTap) {
             const badgeStyle = item.badgeBgColor ? `style="background:${window.escHtml(item.badgeBgColor)}; border-color:rgba(255,255,255,0.4);"` : '';
             const defQ = item.defaultQuality || '1080';
             const qShort = (RVP_QUALITY_META[defQ] || RVP_QUALITY_META['1080']).short;
+            const effAspect = (!item.aspect || item.aspect === 'auto') ? (item.detectedAspect || '9/16') : item.aspect;
+            const isIdb = String(item.url || '').startsWith('idb://');
+            const initialSrcAttr = isIdb ? '' : `src="${window.escHtml(item.url)}"`;
 
             return `
                 <div class="rvp-player-shell${frameCls}" id="rvpHost-${key}">
-                    <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml((!item.aspect || item.aspect === 'auto') ? (item.detectedAspect || '9/16') : item.aspect)};">
+                    <div class="rvp-media-stage" style="--rvp-aspect:${window.escHtml(effAspect)};">
                         <div class="rvp-overlay-top">
                             <span class="rvp-badge-pill" ${badgeStyle}>${window.buildVideoBadgeIconHtml(item.badgeIcon || 'live-dot')}<span>${window.escHtml(item.badge || 'RED Video')}</span></span>
                             <button type="button" class="rvp-expand-fab" data-rvp-act="expand" title="Im Kino-Rahmen vergrößern"><i class="fa-solid fa-expand"></i></button>
                         </div>
-                        <video id="rvpVid-${key}" src="${window.escHtml(item.url)}" data-rvp-src="${window.escHtml(item.url)}" style="${fitStyle}" muted playsinline webkit-playsinline preload="auto" data-rvp-act="play"></video>
+                        <video id="rvpVid-${key}" ${initialSrcAttr} data-rvp-src="${window.escHtml(item.url)}" style="${fitStyle}" muted playsinline webkit-playsinline preload="auto" data-rvp-act="play"></video>
                         <div class="rvp-bumper-overlay" id="rvpBumper-${key}"></div>
                         <div class="rvp-hud-toast" id="rvpHud-${key}"></div>
                         <button type="button" class="rvp-unmute-callout" id="rvpUnmute-${key}" data-rvp-act="unmute">
@@ -7527,126 +7668,159 @@ window.rvpBindDirectTap = function(el, onTap) {
         };
 
         window.renderPromoVideoShowcase = function() {
-            const host = document.getElementById('redVideoShowcaseHost');
-            if (!host) return;
-            const cfg = window.promoVideosConfig || DEFAULT_PROMO_VIDEOS_CFG;
+            const cfg = window.normalizePromoVideosConfig(window.promoVideosConfig || DEFAULT_PROMO_VIDEOS_CFG);
             const list = Array.isArray(cfg.list) ? cfg.list : [];
             const isMgr = window.canManagePromoVideos();
 
+            // Alle bisherigen Inline-Timer & Observer sauber schließen
             Object.keys(window._rvpStates).forEach(k => { if (k !== 'center') window.rvpHideBumper(k); });
             window._rvpObservers.forEach(o => o.disconnect());
             window._rvpObservers = [];
 
-            if (cfg.placement === 'hidden' || list.length === 0) {
-                host.innerHTML = isMgr
-                    ? `<div class="admin-pro-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;"><span style="font-size:12px; font-weight:700; color:var(--text-muted);"><i class="fa-solid fa-film" style="color:var(--primary-red);"></i> Werbevideo-Player ist aktuell ausgeblendet.</span><button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos')"><i class="fa-solid fa-sliders"></i> Video-Studio öffnen</button></div>`
-                    : '';
+            // Alle Zonen-Container leeren
+            const primaryHost = document.getElementById('redVideoShowcaseHost');
+            if (primaryHost) primaryHost.innerHTML = '';
+            document.querySelectorAll('.rvp-zone-host').forEach(el => { el.innerHTML = ''; });
+
+            const visibleEntries = list
+                .map((item, globalIdx) => ({ item, globalIdx, zone: item.placement || 'after-hero' }))
+                .filter(e => e.zone !== 'hidden');
+
+            if (visibleEntries.length === 0) {
+                if (primaryHost && isMgr) {
+                    primaryHost.innerHTML = `<div class="admin-pro-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;"><span style="font-size:12px; font-weight:700; color:var(--text-muted);"><i class="fa-solid fa-film" style="color:var(--primary-red);"></i> Aktuell sind alle Videos ausgeblendet oder leer.</span><button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.startAddNewPromoVideo('after-hero')"><i class="fa-solid fa-plus"></i> Erstes Video hinzufügen</button></div>`;
+                }
                 return;
             }
 
-            window.positionVideoShowcaseHost(cfg.placement || 'after-hero');
-            const autoStart = cfg.autoplayMode !== 'manual';
+            // Gruppiere Videos nach ihrer eigenen Position auf der Website
+            const zoneGroups = {};
+            visibleEntries.forEach(entry => {
+                if (!zoneGroups[entry.zone]) zoneGroups[entry.zone] = [];
+                zoneGroups[entry.zone].push(entry);
+            });
+
+            const autoStartGlobal = cfg.autoplayMode !== 'manual';
             const eyebrow = cfg.sectionEyebrow || 'RED Berlin in Aktion';
-            const layout = (cfg.layoutMode === 'grid-2' || cfg.layoutMode === 'grid-3') && list.length >= 2 ? cfg.layoutMode : 'showcase';
-
+            const multiMode = cfg.multiMode || 'grid';
             const activePlayersToInit = [];
+            let firstAutoAssigned = false;
 
-            if (layout === 'showcase') {
-                if (window.activePromoVideoIdx >= list.length) window.activePromoVideoIdx = 0;
-                const item = list[window.activePromoVideoIdx];
-                const effAspect = (!item.aspect || item.aspect === 'auto') ? (item.detectedAspect || '9/16') : item.aspect;
-                const isLandscape = ['16/9', '4/3', '21/9'].includes(effAspect);
-                const pKey = 'inline-0';
-                const highlights = (Array.isArray(item.highlights) && item.highlights.length > 0) ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS;
-                const sideCls = item.showcaseSide === 'right' ? ' pos-right' : (item.showcaseSide === 'center' ? ' pos-center' : '');
-                const sizeCls = item.playerSize === 'compact' ? ' size-compact' : (item.playerSize === 'large' ? ' size-large' : '');
-                const typoStyle = window.buildVideoTypographyStyle(item);
+            Object.entries(zoneGroups).forEach(([zoneKey, entries]) => {
+                const host = window.getOrCreateVideoZoneHost(zoneKey);
+                if (!host) return;
 
-                const playlistHtml = list.length > 1
-                    ? `<div class="rvp-playlist-bar">${list.map((v, i) => `<button type="button" class="rvp-playlist-chip ${i === window.activePromoVideoIdx ? 'active' : ''}" onclick="window.selectPromoVideo(${i})"><i class="fa-solid fa-play"></i> ${window.escHtml(v.badge || ('Video ' + (i + 1)))}</button>`).join('')}</div>`
-                    : '';
+                // Einzelnes Video ODER Playlist-Modus für diese Zone
+                if (entries.length === 1 || multiMode === 'playlist') {
+                    const activeId = window.zonePlaylistActiveId[zoneKey];
+                    const chosen = entries.find(e => e.item.id === activeId) || entries[0];
+                    const item = chosen.item;
+                    const gIdx = chosen.globalIdx;
+                    const pKey = `inline-${gIdx}`;
+                    const shouldAuto = autoStartGlobal && !firstAutoAssigned;
+                    if (shouldAuto) firstAutoAssigned = true;
 
-                host.innerHTML = `
-                    <div class="rvp-showcase-card${isLandscape ? ' is-landscape' : ''}${sideCls}${sizeCls}">
-                        ${window.buildInlinePlayerShellHtml(pKey, item, window.activePromoVideoIdx, autoStart)}
-                        <div class="rvp-info-col" style="${typoStyle}">
-                            <div class="rvp-info-head">
+                    const effAspect = (!item.aspect || item.aspect === 'auto') ? (item.detectedAspect || '9/16') : item.aspect;
+                    const isLandscape = ['16/9', '4/3', '21/9'].includes(effAspect);
+                    const highlights = (Array.isArray(item.highlights) && item.highlights.length > 0) ? item.highlights : DEFAULT_VIDEO_HIGHLIGHTS;
+                    const sideCls = item.showcaseSide === 'right' ? ' pos-right' : (item.showcaseSide === 'center' ? ' pos-center' : '');
+                    const sizeCls = item.playerSize === 'compact' ? ' size-compact' : (item.playerSize === 'large' ? ' size-large' : '');
+                    const typoStyle = window.buildVideoTypographyStyle(item);
+
+                    const playlistHtml = entries.length > 1
+                        ? `<div class="rvp-playlist-bar">${entries.map((e, i) => `<button type="button" class="rvp-playlist-chip ${e.item.id === item.id ? 'active' : ''}" onclick="window.selectZonePlaylistVideo('${zoneKey}', '${e.item.id}')"><i class="fa-solid fa-play"></i> ${window.escHtml(e.item.badge || ('Video ' + (i + 1)))}</button>`).join('')}</div>`
+                        : '';
+
+                    host.innerHTML = `
+                        <div class="rvp-showcase-card${isLandscape ? ' is-landscape' : ''}${sideCls}${sizeCls}">
+                            ${window.buildInlinePlayerShellHtml(pKey, item, gIdx, shouldAuto)}
+                            <div class="rvp-info-col" style="${typoStyle}">
+                                <div class="rvp-info-head">
+                                    <div>
+                                        <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> ${window.escHtml(eyebrow)}</span>
+                                        <h2>${window.escHtml(item.title || 'RED Zulassungsdienst Berlin')}</h2>
+                                    </div>
+                                    <div class="rvp-admin-inline-btns action-videos">
+                                        <button type="button" class="mini-admin-btn edit" onclick="window.editCurrentPromoVideo('${item.id}')" title="Dieses Video direkt mit Stift bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                                        <button type="button" class="mini-admin-btn del" onclick="window.deletePromoVideoItem('${item.id}')" title="Dieses Video löschen"><i class="fa-solid fa-trash"></i></button>
+                                        <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.startAddNewPromoVideo()" title="Neues separates Video an beliebiger Stelle hinzufügen"><i class="fa-solid fa-plus"></i> Video</button>
+                                    </div>
+                                </div>
+                                <p>${window.escHtml(item.desc || '')}</p>
+                                <ul class="rvp-highlights-list">
+                                    ${highlights.map(h => `<li><i class="fa-solid fa-circle-check"></i><span>${window.escHtml(h)}</span></li>`).join('')}
+                                </ul>
+                                <div class="rvp-cta-row">
+                                    <button type="button" class="btn-primary" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Jetzt Wunschtermin sichern</button>
+                                    <button type="button" class="btn-primary" style="background:#25D366; color:#000; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp(false)"><i class="fa-brands fa-whatsapp"></i> Direkt per WhatsApp</button>
+                                </div>
+                                ${playlistHtml}
+                            </div>
+                        </div>
+                    `;
+                    activePlayersToInit.push({ key: pKey, idx: gIdx, auto: shouldAuto, item });
+                } else {
+                    // 2, 3, 4+ Videos an derselben Position -> automatisch sauber nebeneinander!
+                    const colClass = entries.length >= 4 ? 'cols-4' : (entries.length === 3 ? 'cols-3' : 'cols-2');
+                    host.innerHTML = `
+                        <div class="rvp-multi-section">
+                            <div class="rvp-multi-header">
                                 <div>
                                     <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> ${window.escHtml(eyebrow)}</span>
-                                    <h2>${window.escHtml(item.title || 'RED Zulassungsdienst Berlin')}</h2>
+                                    <h2>Unsere Videos – RED Berlin live erleben</h2>
                                 </div>
                                 <div class="rvp-admin-inline-btns action-videos">
-                                    <button type="button" class="mini-admin-btn edit" onclick="window.editCurrentPromoVideo('${item.id}')" title="Dieses Video direkt mit Stift bearbeiten"><i class="fa-solid fa-pencil"></i></button>
-                                    <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos')" title="Weiteres Video hinzufügen / Studio"><i class="fa-solid fa-plus"></i> Video</button>
+                                    <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.startAddNewPromoVideo('${zoneKey}')"><i class="fa-solid fa-plus"></i> Video daneben</button>
+                                    <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.startAddNewPromoVideo()"><i class="fa-solid fa-layer-group"></i> Andere Stelle</button>
                                 </div>
                             </div>
-                            <p>${window.escHtml(item.desc || '')}</p>
-                            <ul class="rvp-highlights-list">
-                                ${highlights.map(h => `<li><i class="fa-solid fa-circle-check"></i><span>${window.escHtml(h)}</span></li>`).join('')}
-                            </ul>
-                            <div class="rvp-cta-row">
-                                <button type="button" class="btn-primary" onclick="window.desktopNavGo('termin')"><i class="fa-regular fa-calendar-check"></i> Jetzt Wunschtermin sichern</button>
-                                <button type="button" class="btn-primary" style="background:#25D366; color:#000; box-shadow:none;" onclick="window.startPhotoPreCheckWhatsApp(false)"><i class="fa-brands fa-whatsapp"></i> Direkt per WhatsApp</button>
-                            </div>
-                            ${playlistHtml}
-                        </div>
-                    </div>
-                `;
-                activePlayersToInit.push({ key: pKey, idx: window.activePromoVideoIdx, auto: autoStart, item });
-            } else {
-                const maxShow = layout === 'grid-3' ? 3 : 2;
-                const shown = list.slice(0, maxShow);
-                const colClass = shown.length >= 3 ? 'cols-3' : 'cols-2';
+                            <div class="rvp-multi-grid ${colClass}">
+                                ${entries.map((e) => {
+                                    const item = e.item;
+                                    const gIdx = e.globalIdx;
+                                    const pKey = `inline-${gIdx}`;
+                                    const shouldAuto = autoStartGlobal && !firstAutoAssigned;
+                                    if (shouldAuto) firstAutoAssigned = true;
+                                    activePlayersToInit.push({ key: pKey, idx: gIdx, auto: shouldAuto, item });
 
-                host.innerHTML = `
-                    <div class="rvp-multi-section">
-                        <div class="rvp-multi-header">
-                            <div>
-                                <span class="shop-gallery-eyebrow"><i class="fa-solid fa-film"></i> ${window.escHtml(eyebrow)}</span>
-                                <h2>Unsere Videos – RED Berlin live erleben</h2>
-                            </div>
-                            <div class="rvp-admin-inline-btns action-videos">
-                                <button type="button" class="admin-pro-btn admin-pro-btn-primary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos'); window.resetVideoManagerForm();"><i class="fa-solid fa-plus"></i> Video hinzufügen</button>
-                                <button type="button" class="admin-pro-btn admin-pro-btn-secondary admin-pro-btn-sm" onclick="window.openVideoManagerModal('videos')"><i class="fa-solid fa-sliders"></i> Studio</button>
-                            </div>
-                        </div>
-                        <div class="rvp-multi-grid ${colClass}">
-                            ${shown.map((item, idx) => {
-                                const pKey = `inline-${idx}`;
-                                activePlayersToInit.push({ key: pKey, idx, auto: autoStart && idx === 0, item });
-                                const tStyle = [
-                                    `font-family:${item.titleFont || "'Montserrat', sans-serif"}`,
-                                    item.titleColor ? `color:${item.titleColor}` : ''
-                                ].filter(Boolean).join(';');
-                                const dStyle = [
-                                    `font-family:${item.bodyFont || "'Montserrat', sans-serif"}`,
-                                    item.descColor ? `color:${item.descColor}` : ''
-                                ].filter(Boolean).join(';');
-                                return `
-                                    <article class="rvp-grid-card">
-                                        ${window.buildInlinePlayerShellHtml(pKey, item, idx, autoStart && idx === 0)}
-                                        <div class="rvp-grid-meta" style="text-align:${window.escHtml(item.textAlign || 'left')};">
-                                            <div class="rvp-grid-meta-head">
-                                                <strong style="${tStyle}">${window.escHtml(item.title || 'RED Video')}</strong>
-                                                <div class="rvp-admin-inline-btns action-videos">
-                                                    <button type="button" class="mini-admin-btn edit" onclick="window.editCurrentPromoVideo('${item.id}')" title="Video bearbeiten"><i class="fa-solid fa-pencil"></i></button>
-                                                    <button type="button" class="mini-admin-btn del" onclick="window.deletePromoVideoItem('${item.id}')" title="Video löschen"><i class="fa-solid fa-trash"></i></button>
+                                    const tStyle = [
+                                        `font-family:${item.titleFont || "'Montserrat', sans-serif"}`,
+                                        item.titleColor ? `color:${item.titleColor}` : ''
+                                    ].filter(Boolean).join(';');
+                                    const dStyle = [
+                                        `font-family:${item.bodyFont || "'Montserrat', sans-serif"}`,
+                                        item.descColor ? `color:${item.descColor}` : ''
+                                    ].filter(Boolean).join(';');
+                                    return `
+                                        <article class="rvp-grid-card">
+                                            ${window.buildInlinePlayerShellHtml(pKey, item, gIdx, shouldAuto)}
+                                            <div class="rvp-grid-meta" style="text-align:${window.escHtml(item.textAlign || 'left')};">
+                                                <div class="rvp-grid-meta-head">
+                                                    <strong style="${tStyle}">${window.escHtml(item.title || 'RED Video')}</strong>
+                                                    <div class="rvp-admin-inline-btns action-videos">
+                                                        <button type="button" class="mini-admin-btn edit" onclick="window.editCurrentPromoVideo('${item.id}')" title="Video bearbeiten"><i class="fa-solid fa-pencil"></i></button>
+                                                        <button type="button" class="mini-admin-btn del" onclick="window.deletePromoVideoItem('${item.id}')" title="Video löschen"><i class="fa-solid fa-trash"></i></button>
+                                                    </div>
                                                 </div>
+                                                ${item.desc ? `<p style="${dStyle}">${window.escHtml(item.desc)}</p>` : ''}
                                             </div>
-                                            ${item.desc ? `<p style="${dStyle}">${window.escHtml(item.desc)}</p>` : ''}
-                                        </div>
-                                    </article>
-                                `;
-                            }).join('')}
+                                        </article>
+                                    `;
+                                }).join('')}
+                            </div>
                         </div>
-                    </div>
-                `;
-            }
+                    `;
+                }
+            });
 
+            // Alle gerenderten Player unabhängig initialisieren & Touch-Events binden
             activePlayersToInit.forEach(({ key, idx, auto, item }) => {
                 const v = window.getRvpEl(key);
                 if (!v) return;
                 v.muted = true;
+                if (String(item.url || '').startsWith('idb://')) {
+                    window.rvpAttachMediaSrc(v, item.url);
+                }
                 window._rvpStates[key] = {
                     videoIdx: idx,
                     desiredPlaying: auto,
@@ -7754,11 +7928,24 @@ window.rvpBindDirectTap = function(el, onTap) {
             `;
         };
 
-        // --- SUPERVISOR / ADMIN VIDEO- & LOGO-MANAGER ---
+// --- SUPERVISOR / ADMIN MULTI-VIDEO MANAGER (AUTO-SAVE + SEPARATE POSITIONEN) ---
+        window._vmAutoSaveTimer = null;
+
+        window.setVmAutoSaveBadge = function(state, label) {
+            const el = document.getElementById('vmAutoSaveStatus');
+            if (!el) return;
+            el.classList.toggle('is-saving', state === 'saving');
+            el.innerHTML = state === 'saving'
+                ? `<i class="fa-solid fa-spinner fa-spin"></i> ${label || 'Speichert...'}`
+                : `<i class="fa-solid fa-check"></i> ${label || 'Automatisch gespeichert'}`;
+        };
+
         window.persistPromoVideosConfig = async function() {
+            window.normalizePromoVideosConfig(window.promoVideosConfig);
             localStorage.setItem('red_promo_videos_v1', JSON.stringify(window.promoVideosConfig));
             window.renderPromoVideoShowcase();
             window.renderVideoManagerList();
+            window.setVmAutoSaveBadge('saving', 'Synchronisiere...');
             if (window.firebaseDb && window.firebaseSetDoc) {
                 try {
                     await window.firebaseSetDoc(
@@ -7768,6 +7955,55 @@ window.rvpBindDirectTap = function(el, onTap) {
                     );
                 } catch (e) { console.error('Promo-Videos Sync Fehler:', e); }
             }
+            window.setVmAutoSaveBadge('saved', 'Automatisch gespeichert');
+        };
+
+        window.getSuggestedNextVideoPlacement = function() {
+            const used = new Set((window.promoVideosConfig?.list || []).map(v => v.placement || 'after-hero'));
+            const order = ['after-hero', 'after-leistungen', 'after-kompass', 'before-termin', 'in-neukoelln', 'after-tools', 'after-termin', 'page-ankauf', 'page-formulare'];
+            return order.find(z => !used.has(z)) || 'after-hero';
+        };
+
+        window.startAddNewPromoVideo = function(preferredPlacement = '') {
+            if (!window.canManagePromoVideos()) {
+                window.showToast('Nur der Supervisor oder ein freigeschalteter Admin darf Videos hinzufügen.', 'error');
+                return;
+            }
+            window.openVideoManagerModal('videos', true);
+            window.resetVideoManagerForm(preferredPlacement || window.getSuggestedNextVideoPlacement());
+            const nextNum = (window.promoVideosConfig?.list?.length || 0) + 1;
+            const bText = document.getElementById('vmEditBannerText');
+            if (bText) bText.innerHTML = `<i class="fa-solid fa-plus-circle" style="color:var(--green-accent);"></i> <strong>Neues separates Video #${nextNum}</strong> – einfach Position &amp; Video wählen`;
+            document.getElementById('vmEditBanner')?.classList.add('active');
+            document.getElementById('vmPaneVideos')?.scrollTo({ top: 180, behavior: 'smooth' });
+        };
+
+        window.scheduleAutoSavePromoVideo = function(immediate = false) {
+            clearTimeout(window._vmAutoSaveTimer);
+            const run = () => {
+                const editId = document.getElementById('vmEditId')?.value || '';
+                const url = (document.getElementById('vmUrl')?.value || '').trim();
+                const title = (document.getElementById('vmTitle')?.value || '').trim();
+                // Bestehendes Video oder neues Video mit URL wird sofort automatisch gespeichert
+                if (editId || url) {
+                    if (!title && url) {
+                        const nextNum = (window.promoVideosConfig?.list?.length || 0) + 1;
+                        if (document.getElementById('vmTitle')) document.getElementById('vmTitle').value = `RED Berlin Video #${nextNum}`;
+                    }
+                    window.savePromoVideoItem(true);
+                }
+            };
+            if (immediate) {
+                run();
+            } else {
+                window.setVmAutoSaveBadge('saving', 'Speichert...');
+                window._vmAutoSaveTimer = setTimeout(run, 480);
+            }
+        };
+
+        window.onVideoStudioFieldChange = function(immediate = false) {
+            window.updateVideoStudioLivePreview();
+            window.scheduleAutoSavePromoVideo(immediate);
         };
 
         window.switchVideoManagerTab = function(tabKey) {
@@ -7788,20 +8024,41 @@ window.rvpBindDirectTap = function(el, onTap) {
             }
         };
 
-        window.openVideoManagerModal = function(startTab = 'videos') {
+        window.openVideoManagerModal = function(startTab = 'videos', skipAutoEdit = false) {
             if (!window.canManagePromoVideos()) {
                 window.showToast('Nur der Supervisor oder ein freigeschalteter Admin darf Videos & Logo verwalten.', 'error');
                 return;
             }
-            const cfg = window.promoVideosConfig || DEFAULT_PROMO_VIDEOS_CFG;
+            const cfg = window.normalizePromoVideosConfig(window.promoVideosConfig || DEFAULT_PROMO_VIDEOS_CFG);
             if (document.getElementById('vmSectionEyebrow')) document.getElementById('vmSectionEyebrow').value = cfg.sectionEyebrow || 'RED Berlin in Aktion';
-            if (document.getElementById('vmLayoutSelect')) document.getElementById('vmLayoutSelect').value = cfg.layoutMode || 'showcase';
-            if (document.getElementById('vmPlacementSelect')) document.getElementById('vmPlacementSelect').value = cfg.placement || 'after-hero';
+            if (document.getElementById('vmMultiModeSelect')) document.getElementById('vmMultiModeSelect').value = cfg.multiMode || 'grid';
             if (document.getElementById('vmAutoplaySelect')) document.getElementById('vmAutoplaySelect').value = cfg.autoplayMode || 'muted-auto';
             if (typeof window.loadFreeUploadSettingsIntoForm === 'function') window.loadFreeUploadSettingsIntoForm();
+
+            // Alle Eingaben im Formular einmalig an Auto-Save koppeln
+            const editorSec = document.getElementById('vmVideoEditorSection');
+            if (editorSec && editorSec.dataset.autoSaveBound !== '1') {
+                editorSec.dataset.autoSaveBound = '1';
+                editorSec.addEventListener('change', (e) => {
+                    if (e.target && e.target.type === 'file') return;
+                    if (e.target && e.target.closest('#vmFreeUploadCfgDetails')) return;
+                    window.onVideoStudioFieldChange(true);
+                });
+                editorSec.addEventListener('input', (e) => {
+                    if (e.target && (e.target.type === 'file' || e.target.closest('#vmFreeUploadCfgDetails'))) return;
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                        window.onVideoStudioFieldChange(false);
+                    }
+                });
+            }
+
             window.renderVideoManagerList();
             window.switchVideoManagerTab(startTab === 'brand' ? 'brand' : 'videos');
             document.getElementById('videoManagerOverlay').classList.add('open');
+
+            if (!skipAutoEdit && !document.getElementById('vmEditId')?.value && (cfg.list || []).length > 0) {
+                window.editPromoVideoItem(cfg.list[0].id, true);
+            }
             setTimeout(() => {
                 window.updateVideoStudioLivePreview();
                 if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
@@ -7815,11 +8072,61 @@ window.rvpBindDirectTap = function(el, onTap) {
 
         window.saveVideoSettingsOnly = async function() {
             window.promoVideosConfig.sectionEyebrow = (document.getElementById('vmSectionEyebrow')?.value || '').trim() || 'RED Berlin in Aktion';
-            window.promoVideosConfig.layoutMode = document.getElementById('vmLayoutSelect')?.value || 'showcase';
-            window.promoVideosConfig.placement = document.getElementById('vmPlacementSelect')?.value || 'after-hero';
+            window.promoVideosConfig.multiMode = document.getElementById('vmMultiModeSelect')?.value || 'grid';
             window.promoVideosConfig.autoplayMode = document.getElementById('vmAutoplaySelect')?.value || 'muted-auto';
             await window.persistPromoVideosConfig();
-            window.showToast('Video-Ansicht & Einstellungen gespeichert!', 'success');
+        };
+
+        window.resetVideoManagerForm = function(defaultPlacement = '') {
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            const targetZone = defaultPlacement || window.getSuggestedNextVideoPlacement();
+            const nextNum = (window.promoVideosConfig?.list?.length || 0) + 1;
+
+            setVal('vmEditId', '');
+            setVal('vmVideoPlacement', targetZone);
+            setVal('vmTitle', '');
+            setVal('vmBadge', `Video ${nextNum}`);
+            setVal('vmBadgeIcon', 'live-dot');
+            setVal('vmDefaultQuality', '1080');
+            setVal('vmDesc', '');
+            setVal('vmHighlights', DEFAULT_VIDEO_HIGHLIGHTS.join('\n'));
+            setVal('vmUrl', '');
+            setVal('vmUrl4k', ''); setVal('vmUrl1080', ''); setVal('vmUrl720', ''); setVal('vmUrl480', '');
+            setVal('vmAspect', '9/16');
+            setVal('vmShowcaseSide', 'left');
+            setVal('vmPlayerSize', 'normal');
+            setVal('vmVideoFit', 'cover');
+            setVal('vmVideoPos', 'center center');
+            setVal('vmFrameStyle', 'classic');
+            setVal('vmTitleFont', "'Montserrat', sans-serif");
+            setVal('vmBodyFont', "'Montserrat', sans-serif");
+            setVal('vmTitleSizeD', '26px');
+            setVal('vmTitleSizeM', '17px');
+            setVal('vmBodySize', '13px');
+            setVal('vmTextAlign', 'left');
+            setVal('vmTitleCase', 'uppercase');
+            setVal('vmTitleColorMode', 'auto'); setVal('vmTitleColor', '#d90000');
+            setVal('vmDescColorMode', 'auto'); setVal('vmDescColor', '#55555c');
+            setVal('vmHighColorMode', 'auto'); setVal('vmHighColor', '#0b6e31');
+            setVal('vmBadgeColorMode', 'auto'); setVal('vmBadgeBgColor', '#d90000');
+            setVal('vmLogoMode', 'both');
+            setVal('vmLogoStyle', 'round_title');
+            setVal('vmIntroSec', '2.5');
+            setVal('vmOutroSec', '3');
+            setVal('vmIntroMusic', 'cinema-whoosh');
+            setVal('vmOutroMusic', 'victory-chord');
+            setVal('vmIntroCustomAudio', '');
+            setVal('vmOutroCustomAudio', '');
+            if (document.getElementById('vmFileInput')) document.getElementById('vmFileInput').value = '';
+            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = `2. Neues separates Video #${nextNum} anlegen`;
+            document.getElementById('vmEditBanner')?.classList.remove('active');
+            window._vmLastSelectedFile = null;
+            window._vmLastDetectedMeta = null;
+            if (document.getElementById('vmDetectedMetaBox')) document.getElementById('vmDetectedMetaBox').style.display = 'none';
+            window.syncQuickVideoAspectPills();
+            window.toggleCustomVideoAudioFields();
+            window.updateVideoStudioLivePreview();
+            if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
         };
 
         window.resetVideoManagerForm = function() {
@@ -8134,34 +8441,63 @@ window.rvpBindDirectTap = function(el, onTap) {
                 `;
             }
 
-            try {
-                window.setVmUploadProgress(true, 2, `Lade „${file.name}“ (${sizeTxt}) kostenlos hoch...`);
-                const result = await window.uploadVideoFree(file, file.name, (pct, sent, total) => {
-                    window.setVmUploadProgress(true, pct, `Upload: ${window.formatFileSizeMB(sent)} / ${window.formatFileSizeMB(total)}`);
-                });
+            const upCfg = window.getFreeUploadSettings();
+            const hasCloudCfg = (upCfg.provider === 'cloudinary' && upCfg.cloudName && upCfg.cloudPreset) ||
+                (upCfg.provider === 'github' && upCfg.ghRepo && upCfg.ghRepo.includes('/') && upCfg.ghToken);
 
-                document.getElementById('vmUrl').value = result.url;
-
-                // Bei Cloudinary werden alle passenden Qualitätsstufen sofort automatisch befüllt!
-                if (result.provider === 'cloudinary') {
-                    const tiers = window.buildCloudinaryAutoTiers(result.url, meta);
-                    if (tiers) {
-                        if (tiers['4k'] && document.getElementById('vmUrl4k')) document.getElementById('vmUrl4k').value = tiers['4k'];
-                        if (tiers['1080'] && document.getElementById('vmUrl1080')) document.getElementById('vmUrl1080').value = tiers['1080'];
-                        if (tiers['720'] && document.getElementById('vmUrl720')) document.getElementById('vmUrl720').value = tiers['720'];
-                        if (tiers['480'] && document.getElementById('vmUrl480')) document.getElementById('vmUrl480').value = tiers['480'];
-                    }
-                    window.setVmUploadProgress(true, 100, `✅ Hochgeladen & 4K/FHD/HD/SD automatisch bereit!`);
-                    window.showToast(`Video (${meta.qualityLabel}, ${sizeTxt}) hochgeladen + alle Auflösungen automatisch erstellt!`, 'success');
-                } else {
-                    const slotMap = { '4k': 'vmUrl4k', '1080': 'vmUrl1080', '720': 'vmUrl720', '480': 'vmUrl480' };
-                    const targetSlot = slotMap[meta.quality];
-                    if (targetSlot && document.getElementById(targetSlot)) document.getElementById(targetSlot).value = result.url;
-                    window.setVmUploadProgress(true, 100, `✅ Direkt ins GitHub-Repo hochgeladen (in ca. 1 Min. live)!`);
-                    window.showToast(`Video (${meta.qualityLabel}, ${sizeTxt}) direkt zu GitHub hochgeladen – jetzt speichern!`, 'success');
+            const ensureTitleFilled = () => {
+                const tEl = document.getElementById('vmTitle');
+                if (tEl && !tEl.value.trim()) {
+                    const cleanTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ').trim();
+                    tEl.value = cleanTitle || `RED Berlin Video #${(window.promoVideosConfig?.list?.length || 0) + 1}`;
                 }
+            };
 
-                setTimeout(() => window.setVmUploadProgress(false), 3200);
+            try {
+                if (hasCloudCfg) {
+                    window.setVmUploadProgress(true, 2, `Lade „${file.name}“ (${sizeTxt}) hoch...`);
+                    const result = await window.uploadVideoFree(file, file.name, (pct, sent, total) => {
+                        window.setVmUploadProgress(true, pct, `Upload: ${window.formatFileSizeMB(sent)} / ${window.formatFileSizeMB(total)}`);
+                    });
+                    document.getElementById('vmUrl').value = result.url;
+                    if (result.provider === 'cloudinary') {
+                        const tiers = window.buildCloudinaryAutoTiers(result.url, meta);
+                        if (tiers) {
+                            if (tiers['4k'] && document.getElementById('vmUrl4k')) document.getElementById('vmUrl4k').value = tiers['4k'];
+                            if (tiers['1080'] && document.getElementById('vmUrl1080')) document.getElementById('vmUrl1080').value = tiers['1080'];
+                            if (tiers['720'] && document.getElementById('vmUrl720')) document.getElementById('vmUrl720').value = tiers['720'];
+                            if (tiers['480'] && document.getElementById('vmUrl480')) document.getElementById('vmUrl480').value = tiers['480'];
+                        }
+                    } else {
+                        const slotMap = { '4k': 'vmUrl4k', '1080': 'vmUrl1080', '720': 'vmUrl720', '480': 'vmUrl480' };
+                        const targetSlot = slotMap[meta.quality];
+                        if (targetSlot && document.getElementById(targetSlot)) document.getElementById(targetSlot).value = result.url;
+                    }
+                    ensureTitleFilled();
+                    await window.savePromoVideoItem(true);
+                    window.setVmUploadProgress(true, 100, `✅ Hochgeladen & automatisch auf der Seite platziert!`);
+                    window.showToast(`Video (${meta.qualityLabel}, ${sizeTxt}) automatisch gespeichert & online!`, 'success');
+                } else {
+                    // Sofortige lokale Speicherung (IndexedDB / DataURL) ohne Cloud-Einrichtungszwang
+                    window.setVmUploadProgress(true, 35, `Speichere „${file.name}“ (${sizeTxt}) automatisch im Hintergrund...`);
+                    let savedUrl = '';
+                    if (file.size <= 650 * 1024) {
+                        savedUrl = await new Promise((res, rej) => {
+                            const r = new FileReader();
+                            r.onload = (ev) => res(ev.target.result);
+                            r.onerror = rej;
+                            r.readAsDataURL(file);
+                        });
+                    } else {
+                        savedUrl = await window.rvpSaveBlobToIdb(file);
+                    }
+                    document.getElementById('vmUrl').value = savedUrl;
+                    ensureTitleFilled();
+                    await window.savePromoVideoItem(true);
+                    window.setVmUploadProgress(true, 100, `✅ Video (${meta.qualityLabel}, ${sizeTxt}) automatisch gespeichert & aktiv!`);
+                    window.showToast(`Video (${sizeTxt}) sofort aktiv! Tipp: Für alle fremden Geräte oben einmalig Cloudinary Free (0 €) oder ./dateiname.mp4 nutzen.`, 'success');
+                }
+                setTimeout(() => window.setVmUploadProgress(false), 3000);
                 window.updateVideoStudioLivePreview();
             } catch (err) {
                 console.error('Video Upload Fehler:', err);
@@ -8344,10 +8680,11 @@ window.rvpBindDirectTap = function(el, onTap) {
             }
         };
 
-        window.savePromoVideoItem = async function() {
+window.savePromoVideoItem = async function(silent = false) {
             const val = (id, fb = '') => (document.getElementById(id)?.value ?? fb);
             const editId = val('vmEditId');
             const title = val('vmTitle').trim();
+            const placement = val('vmVideoPlacement', 'after-hero');
             const badge = val('vmBadge').trim() || 'RED Video';
             const badgeIcon = val('vmBadgeIcon', 'live-dot');
             const defaultQuality = val('vmDefaultQuality', '1080');
@@ -8356,18 +8693,19 @@ window.rvpBindDirectTap = function(el, onTap) {
             const url = val('vmUrl').trim();
 
             if (!title || !url) {
-                window.showToast('Bitte Überschrift und Video-Pfad / Link eingeben.', 'error');
+                if (!silent) window.showToast('Bitte Überschrift und Video-Datei oder Pfad eingeben.', 'error');
                 return;
             }
 
             window.promoVideosConfig.sectionEyebrow = val('vmSectionEyebrow').trim() || 'RED Berlin in Aktion';
-            window.promoVideosConfig.layoutMode = val('vmLayoutSelect', 'showcase');
-            window.promoVideosConfig.placement = val('vmPlacementSelect', 'after-hero');
+            window.promoVideosConfig.multiMode = val('vmMultiModeSelect', 'grid');
             window.promoVideosConfig.autoplayMode = val('vmAutoplaySelect', 'muted-auto');
 
             if (!Array.isArray(window.promoVideosConfig.list)) window.promoVideosConfig.list = [];
+            const newId = editId || ('vid-' + Date.now());
             const rec = {
-                id: editId || ('vid-' + Date.now()),
+                id: newId,
+                placement,
                 title, badge, badgeIcon, defaultQuality, desc,
                 highlights: highlightsRaw.length > 0 ? highlightsRaw : DEFAULT_VIDEO_HIGHLIGHTS.slice(),
                 url,
@@ -8408,23 +8746,32 @@ window.rvpBindDirectTap = function(el, onTap) {
                 if (idx > -1) {
                     window.promoVideosConfig.list[idx] = rec;
                     window.activePromoVideoIdx = idx;
+                } else {
+                    window.promoVideosConfig.list.push(rec);
                 }
             } else {
                 window.promoVideosConfig.list.push(rec);
                 window.activePromoVideoIdx = window.promoVideosConfig.list.length - 1;
+                // Sofort als aktives Bearbeitungs-Video binden, damit weitere Änderungen direkt automatisch speichern
+                if (document.getElementById('vmEditId')) document.getElementById('vmEditId').value = newId;
+                const bText = document.getElementById('vmEditBannerText');
+                if (bText) bText.innerHTML = `<i class="fa-solid fa-pen"></i> Bearbeite Video: <strong id="vmEditBannerName">${window.escHtml(title)}</strong>`;
+                document.getElementById('vmEditBanner')?.classList.add('active');
             }
 
             await window.persistPromoVideosConfig();
-            window.resetVideoManagerForm();
-            window.showToast(editId ? 'Video, Qualität, Design & Schriften gespeichert!' : 'Neues Werbevideo veröffentlicht!', 'success');
+            if (!silent) {
+                window.showToast(editId ? 'Video & Position gespeichert!' : 'Neues separates Video veröffentlicht!', 'success');
+            }
         };
 
-        window.editPromoVideoItem = function(id) {
+        window.editPromoVideoItem = function(id, skipScroll = false) {
             const item = (window.promoVideosConfig?.list || []).find(v => v.id === id);
             if (!item) return;
             const setVal = (elId, v) => { const el = document.getElementById(elId); if (el) el.value = v; };
 
             setVal('vmEditId', item.id);
+            setVal('vmVideoPlacement', item.placement || 'after-hero');
             setVal('vmTitle', item.title || '');
             setVal('vmBadge', item.badge || '');
             setVal('vmBadgeIcon', item.badgeIcon || 'live-dot');
@@ -8465,21 +8812,34 @@ window.rvpBindDirectTap = function(el, onTap) {
             setVal('vmIntroCustomAudio', item.introCustomAudio || '');
             setVal('vmOutroCustomAudio', item.outroCustomAudio || '');
 
-            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Ausgewähltes Video bearbeiten';
-            const bName = document.getElementById('vmEditBannerName');
-            if (bName) bName.innerText = item.title || item.badge || 'Video';
+            if (document.getElementById('vmFormHeading')) document.getElementById('vmFormHeading').innerText = '2. Ausgewähltes Video bearbeiten (Auto-Speichern aktiv)';
+            const bText = document.getElementById('vmEditBannerText');
+            if (bText) bText.innerHTML = `<i class="fa-solid fa-pen"></i> Bearbeite Video: <strong id="vmEditBannerName">${window.escHtml(item.title || item.badge || 'Video')}</strong>`;
             document.getElementById('vmEditBanner')?.classList.add('active');
-            window._vmLastSelectedFile = null;
-            window._vmLastDetectedMeta = null;
-            if (document.getElementById('vmDetectedMetaBox')) document.getElementById('vmDetectedMetaBox').style.display = 'none';
-            window.syncQuickVideoAspectPills();
-            window.toggleCustomVideoAudioFields();
-            window.updateVideoStudioLivePreview();window._vmLastDetectedAspect = item.detectedAspect || (item.aspect !== 'auto' ? item.aspect : '9/16') || '9/16';
+            window._vmLastDetectedAspect = item.detectedAspect || (item.aspect !== 'auto' ? item.aspect : '9/16') || '9/16';
             window.syncQuickVideoAspectPills();
             window.toggleCustomVideoAudioFields();
             window.updateVideoStudioLivePreview();
             if (typeof window.syncAllMobileSelectDisplays === 'function') window.syncAllMobileSelectDisplays();
-            document.getElementById('vmPaneVideos')?.scrollTo({ top: 0, behavior: 'smooth' });
+            if (!skipScroll) document.getElementById('vmPaneVideos')?.scrollTo({ top: 150, behavior: 'smooth' });
+        };
+
+        window.duplicatePromoVideoItem = async function(id) {
+            const list = window.promoVideosConfig?.list || [];
+            const src = list.find(v => v.id === id);
+            if (!src) return;
+            const nextZone = window.getSuggestedNextVideoPlacement();
+            const copy = {
+                ...JSON.parse(JSON.stringify(src)),
+                id: 'vid-' + Date.now(),
+                placement: nextZone,
+                title: (src.title || 'RED Video') + ` (Nr. ${list.length + 1})`,
+                badge: `Video ${list.length + 1}`
+            };
+            list.push(copy);
+            await window.persistPromoVideosConfig();
+            window.editPromoVideoItem(copy.id);
+            window.showToast(`Neues separates Video #${list.length} angelegt!`, 'success');
         };
 
         window.movePromoVideoOrder = async function(id, delta) {
@@ -8507,6 +8867,44 @@ window.rvpBindDirectTap = function(el, onTap) {
                     window.showToast('Werbevideo entfernt.', 'success');
                 }
             );
+        };
+
+        window.renderVideoManagerList = function() {
+            const listEl = document.getElementById('vmVideosList');
+            const cntEl = document.getElementById('vmVideoCount');
+            const list = window.promoVideosConfig?.list || [];
+            if (cntEl) cntEl.innerText = String(list.length);
+            if (!listEl) return;
+            if (list.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:14px; font-size:12px; color:var(--text-muted);">Noch keine Werbevideos eingetragen – oben auf „Neues separates Video“ klicken.</div>';
+                return;
+            }
+            const curEditId = document.getElementById('vmEditId')?.value || '';
+            listEl.innerHTML = list.map((v, idx) => {
+                const qShort = (RVP_QUALITY_META[v.defaultQuality || '1080'] || RVP_QUALITY_META['1080']).short;
+                const vZone = v.placement || 'after-hero';
+                const optsHtml = window.RED_VIDEO_ZONES.map(z => `<option value="${z.key}" ${z.key === vZone ? 'selected' : ''}>${z.label}</option>`).join('');
+                return `
+                    <div class="pm-page-card" style="${v.id === curEditId ? 'border-left-color:#16a34a; background:rgba(22,163,74,0.06);' : ''}">
+                        <div class="pm-page-info">
+                            <strong><i class="fa-solid fa-film" style="color:var(--primary-red); margin-right:6px;"></i>Video ${idx + 1}: ${window.escHtml(v.title)}</strong>
+                            <span>${window.escHtml(v.badge || 'Video')} • ${qShort} • ${window.escHtml(v.aspect || '9/16')}</span>
+                            <div class="vm-card-pos-row">
+                                <select class="form-control vm-card-pos-select" onchange="window.changeVideoPlacementQuick('${v.id}', this.value)" title="Position dieses Videos sofort ändern">
+                                    ${optsHtml}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="pm-page-actions">
+                            ${idx > 0 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', -1)" title="Nach oben"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
+                            ${idx < list.length - 1 ? `<button type="button" class="apt-btn" onclick="window.movePromoVideoOrder('${v.id}', 1)" title="Nach unten"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
+                            <button type="button" class="apt-btn" onclick="window.duplicatePromoVideoItem('${v.id}')" title="Als weiteres separates Video duplizieren"><i class="fa-regular fa-copy"></i></button>
+                            <button type="button" class="apt-btn edit" onclick="window.editPromoVideoItem('${v.id}')" title="Bearbeiten"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" class="apt-btn delete" onclick="window.deletePromoVideoItem('${v.id}')" title="Löschen"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         };
 
         window.renderVideoManagerList = function() {

@@ -674,9 +674,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
                         placement: d.placement || 'after-hero',
                         autoplayMode: d.autoplayMode || 'muted-auto',
                         layoutMode: d.layoutMode || 'showcase',
+                        multiMode: d.multiMode || 'grid',
                         sectionEyebrow: d.sectionEyebrow || 'RED Berlin in Aktion',
                         list: Array.isArray(d.list) ? d.list : []
                     };
+                    if (typeof window.normalizePromoVideosConfig === 'function') {
+                        window.normalizePromoVideosConfig(window.promoVideosConfig);
+                    }
                     localStorage.setItem('red_promo_videos_v1', JSON.stringify(window.promoVideosConfig));
                     if (typeof window.renderPromoVideoShowcase === 'function') window.renderPromoVideoShowcase();
                     if (document.getElementById('videoManagerOverlay')?.classList.contains('open') && typeof window.renderVideoManagerList === 'function') {
